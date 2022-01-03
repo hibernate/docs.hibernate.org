@@ -1,0 +1,95 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>19.4.&nbsp;The Query Cache</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="performance.html" title="Chapter&nbsp;19.&nbsp;Improving performance">
+      <link rel="prev" href="performance-sessioncache.html" title="19.3.&nbsp;Managing the caches">
+      <link rel="next" href="performance-collections.html" title="19.5.&nbsp;Understanding Collection performance">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">19.4.&nbsp;The Query Cache</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="performance-sessioncache.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;19.&nbsp;Improving performance</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="performance-collections.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="performance-querycache"></a>19.4.&nbsp;The Query Cache
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+            Query result sets may also be cached. This is only useful for queries that are run
+                        frequently with the same parameters. To use the query cache you must first enable it:
+                    
+         </p><pre class="programlisting">hibernate.cache.use_query_cache true</pre><p>
+                        This setting causes the creation of two new cache regions - one holding cached query 
+                        result sets (<code class="literal">org.hibernate.cache.StandardQueryCache</code>), the other 
+                        holding timestamps of the most recent updates to queryable tables 
+                        (<code class="literal">org.hibernate.cache.UpdateTimestampsCache</code>). Note that the query
+                        cache does not cache the state of the actual entities in the result set; it caches 
+                        only identifier values and results of value type. So the query cache should always be
+                        used in conjunction with the second-level cache.
+                    
+         </p>
+         <p>
+                        Most queries do not benefit from caching, so by default queries are not cached. To
+                        enable caching, call <code class="literal">Query.setCacheable(true)</code>. This call allows
+                        the query to look for existing cache results or add its results to the cache when
+                        it is executed.
+                    
+         </p>
+         <p>
+                        If you require fine-grained control over query cache expiration policies, you may
+                        specify a named cache region for a particular query by calling 
+                        <code class="literal">Query.setCacheRegion()</code>.
+                    
+         </p><pre class="programlisting">List blogs = sess.createQuery("from Blog blog where blog.blogger = :blogger")
+    .setEntity("blogger", blogger)
+    .setMaxResults(15)
+    .setCacheable(true)
+    .setCacheRegion("frontpages")
+    .list();</pre><p>
+                        If the query should force a refresh of its query cache region, you should call
+                        <code class="literal">Query.setCacheMode(CacheMode.REFRESH)</code>. This is particularly useful 
+                        in cases where underlying data may have been updated via a separate process (i.e., 
+                        not modified through Hibernate) and allows the application to selectively refresh 
+                        particular query result sets. This is a more efficient alternative to eviction of 
+                        a query cache region via <code class="literal">SessionFactory.evictQueries()</code>.
+                    
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="performance-sessioncache.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="performance.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="performance-collections.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">19.3.&nbsp;Managing the caches&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;19.5.&nbsp;Understanding Collection performance</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

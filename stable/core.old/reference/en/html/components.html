@@ -1,0 +1,181 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>Chapter&nbsp;8.&nbsp;Component Mapping</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="prev" href="assoc-complex.html" title="7.6.&nbsp;More complex association mappings">
+      <link rel="next" href="components-incollections.html" title="8.2.&nbsp;Collections of dependent objects">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">Chapter&nbsp;8.&nbsp;Component Mapping</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="assoc-complex.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">&nbsp;</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="components-incollections.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="chapter" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title"><a name="components"></a>Chapter&nbsp;8.&nbsp;Component Mapping
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+                    The notion of a <span class="emphasis"><em>component</em></span> is re-used in several different contexts,
+                    for different purposes, throughout Hibernate.
+                
+         </p>
+         <div class="sect1" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="components-dependentobjects"></a>8.1.&nbsp;Dependent objects
+                     </h2>
+                  </div>
+               </div>
+            </div>
+            <p>
+               A component is a contained object that is persisted as a value type, not an entity
+                           reference. The term "component" refers to the object-oriented notion of composition
+                           (not to architecture-level components). For example, you might model a person like this:
+                       
+            </p><pre class="programlisting">public class Person {
+    private java.util.Date birthday;
+    private Name name;
+    private String key;
+    public String getKey() {
+        return key;
+    }
+    private void setKey(String key) {
+        this.key=key;
+    }
+    public java.util.Date getBirthday() {
+        return birthday;
+    }
+    public void setBirthday(java.util.Date birthday) {
+        this.birthday = birthday;
+    }
+    public Name getName() {
+        return name;
+    }
+    public void setName(Name name) {
+        this.name = name;
+    }
+    ......
+    ......
+}</pre><pre class="programlisting">public class Name {
+    char initial;
+    String first;
+    String last;
+    public String getFirst() {
+        return first;
+    }
+    void setFirst(String first) {
+        this.first = first;
+    }
+    public String getLast() {
+        return last;
+    }
+    void setLast(String last) {
+        this.last = last;
+    }
+    public char getInitial() {
+        return initial;
+    }
+    void setInitial(char initial) {
+        this.initial = initial;
+    }
+}</pre><p>
+                           Now <code class="literal">Name</code> may be persisted as a component of
+                           <code class="literal">Person</code>. Notice that <code class="literal">Name</code> defines getter
+                           and setter methods for its persistent properties, but doesn't need to declare
+                           any interfaces or identifier properties.
+                       
+            </p>
+            <p>
+                           Our Hibernate mapping would look like:
+                       
+            </p><pre class="programlisting">&lt;class name="eg.Person" table="person"&gt;
+    &lt;id name="Key" column="pid" type="string"&gt;
+        &lt;generator class="uuid"/&gt;
+    &lt;/id&gt;
+    &lt;property name="birthday" type="date"/&gt;
+    &lt;component name="Name" class="eg.Name"&gt; &lt;!-- class attribute optional --&gt;
+        &lt;property name="initial"/&gt;
+        &lt;property name="first"/&gt;
+        &lt;property name="last"/&gt;
+    &lt;/component&gt;
+&lt;/class&gt;</pre><p>
+                           The person table would have the columns <code class="literal">pid</code>,
+                           <code class="literal">birthday</code>,
+                           <code class="literal">initial</code>,
+                           <code class="literal">first</code> and
+                           <code class="literal">last</code>.
+                       
+            </p>
+            <p>
+                           Like all value types, components do not support shared references. In other words, two
+                           persons could have the same name, but the two person objects would contain two independent
+                           name ojects, only "the same" by value. The null value semantics of a component are
+                           <span class="emphasis"><em>ad hoc</em></span>. When reloading the containing object, Hibernate will assume
+                           that if all component columns are null, then the entire component is null. This should
+                           be okay for most purposes.
+                       
+            </p>
+            <p>
+                           The properties of a component may be of any Hibernate type (collections, many-to-one 
+                           associations, other components, etc). Nested components should <span class="emphasis"><em>not</em></span> 
+                           be considered an exotic usage. Hibernate is intended to support a very fine-grained 
+                           object model.
+                       
+            </p>
+            <p>
+                           The <code class="literal">&lt;component&gt;</code> element allows a <code class="literal">&lt;parent&gt;</code>
+                           subelement that maps a property of the component class as a reference back to the
+                           containing entity.
+                       
+            </p><pre class="programlisting">&lt;class name="eg.Person" table="person"&gt;
+    &lt;id name="Key" column="pid" type="string"&gt;
+        &lt;generator class="uuid"/&gt;
+    &lt;/id&gt;
+    &lt;property name="birthday" type="date"/&gt;
+    &lt;component name="Name" class="eg.Name" unique="true"&gt;
+        &lt;parent name="namedPerson"/&gt; &lt;!-- reference back to the Person --&gt;
+        &lt;property name="initial"/&gt;
+        &lt;property name="first"/&gt;
+        &lt;property name="last"/&gt;
+    &lt;/component&gt;
+&lt;/class&gt;</pre></div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="assoc-complex.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center">&nbsp;</td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="components-incollections.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">7.6.&nbsp;More complex association mappings&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;8.2.&nbsp;Collections of dependent objects</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

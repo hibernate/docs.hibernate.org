@@ -1,0 +1,51 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>Chapter&nbsp;6.&nbsp;Batch processing</title><link rel="stylesheet" href="../shared/css/html.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.65.1"><link rel="home" href="index.html" title="Hibernate EntityManager"><link rel="up" href="index.html" title="Hibernate EntityManager"><link rel="previous" href="listeners.html" title="Chapter&nbsp;5.&nbsp;Entity listeners and Callback methods"><link rel="next" href="queryhql.html" title="Chapter&nbsp;7.&nbsp;EJB-QL: The Object Query Language"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter&nbsp;6.&nbsp;Batch processing</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="listeners.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="queryhql.html">Next</a></td></tr></table><hr></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="batch"></a>Chapter&nbsp;6.&nbsp;Batch processing</h2></div></div><div></div></div><p>Batch processing has traditionally been difficult in full
+  object/relational mapping. ORM is all about object state management, which
+  implies that object state is available in memory. However, Hibernate has
+  some features to optimize batch processing which are discussed in the
+  Hibernate reference guide, however, EJB3 persistence differs
+  slightly.</p><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="batch-direct"></a>6.1.&nbsp;Bulk update/delete</h2></div></div><div></div></div><p>As already discussed, automatic and transparent object/relational
+    mapping is concerned with the management of object state. This implies
+    that the object state is available in memory, hence updating or deleting
+    (using SQL <tt class="literal">UPDATE</tt> and <tt class="literal">DELETE</tt>) data
+    directly in the database will not affect in-memory state. However,
+    Hibernate provides methods for bulk SQL-style <tt class="literal">UPDATE</tt>
+    and <tt class="literal">DELETE</tt> statement execution which are performed
+    through EJB-QL (<a href="queryhql.html" title="Chapter&nbsp;7.&nbsp;EJB-QL: The Object Query Language">Chapter&nbsp;7, <i>EJB-QL: The Object Query Language</i></a>).</p><p>The pseudo-syntax for <tt class="literal">UPDATE</tt> and
+    <tt class="literal">DELETE</tt> statements is: <tt class="literal">( UPDATE | DELETE )
+    FROM? ClassName (WHERE WHERE_CONDITIONS)?</tt>. Note that:</p><div class="itemizedlist"><ul type="disc" compact><li><p>In the from-clause, the FROM keyword is optional.</p></li><li><p>There can only be a single class named in the from-clause, and
+        it <span class="emphasis"><em>cannot</em></span> have an alias (this is a current
+        Hibernate limitation and will be removed soon).</p></li><li><p>No joins (either implicit or explicit) can be specified in a
+        bulk EJB-QL query. Sub-queries may be used in the where-clause.</p></li><li><p>The where-clause is also optional.</p></li></ul></div><p>As an example, to execute an EJB-QL <tt class="literal">UPDATE</tt>, use
+    the <tt class="literal">Query.executeUpdate()</tt> method:</p><pre class="programlisting">EntityManager entityManager = entityManagerFactory.createEntityManager();
+entityManager.getTransaction().begin();
+
+String ejbqlUpdate = "update Customer set name = :newName where name = :oldName"
+int updatedEntities = entityManager.createQuery( hqlUpdate )
+                            .setParameter( "newName", newName )
+                            .setParameter( "oldName", oldName )
+                            .executeUpdate();
+entityManager.getTransaction().commit();
+entityManager.close();</pre><p>To execute an EJB-QL <tt class="literal">DELETE</tt>, use the same
+    <tt class="literal">Query.executeUpdate()</tt> method (the method is named for
+    those familiar with JDBC's
+    <tt class="literal">PreparedStatement.executeUpdate()</tt>):</p><pre class="programlisting">EntityManager entityManager = entityManagerFactory.createEntityManager();
+entityManager.getTransaction().begin();
+
+String hqlDelete = "delete Customer where name = :oldName";
+int deletedEntities = entityManager.createQuery( hqlDelete )
+                            .setParameter( "oldName", oldName )
+                            .executeUpdate();
+entityManager.getTransaction().commit();
+entityManager.close();</pre><p>The <tt class="literal">int</tt> value returned by the
+    <tt class="literal">Query.executeUpdate()</tt> method indicate the number of
+    entities effected by the operation. This may or may not correlate with the
+    number of rows effected in the database. An EJB-QL bulk operation might
+    result in multiple actual SQL statements being executed, for
+    joined-subclass, for example. The returned number indicates the number of
+    actual entities affected by the statement. Going back to the example of
+    joined-subclass, a delete against one of the subclasses may actually
+    result in deletes against not just the table to which that subclass is
+    mapped, but also the "root" table and potentially joined-subclass tables
+    further down the inheritence hierarchy.</p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="listeners.html">Prev</a>&nbsp;</td><td width="20%" align="center"><a accesskey="u" href="index.html">Up</a></td><td width="40%" align="right">&nbsp;<a accesskey="n" href="queryhql.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter&nbsp;5.&nbsp;Entity listeners and Callback methods&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;Chapter&nbsp;7.&nbsp;EJB-QL: The Object Query Language</td></tr></table></div></body></html>

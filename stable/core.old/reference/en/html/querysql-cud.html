@@ -1,0 +1,111 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>16.3.&nbsp;Custom SQL for create, update and delete</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="querysql.html" title="Chapter&nbsp;16.&nbsp;Native SQL">
+      <link rel="prev" href="querysql-namedqueries.html" title="16.2.&nbsp;Named SQL queries">
+      <link rel="next" href="querysql-load.html" title="16.4.&nbsp;Custom SQL for loading">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">16.3.&nbsp;Custom SQL for create, update and delete</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="querysql-namedqueries.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;16.&nbsp;Native SQL</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="querysql-load.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="querysql-cud"></a>16.3.&nbsp;Custom SQL for create, update and delete
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Hibernate3 can use custom SQL statements for create, update, and
+            delete operations. The class and collection persisters in Hibernate
+                already contain a set of configuration time generated strings (insertsql,
+                deletesql, updatesql etc.). The mapping tags
+                <code class="literal">&lt;sql-insert&gt;</code>,
+                <code class="literal">&lt;sql-delete&gt;</code>, and
+                <code class="literal">&lt;sql-update&gt;</code> override these strings:
+         </p><pre class="programlisting">&lt;class name="Person"&gt;
+    &lt;id name="id"&gt;
+        &lt;generator class="increment"/&gt;
+    &lt;/id&gt;
+    &lt;property name="name" not-null="true"/&gt;
+    &lt;sql-insert&gt;INSERT INTO PERSON (NAME, ID) VALUES ( UPPER(?), ? )&lt;/sql-insert&gt;
+    &lt;sql-update&gt;UPDATE PERSON SET NAME=UPPER(?) WHERE ID=?&lt;/sql-update&gt;
+    &lt;sql-delete&gt;DELETE FROM PERSON WHERE ID=?&lt;/sql-delete&gt;
+&lt;/class&gt;</pre><p>The SQL is directly executed in your database, so you are free to
+                use any dialect you like. This will of course reduce the portability of
+                your mapping if you use database specific SQL.
+         </p>
+         <p>Stored procedures are supported if the <code class="literal">callable</code>
+                attribute is set:
+         </p><pre class="programlisting">&lt;class name="Person"&gt;
+    &lt;id name="id"&gt;
+        &lt;generator class="increment"/&gt;
+    &lt;/id&gt;
+    &lt;property name="name" not-null="true"/&gt;
+    &lt;sql-insert callable="true"&gt;{call createPerson (?, ?)}&lt;/sql-insert&gt;
+    &lt;sql-delete callable="true"&gt;{? = call deletePerson (?)}&lt;/sql-delete&gt;
+    &lt;sql-update callable="true"&gt;{? = call updatePerson (?, ?)}&lt;/sql-update&gt;
+&lt;/class&gt;</pre><p>The order of the positional parameters are currently vital, as they
+                must be in the same sequence as Hibernate expects them.
+         </p>
+         <p>You can see the expected order by enabling debug logging for the
+                <code class="literal">org.hibernate.persister.entity</code> level. With this level
+                enabled Hibernate will print out the static SQL that is used to create,
+                update, delete etc. entities. (To see the expected sequence, remember to
+                not include your custom SQL in the mapping files as that will override the
+                Hibernate generated static sql.)
+         </p>
+         <p>The stored procedures are in most cases (read: better do it than
+                not) required to return the number of rows inserted/updated/deleted, as
+                Hibernate has some runtime checks for the success of the statement.
+                Hibernate always registers the first statement parameter as a numeric
+                output parameter for the CUD operations:
+         </p><pre class="programlisting">CREATE OR REPLACE FUNCTION updatePerson (uid IN NUMBER, uname IN VARCHAR2)
+    RETURN NUMBER IS
+BEGIN
+
+    update PERSON
+    set
+        NAME = uname,
+    where
+        ID = uid;
+
+    return SQL%ROWCOUNT;
+
+END updatePerson;</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="querysql-namedqueries.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="querysql.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="querysql-load.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">16.2.&nbsp;Named SQL queries&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;16.4.&nbsp;Custom SQL for loading</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

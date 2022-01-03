@@ -1,0 +1,116 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>10.9.&nbsp;Replicating object between two different datastores</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="objectstate.html" title="Chapter&nbsp;10.&nbsp;Working with objects">
+      <link rel="prev" href="objectstate-deleting.html" title="10.8.&nbsp;Deleting persistent objects">
+      <link rel="next" href="objectstate-flushing.html" title="10.10.&nbsp;Flushing the Session">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">10.9.&nbsp;Replicating object between two different datastores</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="objectstate-deleting.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;10.&nbsp;Working with objects</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="objectstate-flushing.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="objectstate-replicating"></a>10.9.&nbsp;Replicating object between two different datastores
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+                	    It is occasionally useful to be able to take a graph of persistent instances
+                	    and make them persistent in a different datastore, without regenerating identifier
+                	    values.
+                	
+         </p><pre class="programlisting">//retrieve a cat from one database
+Session session1 = factory1.openSession();
+Transaction tx1 = session1.beginTransaction();
+Cat cat = session1.get(Cat.class, catId);
+tx1.commit();
+session1.close();
+
+//reconcile with a second database
+Session session2 = factory2.openSession();
+Transaction tx2 = session2.beginTransaction();
+session2.replicate(cat, ReplicationMode.LATEST_VERSION);
+tx2.commit();
+session2.close();</pre><p>
+                        The <code class="literal">ReplicationMode</code> determines how <code class="literal">replicate()</code>
+                        will deal with conflicts with existing rows in the database.
+                    
+         </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p>
+                                         <code class="literal">ReplicationMode.IGNORE</code> - ignore the object when there is
+                                         an existing database row with the same identifier
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         <code class="literal">ReplicationMode.OVERWRITE</code> - overwrite any existing database 
+                                         row with the same identifier
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         <code class="literal">ReplicationMode.EXCEPTION</code> - throw an exception if there is
+                                         an existing database row with the same identifier
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         <code class="literal">ReplicationMode.LATEST_VERSION</code> - overwrite the row if its
+                                         version number is earlier than the version number of the object, or ignore
+                                         the object otherwise
+                                     
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p>
+                        Usecases for this feature include reconciling data entered into different database
+                        instances, upgrading system configuration information during product upgrades,
+                        rolling back changes made during non-ACID transactions and more.
+                    
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="objectstate-deleting.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="objectstate.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="objectstate-flushing.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">10.8.&nbsp;Deleting persistent objects&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;10.10.&nbsp;Flushing the Session</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

@@ -1,0 +1,104 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>2.3.&nbsp;JMX Integration</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="architecture.html" title="Chapter&nbsp;2.&nbsp;Architecture">
+      <link rel="prev" href="architecture-states.html" title="2.2.&nbsp;Instance states">
+      <link rel="next" href="architecture-jca.html" title="2.4.&nbsp;JCA Support">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">2.3.&nbsp;JMX Integration</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="architecture-states.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;2.&nbsp;Architecture</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="architecture-jca.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="architecture-jmx"></a>2.3.&nbsp;JMX Integration
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+            JMX is the J2EE standard for management of Java components. Hibernate may be managed via
+             a JMX standard service. We provide an MBean implementation in the distribution,
+                        <code class="literal">org.hibernate.jmx.HibernateService</code>.
+                    
+         </p>
+         <p>
+                        For an example how to deploy Hibernate as a JMX service on the JBoss Application Server,
+                        please see the JBoss User Guide. On JBoss AS, you also get these benefits if you deploy
+                        using JMX:
+                    
+         </p>
+         <div class="itemizedlist">
+            <ul type="disc">
+               <li>
+                  <p>
+                                         <span class="emphasis"><em>Session Management:</em></span> The Hibernate <code class="literal">Session</code>'s life cycle
+                                         can be automatically bound to the scope of a JTA transaction. This means you no
+                                         longer have to manually open and close the <code class="literal">Session</code>, this
+                                         becomes the job of a JBoss EJB interceptor. You also don't have to worry about
+                                         transaction demarcation in your code anymore (unless you'd like to write a portable
+                                         persistence layer of course, use the optional Hibernate <code class="literal">Transaction</code>
+                                         API for this). You call the <code class="literal">HibernateContext</code> to access a
+                                         <code class="literal">Session</code>.
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         <span class="emphasis"><em>HAR deployment:</em></span> Usually you deploy the Hibernate JMX service using a JBoss
+                                         service deployment descriptor (in an EAR and/or SAR file), it supports all the usual
+                                         configuration options of a Hibernate <code class="literal">SessionFactory</code>. However, you still
+                                         have to name all your mapping files in the deployment descriptor. If you decide to use
+                                         the optional HAR deployment, JBoss will automatically detect all mapping files in your
+                                         HAR file.
+                                     
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p>
+                        Consult the JBoss AS user guide for more information about these options.
+                    
+         </p>
+         <p>
+                        Another feature available as a JMX service are runtime Hibernate statistics. See
+                        <a href="configuration-optional.html#configuration-optional-statistics" title="3.4.6.&nbsp;Hibernate statistics">Section&nbsp;3.4.6, &#8220;Hibernate statistics&#8221;</a>.
+                    
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="architecture-states.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="architecture.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="architecture-jca.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">2.2.&nbsp;Instance states&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;2.4.&nbsp;JCA Support</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

@@ -1,0 +1,606 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory">TCK Reference Guide for JSR 349: Bean Validation</title><link rel="stylesheet" href="css/hibernate-single.css" type="text/css"/><meta xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" name="generator" content="DocBook XSL Stylesheets V1.74.0"/></head><body><div class="book" lang="en-US"><div class="titlepage"><div><p id="title"><a href="http://www.hibernate.org" class="site_href"><strong>Hibernate.org</strong></a><a href="http://hibernate.org/Documentation/DocumentationOverview" class="doc_href"><strong>Community Documentation</strong></a></p><div><h1 class="title"><a id="d0e1"/>TCK Reference Guide for JSR 349: Bean Validation</h1></div><div><div xmlns="" xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="authorgroup"><div class="authors">by <span xmlns="http://www.w3.org/1999/xhtml" class="corpauthor">Red Hat, Inc. (Specification Lead)</span>, <span xmlns="http://www.w3.org/1999/xhtml" class="firstname">Emmanuel Bernard</span> <span xmlns="http://www.w3.org/1999/xhtml" class="orgname">Red Hat, Inc.</span>, and <span xmlns="http://www.w3.org/1999/xhtml" class="firstname">Hardy Ferentschik</span> <span xmlns="http://www.w3.org/1999/xhtml" class="orgname">Red Hat, Inc.</span></div><div class="editors"/><div class="others"/></div></div><div><p class="releaseinfo">1.1.4.Final</p></div><div><p class="copyright">Copyright © 2009 - 2014 Red Hat, Inc.</p></div></div><hr/></div><div class="toc"><dl><dt><span class="preface"><a href="#book-preface">Preface</a></span></dt><dd><dl><dt><span class="section"><a href="#target-audience">1. Who Should Use This Guide</a></span></dt><dt><span class="section"><a href="#before-reading">2. Before You Read This Guide</a></span></dt><dt><span class="section"><a href="#book-organization">3. How This Guide Is Organized</a></span></dt></dl></dd><dt><span class="chapter"><a href="#introduction">1. Introduction</a></span></dt><dd><dl><dt><span class="section"><a href="#primer">1.1. TCK Primer</a></span></dt><dt><span class="section"><a href="#d0e108">1.2. Compatibility Testing</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e117">1.2.1. Why Compatibility Is Important</a></span></dt></dl></dd><dt><span class="section"><a href="#d0e137">1.3. About the Bean Validation TCK</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e149">1.3.1. TCK Components</a></span></dt><dt><span class="section"><a href="#passing-the-tck">1.3.2. Passing the Bean Validation TCK</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="#appeals-process">2. Appeals Process</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e213">2.1. Who can make challenges to the TCK?</a></span></dt><dt><span class="section"><a href="#d0e218">2.2. What challenges to the TCK may be submitted?</a></span></dt><dt><span class="section"><a href="#d0e234">2.3. How these challenges are submitted?</a></span></dt><dt><span class="section"><a href="#d0e252">2.4. How and by whom challenges are addressed?</a></span></dt><dt><span class="section"><a href="#d0e265">2.5. How accepted challenges to the TCK are managed?</a></span></dt></dl></dd><dt><span class="chapter"><a href="#installation">3. Installation</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e277">3.1. Obtaining the Software</a></span></dt><dt><span class="section"><a href="#tck-environment">3.2. The TCK Environment</a></span></dt></dl></dd><dt><span class="chapter"><a href="#reporting">4. Reports</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e402">4.1. Bean Validation TCK Coverage Report</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e409">4.1.1. Bean Validation TCK Assertions</a></span></dt><dt><span class="section"><a href="#d0e438">4.1.2. The Coverage Report</a></span></dt></dl></dd><dt><span class="section"><a href="#d0e511">4.2. The TestNG Report</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e516">4.2.1. Maven 2, Surefire and TestNG</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="#configuration">5. Running the TCK test suite</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e541">5.1. Setup examples</a></span></dt><dt><span class="section"><a href="#d0e570">5.2. Configuring TestNG to execute the TCK</a></span></dt><dt><span class="section"><a href="#d0e593">5.3. Selecting the ValidationProvider</a></span></dt><dt><span class="section"><a href="#configuration-deployable-container">5.4. Selecting the DeployableContainer</a></span></dt><dt><span class="section"><a href="#configuration-arquillian-xml">5.5. arquillian.xml</a></span></dt></dl></dd><dt><span class="chapter"><a href="#sigtest">6. Running the Signature Test</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e696">6.1. Obtaining the sigtest tool</a></span></dt><dt><span class="section"><a href="#d0e710">6.2. Creating the signature file</a></span></dt><dt><span class="section"><a href="#d0e733">6.3. Running the signature test</a></span></dt><dt><span class="section"><a href="#d0e745">6.4. Forcing a signature test failure</a></span></dt></dl></dd></dl></div><div class="preface" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="book-preface"/>Preface</h2></div></div></div><p>This guide describes how to download, install, configure, and run the
+  Technology Compatibility Kit (TCK) used to verify the compatibility of an
+  implementation of JSR 349: Bean Validation 1.1.</p><p>The Bean Validation TCK is built atop <a class="ulink" href="http://www.jboss.org/arquillian.html">Arquillian</a>, a portable
+  and configurable automated test suite for authoring unit and integration
+  tests in a Java EE environment.</p><p>The Bean Validation TCK is provided under the <a class="ulink" href="http://www.apache.org/licenses/LICENSE-2.0">Apache Public License
+  2.0</a>.</p><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="target-audience"/>1. Who Should Use This Guide</h2></div></div></div><p>This guide is for implementors of the Bean Validation specification
+    to assist in running the test suite that verifies the compatibility of
+    their implementation.</p></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="before-reading"/>2. Before You Read This Guide</h2></div></div></div><p>The Bean Validation TCK is based on the Bean Validation
+    specification 1.1 (JSR 349). Information about the specification can
+    be found on the <a class="ulink" href="http://jcp.org/en/jsr/detail?id=303">JSR-349
+    JCP page</a>.</p></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="book-organization"/>3. How This Guide Is Organized</h2></div></div></div><p>If you are running the Bean Validation TCK for the first time, read
+    <a class="xref" href="#introduction" title="Chapter 1. Introduction">Chapter 1, <i>Introduction</i></a> completely for the necessary background
+    information about the TCK. Once you have reviewed that material, perform
+    the steps outlined in the remaining chapters.</p><div class="itemizedlist"><ul><li><p><a class="xref" href="#introduction" title="Chapter 1. Introduction">Chapter 1, <i>Introduction</i></a> gives an overview of the
+        principles that apply generally to all Technology Compatibility Kits
+        (TCKs), outlines the appeals process and describes the Bean Validation
+        TCK architecture and components.</p></li><li><p><a class="xref" href="#appeals-process" title="Chapter 2. Appeals Process">Chapter 2, <i>Appeals Process</i></a> explains the process to be
+        followed by an implementor should they wish to challenge any test in
+        the TCK.</p></li><li><p><a class="xref" href="#installation" title="Chapter 3. Installation">Chapter 3, <i>Installation</i></a> explains where to obtain the
+        required software for the Bean Validation TCK and how to install
+        it.</p></li><li><p><a class="xref" href="#reporting" title="Chapter 4. Reports">Chapter 4, <i>Reports</i></a> explains the test reports that are
+        generated by the TCK test suite and introduces the TCK audit report as
+        a tool for measuring the completeness of the TCK in testing the
+        JSR 349 specification and in understanding how test cases relate
+        to the specification.</p></li><li><p><a class="xref" href="#configuration" title="Chapter 5. Running the TCK test suite">Chapter 5, <i>Running the TCK test suite</i></a> details the configuration of the
+        test harness and documents how to create a TCK runner for executing
+        the TCK test suite, either in standalone or container mode.</p></li><li><p><a class="xref" href="#sigtest" title="Chapter 6. Running the Signature Test">Chapter 6, <i>Running the Signature Test</i></a> finally documents how to use the
+        SigTest tool for ensuring compatibility of types provided in the
+        package <span class="package">javax.validation.*</span> with the official API
+        signature defined by the specification.</p></li></ul></div></div></div><div class="chapter" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="introduction"/>Chapter 1. Introduction</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="#primer">1.1. TCK Primer</a></span></dt><dt><span class="section"><a href="#d0e108">1.2. Compatibility Testing</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e117">1.2.1. Why Compatibility Is Important</a></span></dt></dl></dd><dt><span class="section"><a href="#d0e137">1.3. About the Bean Validation TCK</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e149">1.3.1. TCK Components</a></span></dt><dt><span class="section"><a href="#passing-the-tck">1.3.2. Passing the Bean Validation TCK</a></span></dt></dl></dd></dl></div><p>This chapter explains the purpose of a TCK and identifies the
+  foundation elements of the Bean Validation TCK.</p><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="primer"/>1.1. TCK Primer</h2></div></div></div><p>A TCK, or Technology Compatibility Kit, is one of the three required
+    pieces for any JSR (the other two being the specification document and the
+    reference implementation). The TCK is a set of tools and tests to verify
+    that an implementation of the technology conforms to the specification.
+    The tests are the primary component, but the tools serve an equally
+    critical role of providing a framework and/or set of SPIs for executing
+    the tests.</p><p>The tests in the TCK are derived from assertions in the written
+    specification document. The assertions are itemized in an XML document
+    (<code class="filename">tck-audit.xml</code>), where they each get assigned a
+    unique identifier, and materialize as a suite of automated tests that
+    collectively validate whether an implementation complies with the
+    aforementioned assertions, and in turn the specification. For a particular
+    implementation to be certified, all of the required tests must pass
+    (meaning the provided test suite must be run unmodified).</p><p>A TCK is entirely implementation agnostic. It should validate
+    assertions by consulting the specification's public API.</p></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="d0e108"/>1.2. Compatibility Testing</h2></div></div></div><p>The goal of any specification is to eliminate portability problems
+    so long as the program which uses the implementation also conforms to the
+    rules laid out in the specification.</p><p>Executing the TCK is a form of compatibility testing. It's important
+    to understand that compatibility testing is distinctly different from
+    product testing. The TCK is not concerned with robustness, performance or
+    ease of use, and therefore cannot vouch for how well an implementation
+    meets these criteria. What a TCK can do is to ensure the exactness of an
+    implementation as it relates to the specification.</p><p>Compatibility testing of any feature relies on both a complete
+    specification and a complete reference implementation. The reference
+    implementation demonstrates how each test can be passed and provides
+    additional context to the implementor during development for the
+    corresponding assertion.</p><div class="section" lang="en-US"><div class="titlepage"><div><div><h3 class="title"><a id="d0e117"/>1.2.1. Why Compatibility Is Important</h3></div></div></div><p>Java platform compatibility is important to different groups
+      involved with Java technologies for different reasons:</p><div class="itemizedlist"><ul><li><p>Compatibility testing is the means by which the JCP ensures
+          that the Java platform does not become fragmented as it is ported to
+          different operating systems and hardware.</p></li><li><p>Compatibility testing benefits developers working in the Java
+          programming language, enabling them to write applications once and
+          deploy them across heterogeneous computing environments without
+          porting.</p></li><li><p>Compatibility testing enables application users to obtain
+          applications from disparate sources and deploy them with
+          confidence.</p></li><li><p>Conformance testing benefits Java platform implementors by
+          ensuring the same extent of reliability for all Java platform
+          ports.</p></li></ul></div><p>The Bean Validation specification goes to great lengths to ensure
+      that programs written for Java EE are compatible and the TCK is rigorous
+      about enforcing the rules the specification lays down.</p></div></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="d0e137"/>1.3. About the Bean Validation TCK</h2></div></div></div><p>The Bean Validation TCK is designed as a portable, configurable and
+    automated test suite for verifying the compatibility of an implementation
+    of JSR 349. The test suite is built atop TestNG and provides a series
+    of extensions that allow runtime packaging and deployment of JEE artifacts
+    for in-container testing (Arquillian).</p><p>Each test class in the suite acts as a deployable unit. The
+    deployable units, or artifacts, are defined in a declarative way using
+    annotations.</p><p>The declarative approach allows many of the tests to be executed in
+    a standalone implementation of Bean Validation, accounting for a boost in
+    developer productivity. However, an implementation is only valid if all
+    tests pass using the in-container execution mode. The standalone mode is
+    merely a developer convenience.</p><div xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="note"><h2>Note</h2><p>The reason the Bean Validation TCK must pass running in a EE
+        container is that Bean Validation is part of Java EE 7 itself.</p></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h3 class="title"><a id="d0e149"/>1.3.1. TCK Components</h3></div></div></div><p>The Bean Validation TCK includes the following components:</p><div class="itemizedlist"><ul><li><p><span class="bold"><strong>The test suite</strong></span>, which is a
+          collection of TestNG tests, the TestNG test suite descriptor and
+          supplemental resources that configure Bean Validation and other
+          software components.</p></li><li><p><span class="bold"><strong>The TCK audit</strong></span>
+          (<code class="filename">tck-audit.xml</code>) used to list out the assertions
+          identified in the Bean Validation specification. It matches the
+          assertions to test cases in the test suite by unique identifier and
+          produces a coverage report.</p><p>The audit document is provided along with the TCK. Each
+          assertion is defined with a reference to a chapter, section and
+          paragraph from the specification document, making it easy for the
+          implementor to locate the language in the specification document
+          that supports the feature being tested.</p></li><li><p><span class="bold"><strong>TCK documentation</strong></span> accompanied
+          by release notes identifying updates between versions.</p></li><li><p><span class="bold"><strong>TCK Container Adapter</strong></span>
+          provided as a convenience for developers in order to run and debug
+          tests outside of the EE container.</p></li><li><p><span class="bold"><strong>Setup examples</strong></span> demonstrating
+          Maven and Ant setups to run the TCK test suite</p></li></ul></div></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h3 class="title"><a id="passing-the-tck"/>1.3.2. Passing the Bean Validation TCK</h3></div></div></div><p>In order to pass the Bean Validation TCK (which is one requirement
+      for becoming a certified Bean Validation provider), you need to:</p><div class="itemizedlist"><ul><li><p>Pass the Bean Validation signature tests (see <a class="xref" href="#sigtest" title="Chapter 6. Running the Signature Test">Chapter 6, <i>Running the Signature Test</i></a>) asserting the correctness of the Bean
+          Validation API used.</p></li><li><p>Run and pass the test suite (see <a class="xref" href="#configuration" title="Chapter 5. Running the TCK test suite">Chapter 5, <i>Running the TCK test suite</i></a>). The test must be run within an EE 7
+          container and pass with an unmodified TestNG suite file.</p></li></ul></div><div xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="note"><h2>Note</h2><p>The designated reference runtime for compatibility testing of
+        the Bean Validation specification is the Sun Java Platform, Enterprise
+        Edition (Java EE) 7 reference implementation (RI), aka Glassfish
+        4.</p></div></div></div></div><div class="chapter" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="appeals-process"/>Chapter 2. Appeals Process</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="#d0e213">2.1. Who can make challenges to the TCK?</a></span></dt><dt><span class="section"><a href="#d0e218">2.2. What challenges to the TCK may be submitted?</a></span></dt><dt><span class="section"><a href="#d0e234">2.3. How these challenges are submitted?</a></span></dt><dt><span class="section"><a href="#d0e252">2.4. How and by whom challenges are addressed?</a></span></dt><dt><span class="section"><a href="#d0e265">2.5. How accepted challenges to the TCK are managed?</a></span></dt></dl></div><p>While the Bean Validation TCK is rigourous about enforcing an
+  implementation's conformance to the JSR 349 specification, it's
+  reasonable to assume that an implementor may discover new and/or better ways
+  to validate the assertions. This chapter covers the appeals process, defined
+  by the Specification Lead, Red Hat, Inc., which allows implementors of the
+  JSR 349 specification to challenge one or more tests defined by the
+  Bean Validation TCK.</p><p>The appeals process identifies who can make challenges to the TCK,
+  what challenges to the TCK may be submitted, how these challenges are
+  submitted, how and by whom challenges are addressed and how accepted
+  challenges to the TCK are managed.</p><p>Following the recent adoption of transparency in the JCP, implementors
+  are encouraged to make their appeals public, which this process facilitates.
+  The JCP community should recognize that issue reports are a central aspect
+  of any good software and it's only natural to point out shortcomings and
+  strive to make improvements. Despite this good faith, not all implementors
+  will be comfortable with a public appeals process. Instructions about how to
+  make a private appeal are therefore provided.</p><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="d0e213"/>2.1. Who can make challenges to the TCK?</h2></div></div></div><p>Any implementor may submit an appeal to challenge one or more tests
+    in the Bean Validation TCK. In fact, members of the JSR 349 Expert
+    Group (EG) encourage this level of participation.</p></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="d0e218"/>2.2. What challenges to the TCK may be submitted?</h2></div></div></div><p>Any test case (i.e. <code class="classname">@Test</code> method), test case
+    configuration (e.g. <code class="classname">@Deployment</code>, validation.xml),
+    test entities, annotations and other resources may be challenged by an
+    appeal.</p><p>What is generally not challengeable are the assertions made by the
+    specification. The specification document is controlled by a separate
+    process and challenges to it should be handled through the JSR 349 EG
+    by sending an e-mail to <a class="ulink" href="beanvalidation-tck@redhat.com">beanvalidation-tck@redhat.com</a>.</p></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="d0e234"/>2.3. How these challenges are submitted?</h2></div></div></div><p>To submit a challenge, a new issue of type Bug should be created
+    against <a class="ulink" href="https://hibernate.atlassian.net/browse/BVTCK">BVTCK</a> in the
+    Hibernate JIRA instance. The appellant should complete the Summary,
+    Component (TCK Appeal), Environment and Description fields only. Any
+    communication regarding the issue should be added in the comments of the
+    issue for accurate record.</p><p>To submit an issue in the Hibernate JIRA, you must have a (free)
+    JIRA member account. You can create a member account using the <a class="ulink" href="https://hibernate.atlassian.net/secure/Signup!default.jspa">on-line
+    registration</a>.</p><p>If you wish to make a private challenge, you should follow the above
+    procedure, setting the Security Level to Private. Only the issue reporter,
+    TCK Project Lead and designates will be able to view the issue. Should
+    there be need for clarification or discussions before actually entering a
+    bug into the issue tracker, an email can be sent to <a class="ulink" href="mailto:beanvalidation-tck@redhat.com">beanvalidation-tck@redhat.com</a>.</p></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="d0e252"/>2.4. How and by whom challenges are addressed?</h2></div></div></div><p>The challenges will be addressed in a timely fashion by the Bean
+    Validation TCK Project Lead, as designated by Specification Lead, Red Hat,
+    Inc. or his/her designate. The appellant can also monitor the process by
+    watching the issue filed against <a class="ulink" href="https://hibernate.atlassian.net/browse/BVTCK">BVTCK</a>.</p><p>The current TCK Project Lead is listed on the <a class="ulink" href="https://hibernate.atlassian.net/browse/BVTCK">BVTCK
+    Project Summary Page</a>.</p></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="d0e265"/>2.5. How accepted challenges to the TCK are managed?</h2></div></div></div><p>Accepted challenges will be acknowledged via the filed issue's
+    comment section. Communication between the Bean Validation TCK Project
+    Lead and the appellant will take place via the issue comments. The issue's
+    status will be set to "Resolved" when the TCK project lead believes the
+    issue to be resolved. The appellant should, within 30 days, either close
+    the issue if they agree, or reopen the issue if they do not believe the
+    issue to be resolved.</p><p>Resolved issue not addressed for 30 days will be closed by the TCK
+    Project Lead. If the TCK Project Lead and appellant are unable to agree on
+    the issue resolution, it will be referred to the JSR 349
+    specification lead or his/her designate.</p></div></div><div class="chapter" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="installation"/>Chapter 3. Installation</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="#d0e277">3.1. Obtaining the Software</a></span></dt><dt><span class="section"><a href="#tck-environment">3.2. The TCK Environment</a></span></dt></dl></div><p>This chapter explains how to obtain the TCK and supporting software
+  and provides recommendations for how to install/extract it on your
+  system.</p><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="d0e277"/>3.1. Obtaining the Software</h2></div></div></div><p>You can obtain a release of the Bean Validation TCK project via the
+    official <a class="ulink" href="http://beanvalidation.org/1.1/tck/">Bean Validation
+    home page</a>. The Bean Validation TCK is distributed as a ZIP file,
+    which contains the TCK artifacts (the test suite binary and source, the
+    test suite descriptor, the audit source and report), the TCK library
+    dependencies in <code class="code">/lib</code> and documentation in <code class="code">/doc</code>.
+    The contents should look like:</p><pre class="programlisting">artifacts/
+changelog.txt
+docs/
+lib/
+license.txt
+setup-examples/
+src/
+readme.md
+</pre><p>You can also download the source code from GitHub - <a class="ulink" href="https://github.com/beanvalidation/beanvalidation-tck">https://github.com/beanvalidation/beanvalidation-tck</a>.</p><p>The JSR 349 reference implementation (RI) project is named
+    Hibernate Validator. You can obtain the Hibernate Validator release used
+    as reference implementation from the Hibernate Validator <a class="ulink" href="http://www.hibernate.org/subprojects/validator/download">download
+    page</a>.</p><div xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="note"><h2>Note</h2><p>Hibernate Validator is not required for running the Bean
+      Validation TCK, but it can be used as a reference for familiarizing
+      yourself with the TCK before testing your own Bean Validation
+      implementation.</p></div></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="tck-environment"/>3.2. The TCK Environment</h2></div></div></div><p>The TCK requires the following two Java runtime environments:</p><div class="itemizedlist"><ul><li><p>Java 6 or better</p></li><li><p>Java EE 7 or better (e.g. Glassfish 4)</p></li></ul></div><p>You should refer to vendor instructions for how to install the
+    runtime.</p><p>The rest of the TCK software can simply be extracted. It's
+    recommended that you create a dedicated folder to hold all of the
+    jsr349-related artifacts. This guide assumes the folder is called
+    <code class="filename">jsr349</code>. Extract the <code class="filename">src</code> folder
+    of the TCK distribution into a sub-folder named <code class="filename">tck</code>
+    or use the following git commands:</p><pre class="programlisting">git clone git://github.com/beanvalidation/beanvalidation-tck tck
+git checkout 1.1.0.Final</pre><p>You can also check out the full
+    Hibernate Validator source into a subfolder ri. This will allow you to run
+    the TCK against Hibernate Validator.</p><pre class="programlisting">git clone git://github.com/hibernate/hibernate-validator.git ri
+git checkout 5.0.0.Final</pre><p>The resulting folder structure is shown here:</p><pre class="programlisting">jsr349/
+   ri/
+   tck/</pre><p>Now lets have a look at one concrete test of the TCK, namely
+    <code class="filename">ConstraintInheritanceTest</code> (found in
+    <code class="filename">tck/tests/src/main/java/org/hibernate/beanvalidation/tck/tests/constraints/inheritance/ConstraintInheritanceTest.java</code>):</p><pre class="programlisting">package org.hibernate.beanvalidation.tck.tests.constraints.inheritance;
+
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import javax.validation.metadata.BeanDescriptor;
+import javax.validation.metadata.ConstraintDescriptor;
+import javax.validation.metadata.PropertyDescriptor;
+
+import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.testng.Arquillian;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.test.audit.annotations.SpecAssertion;
+import org.jboss.test.audit.annotations.SpecAssertions;
+import org.jboss.test.audit.annotations.SpecVersion;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+import org.hibernate.beanvalidation.tck.util.TestUtil;
+import org.hibernate.beanvalidation.tck.util.shrinkwrap.WebArchiveBuilder;
+
+import static org.hibernate.beanvalidation.tck.util.TestUtil.assertCorrectConstraintTypes;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+
+/**
+ * @author Hardy Ferentschik
+ */
+@SpecVersion(spec = "beanvalidation", version = "1.1.0")
+public class ConstraintInheritanceTest extends Arquillian {
+
+    private Validator validator;
+
+    @Deployment
+    public static WebArchive createTestArchive() {
+        return new WebArchiveBuilder()
+                .withTestClassPackage( ConstraintInheritanceTest.class )
+                .build();
+    }
+
+    @BeforeMethod
+    public void setupValidator() {
+        validator = TestUtil.getValidatorUnderTest();
+    }
+
+    @Test
+    @SpecAssertion(section = "4.3", id = "b")
+    public void testConstraintsOnSuperClassAreInherited() {
+        BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Bar.class );
+
+        String propertyName = "foo";
+        assertTrue( beanDescriptor.getConstraintsForProperty( propertyName ) != null );
+        PropertyDescriptor propDescriptor = beanDescriptor.getConstraintsForProperty( propertyName );
+
+        Annotation constraintAnnotation = propDescriptor.getConstraintDescriptors()
+                .iterator()
+                .next().getAnnotation();
+        assertTrue( constraintAnnotation.annotationType() == NotNull.class );
+    }
+
+    @Test
+    @SpecAssertions({
+            @SpecAssertion(section = "4.3", id = "a"),
+            @SpecAssertion(section = "4.3", id = "b")
+    })
+    public void testConstraintsOnInterfaceAreInherited() {
+        BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Bar.class );
+
+        String propertyName = "fubar";
+        assertTrue( beanDescriptor.getConstraintsForProperty( propertyName ) != null );
+        PropertyDescriptor propDescriptor = beanDescriptor.getConstraintsForProperty( propertyName );
+
+        Annotation constraintAnnotation = propDescriptor.getConstraintDescriptors()
+                .iterator()
+                .next().getAnnotation();
+        assertTrue( constraintAnnotation.annotationType() == NotNull.class );
+    }
+
+    @Test
+    @SpecAssertions({
+            @SpecAssertion(section = "4.3", id = "a"),
+            @SpecAssertion(section = "4.3", id = "c")
+    })
+    public void testConstraintsOnInterfaceAndImplementationAddUp() {
+        BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Bar.class );
+
+        String propertyName = "name";
+        assertTrue( beanDescriptor.getConstraintsForProperty( propertyName ) != null );
+        PropertyDescriptor propDescriptor = beanDescriptor.getConstraintsForProperty( propertyName );
+
+        List&lt;Class&lt;? extends Annotation&gt;&gt; constraintTypes = getConstraintTypes( propDescriptor.getConstraintDescriptors() );
+
+        assertEquals( constraintTypes.size(), 2 );
+        assertTrue( constraintTypes.contains( DecimalMin.class ) );
+        assertTrue( constraintTypes.contains( Size.class ) );
+    }
+
+    @Test
+    @SpecAssertions({
+            @SpecAssertion(section = "4.3", id = "a"),
+            @SpecAssertion(section = "4.3", id = "c")
+    })
+    public void testConstraintsOnSuperAndSubClassAddUp() {
+        BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Bar.class );
+
+        String propertyName = "lastName";
+        assertTrue( beanDescriptor.getConstraintsForProperty( propertyName ) != null );
+        PropertyDescriptor propDescriptor = beanDescriptor.getConstraintsForProperty( propertyName );
+
+        List&lt;Class&lt;? extends Annotation&gt;&gt; constraintTypes = getConstraintTypes( propDescriptor.getConstraintDescriptors() );
+
+        assertEquals( constraintTypes.size(), 2 );
+        assertTrue( constraintTypes.contains( DecimalMin.class ) );
+        assertTrue( constraintTypes.contains( Size.class ) );
+    }
+
+    @Test
+    @SpecAssertion(section = "4.6", id = "a")
+    public void testValidationConsidersConstraintsFromSuperTypes() {
+        Set&lt;ConstraintViolation&lt;Bar&gt;&gt; violations = validator.validate( new Bar() );
+        assertCorrectConstraintTypes(
+                violations,
+                DecimalMin.class, DecimalMin.class, ValidBar.class, //Bar
+                NotNull.class, Size.class, ValidFoo.class, //Foo
+                NotNull.class, Size.class, ValidFubar.class //Fubar
+        );
+    }
+
+    private List&lt;Class&lt;? extends Annotation&gt;&gt; getConstraintTypes(Iterable&lt;ConstraintDescriptor&lt;?&gt;&gt; descriptors) {
+        List&lt;Class&lt;? extends Annotation&gt;&gt; constraintTypes = new ArrayList&lt;Class&lt;? extends Annotation&gt;&gt;();
+
+        for ( ConstraintDescriptor&lt;?&gt; constraintDescriptor : descriptors ) {
+            constraintTypes.add( constraintDescriptor.getAnnotation().annotationType() );
+        }
+
+        return constraintTypes;
+    }
+}</pre><p>Each test class is treated as an individual artifact (hence
+    the <code class="literal">@Deployment</code> annotation on the class). In most tests
+    the created artifact is a standard <a class="ulink" href="http://en.wikipedia.org/wiki/WAR_file_format_%28Sun%29">Web
+    application Archive</a> build via <code class="code">WebArchiveBuilder</code> which
+    in turn is a helper class of the TCK itself alleviating the creation of of
+    the artifact. All methods annotated with <code class="literal">@Test</code> are
+    actual tests which are getting run. Last but not least we see the use of
+    the <code class="code">@SpecAssertion</code> annotation which creates the link between
+    the tck-audit.xml document and the actual test (see <a class="xref" href="#primer" title="1.1. TCK Primer">Section 1.1, “TCK Primer”</a>).</p><div xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="tip"><a id="tck-in-jboss-as"/><h2>Running the TCK against the Bean Validation RI (Hibernate
+      Validator) and JBoss AS 7</h2><div class="itemizedlist"><ul><li><p>Install Maven. You can find documentation on how to install
+          Maven 2 in the <a class="ulink" href="http://www.sonatype.com/books/maven-book/reference/installation-sect-maven-install.html">Maven:
+          The Definitive Guide</a> book published by Sonatype.</p></li><li><p>Change to the
+          <code class="filename">ri/hibernate-validator-tck-runner</code>
+          directory.</p></li><li><p>Next, instruct Maven to run the TCK:</p><pre class="programlisting">mvn test -Dincontainer</pre></li><li><p>TestNG will report, via Maven, the outcome of the run, and
+          report any failures on the console. Details can be found in
+          <code class="code">target/surefire-reports/TestSuite.txt</code>.</p></li></ul></div></div></div></div><div class="chapter" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="reporting"/>Chapter 4. Reports</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="#d0e402">4.1. Bean Validation TCK Coverage Report</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e409">4.1.1. Bean Validation TCK Assertions</a></span></dt><dt><span class="section"><a href="#d0e438">4.1.2. The Coverage Report</a></span></dt></dl></dd><dt><span class="section"><a href="#d0e511">4.2. The TestNG Report</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e516">4.2.1. Maven 2, Surefire and TestNG</a></span></dt></dl></dd></dl></div><p>This chapter covers the two types of reports that can be generated
+  from the TCK, an assertion coverage report and the test execution
+  results.</p><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="d0e402"/>4.1. Bean Validation TCK Coverage Report</h2></div></div></div><p>A specification can be distilled into a collection of assertions
+    that define the behavior of the software. This section introduces the Bean
+    Validation TCK coverage report, which documents the relationship between
+    the assertions that have been identified in the JSR 349 specification
+    document and the tests in the TCK test suite.</p><p>The structure of this report is controlled by the assertion
+    document, so we'll start there.</p><div class="section" lang="en-US"><div class="titlepage"><div><div><h3 class="title"><a id="d0e409"/>4.1.1. Bean Validation TCK Assertions</h3></div></div></div><p>The Bean Validation TCK developers have analyzed the JSR 349
+      specification document and identified the assertions that are present in
+      each chapter. Here's an example of one such assertion found in section
+      2.1: “<span class="quote">Every constraint annotation must define a message element of
+      type String</span>”</p><p>The assertions are listed in the XML file
+      <code class="filename">tck-audit.xml</code> in the Bean Validation TCK
+      distribution. Each assertion is identified by the section of the
+      specification document in which it resides and assigned a unique
+      paragraph identifier to narrow down the location of the assertion
+      further. To continue with the example, the assertion shown above is
+      listed in the <code class="filename">tck-audit.xml</code> file using this XML
+      fragment:</p><pre xmlns="" xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="XML"><!-- XML : generated by JHighlight v1.0 (http://jhighlight.dev.java.net) -->
+<span class="xml_tag_symbols">&lt;</span><span class="xml_tag_name">section</span><span class="xml_plain">&nbsp;</span><span class="xml_attribute_name">id</span><span class="xml_tag_symbols">=</span><span class="xml_attribute_value">&quot;2.1.1&quot;</span><span class="xml_plain">&nbsp;</span><span class="xml_attribute_name">title</span><span class="xml_tag_symbols">=</span><span class="xml_attribute_value">&quot;Constraint&nbsp;definition&nbsp;properties&quot;</span><span class="xml_tag_symbols">&gt;</span><span class="xml_plain"></span><br />
+<span class="xml_plain">&nbsp;&nbsp;...</span><br />
+<span class="xml_plain">&nbsp;&nbsp;&nbsp;</span><span class="xml_tag_symbols">&lt;</span><span class="xml_tag_name">assertion</span><span class="xml_plain">&nbsp;</span><span class="xml_attribute_name">id</span><span class="xml_tag_symbols">=</span><span class="xml_attribute_value">&quot;c&quot;</span><span class="xml_tag_symbols">&gt;</span><span class="xml_plain"></span><br />
+<span class="xml_plain">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="xml_tag_symbols">&lt;</span><span class="xml_tag_name">text</span><span class="xml_tag_symbols">&gt;</span><span class="xml_plain">Every&nbsp;constraint&nbsp;annotation&nbsp;must&nbsp;define&nbsp;a&nbsp;message&nbsp;element&nbsp;of&nbsp;type&nbsp;String</span><span class="xml_tag_symbols">&lt;/</span><span class="xml_tag_name">text</span><span class="xml_tag_symbols">&gt;</span><span class="xml_plain"></span><br />
+<span class="xml_plain">&nbsp;&nbsp;&nbsp;</span><span class="xml_tag_symbols">&lt;/</span><span class="xml_tag_name">assertion</span><span class="xml_tag_symbols">&gt;</span><span class="xml_plain"></span><br />
+<span class="xml_plain">&nbsp;&nbsp;...</span><br />
+<span class="xml_tag_symbols">&lt;/</span><span class="xml_tag_name">section</span><span class="xml_tag_symbols">&gt;</span><span class="xml_plain"></span><br />
+</pre><p>The strategy of the Bean Validation TCK is to write a test which
+      validates this assertion when run against an implementation. A test case
+      (a method annotated with <code class="literal">@Test</code>) is correlated with an
+      assertion using the
+      <code class="literal">@org.jboss.test.audit.annotations.SpecAssertion</code>
+      annotation as follows:</p><pre xmlns="" xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="JAVA"><!-- <br/> --><span class="java_plain">@</span><!-- <br/> --><span class="java_type">Test</span>
+<!--  --><br/><span class="java_plain">@</span><span class="java_type">SpecAssertion</span><span class="java_separator">(</span><span class="java_plain">section&nbsp;</span><span class="java_operator">=</span><span class="java_plain">&nbsp;</span><span class="java_literal">&quot;2.1.1&quot;</span><span class="java_separator">,</span><span class="java_plain">&nbsp;id&nbsp;</span><span class="java_operator">=</span><span class="java_plain">&nbsp;</span><span class="java_literal">&quot;c&quot;</span><span class="java_separator">)</span>
+<!--  --><br/><span class="java_keyword">public</span><span class="java_plain">&nbsp;</span><span class="java_type">void</span><span class="java_plain">&nbsp;testConstraintDefinitionWithoutMessageParameter</span><span class="java_separator">()</span><span class="java_plain">&nbsp;</span><span class="java_separator">{</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;</span><span class="java_keyword">try</span><span class="java_plain">&nbsp;</span><span class="java_separator">{</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="java_type">Validator</span><span class="java_plain">&nbsp;validator&nbsp;</span><span class="java_operator">=</span><span class="java_plain">&nbsp;</span><span class="java_type">TestUtil</span><span class="java_separator">.</span><span class="java_plain">getValidatorUnderTest</span><span class="java_separator">();</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;validator</span><span class="java_separator">.</span><span class="java_plain">validate</span><span class="java_separator">(</span><span class="java_plain">&nbsp;</span><span class="java_keyword">new</span><span class="java_plain">&nbsp;</span><span class="java_type">DummyEntityNoMessage</span><span class="java_separator">()</span><span class="java_plain">&nbsp;</span><span class="java_separator">);</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fail</span><span class="java_separator">(</span><span class="java_plain">&nbsp;</span><span class="java_literal">&quot;The&nbsp;used&nbsp;constraint&nbsp;does&nbsp;not&nbsp;define&nbsp;a&nbsp;message&nbsp;parameter.&nbsp;The&nbsp;validation&nbsp;should&nbsp;have&nbsp;failed.&quot;</span><span class="java_plain">&nbsp;</span><span class="java_separator">);</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;</span><span class="java_separator">}</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;</span><span class="java_keyword">catch</span><span class="java_plain">&nbsp;</span><span class="java_separator">(</span><span class="java_plain">&nbsp;</span><span class="java_type">ConstraintDefinitionException</span><span class="java_plain">&nbsp;e&nbsp;</span><span class="java_separator">)</span><span class="java_plain">&nbsp;</span><span class="java_separator">{</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="java_operator">//</span><span class="java_plain">&nbsp;success</span>
+<!--  --><br/><span class="java_separator">}</span>
+</pre><p>To help evaluate the distribution of coverage for these
+      assertions, the TCK provides a detailed coverage report. This report is
+      also useful to help implementors match tests with the language in the
+      specification that supports the behavior being tested.</p></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h3 class="title"><a id="d0e438"/>4.1.2. The Coverage Report</h3></div></div></div><p>The coverage report is an HTML report generated as part of the TCK
+      project build. Specifically, it is generated by an annotation processor
+      that attaches to the compilation of the classes in the TCK test
+      suite.</p><div xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="tip"><h2>Tip</h2><p>You can find the source code for this processor in the GitHub
+          repository <a class="ulink" href="https://github.com/jboss/jboss-test-audit">https://github.com/jboss/jboss-test-audit</a></p></div><p> The report is written to the file
+      <code class="filename">target/coverage-report/coverage-beanvalidation.html</code>.
+      The report itself has five sections:</p><div xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="orderedlist"><ol><li><p><span class="bold"><strong>Chapter Summary</strong></span> - List the
+          chapters (that contain assertions) in the specification document
+          along with total assertions, tests and coverage percentage.</p></li><li><p><span class="bold"><strong>Section Summary</strong></span> - Lists the
+          sections (that contain assertions) in the specification document
+          along with total assertions, tests and coverage percentage.</p></li><li><p><span class="bold"><strong>Coverage Detail</strong></span> - Each
+          assertion and the test that covers it, if any.</p></li><li><p><span class="bold"><strong>Unmatched Tests</strong></span> - A list of
+          tests for which there is no matching assertion (useful during TCK
+          development).</p></li><li><p><span class="bold"><strong>Unversioned Tests</strong></span> - A list of
+          tests for which there is no <code class="literal">@SpecVersion</code>
+          annotation on the test class (useful during TCK development).</p></li></ol></div><p>The coverage report is color coded to indicate the status of an
+      assertion, or group of assertions. The status codes are as
+      follows:</p><div class="itemizedlist"><ul><li><p><span class="bold"><strong>Covered</strong></span> - a test exists for
+          this assertion</p></li><li><p><span class="bold"><strong>Not covered</strong></span> - no test exists
+          for this assertion</p></li><li><p><span class="bold"><strong> Unimplemented</strong></span> - a test
+          exists, but is unimplemented</p></li><li><p><span class="bold"><strong>Untestable</strong></span> - the assertion
+          has been deemed untestable, a note, explaining why, is normally
+          provided</p></li></ul></div><p>For reasons provided in the <code class="literal">tck-audit.xml</code>
+      document and presented in the coverage report, some assertions are not
+      testable.</p><p>The coverage report does not give any indication as to whether the
+      tests are passing. That's where the TestNG reports come in.</p></div></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="d0e511"/>4.2. The TestNG Report</h2></div></div></div><p>As you by now know, the Bean Validation TCK test suite is really
+    just a TestNG test suite. That means an execution of the Bean Validation
+    TCK test suite produces all the same reports that TestNG produces. This
+    section will go over those reports and show you were to go to find each of
+    them.</p><div class="section" lang="en-US"><div class="titlepage"><div><div><h3 class="title"><a id="d0e516"/>4.2.1. Maven 2, Surefire and TestNG</h3></div></div></div><p>When the Bean Validation TCK test suite is executed during the
+      Maven 2 test phase of the TCK runner project, TestNG is invoked
+      indirectly through the Maven Surefire plugin. Surefire is a test
+      execution abstraction layer capable of executing a mix of tests written
+      for JUnit, TestNG, and other supported test frameworks.</p><p>Why is this relevant? It means two things. First, it means that
+      you are going to get a summary of the test run on the commandline.
+      Here's the output generated when the tests are run using standalone
+      mode.</p><pre class="programlisting">-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Running TestSuite
+Tests run: 697, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 26.413 sec
+
+Results :
+
+Tests run: 697, Failures: 0, Errors: 0, Skipped: 0
+</pre><div xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="note"><h2>Note</h2><p>The number of tests executed, the execution time, and the output
+        will differ when you run the tests using in-container mode as the Bean
+        Validation TCK requires.</p></div><p>If the Maven reporting plugin that compliments Surefire is
+      configured properly, Maven will also generate a generic HTML test result
+      report. That report is written to the file test-report.html in the
+      <code class="filename">target/surefire-reports</code> directory of the TCK runner
+      project. It shows how many tests were run, how many failed and the
+      success rate of the test run.</p></div></div></div><div class="chapter" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="configuration"/>Chapter 5. Running the TCK test suite</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="#d0e541">5.1. Setup examples</a></span></dt><dt><span class="section"><a href="#d0e570">5.2. Configuring TestNG to execute the TCK</a></span></dt><dt><span class="section"><a href="#d0e593">5.3. Selecting the ValidationProvider</a></span></dt><dt><span class="section"><a href="#configuration-deployable-container">5.4. Selecting the DeployableContainer</a></span></dt><dt><span class="section"><a href="#configuration-arquillian-xml">5.5. arquillian.xml</a></span></dt></dl></div><p>This chapter lays out how to run and configure the TCK harness against
+  a given Bean Validation provider in a given Java EE container. If you have
+  not by now made yourself familiar with the <a class="ulink" href="https://docs.jboss.org/author/display/ARQ/Reference+Guide">Arquillian
+  documentation</a>, this is a good time to do it. It will give you a
+  deeper understanding of the different parts described in the following
+  sections.</p><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="d0e541"/>5.1. Setup examples</h2></div></div></div><p>The TCK distribution comes with a directory
+    <code class="filename">setup-examples</code> which contains two example projects
+    for running the TCK. If you followed the instructions in <a class="xref" href="#installation" title="Chapter 3. Installation">Chapter 3, <i>Installation</i></a> you find the directory under
+    <code class="filename">jsr349/tck/setup-examples</code>. Both setups are using
+    Hibernate Validator as Bean Validation Provider and Glassfish 4 as EE
+    constainer. However, one is using <a class="ulink" href="http://maven.apache.org/">Maven</a> as build tool to run the TCK,
+    the other <a class="ulink" href="http://ant.apache.org/">Ant</a>. Depending which
+    of the examples you want to use, you need to install the corresponding
+    build tool.</p><p>Each example comes with a <code class="filename">readme.md</code> containing
+    the prerequisites for using this setup, how to run the TCK against
+    Hibernate Validator and Glassfish. The readme in
+    <code class="filename">setup-examples</code> itself contains information about what
+    needs to be changed to use a different Bean Validation provider and EE
+    container.</p><p>The following chapters contain some more information about the
+    general structure of the TCK which will give you a deeper understanding
+    above the simple readme files.</p></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="d0e570"/>5.2. Configuring TestNG to execute the TCK</h2></div></div></div><p>The Bean Validation test harness is built atop TestNG, and it is
+    TestNG that is responsible for selecting the tests to execute, the order
+    of execution, and reporting the results. Detailed TestNG documentation can
+    be found at <a class="ulink" href="http://testng.org/doc/documentation-main.html">testng.org</a>.</p><p>The <code class="literal">tck-tests.xml</code> artifact provided in the TCK
+    distribution must be run by TestNG (described by the TestNG documentation
+    as "with a <code class="literal">testng.xml</code> file") unmodified for an
+    implementation to pass the TCK. For testing purposes it is of course ok to
+    modify the file (see also the TestNG <a class="ulink" href="http://testng.org/doc/documentation-main.html#testng-xml">documentation</a>)</p><pre class="programlisting">&lt;suite name="JSR-349-TCK" verbose="1"&gt;
+    &lt;test name="JSR-349-TCK"&gt;
+
+        &lt;method-selectors&gt;
+            &lt;method-selector&gt;
+                &lt;selector-class name="org.hibernate.beanvalidation.tck.util.IntegrationTestsMethodSelector"/&gt;
+            &lt;/method-selector&gt;
+        &lt;/method-selectors&gt;
+
+        &lt;packages&gt;
+            &lt;package name="org.hibernate.beanvalidation.tck.tests"/&gt;
+        &lt;/packages&gt;
+    &lt;/test&gt;
+&lt;/suite&gt;</pre><p>TestNG provides extensive reporting information. Depending on the
+    build tool or IDE you use, the reporting will take a different format.
+    Please consult the TestNG documentation and the tool documentation for
+    more information.</p></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="d0e593"/>5.3. Selecting the <code class="classname">ValidationProvider</code></h2></div></div></div><p>The most important configuration you have make in order to run the
+    Bean Validation TCK is to specify your
+    <code class="classname">ValidationProvider</code> you want to run your tests
+    against. To do so you need to set the Java system property
+    <span class="property">validation.provider</span> to the fully specified class name
+    of your <code class="classname">ValidationProvider</code>. In Maven this is done
+    via the <span class="emphasis"><em>systemProperties</em></span> configuration option of the
+    <span class="emphasis"><em>maven-surefire-plugin</em></span>, whereas
+    <span class="emphasis"><em>sysproperty</em></span> is used in an Ant testng task. This
+    system property will be picked up by
+    <code class="classname">org.hibernate.beanvalidation.tck.util.TestUtil</code>
+    which will instantiate the <code class="classname">Validator</code> under test.
+    This means the test harness does not rely on the service provider
+    mechanism to instantiate the Bean Validation provider under test, partly
+    because this selection mechanism is under test as well.</p></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="configuration-deployable-container"/>5.4. Selecting the <code class="classname">DeployableContainer</code></h2></div></div></div><p>After setting the <code class="classname">ValidationProvider</code> you have
+    to make a choice on the right <code class="classname">DeployableContainer</code>.
+    Arquillian picks which container it is going to use to deploy the test
+    archive and negotiate test execution using Java's service provider
+    mechanism. Concretely Arquillian is looking for an implementation of the
+    <code class="classname">DeployableContainer</code> SPI on the classpath. The setup
+    examples use a remote Glassfish container adapter, which means that
+    Arquillian tries to deploy the test artifacts onto a specified remote
+    Glassfish instance, run the tests remotely and report the results back to
+    the current JVM. The installation directory of the remote container is
+    specified via the <span class="emphasis"><em>container.home</em></span> property in the
+    example build files. </p><div xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="tip"><h2>Tip</h2><p>To make it easier to develop, debug or test the TCK, an in JVM
+        adapter is provided as part of the distribution
+        (<code class="filename">beanvalidation-standalone-container-adapter-1.1.0.Final.jar</code>).
+        Using this adapter the tests are not executed in a remote Java EE
+        container, but in the current JVM. This allows for easy and fast
+        debugging. Some tests, however, are only runnable in a EE container
+        and will fail in this in JVM execution mode. By setting the property
+        <span class="property">excludeIntegrationTests</span> to
+        <code class="constant">true</code> these tests can be excluded.</p><p>The adapter is also available as Maven artifact under the GAV
+        <span class="emphasis"><em>org.hibernate.beanvalidation.tck:beanvalidation-standalone-container-adapter:1.1.0.Final.</em></span>
+        You can refer to <code class="filename">pom.xml</code> in the tck-runner module
+        of Hibernate Validator (in the directory
+        <code class="filename">jsr349/ri/tck-runner</code>, if you followed the
+        instruction in <a class="xref" href="#installation" title="Chapter 3. Installation">Chapter 3, <i>Installation</i></a>) to see how it is
+        used.</p></div></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="configuration-arquillian-xml"/>5.5. arquillian.xml</h2></div></div></div><p>The next piece in the configuration puzzle is
+    <code class="filename">arquillian.xml</code>. This xml file needs to be in the root
+    of the classpath and is used to pass additional options to the selected
+    container. Let's look at an example:</p><pre class="programlisting">&lt;arquillian xmlns="http://jboss.org/schema/arquillian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://jboss.org/schema/arquillian
+        http://jboss.org/schema/arquillian/arquillian_1_0.xsd"&gt;
+    &lt;defaultProtocol type="Servlet 3.0"/&gt;
+
+    &lt;engine&gt;
+        &lt;property name="deploymentExportPath"&gt;target/artifacts&lt;/property&gt;
+    &lt;/engine&gt;
+
+    &lt;container qualifier="incontainer" default="true"&gt;
+        &lt;configuration&gt;
+            &lt;property name="glassFishHome"&gt;@CONTAINER.HOME@&lt;/property&gt;
+            &lt;property name="adminHost"&gt;localhost&lt;/property&gt;
+            &lt;property name="adminPort"&gt;4848&lt;/property&gt;
+            &lt;property name="debug"&gt;true&lt;/property&gt;
+        &lt;/configuration&gt;
+    &lt;/container&gt;
+
+&lt;/arquillian&gt;</pre><p>The most important container configuration option is the protocol
+    type which determines how Arquillian communicates with the selected
+    container. The most popular types are <span class="emphasis"><em>Servlet 3.0</em></span> and
+    <span class="emphasis"><em>Local</em></span>. The former is used when connecting to a remote
+    container whereas the latter is used for the in JVM mode.</p><p>Another interesting property is
+    <span class="property">deploymentExportPath</span> which is optional and instructs
+    Arquillian to dump the test artifacts to the specified directory on disk.
+    Inspection of the deployed artifacts can be very useful when debugging
+    test failures.</p></div></div><div class="chapter" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="sigtest"/>Chapter 6. Running the Signature Test</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="#d0e696">6.1. Obtaining the sigtest tool</a></span></dt><dt><span class="section"><a href="#d0e710">6.2. Creating the signature file</a></span></dt><dt><span class="section"><a href="#d0e733">6.3. Running the signature test</a></span></dt><dt><span class="section"><a href="#d0e745">6.4. Forcing a signature test failure</a></span></dt></dl></div><p>One of the requirements of an implementation passing the TCK is for it
+  to pass the Bean Validation signature test. This section describes how the
+  signature file is generated and how to run it against your
+  implementation.</p><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="d0e696"/>6.1. Obtaining the sigtest tool</h2></div></div></div><p>You can obtain the Sigtest tool from the <a class="ulink" href="https://wiki.openjdk.java.net/display/CodeTools/SigTest">Sigtest home
+    page</a>. The TCK uses version 3_0-dev-bin-b09-24_apr_2013 which can
+    be obtained from the SigTest <a class="ulink" href="http://download.java.net/sigtest/download.html">download page</a>. The
+    user guide can be found <a class="ulink" href="http://download.oracle.com/javame/test-tools/sigtest/2_2/sigtest2_2_usersguide.pdf">here</a>
+    (the latest published documentation version is 2.2 but this documentation
+    still applies to SigTest 3.0 in general). The downloadable package
+    contains the jar files used in the commands below.</p></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="d0e710"/>6.2. Creating the signature file</h2></div></div></div><p>The TCK package contains the files
+    <code class="filename">validation-api-java6.sig</code>,
+    <code class="filename">validation-api-java7.sig</code> and
+    <code class="filename">validation-api-java8.sig</code> (in the
+    <code class="filename">artifacts</code> directory) which were created using the
+    following commands:</p><pre class="programlisting">// using Java 6
+java -jar sigtestdev.jar Setup -classpath $JAVA_HOME/jre/lib/rt.jar:validation-api-1.1.0.Final.jar -package javax.validation -filename validation-api-java6.sig
+
+
+// using Java 7
+java -jar sigtestdev.jar Setup -classpath $JAVA_HOME/jre/lib/rt.jar:validation-api-1.1.0.Final.jar -package javax.validation -filename validation-api-java7.sig
+
+
+// using Java 8
+java -jar sigtestdev.jar Setup -classpath $JAVA_HOME/jre/lib/rt.jar:validation-api-1.1.0.Final.jar -package javax.validation -filename validation-api-java8.sig</pre><p>In order to pass the Bean Validation TCK you have to make sure that
+    your API passes the signature tests against
+    <code class="filename">validation-api.sig.</code></p></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="d0e733"/>6.3. Running the signature test</h2></div></div></div><p>To run the signature test use:</p><pre class="programlisting">java -jar sigtest.jar Test -classpath $JAVA_HOME/jre/lib/rt.jar:validation-api-1.1.0.Final.jar -static -package javax.validation -filename validation-api-java6.sig</pre><p>You have to chose the right version of the signature file depending
+    on your Java version. In order to run against your own Bean Validation API
+    replace validation-api-1.1.0.Final.jar with your own API jar. You
+    should get the message <code class="literal">"STATUS:Passed."</code>.</p></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="d0e745"/>6.4. Forcing a signature test failure</h2></div></div></div><p>Just for fun (and to confirm that the signature test is working
+    correctly), you can try the following:</p><p>1) Edit validation-api-java6.sig</p><p>2) Modify one of the class signatures - in the following example we
+    change one of the constructors for <code class="literal">ValidationException</code>
+    - here's the original:</p><pre class="programlisting">CLSS public javax.validation.ValidationException
+cons public ValidationException()
+cons public ValidationException(java.lang.String)
+cons public ValidationException(java.lang.String,java.lang.Throwable)
+cons public ValidationException(java.lang.Throwable)
+supr java.lang.RuntimeException</pre><p>Let's change the default (empty) constructor parameter to one with a
+    <code class="literal">java.lang.Integer</code> parameter instead:</p><pre class="programlisting">CLSS public javax.validation.ValidationException
+cons public ValidationException(java.lang.Integer)
+cons public ValidationException(java.lang.String)
+cons public ValidationException(java.lang.String,java.lang.Throwable)
+cons public ValidationException(java.lang.Throwable)
+supr java.lang.RuntimeException</pre><p>3) Now when we run the signature test using the above command, we
+    should get the following errors:</p><pre class="programlisting">Missing Constructors
+--------------------
+
+javax.validation.ValidationException:   constructor public javax.validation.ValidationException.ValidationException(java.lang.Integer)
+
+Added Constructors
+------------------
+
+javax.validation.ValidationException:   constructor public javax.validation.ValidationException.ValidationException()
+
+
+STATUS:Failed.2 errors</pre></div></div></div><HR xmlns=""/><a xmlns="" href=""><p xmlns="http://www.w3.org/1999/xhtml" class="copyright">Copyright © 2009 - 2014 Red Hat, Inc.</p></a></body></html>

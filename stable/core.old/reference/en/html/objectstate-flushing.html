@@ -1,0 +1,171 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>10.10.&nbsp;Flushing the Session</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="objectstate.html" title="Chapter&nbsp;10.&nbsp;Working with objects">
+      <link rel="prev" href="objectstate-replicating.html" title="10.9.&nbsp;Replicating object between two different datastores">
+      <link rel="next" href="objectstate-transitive.html" title="10.11.&nbsp;Transitive persistence">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">10.10.&nbsp;Flushing the Session</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="objectstate-replicating.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;10.&nbsp;Working with objects</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="objectstate-transitive.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="objectstate-flushing"></a>10.10.&nbsp;Flushing the Session
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+                        From time to time the <code class="literal">Session</code> will execute the SQL statements 
+                        needed to synchronize the JDBC connection's state with the state of objects held in 
+                        memory. This process, <span class="emphasis"><em>flush</em></span>, occurs by default at the following 
+                        points
+                    
+         </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p>
+                                         before some query executions
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         from <code class="literal">org.hibernate.Transaction.commit()</code>
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         from <code class="literal">Session.flush()</code>
+                                     
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p>
+                        The SQL statements are issued in the following order
+                    
+         </p>
+         <div class="orderedlist">
+            <ol type="1" compact>
+               <li>
+                  <p>
+                                         all entity insertions, in the same order the corresponding objects
+                                         were saved using <code class="literal">Session.save()</code>
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         all entity updates
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         all collection deletions
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         all collection element deletions, updates and insertions
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         all collection insertions
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         all entity deletions, in the same order the corresponding objects
+                                         were deleted using <code class="literal">Session.delete()</code>
+                                     
+                  </p>
+               </li>
+            </ol>
+         </div>
+         <p>
+                        (An exception is that objects using <code class="literal">native</code> ID generation are 
+                        inserted when they are saved.)
+                    
+         </p>
+         <p>
+                        Except when you explicity <code class="literal">flush()</code>, there are absolutely no 
+                        guarantees about <span class="emphasis"><em>when</em></span> the <code class="literal">Session</code> executes 
+                        the JDBC calls, only the <span class="emphasis"><em>order</em></span> in which they are executed.
+                        However, Hibernate does guarantee that the <code class="literal">Query.list(..)</code> 
+                        will never return stale data; nor will they return the wrong data.
+                    
+         </p>
+         <p>
+                        It is possible to change the default behavior so that flush occurs less frequently.
+                        The <code class="literal">FlushMode</code> class defines three different modes: only flush
+                        at commit time (and only when the Hibernate <code class="literal">Transaction</code> API
+                        is used), flush automatically using the explained routine, or never flush unless
+                        <code class="literal">flush()</code> is called explicitly. The last mode is useful for long running
+                        units of work, where a <code class="literal">Session</code> is kept open and disconnected for
+                        a long time (see <a href="transactions-optimistic.html#transactions-optimistic-longsession" title="11.3.2.&nbsp;Extended session and automatic versioning">Section&nbsp;11.3.2, &#8220;Extended session and automatic versioning&#8221;</a>).
+                    
+         </p><pre class="programlisting">sess = sf.openSession();
+Transaction tx = sess.beginTransaction();
+sess.setFlushMode(FlushMode.COMMIT); // allow queries to return stale state
+
+Cat izi = (Cat) sess.load(Cat.class, id);
+izi.setName(iznizi);
+
+// might return stale data
+sess.find("from Cat as cat left outer join cat.kittens kitten");
+
+// change to izi is not flushed!
+...
+tx.commit(); // flush occurs
+sess.close();</pre><p>
+                        During flush, an exception might occur (e.g. if a DML operation violates a constraint).
+                        Since handling exceptions involves some understanding of Hibernate's transactional 
+                        behavior, we discuss it in <a href="transactions.html" title="Chapter&nbsp;11.&nbsp;Transactions And Concurrency">Chapter&nbsp;11, <i xmlns:xlink="http://www.w3.org/1999/xlink">Transactions And Concurrency</i></a>.
+                    
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="objectstate-replicating.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="objectstate.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="objectstate-transitive.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">10.9.&nbsp;Replicating object between two different datastores&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;10.11.&nbsp;Transitive persistence</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

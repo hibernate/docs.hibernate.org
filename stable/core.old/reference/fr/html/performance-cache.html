@@ -1,0 +1,325 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>19.2.&nbsp;Le cache de second niveau</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="performance.html" title="Chapitre&nbsp;19.&nbsp;Am&eacute;liorer les performances">
+      <link rel="prev" href="performance.html" title="Chapitre&nbsp;19.&nbsp;Am&eacute;liorer les performances">
+      <link rel="next" href="performance-sessioncache.html" title="19.3.&nbsp;G&eacute;rer les caches">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">19.2.&nbsp;Le cache de second niveau</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="performance.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;19.&nbsp;Am&eacute;liorer les performances</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="performance-sessioncache.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="performance-cache"></a>19.2.&nbsp;Le cache de second niveau
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Une <code class="literal">Session</code> Hibernate est un cache de niveau transactionnel des donn&eacute;es persistantes. Il est possible de configurer un cache de cluster
+            ou de JVM (de niveau <code class="literal">SessionFactory</code> pour &ecirc;tre exact) d&eacute;fini classe par classe et collection par collection. Vous pouvez m&ecirc;me utiliser votr choix de cache en
+            impl&eacute;mentant le pourvoyeur (provider) associ&eacute;. Faites attention, les caches ne sont jamais avertis des modifications faites
+            dans la base de donn&eacute;es par d'autres applications (ils peuvent cependant &ecirc;tre configur&eacute;s pour r&eacute;guli&egrave;rement expirer les donn&eacute;es
+            en cache). 
+         </p>
+         <p>Par d&eacute;faut, Hibernate utilise EHCache comme cache de niveau JVM (le support de JCS est d&eacute;sormais d&eacute;pr&eacute;ci&eacute; et sera enlev&eacute; des
+            futures versions d'Hibernate). Vous pouvez choisir une autre impl&eacute;mentation en sp&eacute;cifiant le nom de la classe qui impl&eacute;mente
+            <code class="literal">org.hibernate.cache.CacheProvider</code> en utilisant la propri&eacute;t&eacute; <code class="literal">hibernate.cache.provider_class</code>. 
+         </p>
+         <div class="table"><a name="cacheproviders"></a><p class="title"><b>Tableau&nbsp;19.1.&nbsp;Fournisseur de cache</b></p>
+            <div class="table-contents">
+               <table summary="Fournisseur de cache" border="1">
+                  <colgroup>
+                     <col align="left">
+                     <col align="left">
+                     <col align="left">
+                     <col align="left">
+                     <col align="left">
+                  </colgroup>
+                  <thead>
+                     <tr>
+                        <th align="left">Cache</th>
+                        <th align="left">Classe pourvoyeuse</th>
+                        <th align="left">Type</th>
+                        <th align="left">Support en Cluster</th>
+                        <th align="left">Cache de requ&ecirc;tes support&eacute;</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     <tr>
+                        <td align="left">Hashtable (not intended for production use)</td>
+                        <td align="left"><code class="literal">org.hibernate.cache.HashtableCacheProvider</code></td>
+                        <td align="left">m&eacute;moire</td>
+                        <td align="left">&nbsp;</td>
+                        <td align="left">yes</td>
+                     </tr>
+                     <tr>
+                        <td align="left">EHCache</td>
+                        <td align="left"><code class="literal">org.hibernate.cache.EhCacheProvider</code></td>
+                        <td align="left">m&eacute;moire, disque</td>
+                        <td align="left">&nbsp;</td>
+                        <td align="left">yes</td>
+                     </tr>
+                     <tr>
+                        <td align="left">OSCache</td>
+                        <td align="left"><code class="literal">org.hibernate.cache.OSCacheProvider</code></td>
+                        <td align="left">m&eacute;moire, disque</td>
+                        <td align="left">&nbsp;</td>
+                        <td align="left">yes</td>
+                     </tr>
+                     <tr>
+                        <td align="left">SwarmCache</td>
+                        <td align="left"><code class="literal">org.hibernate.cache.SwarmCacheProvider</code></td>
+                        <td align="left">en cluster (multicast ip)</td>
+                        <td align="left">oui (invalidation de cluster)</td>
+                        <td align="left">&nbsp;</td>
+                     </tr>
+                     <tr>
+                        <td align="left">JBoss Cache 1.x</td>
+                        <td align="left"><code class="literal">org.hibernate.cache.TreeCacheProvider</code></td>
+                        <td align="left">en cluster (multicast ip), transactionnel</td>
+                        <td align="left">oui (replication)</td>
+                        <td align="left">oui (horloge sync. n&eacute;cessaire)</td>
+                     </tr>
+                     <tr>
+                        <td align="left">JBoss Cache 2</td>
+                        <td align="left"><code class="literal">org.hibernate.cache.jbc2.JBossCacheRegionFactory</code></td>
+                        <td align="left">en cluster (multicast ip), transactionnel</td>
+                        <td align="left">yes (replication or invalidation)</td>
+                        <td align="left">oui (horloge sync. n&eacute;cessaire)</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+         </div><br class="table-break"><div class="sect2" lang="fr-FR">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="performance-cache-mapping"></a>19.2.1.&nbsp;Mapping de Cache
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>L'&eacute;l&eacute;ment <code class="literal">&lt;cache&gt;</code> d'une classe ou d'une collection &agrave; la forme suivante : 
+            </p>
+            <div class="programlistingco"><pre class="programlisting">&lt;cache 
+    usage="transactional|read-write|nonstrict-read-write|read-only"  <span class="co">(1)</span>
+    region="RegionName"                                              <span class="co">(2)</span>
+    include="all|non-lazy"                                           <span class="co">(3)</span>
+/&gt;</pre><div class="calloutlist">
+                  <table border="0" summary="Callout list">
+                     <tr>
+                        <td width="5%" valign="top" align="left">
+                           <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(1)</fo:inline>
+                        </td>
+                        <td valign="top" align="left">
+                           <p><code class="literal">usage</code> (requis) sp&eacute;cifie la strat&eacute;gie de cache : <code class="literal">transactionel</code>, <code class="literal">lecture-&eacute;criture</code>, <code class="literal">lecture-&eacute;criture non stricte</code> ou <code class="literal">lecture seule</code> 
+                           </p>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td width="5%" valign="top" align="left">
+                           <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(2)</fo:inline>
+                        </td>
+                        <td valign="top" align="left">
+                           <p><code class="literal">region</code> (optionnel, par d&eacute;faut il s'agit du nom de la classe ou du nom de role de la collection) sp&eacute;cifie le nom de la r&eacute;gion du
+                              cache de second niveau 
+                           </p>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td width="5%" valign="top" align="left">
+                           <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(3)</fo:inline>
+                        </td>
+                        <td valign="top" align="left">
+                           <p><code class="literal">include</code> (optionnel, par d&eacute;faut <code class="literal">all</code>) <code class="literal">non-lazy</code> sp&eacute;cifie que les propri&eacute;t&eacute;s des entit&eacute;s mapp&eacute;es avec <code class="literal">lazy="true"</code> ne doivent pas &ecirc;tre mises en cache lorsque le chargement tardif des attributs est activ&eacute;. 
+                           </p>
+                        </td>
+                     </tr>
+                  </table>
+               </div>
+            </div>
+            <p>Alternatively (preferably?), you may specify <code class="literal">&lt;class-cache&gt;</code> and <code class="literal">&lt;collection-cache&gt;</code> elements in <code class="literal">hibernate.cfg.xml</code>. 
+            </p>
+            <p>L'attribut <code class="literal">usage</code> sp&eacute;cifie une <span class="emphasis"><em>strat&eacute;gie de concurrence d'acc&egrave;s au cache</em></span>. 
+            </p>
+         </div>
+         <div class="sect2" lang="fr-FR">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="performance-cache-readonly"></a>19.2.2.&nbsp;Strategie : lecture seule
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>Si votre application a besoin de lire mais ne modifie jamais les instances d'une classe, un cache <code class="literal">read-only</code> peut &ecirc;tre utilis&eacute;. C'est la strat&eacute;gie la plus simple et la plus performante. Elle est m&ecirc;me parfaitement s&ucirc;re dans un cluster.
+               
+            </p><pre class="programlisting">&lt;class name="eg.Immutable" mutable="false"&gt;
+    &lt;cache usage="read-only"/&gt;
+    ....
+&lt;/class&gt;</pre></div>
+         <div class="sect2" lang="fr-FR">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="performance-cache-readwrite"></a>19.2.3.&nbsp;Strat&eacute;gie : lecture/&eacute;criture
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>Si l'application a besoin de mettre &agrave; jour des donn&eacute;es, un cache <code class="literal">read-write</code> peut &ecirc;tre appropri&eacute;. Cette strat&eacute;gie ne devrait jamais &ecirc;tre utilis&eacute;e si votre application n&eacute;cessite un niveau d'isolation
+               transactionnelle s&eacute;rialisable. Si le cache est utilis&eacute; dans un environnement JTA, vous devez sp&eacute;cifier <code class="literal">hibernate.transaction.manager_lookup_class</code>, fournissant une strat&eacute;gie pour obtenir le <code class="literal">TransactionManager</code> JTA. Dans d'autres environnements, vous devriez vous assurer que la transation est termin&eacute;e &agrave; l'appel de <code class="literal">Session.close()</code> ou <code class="literal">Session.disconnect()</code>. Si vous souhaitez utiliser cette strat&eacute;gie dans un cluster, vous devriez vous assurer que l'impl&eacute;mentation de cache utilis&eacute;e
+               supporte le v&eacute;rrouillage. Ce que ne font <span class="emphasis"><em>pas</em></span> les pourvoyeurs caches fournis. 
+            </p><pre class="programlisting">&lt;class name="eg.Cat" .... &gt;
+    &lt;cache usage="read-write"/&gt;
+    ....
+    &lt;set name="kittens" ... &gt;
+        &lt;cache usage="read-write"/&gt;
+        ....
+    &lt;/set&gt;
+&lt;/class&gt;</pre></div>
+         <div class="sect2" lang="fr-FR">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="performance-cache-nonstrict"></a>19.2.4.&nbsp;Strat&eacute;gie : lecture/&eacute;criture non stricte
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>Si l'application besoin de mettre &agrave; jour les donn&eacute;es de mani&egrave;re occasionnelle (qu'il est tr&egrave;s peu probable que deux transactions
+               essaient de mettre &agrave; jour le m&ecirc;me &eacute;l&eacute;ment simultan&eacute;ment) et qu'une isolation transactionnelle stricte n'est pas n&eacute;cessaire,
+               un cache <code class="literal">nonstrict-read-write</code> peut &ecirc;tre appropri&eacute;. Si le cache est utilis&eacute; dans un environnement JTA, vous devez sp&eacute;cifier <code class="literal">hibernate.transaction.manager_lookup_class</code>. Dans d'autres environnements, vous devriez vous assurer que la transation est termin&eacute;e &agrave; l'appel de <code class="literal">Session.close()</code> ou <code class="literal">Session.disconnect()</code> 
+            </p>
+         </div>
+         <div class="sect2" lang="fr-FR">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="performance-cache-transactional"></a>19.2.5.&nbsp;Strat&eacute;gie : transactionelle
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>La strat&eacute;gie de cache <code class="literal">transactional</code> supporte un cache compl&egrave;tement transactionnel comme, par exemple, JBoss TreeCache. Un tel cache ne peut &ecirc;tre utilis&eacute; que
+               dans un environnement JTA et vous devez sp&eacute;cifier <code class="literal">hibernate.transaction.manager_lookup_class</code>. 
+            </p>
+         </div>
+         <div class="sect2" lang="fr-FR">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="performance-cache-compat-matrix"></a>19.2.6.&nbsp;Cache-provider/concurrency-strategy compatibility
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <div class="important" style="margin-left: 0.5in; margin-right: 0.5in;">
+               <h3 class="title">Important</h3>
+               <p>None of the cache providers support all of the cache concurrency strategies. </p>
+            </div>
+            <p>The following table shows which providers are compatible with which concurrency strategies. </p>
+            <div class="table"><a name="d0e14674"></a><p class="title"><b>Tableau&nbsp;19.2.&nbsp;Strat&eacute;gie de concurrence du cache</b></p>
+               <div class="table-contents">
+                  <table summary="Strat&eacute;gie de concurrence du cache" border="1">
+                     <colgroup>
+                        <col align="left">
+                        <col align="left">
+                        <col align="left">
+                        <col align="left">
+                        <col align="left">
+                     </colgroup>
+                     <thead>
+                        <tr>
+                           <th align="left">Cache</th>
+                           <th align="left">read-only (lecture seule)</th>
+                           <th align="left">nonstrict-read-write (lecture-&eacute;criture non stricte)</th>
+                           <th align="left">read-write (lecture-&eacute;riture)</th>
+                           <th align="left">transactional (transactionnel)</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        <tr>
+                           <td align="left">Hashtable (not intended for production use)</td>
+                           <td align="left">yes</td>
+                           <td align="left">yes</td>
+                           <td align="left">yes</td>
+                           <td align="left">&nbsp;</td>
+                        </tr>
+                        <tr>
+                           <td align="left">EHCache</td>
+                           <td align="left">yes</td>
+                           <td align="left">yes</td>
+                           <td align="left">yes</td>
+                           <td align="left">&nbsp;</td>
+                        </tr>
+                        <tr>
+                           <td align="left">OSCache</td>
+                           <td align="left">yes</td>
+                           <td align="left">yes</td>
+                           <td align="left">yes</td>
+                           <td align="left">&nbsp;</td>
+                        </tr>
+                        <tr>
+                           <td align="left">SwarmCache</td>
+                           <td align="left">yes</td>
+                           <td align="left">yes</td>
+                           <td align="left">&nbsp;</td>
+                           <td align="left">&nbsp;</td>
+                        </tr>
+                        <tr>
+                           <td align="left">JBoss Cache 1.x</td>
+                           <td align="left">yes</td>
+                           <td align="left">&nbsp;</td>
+                           <td align="left">&nbsp;</td>
+                           <td align="left">yes</td>
+                        </tr>
+                        <tr>
+                           <td align="left">JBoss Cache 2</td>
+                           <td align="left">yes</td>
+                           <td align="left">&nbsp;</td>
+                           <td align="left">&nbsp;</td>
+                           <td align="left">yes</td>
+                        </tr>
+                     </tbody>
+                  </table>
+               </div>
+            </div><br class="table-break"></div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="performance.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="performance.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="performance-sessioncache.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">Chapitre&nbsp;19.&nbsp;Am&eacute;liorer les performances&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;19.3.&nbsp;G&eacute;rer les caches</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

@@ -1,0 +1,88 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>16.4.&nbsp;SQL personnalis&eacute; pour le chargement</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="querysql.html" title="Chapitre&nbsp;16.&nbsp;SQL natif">
+      <link rel="prev" href="querysql-cud.html" title="16.3.&nbsp;SQL personnalis&eacute; pour cr&eacute;er, mettre &agrave; jour et effacer">
+      <link rel="next" href="filters.html" title="Chapitre&nbsp;17.&nbsp;Filtrer les donn&eacute;es">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">16.4.&nbsp;SQL personnalis&eacute; pour le chargement</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="querysql-cud.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;16.&nbsp;SQL natif</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="filters.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="querysql-load"></a>16.4.&nbsp;SQL personnalis&eacute; pour le chargement
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Vous pouvez aussi d&eacute;clarer vos propres requ&ecirc;tes SQL (ou HQL) pour le chargement d'entit&eacute; :</p><pre class="programlisting">&lt;sql-query name="person"&gt;
+    &lt;return alias="pers" class="Person" lock-mode="upgrade"/&gt;
+    SELECT NAME AS {pers.name}, ID AS {pers.id}
+    FROM PERSON
+    WHERE ID=?
+    FOR UPDATE
+&lt;/sql-query&gt;</pre><p>Ceci est juste une d&eacute;claration de requ&ecirc;te nomm&eacute;e, comme vu plus t&ocirc;t. Vous pouvez r&eacute;f&eacute;rencer cette requ&ecirc;te nomm&eacute;e dans un mapping
+            de classe :
+         </p><pre class="programlisting">&lt;class name="Person"&gt;
+    &lt;id name="id"&gt;
+        &lt;generator class="increment"/&gt;
+    &lt;/id&gt;
+    &lt;property name="name" not-null="true"/&gt;
+    &lt;loader query-ref="person"/&gt;
+&lt;/class&gt;</pre><p>Ceci fonctionne m&ecirc;me avec des proc&eacute;dures stock&eacute;es.</p>
+         <p>Vous pouvez m&ecirc;me d&eacute;finir une requ&ecirc;te pour le chargement d'une collection :</p><pre class="programlisting">&lt;set name="employments" inverse="true"&gt;
+    &lt;key/&gt;
+    &lt;one-to-many class="Employment"/&gt;
+    &lt;loader query-ref="employments"/&gt;
+&lt;/set&gt;</pre><pre class="programlisting">&lt;sql-query name="employments"&gt;
+    &lt;load-collection alias="emp" role="Person.employments"/&gt;
+    SELECT {emp.*}
+    FROM EMPLOYMENT emp
+    WHERE EMPLOYER = :id
+    ORDER BY STARTDATE ASC, EMPLOYEE ASC
+&lt;/sql-query&gt;</pre><p>Vous pourriez m&ecirc;me d&eacute;finir un chargeur d'entit&eacute; qui charge une collection par jointure :</p><pre class="programlisting">&lt;sql-query name="person"&gt;
+    &lt;return alias="pers" class="Person"/&gt;
+    &lt;return-join alias="emp" property="pers.employments"/&gt;
+    SELECT NAME AS {pers.*}, {emp.*}
+    FROM PERSON pers
+    LEFT OUTER JOIN EMPLOYMENT emp
+        ON pers.ID = emp.PERSON_ID
+    WHERE ID=?
+&lt;/sql-query&gt;</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="querysql-cud.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="querysql.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="filters.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">16.3.&nbsp;SQL personnalis&eacute; pour cr&eacute;er, mettre &agrave; jour et effacer&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;Chapitre&nbsp;17.&nbsp;Filtrer les donn&eacute;es</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

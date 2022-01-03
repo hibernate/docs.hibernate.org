@@ -1,0 +1,147 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>4.4.&nbsp;Mod&egrave;les dynamiques</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="persistent-classes.html" title="Chapitre&nbsp;4.&nbsp;Classes persistantes">
+      <link rel="prev" href="persistent-classes-equalshashcode.html" title="4.3.&nbsp;Impl&eacute;menter equals() et hashCode()">
+      <link rel="next" href="persistent-classes-tuplizers.html" title="4.5.&nbsp;Tuplizers">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">4.4.&nbsp;Mod&egrave;les dynamiques</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="persistent-classes-equalshashcode.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;4.&nbsp;Classes persistantes</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="persistent-classes-tuplizers.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="persistent-classes-dynamicmodels"></a>4.4.&nbsp;Mod&egrave;les dynamiques
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+                        <span class="emphasis"><em>Notez que la fonctionnalit&eacute;s suivantes sont actuellement consid&eacute;r&eacute;es comme exp&eacute;rimentales et peuvent changer dans un futur
+                  proche.</em></span>
+                    
+         </p>
+         <p>Les entit&eacute;s persistantes ne doivent pas n&eacute;cessairement &ecirc;tre repr&eacute;sent&eacute;es comme des classes POJO ou des objets JavaBean &agrave; l'ex&eacute;cution.
+            Hibernate supporte aussi les mod&egrave;les dynamiques (en utilisant des <code class="literal">Map</code>s de <code class="literal">Map</code>s &agrave; l'ex&eacute;cution) et la repr&eacute;sentation des entit&eacute;s comme des arbres DOM4J. Avec cette approche, vous n'&eacute;crivez pas de classes
+            persistantes, seulement des fichiers de mapping. 
+         </p>
+         <p>Par d&eacute;faut, Hibernate fonctionne en mode POJO normal. Vous pouvez param&eacute;trer un mode de repr&eacute;sentation d'entit&eacute; par d&eacute;faut
+            pour une <code class="literal">SessionFactory</code> particuli&egrave;re en utilisant l'option de configuration <code class="literal">default_entity_mode</code> (voir <a href="configuration-optional.html#configuration-optional-properties" title="Tableau&nbsp;3.3.&nbsp;Propri&eacute;t&eacute;s de configuration d'Hibernate">Tableau&nbsp;3.3, &laquo;&nbsp;Propri&eacute;t&eacute;s de configuration d'Hibernate&nbsp;&raquo;</a>). 
+         </p>
+         <p>Les exemples suivants d&eacute;montrent la repr&eacute;sentation utilisant des <code class="literal">Map</code>s. D'abord, dans le fichier de mapping, un <code class="literal">entity-name</code> doit &ecirc;tre d&eacute;clar&eacute; au lieu (ou en plus) d'un nom de classe : 
+         </p><pre class="programlisting">&lt;hibernate-mapping&gt;
+
+    &lt;class entity-name="Customer"&gt;
+
+        &lt;id name="id"
+            type="long"
+            column="ID"&gt;
+            &lt;generator class="sequence"/&gt;
+        &lt;/id&gt;
+
+        &lt;property name="name"
+            column="NAME"
+            type="string"/&gt;
+
+        &lt;property name="address"
+            column="ADDRESS"
+            type="string"/&gt;
+
+        &lt;many-to-one name="organization"
+            column="ORGANIZATION_ID"
+            class="Organization"/&gt;
+
+        &lt;bag name="orders"
+            inverse="true"
+            lazy="false"
+            cascade="all"&gt;
+            &lt;key column="CUSTOMER_ID"/&gt;
+            &lt;one-to-many class="Order"/&gt;
+        &lt;/bag&gt;
+
+    &lt;/class&gt;
+    
+&lt;/hibernate-mapping&gt;</pre><p>Notez que m&ecirc;me si des associations sont d&eacute;clar&eacute;es en utilisant des noms de classe cible, le type de cible d'une association
+            peut aussi &ecirc;tre une entit&eacute; dynamique au lieu d'un POJO. 
+         </p>
+         <p>Apr&egrave;s avoir configur&eacute; le mode d'entit&eacute; par d&eacute;faut &agrave; <code class="literal">dynamic-map</code> pour la <code class="literal">SessionFactory</code>, nous pouvons lors de l'ex&eacute;cution fonctionner avec des <code class="literal">Map</code>s de <code class="literal">Map</code>s : 
+         </p><pre class="programlisting">Session s = openSession();
+Transaction tx = s.beginTransaction();
+Session s = openSession();
+
+// Create a customer
+Map david = new HashMap();
+david.put("name", "David");
+
+// Create an organization
+Map foobar = new HashMap();
+foobar.put("name", "Foobar Inc.");
+
+// Link both
+david.put("organization", foobar);
+
+// Save both
+s.save("Customer", david);
+s.save("Organization", foobar);
+
+tx.commit();
+s.close();</pre><p>Les avantages d'un mapping dynamique sont un gain de temps pour le prototypage sans la n&eacute;cessit&eacute; d'impl&eacute;menter les classes
+            d'entit&eacute;. Pourtant, vous perdez la v&eacute;rification du typage au moment de la compilation et aurez plus d'exceptions &agrave; g&eacute;rer lors
+            de l'ex&eacute;cution. Gr&acirc;ce au mapping d'Hibernate, le sch&eacute;ma de la base de donn&eacute;es peut facilement &ecirc;tre normalis&eacute; et solidifi&eacute;,
+            permettant de rajouter une impl&eacute;mentation propre du mod&egrave;le de domaine plus tard. 
+         </p>
+         <p>Les modes de repr&eacute;sentation d'une entit&eacute; peut aussi &ecirc;tre configur&eacute; par <code class="literal">Session</code> : 
+         </p><pre class="programlisting">Session dynamicSession = pojoSession.getSession(EntityMode.MAP);
+
+// Create a customer
+Map david = new HashMap();
+david.put("name", "David");
+dynamicSession.save("Customer", david);
+...
+dynamicSession.flush();
+dynamicSession.close()
+...
+// Continue on pojoSession
+</pre><p>Veuillez noter que l'appel &agrave; <code class="literal">getSession()</code> en utilisant un <code class="literal">EntityMode</code> se fait sur l'API <code class="literal">Session</code>, pas <code class="literal">SessionFactory</code>. De cette mani&egrave;re, la nouvelle <code class="literal">Session</code> partage les connexions JDBC, transactions et autres informations de contexte sous-jacentes. Cela signifie que vous n'avez
+            pas &agrave; appeler <code class="literal">flush()</code> et <code class="literal">close()</code> sur la <code class="literal">Session</code> secondaire, et laissez aussi la gestion de la transaction et de la connexion &agrave; l'unit&eacute; de travail primaire. 
+         </p>
+         <p>Plus d'informations &agrave; propos de la repr&eacute;sentation XML peuvent &ecirc;tre trouv&eacute;es dans <a href="xml.html" title="Chapitre&nbsp;18.&nbsp;Mapping XML">Chapitre&nbsp;18, <i xmlns:xlink="http://www.w3.org/1999/xlink">Mapping XML</i></a>. 
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="persistent-classes-equalshashcode.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="persistent-classes.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="persistent-classes-tuplizers.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">4.3.&nbsp;Impl&eacute;menter <code class="literal">equals()</code> et <code class="literal">hashCode()</code>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;4.5.&nbsp;Tuplizers</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

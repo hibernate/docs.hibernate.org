@@ -1,0 +1,242 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>Chapitre&nbsp;3.&nbsp;Surcharger des m&eacute;ta-donn&eacute;es &agrave; travers du XML</title><link rel="stylesheet" href="../shared/css/html.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.65.1"><link rel="home" href="index.html" title="Hibernate Annotations"><link rel="up" href="index.html" title="Hibernate Annotations"><link rel="previous" href="entity.html" title="Chapitre&nbsp;2.&nbsp;Entity Beans"><link rel="next" href="validator.html" title="Chapitre&nbsp;4.&nbsp;Hibernate Validator"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapitre&nbsp;3.&nbsp;Surcharger des m&eacute;ta-donn&eacute;es &agrave; travers du XML</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="entity.html">Pr&eacute;c&eacute;dent</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="validator.html">Suivant</a></td></tr></table><hr></div><div class="chapter" lang="fr"><div class="titlepage"><div><div><h2 class="title"><a name="xml-overriding"></a>Chapitre&nbsp;3.&nbsp;Surcharger des m&eacute;ta-donn&eacute;es &agrave; travers du XML</h2></div></div><div></div></div><p>La cible primaire pour les m&eacute;ta-donn&eacute;es dans EJB3 sont les annotations,
+  mais la sp&eacute;cification EJB3 fournit un moyen de surcharger ou remplacer les
+  m&eacute;ta-donn&eacute;es d&eacute;finies par des annotations &agrave; travers un descripteur de
+  d&eacute;ploiement XML. Dans la version courante, seule la surcharge des annotations
+  pure EJB3 est prise en charge. Si vous souhaitez utiliser des caract&eacute;ristiques
+  sp&eacute;cifiques &agrave; Hibernate dans des entit&eacute;s, vous devrez utiliser les annotations
+  ou vous replier sur les fichiers hbm. Vous pouvez bien s&ucirc;r m&eacute;langer et faire
+  correspondre des entit&eacute;s annot&eacute;es et des entit&eacute;s d&eacute;crites dans des fichiers
+  hbm.</p><p>La suite de test unitaires montre des exemples suppl&eacute;mentaires de
+  fichier XML.</p><div class="section" lang="fr"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="xml-overriding-principles"></a>3.1.&nbsp;Principes</h2></div></div><div></div></div><p>La structure du descripteur de d&eacute;ploiement XML a &eacute;t&eacute; con&ccedil;ue pour
+    refl&eacute;ter celle des annotations. Donc si vous connaissez la structure des
+    annotations, utiliser le sch&eacute;ma XML sera facile pour vous.</p><p>Vous pouvez d&eacute;finir un ou plusieurs fichiers XML d&eacute;crivant vos
+    m&eacute;ta-donn&eacute;es, ces fichiers seront fusionn&eacute;s par le moteur de surcharge.</p><div class="section" lang="fr"><div class="titlepage"><div><div><h3 class="title"><a name="d0e2703"></a>3.1.1.&nbsp;M&eacute;ta-donn&eacute;es de niveau global</h3></div></div><div></div></div><p>Vous pouvez d&eacute;finir des m&eacute;ta-donn&eacute;es de niveau global disponibles
+      pour tous les fichiers XML. Vous ne devez pas d&eacute;finir ces m&eacute;ta-donn&eacute;es
+      plus d'une fois par d&eacute;ploiement.</p><pre class="programlisting">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+
+&lt;entity-mappings
+  xmlns="http://java.sun.com/xml/ns/persistence/orm"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_1_0.xsd"
+  version="1.0"&gt;
+
+    &lt;persistence-unit-metadata&gt;
+        &lt;xml-mapping-metadata-complete/&gt;
+        &lt;persistence-unit-defaults&gt;
+            &lt;schema&gt;myschema&lt;/schema&gt;
+            &lt;catalog&gt;mycatalog&lt;/catalog&gt;
+            &lt;cascade-persist/&gt;
+        &lt;/persistence-unit-defaults&gt;
+    &lt;/persistence-unit-metadata&gt;</pre><p><tt class="literal">xml-mapping-metadata-complete</tt> signifie que toutes
+      les entit&eacute;s, classes m&egrave;res mapp&eacute;es et m&eacute;ta-donn&eacute;es devraient &ecirc;tre
+      r&eacute;cup&eacute;r&eacute;es &agrave; partir du XML (c'est-&agrave;-dire ignorer les annotations).</p><p><tt class="literal">schema / catalog</tt> surchargera toutes les
+      d&eacute;finitions par d&eacute;faut de sch&eacute;ma et de catalogue dans les m&eacute;ta-donn&eacute;es
+      (XML et annotations).</p><p><tt class="literal">cascade-persist</tt> signifie que toutes les
+      associations ont PERSIST comme type de cascade. Nous vous recommandons de
+      ne pas utiliser cette fonctionnalit&eacute;.</p></div><div class="section" lang="fr"><div class="titlepage"><div><div><h3 class="title"><a name="xml-overriding-principles-entity"></a>3.1.2.&nbsp;M&eacute;ta-donn&eacute;es de niveau entit&eacute;</h3></div></div><div></div></div><p>Vous pouvez d&eacute;finir ou surcharger des informations de m&eacute;ta-donn&eacute;es
+      sur une entit&eacute; donn&eacute;e.</p><div class="programlistingco"><pre class="programlisting">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+
+&lt;entity-mappings                                                                    <span class="co">(1)</span>
+  xmlns="http://java.sun.com/xml/ns/persistence/orm"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_1_0.xsd"
+  version="1.0"&gt;
+
+    &lt;package&gt;org.hibernate.test.annotations.reflection&lt;/package&gt;                    <span class="co">(2)</span>
+    &lt;entity class="Administration" access="PROPERTY" metadata-complete="true"&gt;      <span class="co">(3)</span>
+        &lt;table name="tbl_admin"&gt;                                                    <span class="co">(4)</span>
+            &lt;unique-constraint&gt;
+                &lt;column-name&gt;firstname&lt;/column-name&gt;
+                &lt;column-name&gt;lastname&lt;/column-name&gt;
+            &lt;/unique-constraint&gt;
+        &lt;/table&gt;
+        &lt;secondary-table name="admin2"&gt;                                             <span class="co">(5)</span>
+            &lt;primary-key-join-column name="admin_id" referenced-column-name="id"/&gt;
+            &lt;unique-constraint&gt;
+                &lt;column-name&gt;address&lt;/column-name&gt;
+            &lt;/unique-constraint&gt;
+        &lt;/secondary-table&gt;
+        &lt;id-class class="SocialSecurityNumber"/&gt;                                    <span class="co">(6)</span>
+        &lt;inheritance strategy="JOINED"/&gt;                                            <span class="co">(7)</span>
+        &lt;sequence-generator name="seqhilo" sequence-name="seqhilo"/&gt;                <span class="co">(8)</span>
+        &lt;table-generator name="table" table="tablehilo"/&gt;                           <span class="co">(9)</span>
+        ...
+    &lt;/entity&gt;
+
+    &lt;entity class="PostalAdministration"&gt;
+        &lt;primary-key-join-column name="id"/&gt;                                        <span class="co">(10)</span>
+        ...
+    &lt;/entity&gt;
+&lt;/entity-mappings&gt;</pre><div class="calloutlist"><table border="0" summary="Callout list"><tr><td width="5%" valign="top" align="left">(1)</td><td valign="top" align="left"><p><tt class="literal">entity-mappings</tt> : entity-mappings est
+            l'&eacute;l&eacute;ment racine pour tous les fichiers XML. Vous devez d&eacute;clarer le
+            sch&eacute;ma xml, le fichier du sch&eacute;ma est inclus dans le fichier
+            hibernate-annotations.jar, aucun acc&egrave;s &agrave; internet ne sera effectu&eacute;
+            par Hibernate Annotations.</p></td></tr><tr><td width="5%" valign="top" align="left">(2)</td><td valign="top" align="left"><p><tt class="literal">package</tt> (optionnel) : package par d&eacute;faut
+            utilis&eacute; pour tous les noms de classes sans package dans le fichier
+            de descripteur de d&eacute;ploiement donn&eacute;.</p></td></tr><tr><td width="5%" valign="top" align="left">(3)</td><td valign="top" align="left"><p><tt class="literal">entity</tt> : d&eacute;crit une entit&eacute;.</p><p><tt class="literal">metadata-complete</tt> d&eacute;finit si la description
+            des m&eacute;ta-donn&eacute;es pour cet &eacute;l&eacute;ment est compl&egrave;te ou pas (en d'autres
+            mots, si les annotations pr&eacute;sentes au niveau de la classe devraient
+            &ecirc;tre prises en compte ou pas).</p><p>Une entit&eacute; doit avoir un attribut <tt class="literal">class</tt>
+            r&eacute;f&eacute;ren&ccedil;ant une classe java &agrave; laquelle s'applique les
+            m&eacute;ta-donn&eacute;es.</p><p>Vous pouvez surcharger un nom d'entit&eacute; avec l'attribut
+            <tt class="literal">name</tt>, si aucun n'est d&eacute;fini et si une annotation
+            <tt class="literal">@Entity.name</tt> est pr&eacute;sente, alors elle est
+            utilis&eacute;e (et &eacute;tablit que les m&eacute;ta-donn&eacute;es ne sont pas
+            compl&egrave;tes).</p><p>Pour un &eacute;l&eacute;ment avec des m&eacute;ta-donn&eacute;es compl&egrave;tes (voir
+            ci-dessous), vous pouvez d&eacute;finir un attribut
+            <tt class="literal">access</tt> (soit <tt class="literal">FIELD</tt>, soit
+            <tt class="literal">PROPERTY</tt> (valeur par d&eacute;faut)). Pour un &eacute;l&eacute;ment
+            avec des m&eacute;ta-donn&eacute;es incompl&egrave;tes, si <tt class="literal">access</tt>
+            n'est pas d&eacute;fini, la position de @Id permettra de le d&eacute;terminer, si
+            <tt class="literal">access</tt> est d&eacute;fini, sa valeur est utilis&eacute;e.</p></td></tr><tr><td width="5%" valign="top" align="left">(4)</td><td valign="top" align="left"><p><tt class="literal">table</tt> : vous pouvez d&eacute;clarer des propri&eacute;t&eacute;s
+            de table (nom, sch&eacute;ma, catalogue), si aucune n'est d&eacute;finie,
+            l'annotation java est utilis&eacute;e.</p><p>Vous pouvez d&eacute;finir une ou plusieurs contraintes d'unicit&eacute;
+            comme dans l'exemple.</p></td></tr><tr><td width="5%" valign="top" align="left">(5)</td><td valign="top" align="left"><p><tt class="literal">secondary-table</tt> : d&eacute;finit une table
+            secondaire tr&egrave;s semblable &agrave; une table habituelle except&eacute; que vous
+            pouvez d&eacute;finir les colonnes de clef primaire / clef &eacute;trang&egrave;re avec
+            l'&eacute;l&eacute;ment <tt class="literal">primary-key-join-column</tt>. Sur des
+            m&eacute;ta-donn&eacute;es incompl&egrave;tes, les annotations de table secondaire sont
+            utilis&eacute;es seulement s'il n'y a pas de <tt class="literal">secondary-table</tt>
+            de d&eacute;fini, sinon les annotations sont ignor&eacute;es.</p></td></tr><tr><td width="5%" valign="top" align="left">(6)</td><td valign="top" align="left"><p><tt class="literal">id-class</tt> : d&eacute;finit la classe identifiante
+            comme le fait <tt class="literal">@IdClass</tt>.</p></td></tr><tr><td width="5%" valign="top" align="left">(7)</td><td valign="top" align="left"><p><tt class="literal">inheritance</tt> : d&eacute;finit la strat&eacute;gie
+            d'h&eacute;ritage (<tt class="literal">JOINED</tt>,
+            <tt class="literal">TABLE_PER_CLASS</tt>,
+            <tt class="literal">SINGLE_TABLE</tt>) ; disponible seulement au niveau de
+            l'&eacute;l&eacute;ment racine.</p></td></tr><tr><td width="5%" valign="top" align="left">(8)</td><td valign="top" align="left"><p><tt class="literal">sequence-generator</tt> : d&eacute;finit un g&eacute;n&eacute;rateur
+            de s&eacute;quence.</p></td></tr><tr><td width="5%" valign="top" align="left">(9)</td><td valign="top" align="left"><p><tt class="literal">table-generator</tt> : d&eacute;finit un g&eacute;n&eacute;rateur de
+            table.</p></td></tr><tr><td width="5%" valign="top" align="left">(10)</td><td valign="top" align="left"><p><tt class="literal"><tt class="literal">primary-key-join-column</tt></tt> :
+            d&eacute;finit la colonne de jointure sur la clef primaire pour les
+            entit&eacute;s filles lorsque la strat&eacute;gie d'h&eacute;ritage utilis&eacute;e est
+            JOINED.</p></td></tr></table></div></div><div class="programlistingco"><pre class="programlisting">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+
+&lt;entity-mappings
+  xmlns="http://java.sun.com/xml/ns/persistence/orm"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_1_0.xsd"
+  version="1.0"&gt;
+
+    &lt;package&gt;org.hibernate.test.annotations.reflection&lt;/package&gt;
+    &lt;entity class="Music" access="PROPERTY" metadata-complete="true"&gt;
+        &lt;discriminator-value&gt;Generic&lt;/discriminator-value&gt;                          <span class="co">(1)</span>
+        &lt;discriminator-column length="34"/&gt;
+        ...
+    &lt;/entity&gt;
+
+    &lt;entity class="PostalAdministration"&gt;
+        &lt;primary-key-join-column name="id"/&gt;
+        &lt;named-query name="adminById"&gt;                                              <span class="co">(2)</span>
+            &lt;query&gt;select m from Administration m where m.id = :id&lt;/query&gt;
+            &lt;hint name="org.hibernate.timeout" value="200"/&gt;
+        &lt;/named-query&gt;
+        &lt;named-native-query name="allAdmin" result-set-mapping="adminrs"&gt;           <span class="co">(3)</span>
+            &lt;query&gt;select *, count(taxpayer_id) as taxPayerNumber
+            from Administration, TaxPayer
+            where taxpayer_admin_id = admin_id group by ...&lt;/query&gt;
+            &lt;hint name="org.hibernate.timeout" value="200"/&gt;
+        &lt;/named-native-query&gt;
+        &lt;sql-result-set-mapping name="adminrs"&gt;                                     <span class="co">(4)</span>
+            &lt;entity-result entity-class="Administration"&gt;
+                &lt;field-result name="name" column="fld_name"/&gt;
+            &lt;/entity-result&gt;
+            &lt;column-result name="taxPayerNumber"/&gt;
+        &lt;/sql-result-set-mapping&gt;
+        &lt;attribute-override name="ground"&gt;                                          <span class="co">(5)</span>
+            &lt;column name="fld_ground" unique="true" scale="2"/&gt;
+        &lt;/attribute-override&gt;
+        &lt;association-override name="referer"&gt;
+            &lt;join-column name="referer_id" referenced-column-name="id"/&gt;
+        &lt;/association-override&gt;
+        ...
+    &lt;/entity&gt;
+&lt;/entity-mappings&gt;</pre><div class="calloutlist"><table border="0" summary="Callout list"><tr><td width="5%" valign="top" align="left">(1)</td><td valign="top" align="left"><p><tt class="literal">discriminator-value /
+            discriminator-column</tt> : d&eacute;finissent la colonne et la valeur
+            discriminantes lorsque la strat&eacute;gie d'h&eacute;ritage choisie est
+            SINGLE_TABLE.</p></td></tr><tr><td width="5%" valign="top" align="left">(2)</td><td valign="top" align="left"><p><tt class="literal">named-query</tt> : d&eacute;finit les requ&ecirc;tes nomm&eacute;es
+            et potentiellement les indices qui leur sont associ&eacute;s. Ces
+            d&eacute;finitions sont ajout&eacute;es &agrave; celles d&eacute;finies dans les annotations,
+            si deux d&eacute;finitions ont le m&ecirc;me nom, la version XML a la
+            priorit&eacute;.</p></td></tr><tr><td width="5%" valign="top" align="left">(3)</td><td valign="top" align="left"><p><tt class="literal">named-native-query</tt> : d&eacute;finit une requ&ecirc;te
+            SQL nomm&eacute;e et le mapping de son r&eacute;sultat. Alternativement, vous
+            pouvez d&eacute;finir <tt class="literal">result-class</tt>. Ces d&eacute;finitions
+            sont ajout&eacute;es &agrave; celles definies dans les annotations, si deux
+            d&eacute;finitions ont le m&ecirc;me nom, la version XML a la priorit&eacute;.</p></td></tr><tr><td width="5%" valign="top" align="left">(4)</td><td valign="top" align="left"><p><tt class="literal">sql-result-set-mapping</tt> : d&eacute;crit la
+            structure du mapping des r&eacute;sultats. Vous pouvez d&eacute;finir des mappings
+            de colonnes et d'entit&eacute;. Ces d&eacute;finitions sont ajout&eacute;es &agrave; celles
+            d&eacute;finies dans les annotations, si deux d&eacute;finitions ont le m&ecirc;me nom,
+            la version XML a la priorit&eacute;.</p></td></tr><tr><td width="5%" valign="top" align="left">(5)</td><td valign="top" align="left"><p><tt class="literal">attribute-override /
+            association-override</tt> : surcharge la d&eacute;finition d'une
+            colonne ou d'une colonne de jointure. Cette surcharge est ajout&eacute;e &agrave;
+            celle d&eacute;finie dans les annotations.</p></td></tr></table></div></div><p>La m&ecirc;me chose s'applique &agrave; <tt class="literal">&lt;embeddable&gt;</tt> et
+      <tt class="literal">&lt;mapped-superclass&gt;</tt>.</p></div><div class="section" lang="fr"><div class="titlepage"><div><div><h3 class="title"><a name="d0e2893"></a>3.1.3.&nbsp;M&eacute;ta-donn&eacute;es de niveau propri&eacute;t&eacute;</h3></div></div><div></div></div><p>Vous pouvez bien s&ucirc;r d&eacute;finir des surcharges XML pour des propri&eacute;t&eacute;s.
+      Si les m&eacute;ta-donn&eacute;es sont d&eacute;finies comme incompl&egrave;tes, alors les propri&eacute;t&eacute;s
+      suppl&eacute;mentaires (c'est-&agrave;-dire au niveau Java) seront ignor&eacute;es. Toutes les
+      m&eacute;ta-donn&eacute;es de niveau propri&eacute;t&eacute; sont d&eacute;finies par
+      <tt class="literal">entity/attributes</tt>,
+      <tt class="literal">mapped-superclass/attributes</tt> ou
+      <tt class="literal">embeddable/attributes</tt>.</p><pre class="programlisting">    &lt;attributes&gt;
+        &lt;id name="id"&gt;
+            &lt;column name="fld_id"/&gt;
+            &lt;generated-value generator="generator" strategy="SEQUENCE"/&gt;
+            &lt;temporal&gt;DATE&lt;/temporal&gt;
+            &lt;sequence-generator name="generator" sequence-name="seq"/&gt;
+        &lt;/id&gt;
+        &lt;version name="version"/&gt;
+        &lt;embedded name="embeddedObject"&gt;
+            &lt;attribute-override name"subproperty"&gt;
+                &lt;column name="my_column"/&gt;
+            &lt;/attribute-override&gt;
+        &lt;/embedded&gt;
+        &lt;basic name="status" optional="false"&gt;
+            &lt;enumerated&gt;STRING&lt;/enumerated&gt;
+        &lt;/basic&gt;
+        &lt;basic name="serial" optional="true"&gt;
+            &lt;column name="serialbytes"/&gt;
+            &lt;lob/&gt;
+        &lt;/basic&gt;
+        &lt;basic name="terminusTime" fetch="LAZY"&gt;
+            &lt;temporal&gt;TIMESTAMP&lt;/temporal&gt;
+        &lt;/basic&gt;
+    &lt;/attributes&gt;</pre><p>Vous pouvez surcharger une propri&eacute;t&eacute; avec <tt class="literal">id</tt>,
+      <tt class="literal">embedded-id</tt>, <tt class="literal">version</tt>,
+      <tt class="literal">embedded</tt> et <tt class="literal">basic</tt>. Chacun de ces
+      &eacute;l&eacute;ments peuvent avoir des sous-&eacute;l&eacute;ments : <tt class="literal">lob</tt>,
+      <tt class="literal">temporal</tt>, <tt class="literal">enumerated</tt>,
+      <tt class="literal">column</tt>.</p></div><div class="section" lang="fr"><div class="titlepage"><div><div><h3 class="title"><a name="d0e2938"></a>3.1.4.&nbsp;M&eacute;ta-donn&eacute;es au niveau association</h3></div></div><div></div></div><p>Vous pouvez d&eacute;finir des surcharges XML pour les associations. Toutes
+      les m&eacute;ta-donn&eacute;es de niveau association sont d&eacute;finies par
+      <tt class="literal">entity/attributes</tt>,
+      <tt class="literal">mapped-superclass/attributes</tt> ou
+      <tt class="literal">embeddable/attributes</tt>.</p><pre class="programlisting">    &lt;attributes&gt;
+        &lt;one-to-many name="players" fetch="EAGER"&gt;
+            &lt;map-key name="name"/&gt;
+            &lt;join-column name="driver"/&gt;
+            &lt;join-column name="number"/&gt;
+        &lt;/one-to-many&gt;
+        &lt;many-to-many name="roads" target-entity="Administration"&gt;
+            &lt;order-by&gt;maxSpeed&lt;/order-by&gt;
+            &lt;join-table name="bus_road"&gt;
+                &lt;join-column name="driver"/&gt;
+                &lt;join-column name="number"/&gt;
+                &lt;inverse-join-column name="road_id"/&gt;
+                &lt;unique-constraint&gt;
+                    &lt;column-name&gt;driver&lt;/column-name&gt;
+                    &lt;column-name&gt;number&lt;/column-name&gt;
+                &lt;/unique-constraint&gt;
+            &lt;/join-table&gt;
+        &lt;/many-to-many&gt;
+        &lt;many-to-many name="allTimeDrivers" mapped-by="drivenBuses"&gt;
+    &lt;/attributes&gt;</pre><p>Vous pouvez surcharger une association avec
+      <tt class="literal">one-to-many</tt>, <tt class="literal">one-to-one</tt>,
+      <tt class="literal">many-to-one</tt>, et <tt class="literal">many-to-many</tt>.
+      Chacun de ces &eacute;l&eacute;ments peut avoir des sous-&eacute;l&eacute;ments :
+      <tt class="literal">join-table</tt> (qui peut avoir des
+      <tt class="literal">join-column</tt>s et des
+      <tt class="literal">inverse-join-column</tt>s),
+      <tt class="literal"><tt class="literal">join-column</tt>s</tt>,
+      <tt class="literal">map-key</tt>, et <tt class="literal">order-by</tt>.
+      <tt class="literal">mapped-by</tt> et <tt class="literal">target-entity</tt> peuvent
+      &ecirc;tre d&eacute;finis en tant qu'attributs lorsque cela a du sens. Une fois de plus
+      la structure est le reflet de la structure des annotations. Vous pouvez
+      trouver toutes les informations de s&eacute;mantique dans le chapitre d&eacute;crivant
+      les annotations.</p></div></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="entity.html">Pr&eacute;c&eacute;dent</a>&nbsp;</td><td width="20%" align="center"><a accesskey="u" href="index.html">Niveau sup&eacute;rieur</a></td><td width="40%" align="right">&nbsp;<a accesskey="n" href="validator.html">Suivant</a></td></tr><tr><td width="40%" align="left" valign="top">Chapitre&nbsp;2.&nbsp;Entity Beans&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td><td width="40%" align="right" valign="top">&nbsp;Chapitre&nbsp;4.&nbsp;Hibernate Validator</td></tr></table></div></body></html>

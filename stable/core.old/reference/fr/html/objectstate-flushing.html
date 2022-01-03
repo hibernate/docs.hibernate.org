@@ -1,0 +1,120 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>10.10.&nbsp;Flush de la session</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="objectstate.html" title="Chapitre&nbsp;10.&nbsp;Travailler avec des objets">
+      <link rel="prev" href="objectstate-replicating.html" title="10.9.&nbsp;R&eacute;plication d'objets entre deux entrep&ocirc;ts de donn&eacute;es">
+      <link rel="next" href="objectstate-transitive.html" title="10.11.&nbsp;Persistance transitive">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">10.10.&nbsp;Flush de la session</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="objectstate-replicating.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;10.&nbsp;Travailler avec des objets</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="objectstate-transitive.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="objectstate-flushing"></a>10.10.&nbsp;Flush de la session
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>De temps en temps la <code class="literal">Session</code> ex&eacute;cutera les expressions SQL requises pour syncrhoniser l'&eacute;tat de la connexion JDBC avec l'&eacute;tat des objets retenus en m&eacute;moire.
+            Ce processus, <span class="emphasis"><em>flush</em></span>, arrive par d&eacute;faut aux points suivants : 
+         </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p>lors de certaines ex&eacute;cutions de requ&ecirc;te </p>
+               </li>
+               <li>
+                  <p>lors d'un appel &agrave; <code class="literal">org.hibernate.Transaction.commit()</code> 
+                  </p>
+               </li>
+               <li>
+                  <p>lors d'un appel &agrave; <code class="literal">Session.flush()</code> 
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p>Les expressions SQL sont effectu&eacute;es dans l'ordre suivant : </p>
+         <div class="orderedlist">
+            <ol type="1" compact>
+               <li>
+                  <p>insertion des entit&eacute;s, dans le m&ecirc;me ordre que celui des objets correspondants sauvegard&eacute;s par l'appel &agrave; <code class="literal">Session.save()</code> 
+                  </p>
+               </li>
+               <li>
+                  <p>mise &agrave; jours des entit&eacute;s </p>
+               </li>
+               <li>
+                  <p>suppression des collections </p>
+               </li>
+               <li>
+                  <p>suppression, mise &agrave; jour et insertion des &eacute;l&eacute;ments des collections </p>
+               </li>
+               <li>
+                  <p>insertion des collections </p>
+               </li>
+               <li>
+                  <p>suppression des entit&eacute;s, dans le m&ecirc;me ordre que celui des objets correspondants qui ont &eacute;t&eacute; supprim&eacute;s par l'appel &agrave; <code class="literal">Session.delete()</code> 
+                  </p>
+               </li>
+            </ol>
+         </div>
+         <p>(Une exception est que des objets utilisant la g&eacute;n&eacute;ration <code class="literal">native</code> d'identifiants sont ins&eacute;r&eacute;s lorsqu'ils sont sauvegard&eacute;s.) 
+         </p>
+         <p>Except&eacute; lorsque vous appelez <code class="literal">flush()</code> explicitement, il n'y absolument aucune garantie &agrave; propos de <span class="emphasis"><em>quand</em></span> la <code class="literal">Session</code> ex&eacute;cute les appels JDBC, seulement sur l'<span class="emphasis"><em>ordre</em></span> dans lequel ils sont ex&eacute;cut&eacute;s. Cependant, Hibernate garantit que <code class="literal">Query.list(..)</code> ne retournera jamais de donn&eacute;es p&eacute;rim&eacute;es, ni des donn&eacute;es fausses. 
+         </p>
+         <p>Il est possible de changer le comportement par d&eacute;faut, donc que le flush se produise moins fr&eacute;quemment. La classe <code class="literal">FlushMode</code> d&eacute;finit trois modes diff&eacute;rents : flush seulement lors du commit (et seulement quand l'API <code class="literal">Transaction</code> d'Hibernate est utilis&eacute;e), flush automatiquement en utilisant la proc&eacute;dure expliqu&eacute;e, ou jamais de flush &agrave; moins que <code class="literal">flush()</code> soit appel&eacute;e explicitement. Le dernier mode est utile pour l'ex&eacute;cution de longues unit&eacute;s de travail, o&ugrave; une <code class="literal">Session</code> est gard&eacute;e ouverte et d&eacute;connect&eacute;e pour un long moment (voir <a href="transactions-optimistic.html#transactions-optimistic-longsession" title="11.3.2.&nbsp;Les sessions longues et le versionnage automatique.">Section&nbsp;11.3.2, &laquo;&nbsp;Les sessions longues et le versionnage automatique.&nbsp;&raquo;</a>). 
+         </p><pre class="programlisting">sess = sf.openSession();
+Transaction tx = sess.beginTransaction();
+sess.setFlushMode(FlushMode.COMMIT); // allow queries to return stale state
+
+Cat izi = (Cat) sess.load(Cat.class, id);
+izi.setName(iznizi);
+
+// might return stale data
+sess.find("from Cat as cat left outer join cat.kittens kitten");
+
+// change to izi is not flushed!
+...
+tx.commit(); // flush occurs
+sess.close();</pre><p>Durant le flush, une exception peut se produire (par exemple, si une op&eacute;ration de la DML viole une contrainte). Puisque les
+            exceptions de gestion impliquent une certaine compr&eacute;hension du comportement transactionnel d'Hibernate, nous le traitons dans
+            <a href="transactions.html" title="Chapitre&nbsp;11.&nbsp;Transactions et acc&egrave;s concurrents">Chapitre&nbsp;11, <i xmlns:xlink="http://www.w3.org/1999/xlink">Transactions et acc&egrave;s concurrents</i></a>. 
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="objectstate-replicating.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="objectstate.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="objectstate-transitive.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">10.9.&nbsp;R&eacute;plication d'objets entre deux entrep&ocirc;ts de donn&eacute;es&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;10.11.&nbsp;Persistance transitive</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

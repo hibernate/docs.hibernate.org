@@ -1,0 +1,130 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>12.2.&nbsp;Event system</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="events.html" title="Chapter&nbsp;12.&nbsp;Interceptors and events">
+      <link rel="prev" href="events.html" title="Chapter&nbsp;12.&nbsp;Interceptors and events">
+      <link rel="next" href="objectstate-decl-security.html" title="12.3.&nbsp;Hibernate declarative security">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">12.2.&nbsp;Event system</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="events.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;12.&nbsp;Interceptors and events</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="objectstate-decl-security.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="objectstate-events"></a>12.2.&nbsp;Event system
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+            If you have to react to particular events in your persistence layer, you may
+                        also use the Hibernate3 <span class="emphasis"><em>event</em></span> architecture. The event
+                        system can be used in addition or as a replacement for interceptors.
+                    
+         </p>
+         <p>
+                        Essentially all of the methods of the <code class="literal">Session</code> interface correlate
+                        to an event. You have a <code class="literal">LoadEvent</code>, a <code class="literal">FlushEvent</code>, etc
+                        (consult the XML configuration-file DTD or the <code class="literal">org.hibernate.event</code>
+                        package for the full list of defined event types). When a request is made of one of
+                        these methods, the Hibernate <code class="literal">Session</code> generates an appropriate
+                        event and passes it to the configured event listeners for that type. Out-of-the-box,
+                        these listeners implement the same processing in which those methods always resulted.
+                        However, you are free to implement a customization of one of the listener interfaces
+                        (i.e., the <code class="literal">LoadEvent</code> is processed by the registered implemenation
+                        of the <code class="literal">LoadEventListener</code> interface), in which case their
+                        implementation would be responsible for processing any <code class="literal">load()</code> requests
+                        made of the <code class="literal">Session</code>.
+                    
+         </p>
+         <p>
+                        The listeners should be considered effectively singletons; meaning, they are shared between
+                        requests, and thus should not save any state as instance variables.
+                    
+         </p>
+         <p>
+                        A custom listener should implement the appropriate interface for the event it wants to
+                        process and/or extend one of the convenience base classes (or even the default event
+                        listeners used by Hibernate out-of-the-box as these are declared non-final for this
+                        purpose). Custom listeners can either be registered programmatically through the
+                        <code class="literal">Configuration</code> object, or specified in the Hibernate configuration
+                        XML (declarative configuration through the properties file is not supported). Here's an
+                        example of a custom load event listener:
+                    
+         </p><pre class="programlisting">public class MyLoadListener implements LoadEventListener {
+    // this is the single method defined by the LoadEventListener interface
+    public void onLoad(LoadEvent event, LoadEventListener.LoadType loadType)
+            throws HibernateException {
+        if ( !MySecurity.isAuthorized( event.getEntityClassName(), event.getEntityId() ) ) {
+            throw MySecurityException("Unauthorized access");
+        }
+    }
+}</pre><p>
+                        You also need a configuration entry telling Hibernate to use the listener in addition
+                        to the default listener:
+                    
+         </p><pre class="programlisting">&lt;hibernate-configuration&gt;
+    &lt;session-factory&gt;
+        ...
+        &lt;event type="load"&gt;
+            &lt;listener class="com.eg.MyLoadListener"/&gt;
+            &lt;listener class="org.hibernate.event.def.DefaultLoadEventListener"/&gt;
+        &lt;/event&gt;
+    &lt;/session-factory&gt;
+&lt;/hibernate-configuration&gt;</pre><p>
+                        Instead, you may register it programmatically:
+                    
+         </p><pre class="programlisting">Configuration cfg = new Configuration();
+LoadEventListener[] stack = { new MyLoadListener(), new DefaultLoadEventListener() };
+cfg.EventListeners().setLoadEventListeners(stack);</pre><p>
+                        Listeners registered declaratively cannot share instances. If the same class name is
+                        used in multiple <code class="literal">&lt;listener/&gt;</code> elements, each reference will
+                        result in a separate instance of that class. If you need the capability to share
+                        listener instances between listener types you must use the programmatic registration
+                        approach.
+                    
+         </p>
+         <p>
+                        Why implement an interface and define the specific type during configuration? Well, a
+                        listener implementation could implement multiple event listener interfaces. Having the
+                        type additionally defined during registration makes it easier to turn custom listeners on
+                        or off during configuration.
+                    
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="events.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="events.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="objectstate-decl-security.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">Chapter&nbsp;12.&nbsp;Interceptors and events&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;12.3.&nbsp;Hibernate declarative security</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

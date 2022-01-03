@@ -1,0 +1,214 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>5.5.&nbsp;alternatives Metadata</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="mapping.html" title="Chapitre&nbsp;5.&nbsp;Mapping O/R basique">
+      <link rel="prev" href="mapping-quotedidentifiers.html" title="5.4.&nbsp;SQL quoted identifiers">
+      <link rel="next" href="mapping-generated.html" title="5.6.&nbsp;Propri&eacute;t&eacute;s g&eacute;n&eacute;r&eacute;es">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">5.5.&nbsp;alternatives Metadata</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="mapping-quotedidentifiers.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;5.&nbsp;Mapping O/R basique</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="mapping-generated.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="mapping-alternatives"></a>5.5.&nbsp;alternatives Metadata
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>XML ne convient pas &agrave; tout le monde, il y a donc des moyens alternatifs pour d&eacute;finir des metatda de mappings O/R dans Hibernate.
+            
+         </p>
+         <div class="sect2" lang="fr-FR">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="mapping-xdoclet"></a>5.5.1.&nbsp;utilisation de XDoclet
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>De nombreux utilisateurs de Hibernate pr&eacute;f&egrave;rent embarquer les informations de mappings directement au sein du code source
+               en utilisant les tags XDoclet <code class="literal">@hibernate.tags</code>. Nous ne couvrons pas cette approche dans ce document cependant, puisque c'est consid&eacute;r&eacute; comme faisant partie de XDoclet.
+               Cependant, nous pr&eacute;sentons l'exemple suivant de la classe <code class="literal">Cat</code> avec des mappings XDoclet. 
+            </p><pre class="programlisting">package eg;
+import java.util.Set;
+import java.util.Date;
+
+/**
+ * @hibernate.class
+ *  table="CATS"
+ */
+public class Cat {
+    private Long id; // identifier
+    private Date birthdate;
+    private Cat mother;
+    private Set kittens
+    private Color color;
+    private char sex;
+    private float weight;
+
+    /*
+     * @hibernate.id
+     *  generator-class="native"
+     *  column="CAT_ID"
+     */
+    public Long getId() {
+        return id;
+    }
+    private void setId(Long id) {
+        this.id=id;
+    }
+
+    /**
+     * @hibernate.many-to-one
+     *  column="PARENT_ID"
+     */
+    public Cat getMother() {
+        return mother;
+    }
+    void setMother(Cat mother) {
+        this.mother = mother;
+    }
+
+    /**
+     * @hibernate.property
+     *  column="BIRTH_DATE"
+     */
+    public Date getBirthdate() {
+        return birthdate;
+    }
+    void setBirthdate(Date date) {
+        birthdate = date;
+    }
+    /**
+     * @hibernate.property
+     *  column="WEIGHT"
+     */
+    public float getWeight() {
+        return weight;
+    }
+    void setWeight(float weight) {
+        this.weight = weight;
+    }
+
+    /**
+     * @hibernate.property
+     *  column="COLOR"
+     *  not-null="true"
+     */
+    public Color getColor() {
+        return color;
+    }
+    void setColor(Color color) {
+        this.color = color;
+    }
+    /**
+     * @hibernate.set
+     *  inverse="true"
+     *  order-by="BIRTH_DATE"
+     * @hibernate.collection-key
+     *  column="PARENT_ID"
+     * @hibernate.collection-one-to-many
+     */
+    public Set getKittens() {
+        return kittens;
+    }
+    void setKittens(Set kittens) {
+        this.kittens = kittens;
+    }
+    // addKitten not needed by Hibernate
+    public void addKitten(Cat kitten) {
+        kittens.add(kitten);
+    }
+
+    /**
+     * @hibernate.property
+     *  column="SEX"
+     *  not-null="true"
+     *  update="false"
+     */
+    public char getSex() {
+        return sex;
+    }
+    void setSex(char sex) {
+        this.sex=sex;
+    }
+}</pre><p>Voyez le site web de Hibernate pour plus d'exemples sur XDoclet et Hibernate. </p>
+         </div>
+         <div class="sect2" lang="fr-FR">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="mapping-annotations"></a>5.5.2.&nbsp;Utilisation des annotations JDK 5.0
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>Le JDK 5.0 introduit des annotations proches de celles de XDoclet au niveau java, qui sont type-safe et v&eacute;rifi&eacute;es &agrave; la compilation.
+               Ce m&eacute;canisme est plus puissant que XDoclet et mieux support&eacute; par les outils et IDE. IntelliJ IDEA, par exemple, supporte l'auto-compl&eacute;tion
+               et le surlignement syntaxique des annotations JDK 5.0. La nouvelle r&eacute;vision des sp&eacute;cifications des EJB (JSR-220) utilise les
+               annotations JDK 5.0 comme m&eacute;canisme primaire pour les meta-donn&eacute;es des beans entit&eacute;s. Hibernate3 impl&eacute;mente l'<code class="literal">EntityManager</code> de la JSR-220 (API de persistance), le support du mapping de meta-donn&eacute;es est disponible via le package <span class="emphasis"><em>Hibernate Annotations</em></span>, en tant que module s&eacute;par&eacute; &agrave; t&eacute;l&eacute;charger. EJB3 (JSR-220) et les m&eacute;tadata Hibernate3 sont support&eacute;s. 
+            </p>
+            <p>Ceci est un exemple d'une classe POJO annot&eacute;e comme un EJB entit&eacute; : </p><pre class="programlisting">@Entity(access = AccessType.FIELD)
+public class Customer implements Serializable {
+
+    @Id;
+    Long id;
+
+    String firstName;
+    String lastName;
+    Date birthday;
+
+    @Transient
+    Integer age;
+
+    @Embedded
+    private Address homeAddress;
+
+    @OneToMany(cascade=CascadeType.ALL)
+    @JoinColumn(name="CUSTOMER_ID")
+    Set&lt;Order&gt; orders;
+
+    // Getter/setter and business methods
+}</pre><p>Notez que le support des annotations JDK 5.0 (et de la JSR-220) est encore en cours et n'est pas termin&eacute;. R&eacute;f&eacute;rez vous au
+               module Hibernate Annotation pour plus de d&eacute;tails. 
+            </p>
+         </div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="mapping-quotedidentifiers.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="mapping.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="mapping-generated.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">5.4.&nbsp;SQL quoted identifiers&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;5.6.&nbsp;Propri&eacute;t&eacute;s g&eacute;n&eacute;r&eacute;es</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

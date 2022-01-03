@@ -1,0 +1,1721 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Chapter 11. MongoDB</title><!-- HibernateDoc.Meta --><meta name="description" content="Hibernate OGM, JPA for NoSQL datastores - Reference Documentation" /><meta name="keywords" content="hibernate, ogm, hibernate ogm, nosql, jpa, infinispan, mongodb, neo4j, cassandra, couchdb, ehcache, redis" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://docs.jboss.org/hibernate/stable/ogm/reference/en-US/html_single/" /><!-- /HibernateDoc.Meta --><link rel="stylesheet" type="text/css" href="css/hibernate.css"/><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"/><link rel="home" href="index.html" title="Hibernate OGM Reference Guide"/><link rel="up" href="index.html" title="Hibernate OGM Reference Guide"/><link rel="prev" href="ch10.html" title="Chapter 10. Ehcache"/><link rel="next" href="ch12.html" title="Chapter 12. Neo4j"/><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/></head><body><p id="title"><a href="http://www.hibernate.org" class="site_href"><strong>Hibernate.org</strong></a><a href="http://hibernate.org/Documentation/DocumentationOverview" class="doc_href"><strong>Community Documentation</strong></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="ch10.html"><strong>Prev</strong></a></li><li class="next"><a accesskey="n" href="ch12.html"><strong>Next</strong></a></li></ul><div class="chapter" title="Chapter 11. MongoDB"><div class="titlepage"><div><div><h2 class="title"><a id="ogm-mongodb"/>Chapter 11. MongoDB</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="ch11.html#configuring_mongodb">11.1. Configuring MongoDB</a></span></dt><dd><dl><dt><span class="section"><a href="ch11.html#adding_mongodb_dependencies">11.1.1. Adding MongoDB dependencies</a></span></dt><dt><span class="section"><a href="ch11.html#mongodb_specific_configuration_properties">11.1.2. MongoDB specific configuration properties</a></span></dt><dt><span class="section"><a href="ch11.html#fongodb_provider">11.1.3. FongoDB Provider</a></span></dt><dt><span class="section"><a href="ch11.html#ogm-mongodb-annotation-configuration">11.1.4. Annotation based configuration</a></span></dt><dt><span class="section"><a href="ch11.html#ogm-mongodb-programmatic-configuration">11.1.5. Programmatic configuration</a></span></dt></dl></dd><dt><span class="section"><a href="ch11.html#ogm-mongodb-storage-principles">11.2. Storage principles</a></span></dt><dd><dl><dt><span class="section"><a href="ch11.html#mongodb-built-in-types">11.2.1. Properties and built-in types</a></span></dt><dt><span class="section"><a href="ch11.html#entities_3">11.2.2. Entities</a></span></dt><dt><span class="section"><a href="ch11.html#associations_3">11.2.3. Associations</a></span></dt></dl></dd><dt><span class="section"><a href="ch11.html#transactions">11.3. Transactions</a></span></dt><dt><span class="section"><a href="ch11.html#ogm-mongodb-optimisticlocking">11.4. Optimistic Locking</a></span></dt><dt><span class="section"><a href="ch11.html#ogm-mongodb-queries">11.5. Queries</a></span></dt><dd><dl><dt><span class="section"><a href="ch11.html#jp_ql_queries">11.5.1. JP-QL queries</a></span></dt><dt><span class="section"><a href="ch11.html#ogm-mongodb-queries-native">11.5.2. Native MongoDB queries</a></span></dt><dt><span class="section"><a href="ch11.html#hibernate_search">11.5.3. Hibernate Search</a></span></dt></dl></dd></dl></div><p><a class="link" href="http://www.mongodb.org">MongoDB</a> is a document oriented datastore
+written in C++ with strong emphasis on ease of use.
+The nested nature of documents make it a particularly natural fit for most object representations.</p><p>This implementation is based upon the MongoDB Java driver.
+The currently supported version is 2.13.1.</p><div class="section" title="11.1. Configuring MongoDB"><div class="titlepage"><div><div><h2 class="title"><a id="configuring_mongodb"/>11.1. Configuring MongoDB</h2></div></div></div><p>Configuring Hibernate OGM to use MongoDb is easy:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">Add the MongoDB module and driver to the classpath</li><li class="listitem">provide the MongoDB URL to Hibernate OGM</li></ul></div><div class="section" title="11.1.1. Adding MongoDB dependencies"><div class="titlepage"><div><div><h3 class="title"><a id="adding_mongodb_dependencies"/>11.1.1. Adding MongoDB dependencies</h3></div></div></div><p>To add the dependencies via Maven, add the following module:</p><pre><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.hibernate.ogm&lt;/groupId&gt;
+    &lt;artifactId&gt;hibernate-ogm-mongodb&lt;/artifactId&gt;
+    &lt;version&gt;4.2.0.Final&lt;/version&gt;
+&lt;/dependency&gt;</code></pre><p>This will pull the MongoDB driver transparently.</p><p>If you’re not using a dependency management tool,
+copy all the dependencies from the distribution in the directories:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">/lib/required</code></li><li class="listitem"><code class="literal">/lib/mongodb</code></li><li class="listitem">Optionally - depending on your container - you might need some of the jars from <code class="literal">/lib/provided</code></li></ul></div></div><div class="section" title="11.1.2. MongoDB specific configuration properties"><div class="titlepage"><div><div><h3 class="title"><a id="mongodb_specific_configuration_properties"/>11.1.2. MongoDB specific configuration properties</h3></div></div></div><p>To get started quickly, pay attention to the following options:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">hibernate.ogm.datastore.provider</code></li><li class="listitem"><code class="literal">hibernate.ogm.datastore.host</code></li><li class="listitem"><code class="literal">hibernate.ogm.datastore.database</code></li></ul></div><p>And we should have you running.
+The following properties are available to configure MongoDB support:</p><div class="variablelist" title="MongoDB datastore configuration properties"><p class="title"><strong>MongoDB datastore configuration properties</strong></p><dl><dt><span class="term">hibernate.ogm.datastore.provider</span></dt><dd>To use MongoDB as a datastore provider, this property must be set to <code class="literal">mongodb</code></dd><dt><span class="term">hibernate.ogm.option.configurator</span></dt><dd>The fully-qualified class name or an instance of a programmatic option configurator (see <a class="xref" href="ch11.html#ogm-mongodb-programmatic-configuration" title="11.1.5. Programmatic configuration">Section 11.1.5, “Programmatic configuration”</a>)</dd><dt><span class="term">hibernate.ogm.datastore.host</span></dt><dd><p class="simpara">The hostname and port of the MongoDB instance.
+The optional port is concatenated to the host and separated by a colon.
+When using replica sets, you can define the various servers in a comma separated list of hosts and ports.
+Let’s see a few valid examples:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">mongodb.example.com</code></li><li class="listitem"><code class="literal">mongodb.example.com:27018</code></li><li class="listitem"><code class="literal">2001:db8::ff00:42:8329</code> (IPv6)</li><li class="listitem"><code class="literal">[2001:db8::ff00:42:8329]:27018</code> (IPv6 with port requires the IPv6 to be surrounded by square brackets)</li><li class="listitem"><p class="simpara"><code class="literal">www.example.com, www2.example.com:123, 192.0.2.1, 192.0.2.2:123, 2001:db8::ff00:42:8329, [2001:db8::ff00:42:8329]:123</code> (replica set)</p><p class="simpara">The default value is <code class="literal">127.0.0.1:27017</code>. If left undefined, the default port is <code class="literal">27017</code>.</p></li></ul></div></dd><dt><span class="term">hibernate.ogm.datastore.port</span></dt><dd>Deprecated: use <code class="literal">hibernate.ogm.datastore.host</code>.
+The port used by the MongoDB instance.
+Ignored when multiple hosts are defined.
+The default value is <code class="literal">27017</code>.</dd><dt><span class="term">hibernate.ogm.datastore.database</span></dt><dd>The database to connect to. This property has no default value.</dd><dt><span class="term">hibernate.ogm.datastore.create_database</span></dt><dd>If set to true, the database will be created if it doesn’t exist.
+This property default value is false.</dd><dt><span class="term">hibernate.ogm.datastore.username</span></dt><dd>The username used when connecting to the MongoDB server.
+This property has no default value.</dd><dt><span class="term">hibernate.ogm.datastore.password</span></dt><dd>The password used to connect to the MongoDB server.
+This property has no default value.
+This property is ignored if the username isn’t specified.</dd><dt><span class="term">hibernate.ogm.error_handler</span></dt><dd>The fully-qualified class name, class object or an instance of <code class="literal">ErrorHandler</code> to get notified upon errors during flushes (see <a class="xref" href="ch06.html#ogm-api-error-handler" title="6.3.1. Acting upon errors during application of changes">Section 6.3.1, “Acting upon errors during application of changes”</a>)</dd><dt><span class="term">hibernate.ogm.mongodb.connection_timeout</span></dt><dd>Defines the timeout used by the driver
+when the connection to the MongoDB instance is initiated.
+This configuration is expressed in milliseconds.
+The default value is <code class="literal">5000</code>.</dd><dt><span class="term">hibernate.ogm.mongodb.authentication_mechanism</span></dt><dd><p class="simpara">Define the authentication mechanism to use. Possible values are:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">BEST</code>: Handshakes with the server to find the best authentication mechanism.</li><li class="listitem"><code class="literal">SCRAM_SHA_1</code>: The SCRAM SHA 1 Challenge Response mechanism as described in this <a class="link" href="http://tools.ietf.org/html/rfc5802">RFC</a>.</li><li class="listitem"><code class="literal">MONGODB_CR</code>: The MongoDB Challenge Response mechanism (deprecated since MongoDB 3)</li><li class="listitem"><code class="literal">GSSAPI</code>: The GSSAPI mechanism. See the <a class="link" href="http://tools.ietf.org/html/rfc4752">RFC</a></li><li class="listitem"><code class="literal">MONGODB_X509</code>: The MongoDB X.509</li><li class="listitem"><code class="literal">PLAIN</code>: The PLAIN mechanism.  See the <a class="link" href="http://www.ietf.org/rfc/rfc4616.txt">RFC</a></li></ul></div></dd><dt><span class="term">hibernate.ogm.datastore.document.association_storage</span></dt><dd><p class="simpara">Defines the way OGM stores association information in MongoDB.
+The following two strategies exist (values of the <code class="literal">org.hibernate.ogm.datastore.document.options.AssociationStorageType</code> enum):</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">IN_ENTITY</code>: store association information within the entity</li><li class="listitem"><code class="literal">ASSOCIATION_DOCUMENT</code>: store association information in a dedicated document per association</li></ul></div><p class="simpara"><code class="literal">IN_ENTITY</code> is the default and recommended option
+unless the association navigation data is much bigger than the core of the document and leads to performance degradation.</p></dd><dt><span class="term">hibernate.ogm.mongodb.association_document_storage</span></dt><dd><p class="simpara">Defines how to store assocation documents (applies only if the <code class="literal">ASSOCIATION_DOCUMENT</code>
+association storage strategy is used).
+Possible strategies are (values of the <code class="literal">org.hibernate.ogm.datastore.mongodb.options.AssociationDocumentStorageType</code> enum):</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">GLOBAL_COLLECTION</code> (default): stores the association information in a unique MongoDB collection for all associations</li><li class="listitem"><code class="literal">COLLECTION_PER_ASSOCIATION</code> stores the association in a dedicated MongoDB collection per association</li></ul></div></dd><dt><span class="term">hibernate.ogm.mongodb.write_concern</span></dt><dd><p class="simpara">Defines the write concern setting to be applied when issuing writes against the MongoDB datastore.
+Possible settings are (values of the <code class="literal">WriteConcernType</code> enum):
+<code class="literal">ACKNOWLEDGED</code>, <code class="literal">UNACKNOWLEDGED</code>, <code class="literal">FSYNCED</code>, <code class="literal">JOURNALED</code>, <code class="literal">REPLICA_ACKNOWLEDGED</code>, <code class="literal">MAJORITY</code> and <code class="literal">CUSTOM</code>.
+When set to <code class="literal">CUSTOM</code>, a custom <code class="literal">WriteConcern</code> implementation type has to be specified.</p><p class="simpara">This option is case insensitive and the default value is <code class="literal">ACKNOWLEDGED</code>.</p></dd><dt><span class="term">hibernate.ogm.mongodb.write_concern_type</span></dt><dd>Specifies a custom <code class="literal">WriteConcern</code> implementation type (fully-qualified name, class object or instance).
+This is useful in cases where the pre-defined configurations are not sufficient,
+e.g. if you want to ensure that writes are propagated to a specific number of replicas or given "tag set".
+Only takes effect if <code class="literal">hibernate.ogm.mongodb.write_concern</code> is set to <code class="literal">CUSTOM</code>.</dd><dt><span class="term">hibernate.ogm.mongodb.read_preference</span></dt><dd>Specifies the <code class="literal">ReadPreference</code> to be applied when issuing reads against the MongoDB datastore.
+Possible settings are (values of the <code class="literal">ReadPreferenceType</code> enum):
+<code class="literal">PRIMARY</code>, <code class="literal">PRIMARY_PREFERRED</code>, <code class="literal">SECONDARY</code>, <code class="literal">SECONDARY_PREFERRED</code> and <code class="literal">NEAREST</code>.
+It’s currently not possible to plug in custom read preference types.
+If you’re interested in such a feature, please let us know.</dd></dl></div><p>For more information, please refer to the
+<a class="link" href="http://api.mongodb.org/java/current/com/mongodb/WriteConcern.html">official documentation</a>.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>When bootstrapping a session factory or entity manager factory programmatically,
+you should use the constants accessible via <code class="literal">MongoDBProperties</code>
+when specifying the configuration properties listed above.</p><p>Common properties shared between stores are declared on <code class="literal">OgmProperties</code>
+(a super interface of <code class="literal">MongoDBProperties</code>).</p><p>For maximum portability between stores, use the most generic interface possible.</p></div></div><div class="section" title="11.1.3. FongoDB Provider"><div class="titlepage"><div><div><h3 class="title"><a id="fongodb_provider"/>11.1.3. FongoDB Provider</h3></div></div></div><p>Fongo is an in-memory java implementation of MongoDB.
+It intercepts calls to the standard mongo-java-driver for finds, updates, inserts, removes and other methods.
+The primary use is for lightweight unit testing where you don’t want to spin up a <code class="literal">mongod</code> process.</p><p>Hibernate OGM provides a FongoDB provider so during tests it can be used instead of MongoDB driver.
+Note that you don’t need to change your business code to adapt to FongoDB because all adaptations are done under the cover by Hibernate OGM.</p><p>To start using FongoDB provider, you should do two things:</p><p>The first one is register the provider by using <code class="literal">hibernate.ogm.datastore.provider</code> and setting to <code class="literal">fongodb</code>.</p><div class="example"><a id="d0e8578"/><p class="title"><strong>Example 11.1. Configuring FongoDB provider</strong></p><div class="example-contents"><pre><code class="language-xml">&lt;persistence-unit name="ogm-jpa-tutorial" transaction-type="JTA"&gt;
+    &lt;provider&gt;org.hibernate.ogm.jpa.HibernateOgmPersistence&lt;/provider&gt;
+    &lt;properties&gt;
+        &lt;property name="hibernate.ogm.datastore.provider" value="fongodb"/&gt;
+        &lt;property name="hibernate.transaction.jta.platform"
+                  value="org.hibernate.service.jta.platform.internal.JBossStandAloneJtaPlatform"/&gt;
+    &lt;/properties&gt;
+&lt;/persistence-unit&gt;</code></pre></div></div><br class="example-break"/><p>The second one is adding FongoDB and SLF4J dependencies in your project.</p><pre><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;com.github.fakemongo&lt;/groupId&gt;
+    &lt;artifactId&gt;fongo&lt;/artifactId&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+    &lt;version&gt;1.6.2&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.slf4j&lt;/groupId&gt;
+    &lt;artifactId&gt;slf4j-simple&lt;/artifactId&gt;
+    &lt;version&gt;1.7.5&lt;/version&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre><p>You can read more about FongoDB project and its limitations at <a class="link" href="https://github.com/fakemongo/fongo">https://github.com/fakemongo/fongo</a></p></div><div class="section" title="11.1.4. Annotation based configuration"><div class="titlepage"><div><div><h3 class="title"><a id="ogm-mongodb-annotation-configuration"/>11.1.4. Annotation based configuration</h3></div></div></div><p>Hibernate OGM allows to configure store-specific options via Java annotations.
+You can override global configurations for a specific entity or even a specify property
+by virtue of the location where you place that annotation.</p><p>When working with the MongoDB backend, you can specify the following settings:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">the write concern for entities and associations using the <code class="literal">@WriteConcern</code> annotation</li><li class="listitem">the read preference for entities and associations using the <code class="literal">@ReadPreference</code> annotation</li><li class="listitem">a strategy for storing associations using the <code class="literal">@AssociationStorage</code> and <code class="literal">@AssociationDocumentStorage</code> annotations
+(refer to <a class="xref" href="ch11.html#ogm-mongodb-storage-principles" title="11.2. Storage principles">Section 11.2, “Storage principles”</a> to learn more about these options).</li></ul></div><p>The following shows an example:</p><div class="example"><a id="d0e8624"/><p class="title"><strong>Example 11.2. Configuring the association storage strategy using annotations</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@WriteConcern(WriteConcernType.JOURNALED)
+@ReadPreference(ReadPreferenceType.PRIMARY_PREFERRED)
+@AssociationStorage(AssociationStorageType.ASSOCIATION_DOCUMENT)
+@AssociationDocumentStorage(AssociationDocumentStorageType.COLLECTION_PER_ASSOCIATION)
+public class Zoo {
+
+    @OneToMany
+    private Set&lt;Animal&gt; animals;
+
+    @OneToMany
+    private Set&lt;Person&gt; employees;
+
+    @OneToMany
+    @AssociationStorage(AssociationStorageType.IN_ENTITY)
+    private Set&lt;Person&gt; visitors;
+
+    // getters, setters ...
+}</code></pre></div></div><br class="example-break"/><p>The <code class="literal">@WriteConcern</code> annotation on the entity level expresses that all writes should be done using the <code class="literal">JOURNALED</code> setting.
+Similarly, the <code class="literal">@ReadPreference</code> annotation advices the engine to preferably read that entity from the primary node if possible.
+The other two annotations on the type-level specify that all associations of the <code class="literal">Zoo</code>
+class should be stored in separate assocation documents, using a dedicated collection per association.
+This setting applies to the <code class="literal">animals</code> and <code class="literal">employees</code> associations.
+Only the elements of the <code class="literal">visitors</code> association will be stored in the document of the corresponding <code class="literal">Zoo</code> entity
+as per the configuration of that specific property which takes precedence over the entity-level configuration.</p></div><div class="section" title="11.1.5. Programmatic configuration"><div class="titlepage"><div><div><h3 class="title"><a id="ogm-mongodb-programmatic-configuration"/>11.1.5. Programmatic configuration</h3></div></div></div><p>In addition to the annotation mechanism,
+Hibernate OGM also provides a programmatic API for applying store-specific configuration options.
+This can be useful if you can’t modify certain entity types or
+don’t want to add store-specific configuration annotations to them.
+The API allows set options in a type-safe fashion on the global, entity and property levels.</p><p>When working with MongoDB, you can currently configure the following options using the API:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">write concern</li><li class="listitem">read preference</li><li class="listitem">association storage strategy</li><li class="listitem">association document storage strategy</li></ul></div><p>To set these options via the API, you need to create an <code class="literal">OptionConfigurator</code> implementation
+as shown in the following example:</p><div class="example"><a id="d0e8680"/><p class="title"><strong>Example 11.3. Example of an option configurator</strong></p><div class="example-contents"><pre><code class="language-java">public class MyOptionConfigurator extends OptionConfigurator {
+
+    @Override
+    public void configure(Configurable configurable) {
+        configurable.configureOptionsFor( MongoDB.class )
+            .writeConcern( WriteConcernType.REPLICA_ACKNOWLEDGED )
+            .readPreference( ReadPreferenceType.NEAREST )
+            .entity( Zoo.class )
+                .associationStorage( AssociationStorageType.ASSOCIATION_DOCUMENT )
+                .associationDocumentStorage( AssociationDocumentStorageType.COLLECTION_PER_ASSOCIATION )
+                .property( "animals", ElementType.FIELD )
+                    .associationStorage( AssociationStorageType.IN_ENTITY )
+            .entity( Animal.class )
+                .writeConcern( new RequiringReplicaCountOf( 3 ) )
+                .associationStorage( AssociationStorageType.ASSOCIATION_DOCUMENT );
+    }
+}</code></pre></div></div><br class="example-break"/><p>The call to <code class="literal">configureOptionsFor()</code>, passing the store-specific identifier type <code class="literal">MongoDB</code>,
+provides the entry point into the API. Following the fluent API pattern, you then can configure
+global options (<code class="literal">writeConcern()</code>, <code class="literal">readPreference()</code>) and navigate to single entities or properties to apply options
+specific to these (<code class="literal">associationStorage()</code> etc.).
+The call to <code class="literal">writeConcern()</code>  for the <code class="literal">Animal</code>  entity shows how a specific write concern type can be used.
+Here <code class="literal">RequiringReplicaCountOf</code> is a custom implementation of <code class="literal">WriteConcern</code> which ensures
+that writes are propagated to a given number of replicas before a write is acknowledged.</p><p>Options given on the property level precede entity-level options. So e.g. the <code class="literal">animals</code> association of the <code class="literal">Zoo</code>
+class would be stored using the in entity strategy, while all other associations of the <code class="literal">Zoo</code> entity would
+be stored using separate association documents.</p><p>Similarly, entity-level options take precedence over options given on the global level.
+Global-level options specified via the API complement the settings given via configuration properties.
+In case a setting is given via a configuration property and the API at the same time,
+the latter takes precedence.</p><p>Note that for a given level (property, entity, global),
+an option set via annotations is overridden by the same option set programmatically.
+This allows you to change settings in a more flexible way if required.</p><p>To register an option configurator, specify its class name using the <code class="literal">hibernate.ogm.option.configurator</code> property.
+When bootstrapping a session factory or entity manager factory programmatically,
+you also can pass in an <code class="literal">OptionConfigurator</code> instance or the class object representing the configurator type.</p></div></div><div class="section" title="11.2. Storage principles"><div class="titlepage"><div><div><h2 class="title"><a id="ogm-mongodb-storage-principles"/>11.2. Storage principles</h2></div></div></div><p>Hibernate OGM tries to make the mapping to the underlying datastore as natural as possible
+so that third party applications not using Hibernate OGM can still read
+and update the same datastore.
+We worked particularly hard on the MongoDB model
+to offer various classic mappings between your object model
+and the MongoDB documents.</p><p>To describe things simply, each entity is stored as a MongoDB document.
+This document is stored in a MongoDB collection named after the entity type.
+The navigational information for each association from one entity to (a set of) entity
+is stored in the document representing the entity we are departing from.</p><div class="section" title="11.2.1. Properties and built-in types"><div class="titlepage"><div><div><h3 class="title"><a id="mongodb-built-in-types"/>11.2.1. Properties and built-in types</h3></div></div></div><p>Each entity is represented by a document.
+Each property or more precisely column is represented by a field in this document,
+the field name being the column name.</p><p>Hibernate OGM supports by default the following property types:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.lang.String</code></li></ul></div><pre><code class="language-json">  { "text" : "Hello world!" }</code></pre><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.lang.Character</code> (or char primitive)</li></ul></div><pre><code class="language-json">  { "delimiter" : "/" }</code></pre><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.lang.Boolean</code> (or boolean primitive)</li></ul></div><pre><code class="language-json">  { "favorite" : true } # default mapping
+  { "favorite" : "T" } # if @Type(type = "true_false") is given
+  { "favorite" : "Y" } # if @Type(type = "yes_no") is given
+  { "favorite" : 1 } # if @Type(type = "numeric_boolean") is given</code></pre><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.lang.Byte</code> (or byte primitive)</li></ul></div><pre><code class="language-json">  { "display_mask" : "70" }</code></pre><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.lang.Byte[]</code> (or byte[])</li></ul></div><pre><code class="language-json">  { "pdfAsBytes" : BinData(0,"MTIzNDU=") }</code></pre><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.lang.Short</code> (or short primitive)</li></ul></div><pre><code class="language-json">  { "urlPort" : 80 }</code></pre><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.lang.Integer</code> (or integer primitive)</li></ul></div><pre><code class="language-json">  { "stockCount" : 12309 }</code></pre><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.lang.Long</code> (or long primitive)</li></ul></div><pre><code class="language-json">  { "userId" : NumberLong("-6718902786625749549") }</code></pre><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.lang.Float</code> (or float primitive)</li></ul></div><pre><code class="language-json">  { "visitRatio" : 10.39 }</code></pre><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.lang.Double</code> (or double primitive)</li></ul></div><pre><code class="language-json">  { "tax_percentage" : 12.34 }</code></pre><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.math.BigDecimal</code></li></ul></div><pre><code class="language-json">  { "site_weight" : "21.77" }</code></pre><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.math.BigInteger</code></li></ul></div><pre><code class="language-json">  { "site_weight" : "444" }</code></pre><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.util.Calendar</code></li></ul></div><pre><code class="language-json">  { "creation" : "2014/11/03 16:19:49:283 +0000" }</code></pre><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.util.Date</code></li></ul></div><pre><code class="language-json">  { "last_update" : ISODate("2014-11-03T16:19:49.283Z") }</code></pre><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.util.UUID</code></li></ul></div><pre><code class="language-json">  { "serialNumber" : "71f5713d-69c4-4b62-ad15-aed8ce8d10e0" }</code></pre><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.util.URL</code></li></ul></div><pre><code class="language-json">  { "url" : "http://www.hibernate.org/" }</code></pre><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">org.bson.types.ObjectId</code></li></ul></div><pre><code class="language-json">  { "object_id" : ObjectId("547d9b40e62048750f25ef77") }</code></pre><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>Hibernate OGM doesn’t store null values in MongoDB,
+setting a value to null is the same as removing the field
+in the corresponding object in the db.</p><p>This can have consequences when it comes to queries on null value.</p></div></div><div class="section" title="11.2.2. Entities"><div class="titlepage"><div><div><h3 class="title"><a id="entities_3"/>11.2.2. Entities</h3></div></div></div><p>Entities are stored as MongoDB documents and not as BLOBs:
+each entity property will be translated into a document field.
+You can use <code class="literal">@Table</code> and <code class="literal">@Column</code> annotations
+to rename respectively the collection the document is stored in
+and the document’s field a property is persisted in.</p><div class="example"><a id="d0e8895"/><p class="title"><strong>Example 11.4. Default JPA mapping for an entity</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class News {
+
+    @Id
+    private String id;
+    private String title;
+
+    // getters, setters ...
+}</code></pre><pre><code class="language-json">// Stored in the Collection "News"
+{
+    "_id" : "1234-5678-0123-4567",
+    "title": "On the merits of NoSQL",
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e8902"/><p class="title"><strong>Example 11.5. Rename field and collection using @Table and @Column</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+// Overrides the collection name
+@Table(name = "News_Collection")
+public class News {
+
+    @Id
+    private String id;
+
+    // Overrides the field name
+    @Column(name = "headline")
+    private String title;
+
+    // getters, setters ...
+}</code></pre><pre><code class="language-json">// Stored in the Collection "News"
+{
+    "_id" : "1234-5678-0123-4567",
+    "headline": "On the merits of NoSQL",
+}</code></pre></div></div><br class="example-break"/><div class="section" title="11.2.2.1. Identifiers"><div class="titlepage"><div><div><h4 class="title"><a id="identifiers_3"/>11.2.2.1. Identifiers</h4></div></div></div><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>Hibernate OGM always store identifiers using the <code class="literal">_id</code> field of a MongoDB document ignoring
+the name of the property in the entity.</p><p>That’s a good thing as MongoDB has special treatment and expectation of the property <code class="literal">_id</code>.</p></div><p>An identifier type may be one of the <a class="link" href="ch11.html#mongodb-built-in-types" title="11.2.1. Properties and built-in types">built-in types</a>
+or a more complex type represented by an embedded class.
+When you use a built-in type, the identifier is mapped like a regular property.
+When you use an embedded class, then the <code class="literal">_id</code> is representing a nested document
+containing the embedded class properties.</p><div class="example"><a id="d0e8931"/><p class="title"><strong>Example 11.6. Define an identifier as a primitive type</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Bookmark {
+
+    @Id
+    private String id;
+
+    private String title;
+
+    // getters, setters ...
+}</code></pre><pre><code class="language-json">{
+  "_id" : "bookmark_1"
+  "title" : "Hibernate OGM documentation"
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e8938"/><p class="title"><strong>Example 11.7. Define an identifier using @EmbeddedId</strong></p><div class="example-contents"><pre><code class="language-java">@Embeddable
+public class NewsID implements Serializable {
+
+    private String title;
+    private String author;
+
+    // getters, setters ...
+}
+
+@Entity
+public class News {
+
+    @EmbeddedId
+    private NewsID newsId;
+    private String content;
+
+    // getters, setters ...
+}</code></pre><p>News collection as JSON in MongoDB</p><pre><code class="language-json">{
+  "_id" : {
+      "author" : "Guillaume",
+      "title" : "How to use Hibernate OGM ?"
+  },
+  "content" : "Simple, just like ORM but with a NoSQL database"
+}</code></pre></div></div><br class="example-break"/><p>Generally, it is recommended though to work with MongoDB’s object id data type.
+This will facilitate the integration with other applications expecting that common MongoDB id type.
+To do so, you have two options:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">Define your id property as <code class="literal">org.bson.types.ObjectId</code></li><li class="listitem">Define your id property as <code class="literal">String</code> and annotate it with <code class="literal">@Type(type="objectid")</code></li></ul></div><p>In both cases the id will be stored as native <code class="literal">ObjectId</code> in the datastore.</p><div class="example"><a id="d0e8968"/><p class="title"><strong>Example 11.8. Define an id as ObjectId</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class News {
+
+    @Id
+    private ObjectId id;
+
+    private String title;
+
+    // getters, setters ...
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e8973"/><p class="title"><strong>Example 11.9. Define an id of type String as ObjectId</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class News {
+
+    @Id
+    @Type(type = "objectid")
+    private String id;
+
+    private String title;
+
+    // getters, setters ...
+}</code></pre></div></div><br class="example-break"/></div><div class="section" title="11.2.2.2. Identifier generation strategies"><div class="titlepage"><div><div><h4 class="title"><a id="identifier_generation_strategies_3"/>11.2.2.2. Identifier generation strategies</h4></div></div></div><p>You can assign id values yourself or let Hibernate OGM generate the value using the
+<code class="literal">@GeneratedValue</code> annotation.</p><p>There are 4 different strategies:</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><a class="link" href="ch11.html#mongodb-identity-id-generation-strategy">IDENTITY</a> (suggested)</li><li class="listitem"><a class="link" href="ch11.html#mongodb-table-id-generation-strategy">TABLE</a></li><li class="listitem"><a class="link" href="ch11.html#mongodb-sequence-id-generation-strategy" title="Example 11.14. SEQUENCE id generation strategy using default values">SEQUENCE</a></li><li class="listitem"><a class="link" href="ch11.html#mongodb-auto-id-generation-strategy">AUTO</a></li></ol></div><p><a id="mongodb-identity-id-generation-strategy"/><span class="strong"><strong>1) IDENTITY generation strategy</strong></span></p><p>The preferable strategy, Hibernate OGM will create the identifier upon insertion.
+To apply this strategy the id must be one of the following:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">annotated with <code class="literal">@Type(type="objectid")</code></li><li class="listitem"><code class="literal">org.bson.types.ObjectId</code></li></ul></div><p>like in the following examples:</p><div class="example"><a id="d0e9023"/><p class="title"><strong>Example 11.10. Define an id of type String as ObjectId</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class News {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Type(type = "objectid")
+    private String id;
+
+    private String title;
+
+    // getters, setters ...
+}</code></pre><pre><code class="language-json">{
+    "_id" : ObjectId("5425448830048b67064d40b1"),
+    "title" : "Exciting News"
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e9030"/><p class="title"><strong>Example 11.11. Define an id as ObjectId</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class News {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private ObjectId id;
+
+    private String title;
+
+    // getters, setters ...
+}</code></pre><pre><code class="language-json">{
+    "_id" : ObjectId("5425448830048b67064d40b1"),
+    "title" : "Exciting News"
+}</code></pre></div></div><br class="example-break"/><p><a id="mongodb-table-id-generation-strategy"/><span class="strong"><strong>2) TABLE generation strategy</strong></span></p><div class="example"><a id="d0e9040"/><p class="title"><strong>Example 11.12. Id generation strategy TABLE using default values</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class GuitarPlayer {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.TABLE)
+    private Long id;
+
+    private String name;
+
+    // getters, setters ...
+}</code></pre><p>GuitarPlayer collection</p><pre><code class="language-json">{
+    "_id" : NumberLong(1),
+    "name" : "Buck Cherry"
+}</code></pre><p>hibernate_sequences collection</p><pre><code class="language-json">{
+    "_id" : "GuitarPlayer",
+    "next_val" : 101
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e9053"/><p class="title"><strong>Example 11.13. Id generation strategy TABLE using a custom table</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class GuitarPlayer {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "guitarGen")
+    @TableGenerator(
+        name = "guitarGen",
+        table = "GuitarPlayerSequence",
+        pkColumnValue = "guitarPlayer",
+        valueColumnName = "nextGuitarPlayerId"
+    )
+    private long id;
+
+    // getters, setters ...
+}</code></pre><p>GuitarPlayer collection</p><pre><code class="language-json">{
+    "_id" : NumberLong(1),
+    "name" : "Buck Cherry"
+}</code></pre><p>GuitarPlayerSequence collection</p><pre><code class="language-json">{
+    "_id" : "guitarPlayer",
+    "nextGuitarPlayerId" : 2
+}</code></pre></div></div><br class="example-break"/><p><span class="strong"><strong>3) SEQUENCE generation strategy</strong></span></p><div class="example"><a id="mongodb-sequence-id-generation-strategy"/><p class="title"><strong>Example 11.14. SEQUENCE id generation strategy using default values</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Song {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE)
+  private Long id;
+
+  private String title;
+
+  // getters, setters ...
+}</code></pre><p>Song collection</p><pre><code class="language-json">{
+  "_id" : NumberLong(2),
+  "title" : "Flower Duet"
+}</code></pre><p>hibernate_sequences collection</p><pre><code class="language-json">{ "_id" : "song_sequence_name", "next_val" : 21 }</code></pre></div></div><br class="example-break"/><div class="example"><a id="mongodb-sequence-id-generation-strategy-custom"/><p class="title"><strong>Example 11.15. SEQUENCE id generation strategy using custom values</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Song {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "songSequenceGenerator")
+  @SequenceGenerator(
+      name = "songSequenceGenerator",
+      sequenceName = "song_seq",
+      initialValue = 2,
+      allocationSize = 20
+  )
+  private Long id;
+
+  private String title;
+
+  // getters, setters ...
+}</code></pre><p>Song collection</p><pre><code class="language-json">{
+  "_id" : NumberLong(2),
+  "title" : "Flower Duet"
+}</code></pre><p>hibernate_sequences collection</p><pre><code class="language-json">{ "_id" : "song_seq", "next_val" : 42 }</code></pre></div></div><br class="example-break"/><p><a id="mongodb-auto-id-generation-strategy"/><span class="strong"><strong>4) AUTO generation strategy</strong></span></p><div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Warning</h2><p>Care must be taken when using the <code class="literal">GenerationType.AUTO</code> strategy.
+When the property <code class="literal">hibernate.id.new_generator_mappings</code> is set to <code class="literal">false</code> (default),
+it will map to the <code class="literal">IDENTITY</code> strategy.
+As described before, this requires your ids to be of type <code class="literal">ObjectId</code> or <code class="literal">@Type(type = "objectid") String</code>.
+If <code class="literal">hibernate.id.new_generator_mappings</code> is set to true, <code class="literal">AUTO</code> will be mapped to the <code class="literal">TABLE</code> strategy.
+This requires your id to be of a numeric type.</p><p>We recommend to not use <code class="literal">AUTO</code> but one of the explicit strategies (<code class="literal">IDENTITY</code> or <code class="literal">TABLE</code>) to avoid
+potential misconfigurations.</p><p>For more details you can check the issue <a class="link" href="https://hibernate.atlassian.net/browse/OGM-663">OGM-663</a>.</p></div><p>If the property <code class="literal">hibernate.id.new_generator_mappings</code>  is set to <code class="literal">false</code>,
+<code class="literal">AUTO</code> will behave as the <code class="literal">IDENTITY</code> strategy.</p><p>If the property <code class="literal">hibernate.id.new_generator_mappings</code>  is set to <code class="literal">true</code>,
+<code class="literal">AUTO</code> will behave as the <code class="literal">SEQUENCE</code> strategy.</p><div class="example"><a id="d0e9172"/><p class="title"><strong>Example 11.16. AUTO id generation strategy using default values</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class DistributedRevisionControl {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private Long id;
+
+  private String name;
+
+  // getters, setters ...
+}</code></pre><p>DistributedRevisionControl collection</p><pre><code class="language-json">{ "_id" : NumberLong(1), "name" : "Git" }</code></pre><p>hibernate_sequences collection</p><pre><code class="language-json">{ "_id" : "hibernate_sequence", "next_val" : 2 }</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e9185"/><p class="title"><strong>Example 11.17. AUTO id generation strategy wih <code class="literal">hibernate.id.new_generator_mappings</code> set to false and ObjectId</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Comedian {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private ObjectId id;
+
+  private String name;
+
+  // getters, setters ...
+}</code></pre><p>Comedian collection</p><pre><code class="language-json">{ "_id" : ObjectId("5458b11693f4add0f90519c5"), "name" : "Louis C.K." }</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e9197"/><p class="title"><strong>Example 11.18. Entity with @EmbeddedId</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class News {
+
+    @EmbeddedId
+    private NewsID newsId;
+
+    // getters, setters ...
+}
+
+@Embeddable
+public class NewsID implements Serializable {
+
+    private String title;
+    private String author;
+
+    // getters, setters ...
+}</code></pre><p>Rendered as JSON in MongoDB</p><pre><code class="language-json">{
+    "_id" :{
+        "title": "How does Hibernate OGM MongoDB work?",
+        "author": "Guillaume"
+    }
+}</code></pre></div></div><br class="example-break"/></div><div class="section" title="11.2.2.3. Embedded objects and collections"><div class="titlepage"><div><div><h4 class="title"><a id="embedded_objects_and_collections_3"/>11.2.2.3. Embedded objects and collections</h4></div></div></div><p>Hibernate OGM stores elements annotated with <code class="literal">@Embedded</code> or <code class="literal">@ElementCollection</code> as nested documents of the owning entity.</p><div class="example"><a id="d0e9217"/><p class="title"><strong>Example 11.19. Embedded object</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class News {
+
+    @Id
+    private String id;
+    private String title;
+
+    @Embedded
+    private NewsPaper paper;
+
+    // getters, setters ...
+}
+
+@Embeddable
+public class NewsPaper {
+
+    private String name;
+    private String owner;
+
+    // getters, setters ...
+}</code></pre><pre><code class="language-json">{
+    "_id" : "1234-5678-0123-4567",
+    "title": "On the merits of NoSQL",
+    "paper": {
+        "name": "NoSQL journal of prophecies",
+        "owner": "Delphy"
+    }
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e9224"/><p class="title"><strong>Example 11.20. @ElementCollection with primitive types</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class AccountWithPhone {
+
+    @Id
+    private String id;
+
+    @ElementCollection
+    private List&lt;String&gt; mobileNumbers;
+
+    // getters, setters ...
+}</code></pre><p>AccountWithPhone collection</p><pre><code class="language-json">{
+    "_id" : "john_account",
+    "mobileNumbers" : [ "+1-222-555-0222", "+1-202-555-0333" ]
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e9233"/><p class="title"><strong>Example 11.21. @ElementCollection with one attribute</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class GrandMother {
+
+    @Id
+    private String id;
+
+    @ElementCollection
+    private List&lt;GrandChild&gt; grandChildren = new ArrayList&lt;GrandChild&gt;();
+
+    // getters, setters ...
+}
+
+@Embeddable
+public class GrandChild {
+
+    private String name;
+
+    // getters, setters ...
+}</code></pre><pre><code class="language-json">{
+    "_id" : "df153180-c6b3-4a4c-a7da-d5de47cf6f00",
+    "grandChildren" : [ "Luke", "Leia" ]
+}</code></pre></div></div><br class="example-break"/><p>The class <code class="literal">GrandChild</code> has only one attribute <code class="literal">name</code>,
+this means that Hibernate OGM doesn’t need to store the name of the attribute.</p><p>If the nested document has two or more fields, like in the following example,
+Hibernate OGM will store the name of the fields as well.</p><div class="example"><a id="d0e9250"/><p class="title"><strong>Example 11.22. @ElementCollection with @OrderColumn</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class GrandMother {
+
+    @Id
+    private String id;
+
+    @ElementCollection
+    @OrderColumn( name = "birth_order" )
+    private List&lt;GrandChild&gt; grandChildren = new ArrayList&lt;GrandChild&gt;();
+
+    // getters, setters ...
+}
+
+@Embeddable
+public class GrandChild {
+
+    private String name;
+
+    // getters, setters ...
+}</code></pre><pre><code class="language-json">{
+    "_id" : "e3e1ed4e-c685-4c3f-9a67-a5aeec6ff3ba",
+    "grandChildren" :
+        [
+            {
+                "name" : "Luke",
+                "birth_order" : 0
+            },
+            {
+                "name" : "Leia",
+                "birthorder" : 1
+            }
+        ]
+}</code></pre></div></div><br class="example-break"/><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>You can override the column name used for a property of an embedded object.
+But you need to know that the default column name is the concatenation of the embedding property,
+a <code class="literal">.</code> (dot) and the embedded property (recursively for several levels of embedded objects).</p><p>The MongoDB datastore treats dots specifically as it transforms them into nested documents.
+If you want to override one column name and still keep the nested structure, don’t forget the dots.</p><p>That’s a bit abstract, so let’s use an example.</p><pre><code class="language-java">@Entity
+class Order {
+    @Id String number;
+    User user;
+    Address shipping;
+    @AttributeOverrides({
+        @AttributeOverride(name="name", column=@Column(name="delivery.provider"),
+        @AttributeOverride(name="expectedDelaysInDays", column=@Column(name="delivery.delays")
+    })
+    DeliveryProvider deliveryProvider;
+    CreditCardType cardType;
+}
+
+// default columns
+@Embedded
+class User {
+    String firstname;
+    String lastname;
+}
+
+// override one column
+@Embeddable
+public Address {
+    String street;
+    @Column(name="shipping.dest_city")
+    String city;
+}
+
+// both columns overridden from the embedding side
+@Embeddable
+public DeliveryProvider {
+    String name;
+    Integer expectedDelaysInDays;
+}
+
+// do not use dots in the overriding
+// and mix levels (bad form)
+@Embedded
+class CreditCardType {
+    String merchant;
+    @Column(name="network")
+    String network;
+}</code></pre><pre><code class="language-json">{
+    "_id": "123RF33",
+    "user": {
+        "firstname": "Emmanuel",
+        "lastname": "Bernard"
+    },
+    "shipping": {
+        "street": "1 av des Champs Elysées",
+        "dest_city": "Paris"
+    },
+    "delivery": {
+        "provider": "Santa Claus Inc.",
+        "delays": "1"
+    }
+    "network": "VISA",
+    "cardType: {
+        "merchant": "Amazon"
+    }
+}</code></pre><p>If you share the same embeddable in different places, you can use JPA’s <code class="literal">@AttributeOverride</code>
+to override columns from the embedding side.
+This is the case of <code class="literal">DeliveryProvider</code> in our example.</p><p>If you omit the dot in one of the columns, this column will not be part of the nested document.
+This is demonstrated by the <code class="literal">CreditCardType</code>.
+We advise you against it.
+Like crossing streams, it is bad form.
+This approach might not be supported in the future.</p></div></div></div><div class="section" title="11.2.3. Associations"><div class="titlepage"><div><div><h3 class="title"><a id="associations_3"/>11.2.3. Associations</h3></div></div></div><p>Hibernate OGM MongoDB proposes three strategies to store navigation information for associations.
+The three possible strategies are:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><a class="link" href="ch11.html#mongodb-in-entity-strategy" title="11.2.3.1. In Entity strategy">IN_ENTITY</a> (default)</li><li class="listitem"><a class="link" href="ch11.html#mongodb-association-document-strategy" title="11.2.3.5. Global collection strategy">ASSOCIATION_DOCUMENT</a>, using a global collection for all associations</li><li class="listitem"><a class="link" href="ch11.html#mongodb-collection-per-association-strategy" title="11.2.3.4. One collection per association strategy">COLLECTION_PER_ASSOCIATION</a>, using a dedicated collection for each association</li></ul></div><p>To switch between these strategies, use of the three approaches to options:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">annotate your entity with <code class="literal">@AssocationStorage</code> and <code class="literal">@AssociationDocumentStorage</code> annotations (see <a class="xref" href="ch11.html#ogm-mongodb-annotation-configuration" title="11.1.4. Annotation based configuration">Section 11.1.4, “Annotation based configuration”</a>),</li><li class="listitem">use the API for programmatic configuration (see <a class="xref" href="ch11.html#ogm-mongodb-programmatic-configuration" title="11.1.5. Programmatic configuration">Section 11.1.5, “Programmatic configuration”</a>)</li><li class="listitem">or specify a default strategy via the <code class="literal">hibernate.ogm.datastore.document.association_storage</code> and
+<code class="literal">hibernate.ogm.mongodb.association_document_storage</code> configuration properties.</li></ul></div><div class="section" title="11.2.3.1. In Entity strategy"><div class="titlepage"><div><div><h4 class="title"><a id="mongodb-in-entity-strategy"/>11.2.3.1. In Entity strategy</h4></div></div></div><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><a class="link" href="ch11.html#mongodb-in-entity-to-one-associations" title="11.2.3.2. To-one associations">*-to-one associations</a></li><li class="listitem"><a class="link" href="ch11.html#mongodb-in-entity-to-many-associations" title="11.2.3.3. To-many associations">*-to-many associations</a></li></ul></div><p>In this strategy, Hibernate OGM stores the id(s) of the associated entity(ies)
+into the entity document itself.
+This field stores the id value for to-one associations and an array of id values for to-many associations.
+An embedded id will be represented by a nested document.
+For indexed collections (i.e. <code class="literal">List</code> or <code class="literal">Map</code>), the index will be stored along the id.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>When using this strategy the annotations <code class="literal">@JoinTable</code> will be ignored because no collection is created
+for associations.</p><p>You can use <code class="literal">@JoinColumn</code> to change the name of the field that stores the foreign key (as an example, see
+<a class="xref" href="ch11.html#mongodb-in-entity-one-to-one-join-column" title="Example 11.24. Unidirectional one-to-one with @JoinColumn">Example 11.24, “Unidirectional one-to-one with @JoinColumn”</a>).</p></div></div><div class="section" title="11.2.3.2. To-one associations"><div class="titlepage"><div><div><h4 class="title"><a id="mongodb-in-entity-to-one-associations"/>11.2.3.2. To-one associations</h4></div></div></div><div class="example"><a id="d0e9369"/><p class="title"><strong>Example 11.23. Unidirectional one-to-one</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Vehicule {
+
+    @Id
+    private String id;
+    private String brand;
+
+    // getters, setters ...
+}
+
+
+@Entity
+public class Wheel {
+
+    @Id
+    private String id;
+    private double diameter;
+
+    @OneToOne
+    private Vehicule vehicule;
+
+    // getters, setters ...
+}</code></pre><pre><code class="language-json">{
+  "_id" : "V_01",
+  "brand" : "Mercedes"
+}</code></pre><p>Wheel collection as JSON in MongoDB</p><pre><code class="language-json">{
+  "_id" : "W001",
+  "diameter" : 0,
+  "vehicule_id" : "V_01"
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="mongodb-in-entity-one-to-one-join-column"/><p class="title"><strong>Example 11.24. Unidirectional one-to-one with @JoinColumn</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Vehicule {
+
+    @Id
+    private String id;
+    private String brand;
+
+    // getters, setters ...
+}
+
+
+@Entity
+public class Wheel {
+
+    @Id
+    private String id;
+    private double diameter;
+
+    @OneToOne
+    @JoinColumn( name = "part_of" )
+    private Vehicule vehicule;
+
+    // getters, setters ...
+}</code></pre><pre><code class="language-json">{
+  "_id" : "V_01",
+  "brand" : "Mercedes"
+}</code></pre><p>Wheel collection as JSON in MongoDB</p><pre><code class="language-json">{
+  "_id" : "W001",
+  "diameter" : 0,
+  "part_of" : "V_01"
+}</code></pre></div></div><br class="example-break"/><p>In a true one-to-one association, it is possible to share the same id between the two entities
+and therefore a foreign key is not required. You can see how to map this type of association in
+the following example:</p><div class="example"><a id="d0e9393"/><p class="title"><strong>Example 11.25. Unidirectional one-to-one with @MapsId and @PrimaryKeyJoinColumn</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Vehicule {
+
+    @Id
+    private String id;
+    private String brand;
+
+    // getters, setters ...
+}
+
+@Entity
+public class Wheel {
+
+    @Id
+    private String id;
+    private double diameter;
+
+    @OneToOne
+    @PrimaryKeyJoinColumn
+    @MapsId
+    private Vehicule vehicule;
+
+    // getters, setters ...
+}</code></pre><p>Vehicule collection as JSON in MongoDB</p><pre><code class="language-json">{
+  "_id" : "V_01",
+  "brand" : "Mercedes"
+}</code></pre><p>Wheel collection as JSON in MongoDB</p><pre><code class="language-json">{
+  "_id" : "V_01",
+  "diameter" : 0,
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e9406"/><p class="title"><strong>Example 11.26. Bidirectional one-to-one</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Husband {
+
+    @Id
+    private String id;
+    private String name;
+
+    @OneToOne
+    private Wife wife;
+
+    // getters, setters ...
+}
+
+@Entity
+public class Wife {
+
+    @Id
+    private String id;
+    private String name;
+
+    @OneToOne
+    private Husband husband;
+
+    // getters, setters ...
+}</code></pre><p>Husband collection as JSON in MongoDB</p><pre><code class="language-json">{
+  "_id" : "alex",
+  "name" : "Alex",
+  "wife" : "bea"
+}</code></pre><p>Wife collection as JSON in MongoDB</p><pre><code class="language-json">{
+  "_id" : "bea",
+  "name" : "Bea",
+  "husband" : "alex"
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e9419"/><p class="title"><strong>Example 11.27. Unidirectional many-to-one</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class JavaUserGroup {
+
+    @Id
+    private String jugId;
+    private String name;
+
+    // getters, setters ...
+}
+
+@Entity
+public class Member {
+
+    @Id
+    private String id;
+    private String name;
+
+    @ManyToOne
+    private JavaUserGroup memberOf;
+
+    // getters, setters ...
+}</code></pre><p>JavaUserGroup collection as JSON in MongoDB</p><pre><code class="language-json">{
+    "_id" : "summer_camp",
+    "name" : "JUG Summer Camp"
+}</code></pre><p>Member collection as JSON in MongoDB</p><pre><code class="language-json">{
+    "_id" : "jerome",
+    "name" : "Jerome"
+    "memberOf_jugId" : "summer_camp"
+}
+{
+    "_id" : "emmanuel",
+    "name" : "Emmanuel Bernard"
+    "memberOf_jugId" : "summer_camp"
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e9432"/><p class="title"><strong>Example 11.28. Bidirectional many-to-one</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class SalesForce {
+
+    @Id
+    private String id;
+    private String corporation;
+
+    @OneToMany(mappedBy = "salesForce")
+    private Set&lt;SalesGuy&gt; salesGuys = new HashSet&lt;SalesGuy&gt;();
+
+    // getters, setters ...
+}
+
+@Entity
+public class SalesGuy {
+    private String id;
+    private String name;
+
+    @ManyToOne
+    private SalesForce salesForce;
+
+    // getters, setters ...
+}</code></pre><p>SalesForce collection</p><pre><code class="language-json">{
+    "_id" : "red_hat",
+    "corporation" : "Red Hat",
+    "salesGuys" : [ "eric", "simon" ]
+}</code></pre><p>SalesGuy collection</p><pre><code class="language-json">{
+    "_id" : "eric",
+    "name" : "Eric"
+    "salesForce_id" : "red_hat",
+}
+{
+    "_id" : "simon",
+    "name" : "Simon",
+    "salesForce_id" : "red_hat"
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e9445"/><p class="title"><strong>Example 11.29. Bidirectional many-to-one between entities with embedded ids</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Game {
+
+    @EmbeddedId
+    private GameId id;
+
+    private String name;
+
+    @ManyToOne
+    private Court playedOn;
+
+    // getters, setters ...
+}
+
+
+public class GameId implements Serializable {
+
+    private String category;
+
+    @Column(name = "id.gameSequenceNo")
+    private int sequenceNo;
+
+    // getters, setters ...
+    // equals / hashCode
+}
+
+@Entity
+public class Court {
+
+    @EmbeddedId
+    private CourtId id;
+
+    private String name;
+
+    @OneToMany(mappedBy = "playedOn")
+    private Set&lt;Game&gt; games = new HashSet&lt;Game&gt;();
+
+    // getters, setters ...
+}
+
+public class CourtId implements Serializable {
+
+    private String countryCode;
+    private int sequenceNo;
+
+    // getters, setters ...
+    // equals / hashCode
+}</code></pre><p title="Court collection"><strong>Court collection. </strong>
+</p><pre><code class="language-json">{
+    "_id" : {
+        "countryCode" : "DE",
+        "sequenceNo" : 123
+    },
+    "name" : "Hamburg Court",
+    "games" : [
+        { "gameSequenceNo" : 457, "category" : "primary" },
+        { "gameSequenceNo" : 456, "category" : "primary" }
+    ]
+}</code></pre><p title="Court collection">
+</p><p title="Game collection"><strong>Game collection. </strong>
+</p><pre><code class="language-json">{
+    "_id" : {
+        "category" : "primary",
+        "gameSequenceNo" : 456
+    },
+    "name" : "The game",
+    "playedOn_id" : {
+        "countryCode" : "DE",
+        "sequenceNo" : 123
+    }
+}
+{
+    "_id" : {
+        "category" : "primary",
+        "gameSequenceNo" : 457
+    },
+    "name" : "The other game",
+    "playedOn_id" : {
+        "countryCode" : "DE",
+        "sequenceNo" : 123
+    }
+}</code></pre><p title="Game collection">
+</p></div></div><br class="example-break"/><p>Here we see that the embedded id is represented as a nested document
+and directly referenced by the associations.</p></div><div class="section" title="11.2.3.3. To-many associations"><div class="titlepage"><div><div><h4 class="title"><a id="mongodb-in-entity-to-many-associations"/>11.2.3.3. To-many associations</h4></div></div></div><div class="example"><a id="d0e9471"/><p class="title"><strong>Example 11.30. Unidirectional one-to-many</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Basket {
+
+    @Id
+    private String id;
+
+    private String owner;
+
+    @OneToMany
+    private List&lt;Product&gt; products = new ArrayList&lt;Product&gt;();
+
+    // getters, setters ...
+}
+
+@Entity
+public class Product {
+
+    @Id
+    private String name;
+
+    private String description;
+
+    // getters, setters ...
+}</code></pre><p>Basket collection</p><pre><code class="language-json">{
+  "_id" : "davide_basket",
+  "owner" : "Davide",
+  "products" : [ "Beer", "Pretzel" ]
+}</code></pre><p>Product collection</p><pre><code class="language-json">{
+  "_id" : "Pretzel",
+  "description" : "Glutino Pretzel Sticks"
+}
+{
+  "_id" : "Beer",
+  "description" : "Tactical nuclear penguin"
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e9484"/><p class="title"><strong>Example 11.31. Unidirectional one-to-many with @OrderColumn</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Basket {
+
+    @Id
+    private String id;
+
+    private String owner;
+
+    @OneToMany
+    private List&lt;Product&gt; products = new ArrayList&lt;Product&gt;();
+
+    // getters, setters ...
+}
+
+@Entity
+public class Product {
+
+    @Id
+    private String name;
+
+    private String description;
+
+    // getters, setters ...
+}</code></pre><p>Basket collection</p><pre><code class="language-json">{
+  "_id" : "davide_basket",
+  "owner" : "Davide",
+  "products" : [
+    {
+      "products_name" : "Pretzel",
+      "products_ORDER" : 1
+    },
+    {
+      "products_name" : "Beer",
+      "products_ORDER" : 0
+    }
+  ]
+}</code></pre><p>Product collection</p><pre><code class="language-json">{
+  "_id" : "Pretzel",
+  "description" : "Glutino Pretzel Sticks"
+}
+{
+  "_id" : "Beer",
+  "description" : "Tactical nuclear penguin"
+}</code></pre></div></div><br class="example-break"/><p>A map can be used to represents an association,
+in this case Hibernate OGM will store the key of the map
+and the associated id.</p><div class="example"><a id="d0e9499"/><p class="title"><strong>Example 11.32. Unidirectional one-to-many using maps with defaults</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class User {
+
+    @Id
+    private String id;
+
+    @OneToMany
+    private Map&lt;String, Address&gt; addresses = new HashMap&lt;String, Address&gt;();
+
+    // getters, setters ...
+}
+
+@Entity
+public class Address {
+
+    @Id
+    private String id;
+    private String city;
+
+    // getters, setters ...
+}</code></pre><p>User collection as JSON in MongoDB</p><pre><code class="language-json">{
+  "_id" : "user_001",
+  "addresses" : [
+    {
+      "addresses_KEY" : "work",
+      "addresses_id" : "address_001"
+    },
+    {
+      "addresses_KEY" : "home",
+      "addresses_id" : "address_002"
+    }
+  ]
+}</code></pre><p>Address collection as JSON in MongoDB</p><pre><code class="language-json">{ "_id" : "address_001", "city" : "Rome" }
+{ "_id" : "address_002", "city" : "Paris" }</code></pre></div></div><br class="example-break"/><p>You can use @MapKeyColumn to rename the column containing the key of the map.</p><div class="example"><a id="d0e9514"/><p class="title"><strong>Example 11.33. Unidirectional one-to-many using maps with @MapKeyColumn</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class User {
+
+    @Id
+    private String id;
+
+    @OneToMany
+    @MapKeyColumn(name = "addressType")
+    private Map&lt;String, Address&gt; addresses = new HashMap&lt;String, Address&gt;();
+
+    // getters, setters ...
+}
+
+@Entity
+public class Address {
+
+    @Id
+    private String id;
+    private String city;
+
+    // getters, setters ...
+}</code></pre><p>User collection as JSON in MongoDB</p><pre><code class="language-json">{
+  "_id" : "user_001",
+  "addresses" : [
+    {
+      "addressType" : "work",
+      "addresses_id" : "address_001"
+    },
+    {
+      "addressType" : "home",
+      "addresses_id" : "address_002"
+    }
+  ]
+}</code></pre><p>Address collection as JSON in MongoDB</p><pre><code class="language-json">{ "_id" : "address_001", "city" : "Rome" }
+{ "_id" : "address_002", "city" : "Paris" }</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e9527"/><p class="title"><strong>Example 11.34. Unidirectional many-to-many using in entity strategy</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Student {
+
+    @Id
+    private String id;
+    private String name;
+
+    // getters, setters ...
+}
+
+@Entity
+public class ClassRoom {
+
+    @Id
+    private long id;
+    private String lesson;
+
+    @ManyToMany
+    private List&lt;Student&gt; students = new ArrayList&lt;Student&gt;();
+
+    // getters, setters ...
+}</code></pre><p>Student collection</p><pre><code class="language-json">{
+  "_id" : "john",
+  "name" :"John Doe" }
+{
+  "_id" : "mario",
+  "name" : "Mario Rossi"
+}
+{
+  "_id" : "kate",
+  "name" : "Kate Doe"
+}</code></pre><p>ClassRoom collection</p><pre><code class="language-json">{
+  "_id" : NumberLong(1),
+  "lesson" : "Math"
+  "students" : [
+     "mario",
+     "john"
+  ]
+}
+{
+  "_id" : NumberLong(2),
+  "lesson" : "English"
+  "students" : [
+     "mario",
+     "kate"
+  ]
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e9540"/><p class="title"><strong>Example 11.35. Bidirectional many-to-many</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class AccountOwner {
+
+    @Id
+    private String id;
+
+    private String SSN;
+
+    @ManyToMany
+    private Set&lt;BankAccount&gt; bankAccounts;
+
+    // getters, setters ...
+}
+
+@Entity
+public class BankAccount {
+
+    @Id
+    private String id;
+
+    private String accountNumber;
+
+    @ManyToMany( mappedBy = "bankAccounts" )
+    private Set&lt;AccountOwner&gt; owners = new HashSet&lt;AccountOwner&gt;();
+
+    // getters, setters ...
+}</code></pre><p>AccountOwner collection</p><pre><code class="language-json">{
+    "_id" : "owner_1",
+    "SSN" : "0123456"
+    "bankAccounts" : [ "account_1" ]
+}</code></pre><p>BankAccount collection</p><pre><code class="language-json">{
+    "_id" : "account_1",
+    "accountNumber" : "X2345000"
+    "owners" : [ "owner_1", "owner2222" ]
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e9553"/><p class="title"><strong>Example 11.36. Ordered list with embedded id</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Race {
+    @EmbeddedId
+    private RaceId raceId;
+
+    @OrderColumn(name = "ranking")
+    @OneToMany @JoinTable(name = "Race_Runners")
+    private List&lt;Runner&gt; runnersByArrival = new ArrayList&lt;Runner&gt;();
+
+    // getters, setters ...
+}
+
+public class RaceId implements Serializable {
+    private int federationSequence;
+    private int federationDepartment;
+
+    // getters, setters, equals, hashCode
+}
+
+@Entity
+public class Runner {
+    @EmbeddedId
+    private RunnerId runnerId;
+    private int age;
+
+    // getters, setters ...
+}
+
+public class RunnerId implements Serializable {
+    private String firstname;
+    private String lastname;
+
+    // getters, setters, equals, hashCode
+}</code></pre><p title="Race collection"><strong>Race collection. </strong>
+</p><pre><code class="language-json">{
+    "_id": {
+        "federationDepartment": 75,
+        "federationSequence": 23
+    },
+    "runnersByArrival": [{
+        "firstname": "Pere",
+        "lastname": "Noel",
+        "ranking": 1
+    }, {
+        "firstname": "Emmanuel",
+        "lastname": "Bernard",
+        "ranking": 0
+    }]
+}</code></pre><p title="Race collection">
+</p><p title="Runner collection"><strong>Runner collection. </strong>
+</p><pre><code class="language-json">{
+    "_id": {
+        "firstname": "Pere",
+        "lastname": "Noel"
+    },
+    "age": 105
+} {
+    "_id": {
+        "firstname": "Emmanuel",
+        "lastname": "Bernard"
+    },
+    "age": 37
+}</code></pre><p title="Runner collection">
+</p></div></div><br class="example-break"/></div><div class="section" title="11.2.3.4. One collection per association strategy"><div class="titlepage"><div><div><h4 class="title"><a id="mongodb-collection-per-association-strategy"/>11.2.3.4. One collection per association strategy</h4></div></div></div><p>In this strategy, Hibernate OGM creates a MongoDB collection per association
+in which it will store all navigation information for that particular association.</p><p>This is the strategy closest to the relational model.
+If an entity A is related to B and C, 2 collections will be created.
+The name of this collection is made of the association table concatenated with <code class="literal">associations_</code>.</p><p>For example, if the <code class="literal">BankAccount</code> and <code class="literal">Owner</code> are related,
+the collection used to store will be named <code class="literal">associations_Owner_BankAccount</code>. You can rename
+The prefix is useful to quickly identify the association collections from the entity collections.
+You can also decide to rename the collection representing the association using <code class="literal">@JoinTable</code>
+(see <a class="link" href="ch11.html#mongodb-one-collection-strategy-join-table">an example</a>)</p><p>Each document of an association collection has the following structure:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">_id</code> contains the id of the owner of relationship</li><li class="listitem"><code class="literal">rows</code> contains all the id of the related entities</li></ul></div><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>The preferred approach is to use the <a class="link" href="ch11.html#mongodb-in-entity-strategy" title="11.2.3.1. In Entity strategy">in-entity strategy</a>
+but this approach can alleviate the problem of having documents that are too big.</p></div><div class="example"><a id="d0e9620"/><p class="title"><strong>Example 11.37. Unidirectional relationship</strong></p><div class="example-contents"><pre><code class="language-json">{
+    "_id" : { "owners_id" : "owner0001" },
+    "rows" : [
+        "accountABC",
+        "accountXYZ"
+    ]
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e9625"/><p class="title"><strong>Example 11.38. Bidirectional relationship</strong></p><div class="example-contents"><pre><code class="language-json">{
+    "_id" : { "owners_id" : "owner0001" },
+    "rows" : [ "accountABC", "accountXYZ" ]
+}
+{
+    "_id" : { "bankAccounts_id" : "accountXYZ" },
+    "rows" : [ "owner0001" ]
+}</code></pre></div></div><br class="example-break"/><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>This strategy won’t affect *-to-one associations or embedded collections.</p></div><div class="example"><a id="d0e9633"/><p class="title"><strong>Example 11.39. Unidirectional one-to-many using one collection per strategy</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Basket {
+
+    @Id
+    private String id;
+
+    private String owner;
+
+    @OneToMany
+    private List&lt;Product&gt; products = new ArrayList&lt;Product&gt;();
+
+    // getters, setters ...
+}
+
+@Entity
+public class Product {
+
+    @Id
+    private String name;
+
+    private String description;
+
+    // getters, setters ...
+}</code></pre><p>Basket collection</p><pre><code class="language-json">{
+  "_id" : "davide_basket",
+  "owner" : "Davide"
+}</code></pre><p>Product collection</p><pre><code class="language-json">{
+  "_id" : "Pretzel",
+  "description" : "Glutino Pretzel Sticks"
+}
+{
+  "_id" : "Beer",
+  "description" : "Tactical nuclear penguin"
+}</code></pre><p>associations_Basket_Product collection</p><pre><code class="language-json">{
+  "_id" : { "Basket_id" : "davide_basket" },
+  "rows" : [ "Beer", "Pretzel" ]
+}</code></pre></div></div><br class="example-break"/><p>The order of the element in the list might be preserved using @OrderColumn.
+Hibernate OGM will store the order adding an additional fieldd to the document
+containing the association.</p><div class="example"><a id="d0e9652"/><p class="title"><strong>Example 11.40. Unidirectional one-to-many using one collection per strategy with @OrderColumn</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Basket {
+
+    @Id
+    private String id;
+
+    private String owner;
+
+    @OneToMany
+    @OrderColumn
+    private List&lt;Product&gt; products = new ArrayList&lt;Product&gt;();
+
+    // getters, setters ...
+}
+
+@Entity
+public class Product {
+
+    @Id
+    private String name;
+
+    private String description;
+
+    // getters, setters ...
+}</code></pre><p>Basket collection</p><pre><code class="language-json">{
+  "_id" : "davide_basket",
+  "owner" : "Davide"
+}</code></pre><p>Product collection</p><pre><code class="language-json">{
+  "_id" : "Pretzel",
+  "description" : "Glutino Pretzel Sticks"
+}
+{
+  "_id" : "Beer",
+  "description" : "Tactical nuclear penguin"
+}</code></pre><p>associations_Basket_Product collection</p><pre><code class="language-json">{
+  "_id" : { "Basket_id" : "davide_basket" },
+  "rows" : [
+    {
+      "products_name" : "Pretzel",
+      "products_ORDER" : 1
+    },
+    {
+      "products_name" : "Beer",
+      "products_ORDER" : 0
+    }
+  ]
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e9669"/><p class="title"><strong>Example 11.41. Unidirectional many-to-many using one collection per association strategy</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Student {
+
+    @Id
+    private String id;
+    private String name;
+
+    // getters, setters ...
+}
+
+@Entity
+public class ClassRoom {
+
+    @Id
+    private long id;
+    private String lesson;
+
+    @ManyToMany
+    private List&lt;Student&gt; students = new ArrayList&lt;Student&gt;();
+
+    // getters, setters ...
+}</code></pre><p>Student collection</p><pre><code class="language-json">{
+  "_id" : "john",
+  "name" : "John Doe"
+}
+{
+  "_id" : "mario",
+  "name" : "Mario Rossi"
+}
+{
+  "_id" : "kate",
+  "name" : "Kate Doe"
+}</code></pre><p>ClassRoom collection</p><pre><code class="language-json">{
+  "_id" : NumberLong(1),
+  "lesson" : "Math"
+}
+{
+  "_id" : NumberLong(2),
+  "lesson" : "English"
+}</code></pre><p>associations_ClassRoom_Student</p><pre><code class="language-json">{
+  "_id" : {
+    "ClassRoom_id" : NumberLong(1),
+  },
+  "rows" : [ "john", "mario" ]
+}
+{
+  "_id" : {
+    "ClassRoom_id" : NumberLong(2),
+  },
+  "rows" : [ "mario", "kate" ]
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e9686"/><p class="title"><strong>Example 11.42. Bidirectional many-to-many using one collection per association strategy</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class AccountOwner {
+
+    @Id
+    private String id;
+
+    private String SSN;
+
+    @ManyToMany
+    private Set&lt;BankAccount&gt; bankAccounts;
+
+    // getters, setters ...
+}
+
+@Entity
+public class BankAccount {
+
+    @Id
+    private String id;
+
+    private String accountNumber;
+
+    @ManyToMany(mappedBy = "bankAccounts")
+    private Set&lt;AccountOwner&gt; owners = new HashSet&lt;AccountOwner&gt;();
+
+    // getters, setters ...
+}</code></pre><p>AccountOwner collection</p><pre><code class="language-json">{
+  "_id" : "owner_1",
+  "SSN" : "0123456"
+}</code></pre><p>BankAccount collection</p><pre><code class="language-json">{
+  "_id" : "account_1",
+  "accountNumber" : "X2345000"
+}</code></pre><p>associations_AccountOwner_BankAccount collection</p><pre><code class="language-json">{
+  "_id" : {
+    "bankAccounts_id" : "account_1"
+  },
+  "rows" : [ "owner_1" ]
+}
+{
+  "_id" : {
+    "owners_id" : "owner_1"
+  },
+  "rows" : [ "account_1" ]
+}</code></pre></div></div><br class="example-break"/><p><a id="mongodb-one-collection-strategy-join-table"/>You can change the name of the collection containing the association using the <code class="literal">@JoinTable</code> annotation.
+In the following example, the name of the collection containing the association is <code class="literal">OwnerBankAccounts</code>
+(instead of the default <code class="literal">associations_AccountOwner_BankAccount</code>)</p><div class="example"><a id="d0e9714"/><p class="title"><strong>Example 11.43. Bidirectional many-to-many using one collection per association strategy and @JoinTable</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class AccountOwner {
+
+    @Id
+    private String id;
+
+    private String SSN;
+
+    @ManyToMany
+    @JoinTable( name = "OwnerBankAccounts" )
+    private Set&lt;BankAccount&gt; bankAccounts;
+
+    // getters, setters ...
+}
+
+@Entity
+public class BankAccount {
+
+    @Id
+    private String id;
+
+    private String accountNumber;
+
+    @ManyToMany(mappedBy = "bankAccounts")
+    private Set&lt;AccountOwner&gt; owners = new HashSet&lt;AccountOwner&gt;();
+
+    // getters, setters ...
+}</code></pre><p>AccountOwner collection</p><pre><code class="language-json">{
+  "_id" : "owner_1",
+  "SSN" : "0123456"
+}</code></pre><p>BankAccount collection</p><pre><code class="language-json">{
+  "_id" : "account_1",
+  "accountNumber" : "X2345000"
+}</code></pre><p>OwnerBankAccount</p><pre><code class="language-json">{
+  "_id" : {
+    "bankAccounts_id" : "account_1"
+  },
+  "rows" : [ "owner_1" ]
+}
+{
+  "_id" : {
+    "owners_id" : "owner_1"
+  },
+  "rows" : [ "account_1" ]
+}</code></pre></div></div><br class="example-break"/></div><div class="section" title="11.2.3.5. Global collection strategy"><div class="titlepage"><div><div><h4 class="title"><a id="mongodb-association-document-strategy"/>11.2.3.5. Global collection strategy</h4></div></div></div><p>With this strategy, Hibernate OGM creates a single collection named <code class="literal">Associations</code>
+in which it will store all navigation information for all associations.
+Each document of this collection is structured in 2 parts.
+The first is the <code class="literal">_id</code> field which contains the identifier information
+of the association owner and the name of the association table.
+The second part is the <code class="literal">rows</code> field which stores (into an embedded collection) all ids
+that the current instance is related to.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>This strategy won’t affect *-to-one associations or embedded collections.</p><p>Generally, you should not make use of this strategy
+unless embedding the association information proves to be too big for your document
+and you wish to separate them.</p></div><div class="example"><a id="d0e9750"/><p class="title"><strong>Example 11.44. Associations collection containing unidirectional association</strong></p><div class="example-contents"><pre><code class="language-json">{
+    "_id": {
+        "owners_id": "owner0001",
+        "table": "AccountOwner_BankAccount"
+    },
+    "rows": [ "accountABC", "accountXYZ" ]
+}</code></pre></div></div><br class="example-break"/><p>For a bidirectional relationship, another document is created where ids are reversed.
+Don’t worry, Hibernate OGM takes care of keeping them in sync:</p><div class="example"><a id="d0e9757"/><p class="title"><strong>Example 11.45. Associations collection containing a bidirectional association</strong></p><div class="example-contents"><pre><code class="language-json">{
+    "_id": {
+        "owners_id": "owner0001",
+        "table": "AccountOwner_BankAccount"
+    },
+    "rows": [ "accountABC", "accountXYZ" ]
+}
+{
+    "_id": {
+        "bankAccounts_id": "accountXYZ",
+        "table": "AccountOwner_BankAccount"
+    },
+    "rows": [ "owner0001" ]
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e9762"/><p class="title"><strong>Example 11.46. Unidirectional one-to-many using global collection strategy</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Basket {
+
+    @Id
+    private String id;
+
+    private String owner;
+
+    @OneToMany
+    private List&lt;Product&gt; products = new ArrayList&lt;Product&gt;();
+
+    // getters, setters ...
+}
+
+@Entity
+public class Product {
+
+    @Id
+    private String name;
+
+    private String description;
+
+    // getters, setters ...
+}</code></pre><p>Basket collection</p><pre><code class="language-json">{
+  "_id" : "davide_basket",
+  "owner" : "Davide"
+}</code></pre><p>Product collection</p><pre><code class="language-json">{
+  "_id" : "Pretzel",
+  "description" : "Glutino Pretzel Sticks"
+}
+{
+  "_id" : "Beer",
+  "description" : "Tactical nuclear penguin"
+}</code></pre><p>Associations collection</p><pre><code class="language-json">{
+  "_id" : {
+    "Basket_id" : "davide_basket",
+    "table" : "Basket_Product"
+  },
+  "rows" : [
+    {
+      "products_name" : "Pretzel",
+      "products_ORDER" : 1
+    },
+    {
+      "products_name" : "Beer",
+    "products_ORDER" : 0
+    }
+  ]
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e9779"/><p class="title"><strong>Example 11.47. Unidirectional one-to-many using global collection strategy with <code class="literal">@JoinTable</code></strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Basket {
+
+    @Id
+    private String id;
+
+    private String owner;
+
+    @OneToMany
+    // It will change the value stored in the field table in the Associations collection
+    @JoinTable( name = "BasketContent" )
+    private List&lt;Product&gt; products = new ArrayList&lt;Product&gt;();
+
+    // getters, setters ...
+}
+
+@Entity
+public class Product {
+
+    @Id
+    private String name;
+
+    private String description;
+
+    // getters, setters ...
+}</code></pre><p>Basket collection</p><pre><code class="language-json">{
+  "_id" : "davide_basket",
+  "owner" : "Davide"
+}</code></pre><p>Product collection</p><pre><code class="language-json">{
+  "_id" : "Pretzel",
+  "description" : "Glutino Pretzel Sticks"
+}
+{
+  "_id" : "Beer",
+  "description" : "Tactical nuclear penguin"
+}</code></pre><p>Associations collection</p><pre><code class="language-json">{
+  "_id" : {
+    "Basket_id" : "davide_basket",
+    "table" : "BasketContent"
+  },
+  "rows" : [ "Beer", "Pretzel" ]
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e9798"/><p class="title"><strong>Example 11.48. Unidirectional many-to-many using global collection strategy</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Student {
+
+    @Id
+    private String id;
+    private String name;
+
+    // getters, setters ...
+}
+
+@Entity
+public class ClassRoom {
+
+    @Id
+    private long id;
+    private String lesson;
+
+    @ManyToMany
+    private List&lt;Student&gt; students = new ArrayList&lt;Student&gt;();
+
+    // getters, setters ...
+}</code></pre><p>Student collection</p><pre><code class="language-json">{
+  "_id" : "john",
+  "name" : "John Doe"
+}
+{
+  "_id" : "mario",
+  "name" : "Mario Rossi"
+}
+{
+  "_id" : "kate",
+  "name" : "Kate Doe"
+}</code></pre><p>ClassRoom collection</p><pre><code class="language-json">{
+  "_id" : NumberLong(1),
+  "lesson" : "Math"
+}
+{
+  "_id" : NumberLong(2),
+  "lesson" : "English"
+}</code></pre><p>Associations collection</p><pre><code class="language-json">{
+  "_id" : {
+    "ClassRoom_id" : NumberLong(1),
+    "table" : "ClassRoom_Student"
+  },
+  "rows" : [ "john", "mario" ]
+}
+{
+  "_id" : {
+    "ClassRoom_id" : NumberLong(2),
+    "table" : "ClassRoom_Student"
+  },
+  "rows" : [ "mario", "kate" ]
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e9815"/><p class="title"><strong>Example 11.49. Bidirectional many-to-many using global collection strategy</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class AccountOwner {
+
+    @Id
+    private String id;
+
+    private String SSN;
+
+    @ManyToMany
+    private Set&lt;BankAccount&gt; bankAccounts;
+
+    // getters, setters ...
+}
+
+@Entity
+public class BankAccount {
+
+    @Id
+    private String id;
+
+    private String accountNumber;
+
+    @ManyToMany(mappedBy = "bankAccounts")
+    private Set&lt;AccountOwner&gt; owners = new HashSet&lt;AccountOwner&gt;();
+
+    // getters, setters ...
+}</code></pre><p>AccountOwner collection</p><pre><code class="language-json">{
+  "_id" : "owner0001",
+  "SSN" : "0123456"
+}</code></pre><p>BankAccount collection</p><pre><code class="language-json">{
+  "_id" : "account_1",
+  "accountNumber" : "X2345000"
+}</code></pre><p>Associations collection</p><pre><code class="language-json">{
+  "_id" : {
+    "bankAccounts_id" : "account_1",
+    "table" : "AccountOwner_BankAccount"
+    },
+
+  "rows" : [ "owner0001" ]
+}
+{
+  "_id" : {
+    "owners_id" : "owner0001",
+    "table" : "AccountOwner_BankAccount"
+  },
+
+  "rows" : [ "account_1" ]
+}</code></pre></div></div><br class="example-break"/></div></div></div><div class="section" title="11.3. Transactions"><div class="titlepage"><div><div><h2 class="title"><a id="transactions"/>11.3. Transactions</h2></div></div></div><p>MongoDB does not support transactions.
+Only changes applied to the same document are done atomically.
+A change applied to more than one document will not be applied atomically.
+This problem is slightly mitigated by the fact that Hibernate OGM queues all changes
+before applying them during flush time.
+So the window of time used to write to MongoDB is smaller than what you would have done manually.</p><p>We recommend that you still use transaction demarcations with Hibernate OGM
+to trigger the flush operation transparently (on commit).
+But do not consider rollback as a possibility, this won’t work.</p></div><div class="section" title="11.4. Optimistic Locking"><div class="titlepage"><div><div><h2 class="title"><a id="ogm-mongodb-optimisticlocking"/>11.4. Optimistic Locking</h2></div></div></div><p>MongoDB does not provide a built-in mechanism for detecting concurrent updates to the same document
+but it provides a way to execute atomic find and update operations.
+By exploiting this commands Hibernate OGM can detect concurrent modifications to the same document.</p><p>You can enable optimistic locking detection using the annotation <code class="literal">@Version</code>:</p><div class="example"><a id="d0e9849"/><p class="title"><strong>Example 11.50. Optimistic locking detection via <code class="literal">@Version</code></strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Planet implements Nameable {
+
+    @Id
+    private String id;
+    private String name;
+
+    @Version
+    private int version;
+
+   // getters, setters ...
+}</code></pre><pre class="screen">{
+  "_id" : "planet-1",
+  "name" : "Pluto",
+  "version" : 0
+}</pre></div></div><br class="example-break"/><p>The <code class="literal">@Version</code> annotation define which attribute will keep track of the version of the document,
+Hibernate OGM will update the field when required and if two changes from two different sessions (for example)
+are applied to the same document a <code class="literal">org.hibernate.StaleObjectStateException</code> is thrown.</p><p>You can use <code class="literal">@Column</code> to change the name of the field created on MongoDB:</p><div class="example"><a id="d0e9871"/><p class="title"><strong>Example 11.51. Optimistic locking detection via <code class="literal">@Version</code> using <code class="literal">@Column</code></strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Planet implements Nameable {
+
+    @Id
+    private String id;
+    private String name;
+
+    @Version
+    @Column(name="OPTLOCK")
+    private int version;
+
+   // getters, setters ...
+}</code></pre><pre class="screen">{
+  "_id" : "planet-1",
+  "name" : "Pluto",
+  "OPTLOCK" : 0
+}</pre></div></div><br class="example-break"/></div><div class="section" title="11.5. Queries"><div class="titlepage"><div><div><h2 class="title"><a id="ogm-mongodb-queries"/>11.5. Queries</h2></div></div></div><p>You can express queries in a few different ways:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">using JP-QL</li><li class="listitem">using a native MongoQL query</li><li class="listitem">using a Hibernate Search query (brings advanced full-text and geospatial queries)</li></ul></div><p>While you can use JP-QL for simple queries, you might hit limitations.
+The current recommended approach is to use native MongoQL
+if your query involves nested (list of) elements.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>In order to reflect changes performed in the current session,
+all entities affected by a given query are flushed to the datastore prior to query execution
+(that’s the case for Hibernate ORM as well as Hibernate OGM).</p><p>For not fully transactional stores such as MongoDB
+this can cause changes to be written as a side-effect of running queries
+which cannot be reverted by a possible later rollback.</p><p>Depending on your specific use cases and requirements you may prefer to disable auto-flushing,
+e.g. by invoking <code class="literal">query.setFlushMode( FlushMode.MANUAL )</code>.
+Bear in mind though that query results will then not reflect changes applied within the current session.</p></div><div class="section" title="11.5.1. JP-QL queries"><div class="titlepage"><div><div><h3 class="title"><a id="jp_ql_queries"/>11.5.1. JP-QL queries</h3></div></div></div><p>Hibernate OGM is a work in progress, so only a sub-set of JP-QL constructs is available
+when using the JP-QL query support. This includes:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">simple comparisons using "&lt;", "&lt;=", "=", "&gt;=" and "&gt;"</li><li class="listitem"><code class="literal">IS NULL</code> and <code class="literal">IS NOT NULL</code></li><li class="listitem">the boolean operators <code class="literal">AND</code>, <code class="literal">OR</code>, <code class="literal">NOT</code></li><li class="listitem"><code class="literal">LIKE</code>, <code class="literal">IN</code> and <code class="literal">BETWEEN</code></li><li class="listitem"><code class="literal">ORDER BY</code></li><li class="listitem">inner <code class="literal">JOIN</code> on embedded collections</li><li class="listitem">projections of regular and embedded properties</li></ul></div><p>Queries using these constructs will be transformed into equivalent native MongoDB queries.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>Let us know <a class="link" href="ch01.html" title="Chapter 1. How to get help and contribute on Hibernate OGM">by opening an issue or sending an email</a>
+what query you wish to execute.
+Expanding our support in this area is high on our priority list.</p></div></div><div class="section" title="11.5.2. Native MongoDB queries"><div class="titlepage"><div><div><h3 class="title"><a id="ogm-mongodb-queries-native"/>11.5.2. Native MongoDB queries</h3></div></div></div><p>Hibernate OGM also supports certain forms of native queries for MongoDB.
+Currently two forms of native queries are available via the MongoDB backend:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">find queries specifying the search criteria only</li><li class="listitem">queries specified using the MongoDB CLI syntax</li></ul></div><p>The former always maps results to entity types.
+The latter either maps results to entity types or to certain supported forms of projection.
+Note that parameterized queries are not supported by MongoDB, so don’t expect <code class="literal">Query#setParameter()</code> to work.</p><div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Warning</h2><p>Specifying native MongoDB queries using the CLI syntax is an EXPERIMENTAL feature for the time being.
+Currently only <code class="literal">find()</code> and <code class="literal">count()</code> queries are supported via the CLI syntax.
+Further query types (including updating queries) may be supported in future revisions.</p><p>No cursor operations such as <code class="literal">sort()</code> are supported.
+Instead use the corresponding MongoDB <a class="link" href="http://docs.mongodb.org/manual/reference/operator/query-modifier/">query modifiers</a>
+such as <code class="literal">$orderby</code> within the criteria parameter.</p><p>JSON parameters passed via the CLI syntax must be specified using the <a class="link" href="http://docs.mongodb.org/manual/reference/mongodb-extended-json/">strict mode</a>.
+Specifically, keys need to be given within quotes, e.g. use <code class="literal">db.WILDE_POEM.find({ \"name\" : \"Athanasia\" })</code>
+instead of <code class="literal">db.WILDE_POEM.find({ name : \"Athanasia\" })</code>.
+The only relaxation of this is that single quotes may be used when specifying attribute names/values to facilitate embedding
+queries within Java strings, e.g. <code class="literal">db.WILDE_POEM.find({ 'name' : 'Athanasia' })</code>.</p><p>Note that results of projections are returned as retrieved from the MongoDB driver at the moment and
+are not (yet) converted using suitable Hibernate OGM type implementations.</p></div><p>You can execute native queries as shown in the following example:</p><div class="example"><a id="d0e10023"/><p class="title"><strong>Example 11.52. Using the JPA API</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Poem {
+
+    @Id
+    private Long id;
+
+    private String name;
+
+    private String author;
+
+   // getters, setters ...
+}
+
+...
+
+javax.persistence.EntityManager em = ...
+
+// criteria-only find syntax
+String query1 = "{ $and: [ { name : 'Portia' }, { author : 'Oscar Wilde' } ] }";
+Poem poem = (Poem) em.createNativeQuery( query1, Poem.class ).getSingleResult();
+
+// criteria-only find syntax with order-by
+String query2 = "{ $query : { author : 'Oscar Wilde' }, $orderby : { name : 1 } }";
+List&lt;Poem&gt; poems = em.createNativeQuery( query2, Poem.class ).getResultList();
+
+// projection via CLI-syntax
+String query3 = "db.WILDE_POEM.find(" +
+    "{ '$query' : { 'name' : 'Athanasia' }, '$orderby' : { 'name' : 1 } }" +
+    "{ 'name' : 1 }" +
+    ")";
+
+// will contain name and id as MongoDB always returns the id for projections
+List&lt;Object[]&gt; poemNames = (List&lt;Object[]&gt;)em.createNativeQuery( query3 ).getResultList();
+
+// projection via CLI-syntax
+String query4 = "db.WILDE_POEM.count({ 'name' : 'Athanasia' })";
+
+Object[] count = (Object[])em.createNativeQuery( query4 ).getSingleResult();</code></pre></div></div><br class="example-break"/><p>The result of a query is a managed entity (or a list thereof) or a projection of attributes in form of an object array,
+just like you would get from a JP-QL query.</p><div class="example"><a id="d0e10030"/><p class="title"><strong>Example 11.53. Using the Hibernate native API</strong></p><div class="example-contents"><pre><code class="language-java">OgmSession session = ...
+
+String query1 = "{ $and: [ { name : 'Portia' }, { author : 'Oscar Wilde' } ] }";
+Poem poem = session.createNativeQuery( query1 )
+                      .addEntity( "Poem", Poem.class )
+                      .uniqueResult();
+
+String query2 = "{ $query : { author : 'Oscar Wilde' }, $orderby : { name : 1 } }";
+List&lt;Poem&gt; poems = session.createNativeQuery( query2 )
+                      .addEntity( "Poem", Poem.class )
+                      .list();</code></pre></div></div><br class="example-break"/><p>Native queries can also be created using the <code class="literal">@NamedNativeQuery</code> annotation:</p><div class="example"><a id="d0e10040"/><p class="title"><strong>Example 11.54. Using @NamedNativeQuery</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@NamedNativeQuery(
+   name = "AthanasiaPoem",
+   query = "{ $and: [ { name : 'Athanasia' }, { author : 'Oscar Wilde' } ] }",
+   resultClass = Poem.class )
+public class Poem { ... }
+
+...
+
+// Using the EntityManager
+Poem poem1 = (Poem) em.createNamedQuery( "AthanasiaPoem" )
+                     .getSingleResult();
+
+// Using the Session
+Poem poem2 = (Poem) session.getNamedQuery( "AthanasiaPoem" )
+                     .uniqueResult();</code></pre></div></div><br class="example-break"/><p>Hibernate OGM stores data in a natural way so you can still execute queries using the
+MongoDB driver, the main drawback is that the results are going to be raw MongoDB
+documents and not managed entities.</p></div><div class="section" title="11.5.3. Hibernate Search"><div class="titlepage"><div><div><h3 class="title"><a id="hibernate_search"/>11.5.3. Hibernate Search</h3></div></div></div><p>You can index your entities using Hibernate Search.
+That way, a set of secondary indexes independent of MongoDB is maintained by Hibernate Search
+and you can write queries on top of them.
+The benefit of this approach is a nice integration at the JPA / Hibernate API level
+(managed entities are returned by the queries).
+The drawback is that you need to store the Lucene indexes somewhere
+(file system, infinispan grid, etc).
+Have a look at the Infinispan section (<a class="xref" href="ch09.html#ogm-infinispan-indexstorage" title="9.6. Storing a Lucene index in Infinispan">Section 9.6, “Storing a Lucene index in Infinispan”</a>)
+for more info on how to use Hibernate Search.</p></div></div></div><script xmlns="" xmlns:d="http://docbook.org/ns/docbook" type="text/javascript" src="highlight.js/highlight.pack.js"> </script><script xmlns="" xmlns:d="http://docbook.org/ns/docbook" type="text/javascript">hljs.initHighlightingOnLoad();</script><script type="text/javascript">
+dataLayer = [{'channel' : 'Hibernate', 'additional_tracking_code' : 'UA-45270411-3'}];
+(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NJWS5L');</script><noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-NJWS5L" height="0" width="0" style="display:none;visibility:hidden"> </iframe></noscript><hr xmlns="" xmlns:d="http://docbook.org/ns/docbook"/><a xmlns="" xmlns:d="http://docbook.org/ns/docbook" href="legalnotice.html"/><ul class="docnav"><li class="previous"><a accesskey="p" href="ch10.html"><strong>Prev</strong>Chapter 10. Ehcache</a></li><li class="up"><a accesskey="u" href="#"><strong>Up</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Home</strong></a></li><li class="next"><a accesskey="n" href="ch12.html"><strong>Next</strong>Chapter 12. Neo4j</a></li></ul><!-- HibernateDoc.OutdatedContent --><script src="//code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script><script src="/hibernate/_outdated-content/outdated-content.js" type="text/javascript"></script><script type="text/javascript">var jQuery_3_1 = $.noConflict(true); jQuery_3_1(document).ready(function() { HibernateDoc.OutdatedContent.install("ogm"); });</script><!-- /HibernateDoc.OutdatedContent --></body></html>

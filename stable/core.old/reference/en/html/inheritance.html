@@ -1,0 +1,467 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>Chapter&nbsp;9.&nbsp;Inheritance Mapping</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="prev" href="components-dynamic.html" title="8.5.&nbsp;Dynamic components">
+      <link rel="next" href="inheritance-limitations.html" title="9.2.&nbsp;Limitations">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">Chapter&nbsp;9.&nbsp;Inheritance Mapping</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="components-dynamic.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">&nbsp;</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="inheritance-limitations.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="chapter" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title"><a name="inheritance"></a>Chapter&nbsp;9.&nbsp;Inheritance Mapping
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <div class="sect1" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="inheritance-strategies"></a>9.1.&nbsp;The Three Strategies
+                     </h2>
+                  </div>
+               </div>
+            </div>
+            <p>
+                           Hibernate supports the three basic inheritance mapping strategies:
+                       
+            </p>
+            <div class="itemizedlist">
+               <ul type="disc">
+                  <li>
+                     <p>
+                                    table per class hierarchy
+                                
+                     </p>
+                  </li>
+                  <li>
+                     <p>
+                                    table per subclass
+                                
+                     </p>
+                  </li>
+                  <li>
+                     <p>
+                                    table per concrete class
+                                
+                     </p>
+                  </li>
+               </ul>
+            </div>
+            <p>
+                           In addition, Hibernate supports a fourth, slightly different kind of 
+                           polymorphism:
+                       
+            </p>
+            <div class="itemizedlist">
+               <ul type="disc">
+                  <li>
+                     <p>
+                                    implicit polymorphism
+                                
+                     </p>
+                  </li>
+               </ul>
+            </div>
+            <p>
+                           It is possible to use different mapping strategies for different
+                           branches of the same inheritance hierarchy, and then make use of implicit
+                           polymorphism to achieve polymorphism across the whole hierarchy. However, 
+                           Hibernate does not support mixing <code class="literal">&lt;subclass&gt;</code>,
+                           and <code class="literal">&lt;joined-subclass&gt;</code> and 
+                           <code class="literal">&lt;union-subclass&gt;</code> mappings under the same root
+                           <code class="literal">&lt;class&gt;</code> element. It is possible to mix together
+                           the table per hierarchy and table per subclass strategies, under the
+                           the same <code class="literal">&lt;class&gt;</code> element, by combining the 
+                           <code class="literal">&lt;subclass&gt;</code> and <code class="literal">&lt;join&gt;</code>
+                           elements (see below).
+                       
+            </p>
+            <p>
+                            It is possible to define <code class="literal">subclass</code>, <code class="literal">union-subclass</code>,
+                            and <code class="literal">joined-subclass</code> mappings in separate mapping documents, directly beneath
+                            <code class="literal">hibernate-mapping</code>. This allows you to extend a class hierachy just by adding
+                            a new mapping file. You must specify an <code class="literal">extends</code> attribute in the subclass mapping,
+                            naming a previously mapped superclass. Note: Previously this feature made the ordering of the mapping
+                            documents important. Since Hibernate3, the ordering of mapping files does not matter when using the
+                            extends keyword. The ordering inside a single mapping file still needs to be defined as superclasses
+                            before subclasses.
+                        
+            </p><pre class="programlisting">
+ &lt;hibernate-mapping&gt;
+     &lt;subclass name="DomesticCat" extends="Cat" discriminator-value="D"&gt;
+          &lt;property name="name" type="string"/&gt;
+     &lt;/subclass&gt;
+ &lt;/hibernate-mapping&gt;</pre><div class="sect2" lang="en-US">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="inheritance-tableperclass"></a>9.1.1.&nbsp;Table per class hierarchy
+                        </h3>
+                     </div>
+                  </div>
+               </div>
+               <p>
+                              Suppose we have an interface <code class="literal">Payment</code>, with implementors
+                              <code class="literal">CreditCardPayment</code>, <code class="literal">CashPayment</code>,
+                              <code class="literal">ChequePayment</code>. The table per hierarchy mapping would
+                              look like:
+                          
+               </p><pre class="programlisting">&lt;class name="Payment" table="PAYMENT"&gt;
+    &lt;id name="id" type="long" column="PAYMENT_ID"&gt;
+        &lt;generator class="native"/&gt;
+    &lt;/id&gt;
+    &lt;discriminator column="PAYMENT_TYPE" type="string"/&gt;
+    &lt;property name="amount" column="AMOUNT"/&gt;
+    ...
+    &lt;subclass name="CreditCardPayment" discriminator-value="CREDIT"&gt;
+        &lt;property name="creditCardType" column="CCTYPE"/&gt;
+        ...
+    &lt;/subclass&gt;
+    &lt;subclass name="CashPayment" discriminator-value="CASH"&gt;
+        ...
+    &lt;/subclass&gt;
+    &lt;subclass name="ChequePayment" discriminator-value="CHEQUE"&gt;
+        ...
+    &lt;/subclass&gt;
+&lt;/class&gt;</pre><p>
+                              Exactly one table is required. There is one big limitation of this mapping 
+                              strategy: columns declared by the subclasses, such as <code class="literal">CCTYPE</code>, 
+                              may not have <code class="literal">NOT NULL</code> constraints.
+                          
+               </p>
+            </div>
+            <div class="sect2" lang="en-US">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="inheritance-tablepersubclass"></a>9.1.2.&nbsp;Table per subclass
+                        </h3>
+                     </div>
+                  </div>
+               </div>
+               <p>
+                              A table per subclass mapping would look like:
+                          
+               </p><pre class="programlisting">&lt;class name="Payment" table="PAYMENT"&gt;
+    &lt;id name="id" type="long" column="PAYMENT_ID"&gt;
+        &lt;generator class="native"/&gt;
+    &lt;/id&gt;
+    &lt;property name="amount" column="AMOUNT"/&gt;
+    ...
+    &lt;joined-subclass name="CreditCardPayment" table="CREDIT_PAYMENT"&gt;
+        &lt;key column="PAYMENT_ID"/&gt;
+        &lt;property name="creditCardType" column="CCTYPE"/&gt;
+        ...
+    &lt;/joined-subclass&gt;
+    &lt;joined-subclass name="CashPayment" table="CASH_PAYMENT"&gt;
+        &lt;key column="PAYMENT_ID"/&gt;
+        ...
+    &lt;/joined-subclass&gt;
+    &lt;joined-subclass name="ChequePayment" table="CHEQUE_PAYMENT"&gt;
+        &lt;key column="PAYMENT_ID"/&gt;
+        ...
+    &lt;/joined-subclass&gt;
+&lt;/class&gt;</pre><p>
+                              Four tables are required. The three subclass tables have primary
+                              key associations to the superclass table (so the relational model
+                              is actually a one-to-one association).
+                          
+               </p>
+            </div>
+            <div class="sect2" lang="en-US">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="inheritance-tablepersubclass-discriminator"></a>9.1.3.&nbsp;Table per subclass, using a discriminator
+                        </h3>
+                     </div>
+                  </div>
+               </div>
+               <p>
+                              Note that Hibernate's implementation of table per subclass requires
+                              no discriminator column. Other object/relational mappers use a
+                              different implementation of table per subclass which requires a type
+                              discriminator column in the superclass table. The approach taken by
+                              Hibernate is much more difficult to implement but arguably more
+                              correct from a relational point of view. If you would like to use
+                              a discriminator column with the table per subclass strategy, you
+                              may combine the use of <code class="literal">&lt;subclass&gt;</code> and 
+                              <code class="literal">&lt;join&gt;</code>, as follow:
+                          
+               </p><pre class="programlisting">&lt;class name="Payment" table="PAYMENT"&gt;
+    &lt;id name="id" type="long" column="PAYMENT_ID"&gt;
+        &lt;generator class="native"/&gt;
+    &lt;/id&gt;
+    &lt;discriminator column="PAYMENT_TYPE" type="string"/&gt;
+    &lt;property name="amount" column="AMOUNT"/&gt;
+    ...
+    &lt;subclass name="CreditCardPayment" discriminator-value="CREDIT"&gt;
+        &lt;join table="CREDIT_PAYMENT"&gt;
+            &lt;key column="PAYMENT_ID"/&gt;
+            &lt;property name="creditCardType" column="CCTYPE"/&gt;
+            ...
+        &lt;/join&gt;
+    &lt;/subclass&gt;
+    &lt;subclass name="CashPayment" discriminator-value="CASH"&gt;
+        &lt;join table="CASH_PAYMENT"&gt;
+            &lt;key column="PAYMENT_ID"/&gt;
+            ...
+        &lt;/join&gt;
+    &lt;/subclass&gt;
+    &lt;subclass name="ChequePayment" discriminator-value="CHEQUE"&gt;
+        &lt;join table="CHEQUE_PAYMENT" fetch="select"&gt;
+            &lt;key column="PAYMENT_ID"/&gt;
+            ...
+        &lt;/join&gt;
+    &lt;/subclass&gt;
+&lt;/class&gt;</pre><p>
+                              The optional <code class="literal">fetch="select"</code> declaration tells Hibernate 
+                              not to fetch the <code class="literal">ChequePayment</code> subclass data using an
+                              outer join when querying the superclass.
+                          
+               </p>
+            </div>
+            <div class="sect2" lang="en-US">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="inheritance-mixing-tableperclass-tablepersubclass"></a>9.1.4.&nbsp;Mixing table per class hierarchy with table per subclass
+                        </h3>
+                     </div>
+                  </div>
+               </div>
+               <p>
+                              You may even mix the table per hierarchy and table per subclass strategies
+                              using this approach:
+                          
+               </p><pre class="programlisting">&lt;class name="Payment" table="PAYMENT"&gt;
+    &lt;id name="id" type="long" column="PAYMENT_ID"&gt;
+        &lt;generator class="native"/&gt;
+    &lt;/id&gt;
+    &lt;discriminator column="PAYMENT_TYPE" type="string"/&gt;
+    &lt;property name="amount" column="AMOUNT"/&gt;
+    ...
+    &lt;subclass name="CreditCardPayment" discriminator-value="CREDIT"&gt;
+        &lt;join table="CREDIT_PAYMENT"&gt;
+            &lt;property name="creditCardType" column="CCTYPE"/&gt;
+            ...
+        &lt;/join&gt;
+    &lt;/subclass&gt;
+    &lt;subclass name="CashPayment" discriminator-value="CASH"&gt;
+        ...
+    &lt;/subclass&gt;
+    &lt;subclass name="ChequePayment" discriminator-value="CHEQUE"&gt;
+        ...
+    &lt;/subclass&gt;
+&lt;/class&gt;</pre><p>
+                              For any of these mapping strategies, a polymorphic association to the root
+                              <code class="literal">Payment</code> class is mapped using 
+                              <code class="literal">&lt;many-to-one&gt;</code>.
+                          
+               </p><pre class="programlisting">&lt;many-to-one name="payment" column="PAYMENT_ID" class="Payment"/&gt;</pre></div>
+            <div class="sect2" lang="en-US">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="inheritance-tableperconcrete"></a>9.1.5.&nbsp;Table per concrete class
+                        </h3>
+                     </div>
+                  </div>
+               </div>
+               <p>
+                              There are two ways we could go about mapping the table per concrete class
+                              strategy. The first is to use <code class="literal">&lt;union-subclass&gt;</code>.
+                          
+               </p><pre class="programlisting">&lt;class name="Payment"&gt;
+    &lt;id name="id" type="long" column="PAYMENT_ID"&gt;
+        &lt;generator class="sequence"/&gt;
+    &lt;/id&gt;
+    &lt;property name="amount" column="AMOUNT"/&gt;
+    ...
+    &lt;union-subclass name="CreditCardPayment" table="CREDIT_PAYMENT"&gt;
+        &lt;property name="creditCardType" column="CCTYPE"/&gt;
+        ...
+    &lt;/union-subclass&gt;
+    &lt;union-subclass name="CashPayment" table="CASH_PAYMENT"&gt;
+        ...
+    &lt;/union-subclass&gt;
+    &lt;union-subclass name="ChequePayment" table="CHEQUE_PAYMENT"&gt;
+        ...
+    &lt;/union-subclass&gt;
+&lt;/class&gt;</pre><p>
+                              Three tables are involved for the subclasses. Each table defines columns for
+                              all properties of the class, including inherited properties.
+                          
+               </p>
+               <p>
+                              The limitation of this approach is that if a property is mapped on the 
+                              superclass, the column name must be the same on all subclass tables.
+                              (We might relax this in a future release of Hibernate.) The identity
+                  			generator strategy is not allowed in union subclass inheritance, indeed
+                  			the primary key seed has to be shared accross all unioned subclasses
+                  			of a hierarchy.
+                          
+               </p>
+               <p>
+                              If your superclass is abstract, map it with <code class="literal">abstract="true"</code>.
+                              Of course, if it is not abstract, an additional table (defaults to
+                              <code class="literal">PAYMENT</code> in the example above) is needed to hold instances
+                              of the superclass.
+                          
+               </p>
+            </div>
+            <div class="sect2" lang="en-US">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="inheritance-tableperconcreate-polymorphism"></a>9.1.6.&nbsp;Table per concrete class, using implicit polymorphism
+                        </h3>
+                     </div>
+                  </div>
+               </div>
+               <p>
+                              An alternative approach is to make use of implicit polymorphism:
+                          
+               </p><pre class="programlisting">&lt;class name="CreditCardPayment" table="CREDIT_PAYMENT"&gt;
+    &lt;id name="id" type="long" column="CREDIT_PAYMENT_ID"&gt;
+        &lt;generator class="native"/&gt;
+    &lt;/id&gt;
+    &lt;property name="amount" column="CREDIT_AMOUNT"/&gt;
+    ...
+&lt;/class&gt;
+
+&lt;class name="CashPayment" table="CASH_PAYMENT"&gt;
+    &lt;id name="id" type="long" column="CASH_PAYMENT_ID"&gt;
+        &lt;generator class="native"/&gt;
+    &lt;/id&gt;
+    &lt;property name="amount" column="CASH_AMOUNT"/&gt;
+    ...
+&lt;/class&gt;
+
+&lt;class name="ChequePayment" table="CHEQUE_PAYMENT"&gt;
+    &lt;id name="id" type="long" column="CHEQUE_PAYMENT_ID"&gt;
+        &lt;generator class="native"/&gt;
+    &lt;/id&gt;
+    &lt;property name="amount" column="CHEQUE_AMOUNT"/&gt;
+    ...
+&lt;/class&gt;</pre><p>
+                              Notice that nowhere do we mention the <code class="literal">Payment</code> interface 
+                              explicitly. Also notice that properties of <code class="literal">Payment</code> are 
+                              mapped in each of the subclasses. If you want to avoid duplication, consider
+                              using XML entities
+                              (e.g. <code class="literal">[ &lt;!ENTITY allproperties SYSTEM "allproperties.xml"&gt; ]</code>
+                              in the <code class="literal">DOCTYPE</code> declartion and 
+                              <code class="literal">&amp;allproperties;</code> in the mapping).
+                          
+               </p>
+               <p>
+                              The disadvantage of this approach is that Hibernate does not generate SQL
+                              <code class="literal">UNION</code>s when performing polymorphic queries.
+                          
+               </p>
+               <p>
+                              For this mapping strategy, a polymorphic association to <code class="literal">Payment</code> 
+                              is usually mapped using <code class="literal">&lt;any&gt;</code>.
+                          
+               </p><pre class="programlisting">&lt;any name="payment" meta-type="string" id-type="long"&gt;
+    &lt;meta-value value="CREDIT" class="CreditCardPayment"/&gt;
+    &lt;meta-value value="CASH" class="CashPayment"/&gt;
+    &lt;meta-value value="CHEQUE" class="ChequePayment"/&gt;
+    &lt;column name="PAYMENT_CLASS"/&gt;
+    &lt;column name="PAYMENT_ID"/&gt;
+&lt;/any&gt;</pre></div>
+            <div class="sect2" lang="en-US">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="inheritace-mixingpolymorphism"></a>9.1.7.&nbsp;Mixing implicit polymorphism with other inheritance mappings
+                        </h3>
+                     </div>
+                  </div>
+               </div>
+               <p>
+                              There is one further thing to notice about this mapping. Since the subclasses 
+                              are each mapped in their own <code class="literal">&lt;class&gt;</code> element (and since
+                              <code class="literal">Payment</code> is just an interface), each of the subclasses could 
+                              easily be part of another inheritance hierarchy! (And you can still use polymorphic
+                              queries against the <code class="literal">Payment</code> interface.)
+                         
+               </p><pre class="programlisting">&lt;class name="CreditCardPayment" table="CREDIT_PAYMENT"&gt;
+    &lt;id name="id" type="long" column="CREDIT_PAYMENT_ID"&gt;
+        &lt;generator class="native"/&gt;
+    &lt;/id&gt;
+    &lt;discriminator column="CREDIT_CARD" type="string"/&gt;
+    &lt;property name="amount" column="CREDIT_AMOUNT"/&gt;
+    ...
+    &lt;subclass name="MasterCardPayment" discriminator-value="MDC"/&gt;
+    &lt;subclass name="VisaPayment" discriminator-value="VISA"/&gt;
+&lt;/class&gt;
+
+&lt;class name="NonelectronicTransaction" table="NONELECTRONIC_TXN"&gt;
+    &lt;id name="id" type="long" column="TXN_ID"&gt;
+        &lt;generator class="native"/&gt;
+    &lt;/id&gt;
+    ...
+    &lt;joined-subclass name="CashPayment" table="CASH_PAYMENT"&gt;
+        &lt;key column="PAYMENT_ID"/&gt;
+        &lt;property name="amount" column="CASH_AMOUNT"/&gt;
+        ...
+    &lt;/joined-subclass&gt;
+    &lt;joined-subclass name="ChequePayment" table="CHEQUE_PAYMENT"&gt;
+        &lt;key column="PAYMENT_ID"/&gt;
+        &lt;property name="amount" column="CHEQUE_AMOUNT"/&gt;
+        ...
+    &lt;/joined-subclass&gt;
+&lt;/class&gt;</pre><p>
+                              Once again, we don't mention <code class="literal">Payment</code> explicitly. If we
+                              execute a query against the <code class="literal">Payment</code> interface - for
+                              example, <code class="literal">from Payment</code> - Hibernate
+                              automatically returns instances of <code class="literal">CreditCardPayment</code>
+                              (and its subclasses, since they also implement <code class="literal">Payment</code>),
+                              <code class="literal">CashPayment</code> and <code class="literal">ChequePayment</code> but
+                              not instances of <code class="literal">NonelectronicTransaction</code>.
+                          
+               </p>
+            </div>
+         </div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="components-dynamic.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center">&nbsp;</td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="inheritance-limitations.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">8.5.&nbsp;Dynamic components&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;9.2.&nbsp;Limitations</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

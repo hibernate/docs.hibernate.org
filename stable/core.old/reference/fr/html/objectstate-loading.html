@@ -1,0 +1,82 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>10.3.&nbsp;Chargement d'un objet</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="objectstate.html" title="Chapitre&nbsp;10.&nbsp;Travailler avec des objets">
+      <link rel="prev" href="objectstate-makingpersistent.html" title="10.2.&nbsp;Rendre des objets persistants">
+      <link rel="next" href="objectstate-querying.html" title="10.4.&nbsp;Requ&ecirc;tage">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">10.3.&nbsp;Chargement d'un objet</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="objectstate-makingpersistent.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;10.&nbsp;Travailler avec des objets</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="objectstate-querying.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="objectstate-loading"></a>10.3.&nbsp;Chargement d'un objet
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Les m&eacute;thodes <code class="literal">load()</code> de <code class="literal">Session</code> vous donnent un moyen de r&eacute;cup&eacute;rer une instance persistante si vous connaissez d&eacute;j&agrave; son identifiant. <code class="literal">load()</code> prend un objet de classe et chargera l'&eacute;tat dans une instance nouvellement instanci&eacute;e de cette classe, dans un &eacute;tat persistant.
+            
+         </p><pre class="programlisting">Cat fritz = (Cat) sess.load(Cat.class, generatedId);</pre><pre class="programlisting">// you need to wrap primitive identifiers
+long id = 1234;
+DomesticCat pk = (DomesticCat) sess.load( DomesticCat.class, new Long(id) );</pre><p>Alternativement, vous pouvez charger un &eacute;tat dans une instance donn&eacute;e : </p><pre class="programlisting">Cat cat = new DomesticCat();
+// load pk's state into cat
+sess.load( cat, new Long(pkId) );
+Set kittens = cat.getKittens();</pre><p>Notez que <code class="literal">load()</code> l&egrave;vera une exception irr&eacute;cup&eacute;rable s'il n'y a pas de ligne correspondante dans la base de donn&eacute;es. Si la classe est mapp&eacute;e
+            avec un proxy, <code class="literal">load()</code> retourne juste un proxy non initialis&eacute; et n'acc&egrave;de en fait pas &agrave; la base de donn&eacute;es jusqu'&agrave; ce que vous invoquiez une m&eacute;thode
+            du proxy. Ce comportement est tr&egrave;s utile si vous souhaitez cr&eacute;er une association vers un objet sans r&eacute;ellement le charger
+            &agrave; partir de la base de donn&eacute;es. Cela permet aussi &agrave; de multiples instances d'&ecirc;tre charg&eacute;es comme un lot si <code class="literal">batch-size</code> est d&eacute;fini pour le mapping de la classe. 
+         </p>
+         <p>Si vous n'&ecirc;tes pas certain qu'une ligne correspondante existe, vous devriez utiliser la m&eacute;thode <code class="literal">get()</code>, laquelle acc&egrave;de &agrave; la base de donn&eacute;es imm&eacute;diatement et retourne null s'il n'y a pas de ligne correspondante. 
+         </p><pre class="programlisting">Cat cat = (Cat) sess.get(Cat.class, id);
+if (cat==null) {
+    cat = new Cat();
+    sess.save(cat, id);
+}
+return cat;</pre><p>Vous pouvez m&ecirc;me charger un objet en employant un <code class="literal">SELECT ... FOR UPDATE</code> SQL, en utilisant un <code class="literal">LockMode</code>. Voir la documentation de l'API pour plus d'informations. 
+         </p><pre class="programlisting">Cat cat = (Cat) sess.get(Cat.class, id, LockMode.UPGRADE);</pre><p>Notez que n'importe quelles instances associ&eacute;es ou collections contenues <span class="emphasis"><em>ne sont pas</em></span> s&eacute;lectionn&eacute;es par <code class="literal">FOR UPDATE</code>, &agrave; moins que vous ne d&eacute;cidiez de sp&eacute;cifier <code class="literal">lock</code> ou <code class="literal">all</code> en tant que style de cascade pour l'association. 
+         </p>
+         <p>Il est possible de re-charger un objet et toutes ses collections &agrave; n'importe quel moment, en utilisant la m&eacute;thode <code class="literal">refresh()</code>. C'est utile lorsque des "triggers" de base de donn&eacute;es sont utilis&eacute;s pour initiliser certains propri&eacute;t&eacute;s de l'objet. 
+         </p><pre class="programlisting">sess.save(cat);
+sess.flush(); //force the SQL INSERT
+sess.refresh(cat); //re-read the state (after the trigger executes)</pre><p>Une question importante appara&icirc;t g&eacute;n&eacute;ralement &agrave; ce point : combien (NdT : de donn&eacute;es) Hibernate charge-t-il de la base de
+            donn&eacute;es et combient de <code class="literal">SELECT</code>s utilisera-t-il ? Cela d&eacute;pent de la <span class="emphasis"><em>strat&eacute;gie de r&eacute;cup&eacute;ration</em></span> et cela est expliqu&eacute; dans <a href="performance.html#performance-fetching" title="19.1.&nbsp;Strat&eacute;gies de chargement">Section&nbsp;19.1, &laquo;&nbsp;Strat&eacute;gies de chargement&nbsp;&raquo;</a>. 
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="objectstate-makingpersistent.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="objectstate.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="objectstate-querying.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">10.2.&nbsp;Rendre des objets persistants&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;10.4.&nbsp;Requ&ecirc;tage</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

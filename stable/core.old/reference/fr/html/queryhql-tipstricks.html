@@ -1,0 +1,77 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>14.16.&nbsp;Trucs &amp; Astuces</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="queryhql.html" title="Chapitre&nbsp;14.&nbsp;HQL: Langage de requ&ecirc;tage d'Hibernate">
+      <link rel="prev" href="queryhql-bulk.html" title="14.15.&nbsp;Mise &agrave; jour et suppression">
+      <link rel="next" href="queryhql-components.html" title="14.17.&nbsp;translator-credits">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">14.16.&nbsp;Trucs &amp; Astuces</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="queryhql-bulk.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;14.&nbsp;HQL: Langage de requ&ecirc;tage d'Hibernate</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="queryhql-components.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="queryhql-tipstricks"></a>14.16.&nbsp;Trucs &amp; Astuces
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Vous pouvez compter le nombre de r&eacute;sultats d'une requ&ecirc;te sans les retourner : </p><pre class="programlisting">( (Integer) session.createQuery("select count(*) from ....").iterate().next() ).intValue()</pre><p>Pour trier les r&eacute;sultats par la taille d'une collection, utilisez la requ&ecirc;te suivante : </p><pre class="programlisting">select usr.id, usr.name
+from User as usr
+    left join usr.messages as msg
+group by usr.id, usr.name
+order by count(msg)</pre><p>Si votre base de donn&eacute;es supporte les sous-requ&ecirc;tes, vous pouvez placer des conditions sur la taille de la s&eacute;lection dans
+            la clause where de votre requ&ecirc;te: 
+         </p><pre class="programlisting">from User usr where size(usr.messages) &gt;= 1</pre><p>Si votre base de donn&eacute;es ne supporte pas les sous-requ&ecirc;tes, utilisez la requ&ecirc;te suivante : </p><pre class="programlisting">select usr.id, usr.name
+from User usr.name
+    join usr.messages msg
+group by usr.id, usr.name
+having count(msg) &gt;= 1</pre><p>Cette solution ne peut pas retourner un <code class="literal">User</code> avec z&eacute;ro message &agrave; cause de la jointure interne, la forme suivante peut donc &ecirc;tre utile : 
+         </p><pre class="programlisting">select usr.id, usr.name
+from User as usr
+    left join usr.messages as msg
+group by usr.id, usr.name
+having count(msg) = 0</pre><p>Les propri&eacute;t&eacute;s d'un JavaBean peuvent &ecirc;tre inject&eacute;es dans les param&egrave;tres nomm&eacute;s d'un requ&ecirc;te : </p><pre class="programlisting">Query q = s.createQuery("from foo Foo as foo where foo.name=:name and foo.size=:size");
+q.setProperties(fooBean); // fooBean has getName() and getSize()
+List foos = q.list();</pre><p>Les collections sont paginables via l'utilisation de l'interface <code class="literal">Query</code> avec un filtre : 
+         </p><pre class="programlisting">Query q = s.createFilter( collection, "" ); // the trivial filter
+q.setMaxResults(PAGE_SIZE);
+q.setFirstResult(PAGE_SIZE * pageNumber);
+List page = q.list();</pre><p>Les &eacute;l&eacute;ments d'une collection peuvent &ecirc;tre tri&eacute;s ou group&eacute;s en utilisant un filtre de requ&ecirc;te : </p><pre class="programlisting">Collection orderedCollection = s.filter( collection, "order by this.amount" );
+Collection counts = s.filter( collection, "select this.type, count(this) group by this.type" );</pre><p>Vous pouvez r&eacute;cup&eacute;rer la taille d'une collection sans l'initialiser : </p><pre class="programlisting">( (Integer) session.createQuery("select count(*) from ....").iterate().next() ).intValue();</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="queryhql-bulk.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="queryhql.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="queryhql-components.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">14.15.&nbsp;Mise &agrave; jour et suppression&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;14.17.&nbsp;translator-credits</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

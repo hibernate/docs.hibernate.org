@@ -1,0 +1,102 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>14.16.&nbsp;Tips &amp; Tricks</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="queryhql.html" title="Chapter&nbsp;14.&nbsp;HQL: The Hibernate Query Language">
+      <link rel="prev" href="queryhql-bulk.html" title="14.15.&nbsp;Bulk update and delete">
+      <link rel="next" href="queryhql-components.html" title="14.17.&nbsp;Components">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">14.16.&nbsp;Tips &amp; Tricks</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="queryhql-bulk.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;14.&nbsp;HQL: The Hibernate Query Language</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="queryhql-components.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="queryhql-tipstricks"></a>14.16.&nbsp;Tips &amp; Tricks
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+                        You can count the number of query results without actually returning them:
+                    
+         </p><pre class="programlisting">( (Integer) session.createQuery("select count(*) from ....").iterate().next() ).intValue()</pre><p>
+                        To order a result by the size of a collection, use the following query:
+                    
+         </p><pre class="programlisting">select usr.id, usr.name
+from User as usr
+    left join usr.messages as msg
+group by usr.id, usr.name
+order by count(msg)</pre><p>
+                        If your database supports subselects, you can place a condition upon selection
+                        size in the where clause of your query:
+                    
+         </p><pre class="programlisting">from User usr where size(usr.messages) &gt;= 1</pre><p>
+                        If your database doesn't support subselects, use the following query:
+                    
+         </p><pre class="programlisting">select usr.id, usr.name
+from User usr.name
+    join usr.messages msg
+group by usr.id, usr.name
+having count(msg) &gt;= 1</pre><p>
+                        As this solution can't return a <code class="literal">User</code> with zero messages
+                        because of the inner join, the following form is also useful:
+                    
+         </p><pre class="programlisting">select usr.id, usr.name
+from User as usr
+    left join usr.messages as msg
+group by usr.id, usr.name
+having count(msg) = 0</pre><p>
+                        Properties of a JavaBean can be bound to named query parameters:
+                    
+         </p><pre class="programlisting">Query q = s.createQuery("from foo Foo as foo where foo.name=:name and foo.size=:size");
+q.setProperties(fooBean); // fooBean has getName() and getSize()
+List foos = q.list();</pre><p>
+                        Collections are pageable by using the <code class="literal">Query</code> interface with a filter:
+                    
+         </p><pre class="programlisting">Query q = s.createFilter( collection, "" ); // the trivial filter
+q.setMaxResults(PAGE_SIZE);
+q.setFirstResult(PAGE_SIZE * pageNumber);
+List page = q.list();</pre><p>
+                        Collection elements may be ordered or grouped using a query filter:
+                    
+         </p><pre class="programlisting">Collection orderedCollection = s.filter( collection, "order by this.amount" );
+Collection counts = s.filter( collection, "select this.type, count(this) group by this.type" );</pre><p>
+                        You can find the size of a collection without initializing it:
+                    
+         </p><pre class="programlisting">( (Integer) session.createQuery("select count(*) from ....").iterate().next() ).intValue();</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="queryhql-bulk.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="queryhql.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="queryhql-components.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">14.15.&nbsp;Bulk update and delete&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;14.17.&nbsp;Components</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

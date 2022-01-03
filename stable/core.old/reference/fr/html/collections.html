@@ -1,0 +1,100 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>Chapitre&nbsp;6.&nbsp;Mapping des collections</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="prev" href="mapping-database-object.html" title="5.7.&nbsp;Objets auxiliaires de la base de donn&eacute;es">
+      <link rel="next" href="collections-mapping.html" title="6.2.&nbsp;Mapper une collection">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">Chapitre&nbsp;6.&nbsp;Mapping des collections</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="mapping-database-object.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">&nbsp;</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="collections-mapping.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="chapter" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title"><a name="collections"></a>Chapitre&nbsp;6.&nbsp;Mapping des collections
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <div class="sect1" lang="fr-FR">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="collections-persistent"></a>6.1.&nbsp;Collections persistantes
+                     </h2>
+                  </div>
+               </div>
+            </div>
+            <p>Hibernate requiert que les champs contenant des collections persistantes soient d&eacute;clar&eacute;s comme des types d'interface, par
+               exemple : 
+            </p><pre class="programlisting">public class Product {
+    private String serialNumber;
+    private Set parts = new HashSet();
+    
+    public Set getParts() { return parts; }
+    void setParts(Set parts) { this.parts = parts; }
+    public String getSerialNumber() { return serialNumber; }
+    void setSerialNumber(String sn) { serialNumber = sn; }
+}</pre><p>L'interface r&eacute;elle devrait &ecirc;tre <code class="literal">java.util.Set</code>, <code class="literal">java.util.Collection</code>, <code class="literal">java.util.List</code>, <code class="literal">java.util.Map</code>, <code class="literal">java.util.SortedSet</code>, <code class="literal">java.util.SortedMap</code> ou ... n'importe quoi d'autre ! (O&ugrave; "n'importe quoi d'autre" signifie que vous devrez &eacute;crire une impl&eacute;mentation de <code class="literal">org.hibernate.usertype.UserCollectionType</code>.) 
+            </p>
+            <p>Notez comment nous avons initialis&eacute; les variables d'instance avec une instance de <code class="literal">HashSet</code>. C'est le meilleur moyen pour initialiser les collections d'instances nouvellement cr&eacute;&eacute;es (non persistantes). Quand nous
+               fabriquons l'instance persistante - en appelant <code class="literal">persist()</code>, par exemple - Hibernate remplacera r&eacute;ellement le <code class="literal">HashSet</code> avec une instance d'une impl&eacute;mentation propre &agrave; Hibernate de <code class="literal">Set</code>. Prenez garde aux erreurs : 
+            </p><pre class="programlisting">Cat cat = new DomesticCat();
+Cat kitten = new DomesticCat();
+....
+Set kittens = new HashSet();
+kittens.add(kitten);
+cat.setKittens(kittens);
+session.persist(cat);
+kittens = cat.getKittens(); // Okay, kittens collection is a Set
+(HashSet) cat.getKittens(); // Error!</pre><p>Les collections persistantes inject&eacute;es par Hibernate se comportent de la m&ecirc;me mani&egrave;re que <code class="literal">HashMap</code>, <code class="literal">HashSet</code>, <code class="literal">TreeMap</code>, <code class="literal">TreeSet</code> ou <code class="literal">ArrayList</code>, selon le type de l'interface. 
+            </p>
+            <p>Les instances des collections ont le comportement habituel des types des valeurs. Elles sont automatiquement persist&eacute;es quand
+               elles sont r&eacute;f&eacute;renc&eacute;es par un objet persistant et automatiquement effac&eacute;es quand elles sont d&eacute;r&eacute;f&eacute;renc&eacute;es. Si une collection
+               est pass&eacute;e d'un objet persistant &agrave; un autre, ses &eacute;l&eacute;ments pourraient &ecirc;tre d&eacute;plac&eacute;s d'une table &agrave; une autre. Deux entit&eacute;s ne
+               peuvent pas partager une r&eacute;f&eacute;rence vers une m&ecirc;me instance d'une collection. D&ucirc; au mod&egrave;le relationnel sous-jacent, les propri&eacute;t&eacute;s
+               contenant des collections ne supportent pas la s&eacute;mantique de la valeur null ; Hibernate ne distingue pas une r&eacute;f&eacute;rence vers
+               une collection nulle d'une collection vide. 
+            </p>
+            <p>Vous ne devriez pas vous pr&eacute;occuper trop de &ccedil;a. Utilisez les collections persistantes de la m&ecirc;me mani&egrave;re que vous utilisez
+               des collections Java ordinaires. Assurez-vous de comprendre la s&eacute;mantique des associations bidirectionnelles (trait&eacute;e plus
+               loin). 
+            </p>
+         </div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="mapping-database-object.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center">&nbsp;</td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="collections-mapping.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">5.7.&nbsp;Objets auxiliaires de la base de donn&eacute;es&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;6.2.&nbsp;Mapper une collection</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

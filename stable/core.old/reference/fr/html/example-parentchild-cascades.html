@@ -1,0 +1,82 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>21.3.&nbsp;Cycle de vie en cascade</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="example-parentchild.html" title="Chapitre&nbsp;21.&nbsp;Exemple : P&egrave;re/Fils">
+      <link rel="prev" href="example-parentchild-bidir.html" title="21.2.&nbsp;un-vers-plusieurs bidirectionnel">
+      <link rel="next" href="example-parentchild-update.html" title="21.4.&nbsp;Cascades et unsaved-value">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">21.3.&nbsp;Cycle de vie en cascade</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="example-parentchild-bidir.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;21.&nbsp;Exemple : P&egrave;re/Fils</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="example-parentchild-update.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="example-parentchild-cascades"></a>21.3.&nbsp;Cycle de vie en cascade
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>L'appel explicite de <code class="literal">save()</code> est un peu fastidieux. Nous pouvons simplifier cela en utilisant les cascades. 
+         </p><pre class="programlisting">&lt;set name="children" inverse="true" cascade="all"&gt;
+    &lt;key column="parent_id"/&gt;
+    &lt;one-to-many class="Child"/&gt;
+&lt;/set&gt;</pre><p>Simplifie le code pr&eacute;c&eacute;dent en </p><pre class="programlisting">Parent p = (Parent) session.load(Parent.class, pid);
+Child c = new Child();
+p.addChild(c);
+session.flush();</pre><p>De la m&ecirc;me mani&egrave;re, nous n'avons pas &agrave; it&eacute;rer sur les fils lorsque nous sauvons ou effacons un <code class="literal">Parent</code>. Le code suivant efface <code class="literal">p</code> et tous ses fils de la base de donn&eacute;es. 
+         </p><pre class="programlisting">Parent p = (Parent) session.load(Parent.class, pid);
+session.delete(p);
+session.flush();</pre><p>Par contre, ce code </p><pre class="programlisting">Parent p = (Parent) session.load(Parent.class, pid);
+Child c = (Child) p.getChildren().iterator().next();
+p.getChildren().remove(c);
+c.setParent(null);
+session.flush();</pre><p>n'effacera pas <code class="literal">c</code> de la base de donn&eacute;es, il enl&egrave;vera seulement le lien vers <code class="literal">p</code> (et causera une violation de contrainte <code class="literal">NOT NULL</code>, dans ce cas). Vous devez explicitement utiliser <code class="literal">delete()</code> sur <code class="literal">Child</code>. 
+         </p><pre class="programlisting">Parent p = (Parent) session.load(Parent.class, pid);
+Child c = (Child) p.getChildren().iterator().next();
+p.getChildren().remove(c);
+session.delete(c);
+session.flush();</pre><p>Dans notre cas, un <code class="literal">Child</code> ne peut pas vraiment exister sans son p&egrave;re. Si nous effacons un <code class="literal">Child</code> de la collection, nous voulons vraiment qu'il soit effac&eacute;. Pour cela, nous devons utiliser <code class="literal">cascade="all-delete-orphan"</code>. 
+         </p><pre class="programlisting">&lt;set name="children" inverse="true" cascade="all-delete-orphan"&gt;
+    &lt;key column="parent_id"/&gt;
+    &lt;one-to-many class="Child"/&gt;
+&lt;/set&gt;</pre><p>A noter : m&ecirc;me si le mapping de la collection sp&eacute;cifie <code class="literal">inverse="true"</code>, les cascades sont toujours assur&eacute;es par l'it&eacute;ration sur les &eacute;l&eacute;ments de la collection. Donc, si vous avez besoin qu'un objet
+            soit enregistr&eacute;, effac&eacute; ou mis &agrave; jour par cascade, vous devez l'ajouter dans la colleciton. Il ne suffit pas d'appeler explicitement
+            <code class="literal">setParent()</code>. 
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="example-parentchild-bidir.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="example-parentchild.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="example-parentchild-update.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">21.2.&nbsp;un-vers-plusieurs bidirectionnel&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;21.4.&nbsp;Cascades et <code class="literal">unsaved-value</code></td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

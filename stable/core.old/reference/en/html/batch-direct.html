@@ -1,0 +1,240 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>13.4.&nbsp;DML-style operations</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="batch.html" title="Chapter&nbsp;13.&nbsp;Batch processing">
+      <link rel="prev" href="batch-statelesssession.html" title="13.3.&nbsp;The StatelessSession interface">
+      <link rel="next" href="queryhql.html" title="Chapter&nbsp;14.&nbsp;HQL: The Hibernate Query Language">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">13.4.&nbsp;DML-style operations</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="batch-statelesssession.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;13.&nbsp;Batch processing</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="queryhql.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="batch-direct"></a>13.4.&nbsp;DML-style operations
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+            As already discussed, automatic and transparent object/relational mapping is concerned
+            with the management of object state. This implies that the object state is available
+                        in memory, hence manipulating (using the SQL <code class="literal">Data Manipulation Language</code>
+                        (DML) statements: <code class="literal">INSERT</code>, <code class="literal">UPDATE</code>, <code class="literal">DELETE</code>)
+                        data directly in the database will not affect in-memory state. However, Hibernate provides methods
+                        for bulk SQL-style DML statement execution which are performed through the
+                        Hibernate Query Language (<a href="queryhql.html" title="Chapter&nbsp;14.&nbsp;HQL: The Hibernate Query Language">HQL</a>).
+                    
+         </p>
+         <p>
+                        The pseudo-syntax for <code class="literal">UPDATE</code> and <code class="literal">DELETE</code> statements
+                        is: <code class="literal">( UPDATE | DELETE ) FROM? EntityName (WHERE where_conditions)?</code>.  Some
+                        points to note:
+                    
+         </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p>
+                                         In the from-clause, the FROM keyword is optional
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         There can only be a single entity named in the from-clause; it can optionally be
+                                         aliased.  If the entity name is aliased, then any property references must
+                                         be qualified using that alias; if the entity name is not aliased, then it is
+                                         illegal for any property references to be qualified.
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         No <a href="queryhql-joins-forms.html" title="14.4.&nbsp;Forms of join syntax">joins</a> (either implicit or explicit)
+                     	                can be specified in a bulk HQL query.  Sub-queries may be used in the where-clause;
+                     	                the subqueries, themselves, may contain joins.
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         The where-clause is also optional.
+                                     
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p>
+                        As an example, to execute an HQL <code class="literal">UPDATE</code>, use the
+                        <code class="literal">Query.executeUpdate()</code> method (the method is named for
+                        those familiar with JDBC's <code class="literal">PreparedStatement.executeUpdate()</code>):
+                    
+         </p><pre class="programlisting">Session session = sessionFactory.openSession();
+Transaction tx = session.beginTransaction();
+
+String hqlUpdate = "update Customer c set c.name = :newName where c.name = :oldName";
+// or String hqlUpdate = "update Customer set name = :newName where name = :oldName";
+int updatedEntities = s.createQuery( hqlUpdate )
+        .setString( "newName", newName )
+        .setString( "oldName", oldName )
+        .executeUpdate();
+tx.commit();
+session.close();</pre><p>
+                        HQL <code class="literal">UPDATE</code> statements, by default do not effect the
+                        <a href="mapping.html#mapping-declaration-version" title="5.1.9.&nbsp;version (optional)">version</a>
+                        or the <a href="mapping.html#mapping-declaration-timestamp" title="5.1.10.&nbsp;timestamp (optional)">timestamp</a> property values
+                        for the affected entities; this is in keeping with the EJB3 specification.  However,
+                        you can force Hibernate to properly reset the <code class="literal">version</code> or
+                        <code class="literal">timestamp</code> property values through the use of a <code class="literal">versioned update</code>.
+                        This is achieved by adding the <code class="literal">VERSIONED</code> keyword after the <code class="literal">UPDATE</code>
+                        keyword.
+                    
+         </p><pre class="programlisting">Session session = sessionFactory.openSession();
+Transaction tx = session.beginTransaction();
+String hqlVersionedUpdate = "update versioned Customer set name = :newName where name = :oldName";
+int updatedEntities = s.createQuery( hqlUpdate )
+        .setString( "newName", newName )
+        .setString( "oldName", oldName )
+        .executeUpdate();
+tx.commit();
+session.close();</pre><p>
+                        Note that custom version types (<code class="literal">org.hibernate.usertype.UserVersionType</code>)
+                        are not allowed in conjunction with a <code class="literal">update versioned</code> statement.
+                    
+         </p>
+         <p>
+                        To execute an HQL <code class="literal">DELETE</code>, use the same <code class="literal">Query.executeUpdate()</code>
+                        method:
+                    
+         </p><pre class="programlisting">Session session = sessionFactory.openSession();
+Transaction tx = session.beginTransaction();
+
+String hqlDelete = "delete Customer c where c.name = :oldName";
+// or String hqlDelete = "delete Customer where name = :oldName";
+int deletedEntities = s.createQuery( hqlDelete )
+        .setString( "oldName", oldName )
+        .executeUpdate();
+tx.commit();
+session.close();</pre><p>
+                        The <code class="literal">int</code> value returned by the <code class="literal">Query.executeUpdate()</code>
+                        method indicate the number of entities effected by the operation.  Consider this may or may not
+                        correlate to the number of rows effected in the database.  An HQL bulk operation might result in
+                        multiple actual SQL statements being executed, for joined-subclass, for example.  The returned
+                        number indicates the number of actual entities affected by the statement.  Going back to the
+                        example of joined-subclass, a delete against one of the subclasses may actually result
+                        in deletes against not just the table to which that subclass is mapped, but also the "root"
+                        table and potentially joined-subclass tables further down the inheritence hierarchy.
+                    
+         </p>
+         <p>
+                        The pseudo-syntax for <code class="literal">INSERT</code> statements is:
+                        <code class="literal">INSERT INTO EntityName properties_list select_statement</code>.  Some
+                        points to note:
+                    
+         </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p>
+                                         Only the INSERT INTO ... SELECT ... form is supported; not the INSERT INTO ... VALUES ... form.
+                                     
+                  </p>
+                  <p>
+                                         The properties_list is analogous to the <code class="literal">column speficiation</code>
+                                         in the SQL <code class="literal">INSERT</code> statement.  For entities involved in mapped
+                                         inheritence, only properties directly defined on that given class-level can be
+                                         used in the properties_list.  Superclass properties are not allowed; and subclass
+                                         properties do not make sense.  In other words, <code class="literal">INSERT</code>
+                                         statements are inherently non-polymorphic.
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         select_statement can be any valid HQL select query, with the caveat that the return types
+                                         must match the types expected by the insert.  Currently, this is checked during query
+                                         compilation rather than allowing the check to relegate to the database.  Note however
+                                         that this might cause problems between Hibernate <code class="literal">Type</code>s which are
+                                         <span class="emphasis"><em>equivalent</em></span> as opposed to <span class="emphasis"><em>equal</em></span>.  This might cause
+                                         issues with mismatches between a property defined as a <code class="literal">org.hibernate.type.DateType</code>
+                                         and a property defined as a <code class="literal">org.hibernate.type.TimestampType</code>, even though the
+                                         database might not make a distinction or might be able to handle the conversion.
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         For the id property, the insert statement gives you two options.  You can either
+                                         explicitly specify the id property in the properties_list (in which case its value
+                                         is taken from the corresponding select expression) or omit it from the properties_list
+                                         (in which case a generated value is used).  This later option is only available when
+                                         using id generators that operate in the database; attempting to use this option with
+                                         any "in memory" type generators will cause an exception during parsing.  Note that
+                                         for the purposes of this discussion, in-database generators are considered to be
+                                         <code class="literal">org.hibernate.id.SequenceGenerator</code> (and its subclasses) and
+                                         any implementors of <code class="literal">org.hibernate.id.PostInsertIdentifierGenerator</code>.
+                                         The most notable exception here is <code class="literal">org.hibernate.id.TableHiLoGenerator</code>,
+                                         which cannot be used because it does not expose a selectable way to get its values.
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         For properties mapped as either <code class="literal">version</code> or <code class="literal">timestamp</code>,
+                                         the insert statement gives you two options.  You can either specify the property in the
+                                         properties_list (in which case its value is taken from the corresponding select expressions)
+                                         or omit it from the properties_list (in which case the <code class="literal">seed value</code> defined
+                                         by the <code class="literal">org.hibernate.type.VersionType</code> is used).
+                                     
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p>
+                        An example HQL <code class="literal">INSERT</code> statement execution:
+                    
+         </p><pre class="programlisting">Session session = sessionFactory.openSession();
+Transaction tx = session.beginTransaction();
+
+String hqlInsert = "insert into DelinquentAccount (id, name) select c.id, c.name from Customer c where ...";
+int createdEntities = s.createQuery( hqlInsert )
+        .executeUpdate();
+tx.commit();
+session.close();</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="batch-statelesssession.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="batch.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="queryhql.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">13.3.&nbsp;The StatelessSession interface&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;Chapter&nbsp;14.&nbsp;HQL: The Hibernate Query Language</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

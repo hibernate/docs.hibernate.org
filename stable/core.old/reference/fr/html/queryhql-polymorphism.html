@@ -1,0 +1,61 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>14.8.&nbsp;Requ&ecirc;tes polymorphiques</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="queryhql.html" title="Chapitre&nbsp;14.&nbsp;HQL: Langage de requ&ecirc;tage d'Hibernate">
+      <link rel="prev" href="queryhql-aggregation.html" title="14.7.&nbsp;Fonctions d'aggr&eacute;gation">
+      <link rel="next" href="queryhql-where.html" title="14.9.&nbsp;La clause where">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">14.8.&nbsp;Requ&ecirc;tes polymorphiques</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="queryhql-aggregation.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;14.&nbsp;HQL: Langage de requ&ecirc;tage d'Hibernate</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="queryhql-where.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="queryhql-polymorphism"></a>14.8.&nbsp;Requ&ecirc;tes polymorphiques
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Une requ&ecirc;te comme: </p><pre class="programlisting">from Cat as cat</pre><p>retourne non seuleument les instances de <code class="literal">Cat</code>, mais aussi celles des sous classes comme <code class="literal">DomesticCat</code>. Les requ&ecirc;tes Hibernate peuvent nommer n'importe quelle classe ou interface Java dans la clause <code class="literal">from</code>. La requ&ecirc;te retournera les instances de toutes les classes persistantes qui &eacute;tendent cette classe ou impl&eacute;mente cette interface.
+            La requ&ecirc;te suivante retournera tous les objets persistants : 
+         </p><pre class="programlisting">from java.lang.Object o</pre><p>L'interface <code class="literal">Named</code> peut &ecirc;tre impl&eacute;ment&eacute;e par plusieurs classes persistantes : 
+         </p><pre class="programlisting">from Named n, Named m where n.name = m.name</pre><p>Notez que ces deux derni&egrave;res requ&ecirc;tes n&eacute;cessitent plus d'un <code class="literal">SELECT</code> SQL. Ce qui signifie que la clause <code class="literal">order by</code> ne trie pas correctement la totalit&eacute; des r&eacute;sultats (cela signifie aussi que vous ne pouvez ex&eacute;cuter ces requ&ecirc;tes en appelant
+            <code class="literal">Query.scroll()</code>). 
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="queryhql-aggregation.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="queryhql.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="queryhql-where.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">14.7.&nbsp;Fonctions d'aggr&eacute;gation&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;14.9.&nbsp;La clause where</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

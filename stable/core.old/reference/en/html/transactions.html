@@ -1,0 +1,430 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>Chapter&nbsp;11.&nbsp;Transactions And Concurrency</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="prev" href="objectstate-metadata.html" title="10.12.&nbsp;Using metadata">
+      <link rel="next" href="transactions-demarcation.html" title="11.2.&nbsp;Database transaction demarcation">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">Chapter&nbsp;11.&nbsp;Transactions And Concurrency</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="objectstate-metadata.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">&nbsp;</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="transactions-demarcation.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="chapter" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title"><a name="transactions"></a>Chapter&nbsp;11.&nbsp;Transactions And Concurrency
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+            The most important point about Hibernate and concurrency control is that it is very
+            easy to understand. Hibernate directly uses JDBC connections and JTA resources without
+            adding any additional locking behavior. We highly recommend you spend some time with the
+                    JDBC, ANSI, and transaction isolation specification of your database management system.
+                
+         </p>
+         <p>
+                    Hibernate does not lock objects in memory. Your application can expect the behavior as
+                    defined by the isolation level of your database transactions. Note that thanks to the
+                    <code class="literal">Session</code>, which is also a transaction-scoped cache, Hibernate
+                    provides repeatable reads for lookup by identifier and entity queries (not
+                    reporting queries that return scalar values).
+                
+         </p>
+         <p>
+                    In addition to versioning for automatic optimistic concurrency control, Hibernate also
+                    offers a (minor) API for pessimistic locking of rows, using the
+                    <code class="literal">SELECT FOR UPDATE</code> syntax. Optimistic concurrency control and
+                    this API are discussed later in this chapter.
+                
+         </p>
+         <p>
+                    We start the discussion of concurrency control in Hibernate with the granularity of
+                    <code class="literal">Configuration</code>, <code class="literal">SessionFactory</code>, and
+                    <code class="literal">Session</code>, as well as database transactions and long conversations.
+                
+         </p>
+         <div class="sect1" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="transactions-basics"></a>11.1.&nbsp;Session and transaction scopes
+                     </h2>
+                  </div>
+               </div>
+            </div>
+            <p>
+                           A <code class="literal">SessionFactory</code> is an expensive-to-create, threadsafe object 
+                           intended to be shared by all application threads. It is created once, usually on
+                           application startup, from a <code class="literal">Configuration</code> instance.
+                       
+            </p>
+            <p>
+                           A <code class="literal">Session</code> is an inexpensive, non-threadsafe object that should be
+                           used once, for a single request, a conversation, single unit of work, and then discarded.
+                           A <code class="literal">Session</code> will not obtain a JDBC <code class="literal">Connection</code>
+                           (or a <code class="literal">Datasource</code>) unless it is needed, hence consume no
+                           resources until used.
+                       
+            </p>
+            <p>
+                           To complete this picture you also have to think about database transactions. A
+                           database transaction has to be as short as possible, to reduce lock contention in
+                           the database. Long database transactions will prevent your application from scaling
+                           to highly concurrent load. Hence, it is almost never good design to hold a
+                           database transaction open during user think time, until the unit of work is
+                           complete.
+                       
+            </p>
+            <p>
+                           What is the scope of a unit of work? Can a single Hibernate <code class="literal">Session</code>
+                           span several database transactions or is this a one-to-one relationship of scopes? When
+                           should you open and close a <code class="literal">Session</code> and how do you demarcate the
+                           database transaction boundaries?
+                       
+            </p>
+            <div class="sect2" lang="en-US">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="transactions-basics-uow"></a>11.1.1.&nbsp;Unit of work
+                        </h3>
+                     </div>
+                  </div>
+               </div>
+               <p>
+                                  First, don't use the <span class="emphasis"><em>session-per-operation</em></span> antipattern, that is,
+                                  don't open and close a <code class="literal">Session</code> for every simple database call in
+                                  a single thread! Of course, the same is true for database transactions. Database calls
+                                  in an application are made using a planned sequence, they are grouped into atomic
+                                  units of work. (Note that this also means that auto-commit after every single
+                                  SQL statement is useless in an application, this mode is intended for ad-hoc SQL
+                                  console work. Hibernate disables, or expects the application server to do so,
+                                  auto-commit mode immediately.) Database transactions are never optional, all
+                                  communication with a database has to occur inside a transaction, no matter if
+                                  you read or write data. As explained, auto-commit behavior for reading data
+                                  should be avoided, as many small transactions are unlikely to perform better than
+                                  one clearly defined unit of work. The latter is also much more maintainable
+                                  and extensible.
+                              
+               </p>
+               <p>
+                                  The most common pattern in a multi-user client/server application is
+                                  <span class="emphasis"><em>session-per-request</em></span>. In this model, a request from the client
+                                  is sent to the server (where the Hibernate persistence layer runs), a new Hibernate
+                                  <code class="literal">Session</code> is opened, and all database operations are executed in this unit
+                                  of work. Once the work has been completed (and the response for the client has been prepared),
+                                  the session is flushed and closed. You would also use a single database transaction to
+                                  serve the clients request, starting and committing it when you open and close the
+                                  <code class="literal">Session</code>. The relationship between the two is one-to-one and this
+                                  model is a perfect fit for many applications.
+                              
+               </p>
+               <p>
+                                  The challenge lies in the implementation. Hibernate provides built-in management of
+                                  the "current session" to simplify this pattern. All you have to do is start a
+                                  transaction when a server request has to be processed, and end the transaction
+                                  before the response is sent to the client. You can do this in any way you
+                                  like, common solutions are <code class="literal">ServletFilter</code>, AOP interceptor with a
+                                  pointcut on the service methods, or a proxy/interception container. An EJB container
+                                  is a standardized way to implement cross-cutting aspects such as transaction
+                                  demarcation on EJB session beans, declaratively with CMT. If you decide to
+                                  use programmatic transaction demarcation, prefer the Hibernate <code class="literal">Transaction</code>
+                                  API shown later in this chapter, for ease of use and code portability.
+                              
+               </p>
+               <p>
+                                  Your application code can access a "current session" to process the request
+                                  by simply calling <code class="literal">sessionFactory.getCurrentSession()</code> anywhere
+                                  and as often as needed. You will always get a <code class="literal">Session</code> scoped
+                                  to the current database transaction. This has to be configured for either
+                                  resource-local or JTA environments, see <a href="architecture-current-session.html" title="2.5.&nbsp;Contextual Sessions">Section&nbsp;2.5, &#8220;Contextual Sessions&#8221;</a>.
+                              
+               </p>
+               <p>
+                                  Sometimes it is convenient to extend the scope of a <code class="literal">Session</code> and
+                                  database transaction until the "view has been rendered". This is especially useful
+                                  in servlet applications that utilize a separate rendering phase after the request
+                                  has been processed. Extending the database transaction until view rendering is
+                                  complete is easy to do if you implement your own interceptor. However, it is not
+                                  easily doable if you rely on EJBs with container-managed transactions, as a
+                                  transaction will be completed when an EJB method returns, before rendering of any
+                                  view can start. See the Hibernate website and forum for tips and examples around
+                                  this <span class="emphasis"><em>Open Session in View</em></span> pattern.
+                               
+               </p>
+            </div>
+            <div class="sect2" lang="en-US">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="transactions-basics-apptx"></a>11.1.2.&nbsp;Long conversations
+                        </h3>
+                     </div>
+                  </div>
+               </div>
+               <p>
+                                  The session-per-request pattern is not the only useful concept you can use to design
+                                  units of work. Many business processes require a whole series of interactions with the user
+                                  interleaved with database accesses. In web and enterprise applications it is
+                                  not acceptable for a database transaction to span a user interaction. Consider the following
+                                  example:
+                              
+               </p>
+               <div class="itemizedlist">
+                  <ul type="disc">
+                     <li>
+                        <p>
+                                                   The first screen of a dialog opens, the data seen by the user has been loaded in
+                                                   a particular <code class="literal">Session</code> and database transaction. The user is free to
+                                                   modify the objects.
+                                               
+                        </p>
+                     </li>
+                     <li>
+                        <p>
+                                                   The user clicks "Save" after 5 minutes and expects his modifications to be made
+                                                   persistent; he also expects that he was the only person editing this information and
+                                                   that no conflicting modification can occur.
+                                               
+                        </p>
+                     </li>
+                  </ul>
+               </div>
+               <p>
+                                  We call this unit of work, from the point of view of the user, a long running
+                                  <span class="emphasis"><em>conversation</em></span> (or <span class="emphasis"><em>application transaction</em></span>).
+                                  There are many ways how you can implement this in your application.
+                              
+               </p>
+               <p>
+                                  A first naive implementation might keep the <code class="literal">Session</code> and database
+                                  transaction open during user think time, with locks held in the database to prevent
+                                  concurrent modification, and to guarantee isolation and atomicity. This is of course
+                                  an anti-pattern, since lock contention would not allow the application to scale with
+                                  the number of concurrent users.
+                              
+               </p>
+               <p>
+                                  Clearly, we have to use several database transactions to implement the conversation.
+                                  In this case, maintaining isolation of business processes becomes the
+                                  partial responsibility of the application tier. A single conversation
+                                  usually spans several database transactions. It will be atomic if only one of
+                                  these database transactions (the last one) stores the updated data, all others
+                                  simply read data (e.g. in a wizard-style dialog spanning several request/response
+                                  cycles). This is easier to implement than it might sound, especially if
+                                  you use Hibernate's features:
+                              
+               </p>
+               <div class="itemizedlist">
+                  <ul type="disc">
+                     <li>
+                        <p>
+                                                   <span class="emphasis"><em>Automatic Versioning</em></span> - Hibernate can do automatic
+                                                   optimistic concurrency control for you, it can automatically detect
+                                                   if a concurrent modification occurred during user think time. Usually
+                                                   we only check at the end of the conversation.
+                                               
+                        </p>
+                     </li>
+                     <li>
+                        <p>
+                                                   <span class="emphasis"><em>Detached Objects</em></span> - If you decide to use the already
+                                                   discussed <span class="emphasis"><em>session-per-request</em></span> pattern, all loaded instances
+                                                   will be in detached state during user think time. Hibernate allows you to
+                                                   reattach the objects and persist the modifications, the pattern is called
+                                                   <span class="emphasis"><em>session-per-request-with-detached-objects</em></span>. Automatic
+                                                   versioning is used to isolate concurrent modifications.
+                                               
+                        </p>
+                     </li>
+                     <li>
+                        <p>
+                                                   <span class="emphasis"><em>Extended (or Long) Session</em></span> - The Hibernate
+                                                   <code class="literal">Session</code> may be disconnected from the underlying JDBC
+                                                   connection after the database transaction has been committed, and reconnected
+                                                   when a new client request occurs. This pattern is known as
+                                                   <span class="emphasis"><em>session-per-conversation</em></span> and makes
+                                                   even reattachment unnecessary. Automatic versioning is used to isolate
+                                                   concurrent modifications and the <code class="literal">Session</code> is usually
+                                                   not allowed to be flushed automatically, but explicitly.
+                                               
+                        </p>
+                     </li>
+                  </ul>
+               </div>
+               <p>
+                                  Both <span class="emphasis"><em>session-per-request-with-detached-objects</em></span> and
+                                  <span class="emphasis"><em>session-per-conversation</em></span> have advantages and disadvantages,
+                                  we discuss them later in this chapter in the context of optimistic concurrency control.
+                              
+               </p>
+            </div>
+            <div class="sect2" lang="en-US">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="transactions-basics-identity"></a>11.1.3.&nbsp;Considering object identity
+                        </h3>
+                     </div>
+                  </div>
+               </div>
+               <p>
+                                  An application may concurrently access the same persistent state in two
+                                  different <code class="literal">Session</code>s. However, an instance of a persistent class
+                                  is never shared between two <code class="literal">Session</code> instances. Hence there are
+                                  two different notions of identity:
+                              
+               </p>
+               <div class="variablelist">
+                  <dl>
+                     <dt><span class="term">Database Identity</span></dt>
+                     <dd>
+                        <p>
+                                                       <code class="literal">foo.getId().equals( bar.getId() )</code>
+                                                   
+                        </p>
+                     </dd>
+                     <dt><span class="term">JVM Identity</span></dt>
+                     <dd>
+                        <p>
+                                                       <code class="literal">foo==bar</code>
+                                                   
+                        </p>
+                     </dd>
+                  </dl>
+               </div>
+               <p>
+                                  Then for objects attached to a <span class="emphasis"><em>particular</em></span> <code class="literal">Session</code>
+                                  (i.e. in the scope of a <code class="literal">Session</code>) the two notions are equivalent, and
+                                  JVM identity for database identity is guaranteed by Hibernate. However, while the application
+                                  might concurrently access the "same" (persistent identity) business object in two different
+                                  sessions, the two instances will actually be "different" (JVM identity). Conflicts are
+                                  resolved using (automatic versioning) at flush/commit time, using an optimistic approach.
+                              
+               </p>
+               <p>
+                                  This approach leaves Hibernate and the database to worry about concurrency; it also provides
+                                  the best scalability, since guaranteeing identity in single-threaded units of work only doesn't
+                                  need expensive locking or other means of synchronization. The application never needs to
+                                  synchronize on any business object, as long as it sticks to a single thread per
+                                  <code class="literal">Session</code>. Within a <code class="literal">Session</code> the  application may safely use
+                                  <code class="literal">==</code> to compare objects.
+                              
+               </p>
+               <p>
+                                  However, an application that uses <code class="literal">==</code> outside of a <code class="literal">Session</code>,
+                                  might see unexpected results. This might occur even in some unexpected places, for example,
+                                  if you put two detached instances into the same <code class="literal">Set</code>. Both might have the same
+                                  database identity (i.e. they represent the same row), but JVM identity is by definition not
+                                  guaranteed for instances in detached state. The developer has to override the <code class="literal">equals()</code>
+                                  and <code class="literal">hashCode()</code> methods in persistent classes and implement
+                                  his own notion of object equality. There is one caveat: Never use the database
+                                  identifier to implement equality, use a business key, a combination of unique, usually
+                                  immutable, attributes. The database identifier will change if a transient object is made
+                                  persistent. If the transient instance (usually together with detached instances) is held in a
+                                  <code class="literal">Set</code>, changing the hashcode breaks the contract of the <code class="literal">Set</code>.
+                                  Attributes for business keys don't have to be as stable as database primary keys, you only
+                                  have to guarantee stability as long as the objects are in the same <code class="literal">Set</code>. See
+                                  the Hibernate website for a more thorough discussion of this issue. Also note that this is not
+                                  a Hibernate issue, but simply how Java object identity and equality has to be implemented.
+                              
+               </p>
+            </div>
+            <div class="sect2" lang="en-US">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="transactions-basics-issues"></a>11.1.4.&nbsp;Common issues
+                        </h3>
+                     </div>
+                  </div>
+               </div>
+               <p>
+                                   Never use the anti-patterns <span class="emphasis"><em>session-per-user-session</em></span> or
+                                   <span class="emphasis"><em>session-per-application</em></span> (of course, there are rare exceptions to
+                                   this rule). Note that some of the following issues might also appear with the recommended
+                                   patterns, make sure you understand the implications before making a design decision:
+                               
+               </p>
+               <div class="itemizedlist">
+                  <ul type="disc">
+                     <li>
+                        <p>
+                                                   A <code class="literal">Session</code> is not thread-safe. Things which are supposed to work
+                                                   concurrently, like HTTP requests, session beans, or Swing workers, will cause race
+                                                   conditions if a <code class="literal">Session</code> instance would be shared. If you keep your
+                                                   Hibernate <code class="literal">Session</code> in your <code class="literal">HttpSession</code> (discussed
+                                                   later), you should consider synchronizing access to your Http session. Otherwise,
+                                                   a user that clicks reload fast enough may use the same <code class="literal">Session</code> in
+                                                   two concurrently running threads.
+                                               
+                        </p>
+                     </li>
+                     <li>
+                        <p>
+                                                   An exception thrown by Hibernate means you have to rollback your database transaction
+                                                   and close the <code class="literal">Session</code> immediately (discussed later in more detail).
+                                                   If your <code class="literal">Session</code> is bound to the application, you have to stop
+                                                   the application. Rolling back the database transaction doesn't put your business
+                                                   objects back into the state they were at the start of the transaction. This means the
+                                                   database state and the business objects do get out of sync. Usually this is not a
+                                                   problem, because exceptions are not recoverable and you have to start over after
+                                                   rollback anyway.
+                                               
+                        </p>
+                     </li>
+                     <li>
+                        <p>
+                                                   The <code class="literal">Session</code> caches every object that is in persistent state (watched
+                                                   and checked for dirty state by Hibernate). This means it grows endlessly until you
+                                                   get an OutOfMemoryException, if you keep it open for a long time or simply load too
+                                                   much data. One solution for this is to call <code class="literal">clear()</code> and <code class="literal">evict()</code>
+                                                   to manage the <code class="literal">Session</code> cache, but you most likely should consider a
+                                                   Stored Procedure if you need mass data operations. Some solutions are shown in
+                                                   <a href="batch.html" title="Chapter&nbsp;13.&nbsp;Batch processing">Chapter&nbsp;13, <i xmlns:xlink="http://www.w3.org/1999/xlink">Batch processing</i></a>. Keeping a <code class="literal">Session</code> open for the duration
+                                                   of a user session also means a high probability of stale data.
+                                               
+                        </p>
+                     </li>
+                  </ul>
+               </div>
+            </div>
+         </div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="objectstate-metadata.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center">&nbsp;</td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="transactions-demarcation.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">10.12.&nbsp;Using metadata&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;11.2.&nbsp;Database transaction demarcation</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

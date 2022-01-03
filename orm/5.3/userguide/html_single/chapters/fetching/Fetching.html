@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 1.5.2">
+<title>Fetching</title>
+<link rel="stylesheet" href="./css/hibernate.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js"></script>
+<script>document.addEventListener('DOMContentLoaded', prettyPrint)</script>
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="fetching">Fetching</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Fetching, essentially, is the process of grabbing data from the database and making it available to the application.
+Tuning how an application does fetching is one of the biggest factors in determining how an application will perform.
+Fetching too much data, in terms of width (values/columns) and/or depth (results/rows),
+adds unnecessary overhead in terms of both JDBC communication and ResultSet processing.
+Fetching too little data might cause additional fetching to be needed.
+Tuning how an application fetches data presents a great opportunity to influence the application overall performance.</p>
+</div>
+<div class="sect2">
+<h3 id="fetching-basics">The basics</h3>
+<div class="paragraph">
+<p>The concept of fetching breaks down into two different questions.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>When should the data be fetched? Now? Later?</p>
+</li>
+<li>
+<p>How should the data be fetched?</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>"now" is generally termed eager or immediate. "later" is generally termed lazy or delayed.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>There are a number of scopes for defining fetching:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><em>static</em></dt>
+<dd>
+<p>Static definition of fetching strategies is done in the mappings.
+The statically-defined fetch strategies is used in the absence of any dynamically defined strategies</p>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">SELECT</dt>
+<dd>
+<p>Performs a separate SQL select to load the data. This can either be EAGER (the second select is issued immediately) or LAZY (the second select is delayed until the data is needed).
+This is the strategy generally termed N+1.</p>
+</dd>
+<dt class="hdlist1">JOIN</dt>
+<dd>
+<p>Inherently an EAGER style of fetching. The data to be fetched is obtained through the use of an SQL outer join.</p>
+</dd>
+<dt class="hdlist1">BATCH</dt>
+<dd>
+<p>Performs a separate SQL select to load a number of related data items using an IN-restriction as part of the SQL WHERE-clause based on a batch size.
+Again, this can either be EAGER (the second select is issued immediately) or LAZY (the second select is delayed until the data is needed).</p>
+</dd>
+<dt class="hdlist1">SUBSELECT</dt>
+<dd>
+<p>Performs a separate SQL select to load associated data based on the SQL restriction used to load the owner.
+Again, this can either be EAGER (the second select is issued immediately) or LAZY (the second select is delayed until the data is needed).</p>
+</dd>
+</dl>
+</div>
+</dd>
+<dt class="hdlist1"><em>dynamic</em> (sometimes referred to as runtime)</dt>
+<dd>
+<p>Dynamic definition is really use-case centric. There are multiple ways to define dynamic fetching:</p>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><em>fetch profiles</em></dt>
+<dd>
+<p>defined in mappings, but can be enabled/disabled on the <code>Session</code>.</p>
+</dd>
+<dt class="hdlist1">HQL/JPQL</dt>
+<dd>
+<p>and both Hibernate and JPA Criteria queries have the ability to specify fetching, specific to said query.</p>
+</dd>
+<dt class="hdlist1">entity graphs</dt>
+<dd>
+<p>Starting in Hibernate 4.2 (JPA 2.1) this is also an option.</p>
+</dd>
+</dl>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="fetching-direct-vs-query">Direct fetching vs entity queries</h3>
+<div class="paragraph">
+<p>To see the difference between direct fetching and entity queries in regard to eagerly fetched associations, consider the following entities:</p>
+</div>
+<div id="fetching-direct-vs-query-domain-model-example" class="exampleblock">
+<div class="title">Example 1. Domain model</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">@Entity(name = "Department")
+public static class Department {
+
+    @Id
+    private Long id;
+
+    //Getters and setters omitted for brevity
+}
+
+@Entity(name = "Employee")
+public static class Employee {
+
+    @Id
+    private Long id;
+
+    @NaturalId
+    private String username;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Department department;
+
+    //Getters and setters omitted for brevity
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>Employee</code> entity has a <code>@ManyToOne</code> association to a <code>Department</code> which is fetched eagerly.</p>
+</div>
+<div class="paragraph">
+<p>When issuing a direct entity fetch, Hibernate executed the following SQL query:</p>
+</div>
+<div id="fetching-direct-vs-query-direct-fetching-example" class="exampleblock">
+<div class="title">Example 2. Direct fetching example</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">Employee employee = entityManager.find( Employee.class, 1L );</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-SQL" data-lang="SQL">select
+    e.id as id1_1_0_,
+    e.department_id as departme3_1_0_,
+    e.username as username2_1_0_,
+    d.id as id1_0_1_
+from
+    Employee e
+left outer join
+    Department d
+        on e.department_id=d.id
+where
+    e.id = 1</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>LEFT JOIN</code> clause is added to the generated SQL query because this association is required to be fetched eagerly.</p>
+</div>
+<div class="paragraph">
+<p>On the other hand, if you are using an entity query that does not contain a <code>JOIN FETCH</code> directive to the <code>Department</code> association:</p>
+</div>
+<div id="fetching-direct-vs-query-entity-query-example" class="exampleblock">
+<div class="title">Example 3. Entity query fetching example</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">Employee employee = entityManager.createQuery(
+        "select e " +
+        "from Employee e " +
+        "where e.id = :id", Employee.class)
+.setParameter( "id", 1L )
+.getSingleResult();</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-SQL" data-lang="SQL">select
+    e.id as id1_1_,
+    e.department_id as departme3_1_,
+    e.username as username2_1_
+from
+    Employee e
+where
+    e.id = 1
+
+select
+    d.id as id1_0_0_
+from
+    Department d
+where
+    d.id = 1</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Hibernate uses a secondary select instead. This is because the entity query fetch policy cannot be overridden,
+so Hibernate requires a secondary select to ensure that the EAGER association is fetched prior to returning the result to the user.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If you forget to JOIN FETCH all EAGER associations, Hibernate is going to issue a secondary select for each and every one of those
+which, in turn, can lean to N+1 query issues.</p>
+</div>
+<div class="paragraph">
+<p>For this reason, you should prefer LAZY associations.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="fetching-strategies">Applying fetch strategies</h3>
+<div class="paragraph">
+<p>Let&#8217;s consider these topics as it relates to a simple domain model and a few use cases.</p>
+</div>
+<div id="fetching-strategies-domain-model-example" class="exampleblock">
+<div class="title">Example 4. Sample domain model</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">@Entity(name = "Department")
+public static class Department {
+
+    @Id
+    private Long id;
+
+    @OneToMany(mappedBy = "department")
+    private List&lt;Employee&gt; employees = new ArrayList&lt;&gt;();
+
+    //Getters and setters omitted for brevity
+}
+
+@Entity(name = "Employee")
+public static class Employee {
+
+    @Id
+    private Long id;
+
+    @NaturalId
+    private String username;
+
+    @Column(name = "pswd")
+    @ColumnTransformer(
+        read = "decrypt( 'AES', '00', pswd  )",
+        write = "encrypt('AES', '00', ?)"
+    )
+    private String password;
+
+    private int accessLevel;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Department department;
+
+    @ManyToMany(mappedBy = "employees")
+    private List&lt;Project&gt; projects = new ArrayList&lt;&gt;();
+
+    //Getters and setters omitted for brevity
+}
+
+@Entity(name = "Project")
+public class Project {
+
+    @Id
+    private Long id;
+
+    @ManyToMany
+    private List&lt;Employee&gt; employees = new ArrayList&lt;&gt;();
+
+    //Getters and setters omitted for brevity
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The Hibernate recommendation is to statically mark all associations lazy and to use dynamic fetching strategies for eagerness.
+This is unfortunately at odds with the JPA specification which defines that all one-to-one and many-to-one associations should be eagerly fetched by default.
+Hibernate, as a JPA provider, honors that default.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="fetching-strategies-no-fetching">No fetching</h3>
+<div class="paragraph">
+<p>For the first use case, consider the application login process for an <code>Employee</code>.
+Let&#8217;s assume that login only requires access to the <code>Employee</code> information, not <code>Project</code> nor <code>Department</code> information.</p>
+</div>
+<div id="fetching-strategies-no-fetching-example" class="exampleblock">
+<div class="title">Example 5. No fetching example</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">Employee employee = entityManager.createQuery(
+    "select e " +
+    "from Employee e " +
+    "where " +
+    "    e.username = :username and " +
+    "    e.password = :password",
+    Employee.class)
+.setParameter( "username", username)
+.setParameter( "password", password)
+.getSingleResult();</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>In this example, the application gets the <code>Employee</code> data.
+However, because all associations from <code>Employee</code> are declared as LAZY (JPA defines the default for collections as LAZY) no other data is fetched.</p>
+</div>
+<div class="paragraph">
+<p>If the login process does not need access to the <code>Employee</code> information specifically, another fetching optimization here would be to limit the width of the query results.</p>
+</div>
+<div id="fetching-strategies-no-fetching-scalar-example" class="exampleblock">
+<div class="title">Example 6. No fetching (scalar) example</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">Integer accessLevel = entityManager.createQuery(
+    "select e.accessLevel " +
+    "from Employee e " +
+    "where " +
+    "    e.username = :username and " +
+    "    e.password = :password",
+    Integer.class)
+.setParameter( "username", username)
+.setParameter( "password", password)
+.getSingleResult();</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="fetching-strategies-dynamic-fetching">Dynamic fetching via queries</h3>
+<div class="paragraph">
+<p>For the second use case, consider a screen displaying the <code>Projects</code> for an <code>Employee</code>.
+Certainly access to the <code>Employee</code> is needed, as is the collection of <code>Projects</code> for that Employee. Information about <code>Departments</code>, other <code>Employees</code> or other <code>Projects</code> is not needed.</p>
+</div>
+<div id="fetching-strategies-dynamic-fetching-jpql-example" class="exampleblock">
+<div class="title">Example 7. Dynamic JPQL fetching example</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">Employee employee = entityManager.createQuery(
+    "select e " +
+    "from Employee e " +
+    "left join fetch e.projects " +
+    "where " +
+    "    e.username = :username and " +
+    "    e.password = :password",
+    Employee.class)
+.setParameter( "username", username)
+.setParameter( "password", password)
+.getSingleResult();</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div id="fetching-strategies-dynamic-fetching-criteria-example" class="exampleblock">
+<div class="title">Example 8. Dynamic query fetching example</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+CriteriaQuery&lt;Employee&gt; query = builder.createQuery( Employee.class );
+Root&lt;Employee&gt; root = query.from( Employee.class );
+root.fetch( "projects", JoinType.LEFT);
+query.select(root).where(
+    builder.and(
+        builder.equal(root.get("username"), username),
+        builder.equal(root.get("password"), password)
+    )
+);
+Employee employee = entityManager.createQuery( query ).getSingleResult();</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>In this example we have an <code>Employee</code> and their <code>Projects</code> loaded in a single query shown both as an HQL query and a JPA Criteria query.
+In both cases, this resolves to exactly one database query to get all that information.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="fetching-strategies-dynamic-fetching-entity-graph">Dynamic fetching via JPA entity graph</h3>
+<div class="paragraph">
+<p>JPA 2.1 introduced entity graphs so the application developer has more control over fetch plans.</p>
+</div>
+<div id="fetching-strategies-dynamic-fetching-entity-graph-example" class="exampleblock">
+<div class="title">Example 9. Fetch graph example</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">@Entity(name = "Employee")
+@NamedEntityGraph(name = "employee.projects",
+    attributeNodes = @NamedAttributeNode("projects")
+)</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">Employee employee = entityManager.find(
+    Employee.class,
+    userId,
+    Collections.singletonMap(
+        "javax.persistence.fetchgraph",
+        entityManager.getEntityGraph( "employee.projects" )
+    )
+);</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Although the JPA standard specifies that you can override an EAGER fetching association at runtime using the <code>javax.persistence.fetchgraph</code> hint,
+currently, Hibernate does not implement this feature, so EAGER associations cannot be fetched lazily.
+For more info, check out the <a href="https://hibernate.atlassian.net/browse/HHH-8776">HHH-8776</a> Jira issue.</p>
+</div>
+<div class="paragraph">
+<p>When executing a JPQL query, if an EAGER association is omitted, Hibernate will issue a secondary select for every association needed to be fetched eagerly,
+which can lead dto N+1 query issues.</p>
+</div>
+<div class="paragraph">
+<p>For this reason, it&#8217;s better to use LAZY associations, and only fetch them eagerly on a per-query basis.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="fetching-strategies-dynamic-fetching-entity-subgraph">JPA entity subgraphs</h4>
+<div class="paragraph">
+<p>An entity graph specifies which attributes to be fetched, but it limited to a single entity only.
+To fetch associations from a child entity, you need to use the <a href="http://docs.oracle.com/javaee/7/api/javax/persistence/NamedSubgraph.html"><code>@NamedSubgraph</code></a> annotation.</p>
+</div>
+<div class="paragraph">
+<p>If we have a <code>Project</code> parent entity which has an <code>employees</code> child associations,
+and we&#8217;d like to fetch the <code>department</code> for the <code>Employee</code> child association.</p>
+</div>
+<div id="fetching-strategies-dynamic-fetching-entity-subgraph-mapping-example" class="exampleblock">
+<div class="title">Example 10. Fetch graph with a subgraph mapping</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">@Entity(name = "Project")
+@NamedEntityGraph(name = "project.employees",
+    attributeNodes = @NamedAttributeNode(
+        value = "employees",
+        subgraph = "project.employees.department"
+    ),
+    subgraphs = @NamedSubgraph(
+        name = "project.employees.department",
+        attributeNodes = @NamedAttributeNode( "department" )
+    )
+)
+public static class Project {
+
+    @Id
+    private Long id;
+
+    @ManyToMany
+    private List&lt;Employee&gt; employees = new ArrayList&lt;&gt;();
+
+    //Getters and setters omitted for brevity
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>When fetching this entity graph, Hibernate generates the following SQL query:</p>
+</div>
+<div id="fetching-strategies-dynamic-fetching-entity-subgraph-example" class="exampleblock">
+<div class="title">Example 11. Fetch graph with a subgraph mapping</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">Project project = doInJPA( this::entityManagerFactory, entityManager -&gt; {
+    return entityManager.find(
+        Project.class,
+        1L,
+        Collections.singletonMap(
+            "javax.persistence.fetchgraph",
+            entityManager.getEntityGraph( "project.employees" )
+        )
+    );
+} );</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-SQL" data-lang="SQL">select
+    p.id as id1_2_0_, e.id as id1_1_1_, d.id as id1_0_2_,
+    e.accessLevel as accessLe2_1_1_,
+    e.department_id as departme5_1_1_,
+    decrypt( 'AES', '00', e.pswd  ) as pswd3_1_1_,
+    e.username as username4_1_1_,
+    p_e.projects_id as projects1_3_0__,
+    p_e.employees_id as employee2_3_0__
+from
+    Project p
+inner join
+    Project_Employee p_e
+        on p.id=p_e.projects_id
+inner join
+    Employee e
+        on p_e.employees_id=e.id
+inner join
+    Department d
+        on e.department_id=d.id
+where
+    p.id = ?
+
+-- binding parameter [1] as [BIGINT] - [1]</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="fetching-strategies-dynamic-fetching-profile">Dynamic fetching via Hibernate profiles</h3>
+<div class="paragraph">
+<p>Suppose we wanted to leverage loading by natural-id to obtain the <code>Employee</code> information in the "projects for and employee" use-case.
+Loading by natural-id uses the statically defined fetching strategies, but does not expose a means to define load-specific fetching.
+So we would leverage a fetch profile.</p>
+</div>
+<div id="fetching-strategies-dynamic-fetching-profile-example" class="exampleblock">
+<div class="title">Example 12. Fetch profile example</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">@Entity(name = "Employee")
+@FetchProfile(
+    name = "employee.projects",
+    fetchOverrides = {
+        @FetchProfile.FetchOverride(
+            entity = Employee.class,
+            association = "projects",
+            mode = FetchMode.JOIN
+        )
+    }
+)</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">session.enableFetchProfile( "employee.projects" );
+Employee employee = session.bySimpleNaturalId( Employee.class ).load( username );</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Here the <code>Employee</code> is obtained by natural-id lookup and the Employee&#8217;s <code>Project</code> data is fetched eagerly.
+If the <code>Employee</code> data is resolved from cache, the <code>Project</code> data is resolved on its own.
+However, if the <code>Employee</code> data is not resolved in cache, the <code>Employee</code> and <code>Project</code> data is resolved in one SQL query via join as we saw above.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="fetching-batch">Batch fetching</h3>
+<div class="paragraph">
+<p>Hibernate offers the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/annotations/BatchSize.html"><code>@BatchSize</code></a> annotation,
+which can be used when fetching uninitialized entity proxies.</p>
+</div>
+<div class="paragraph">
+<p>Considering the following entity mapping:</p>
+</div>
+<div id="fetching-batch-mapping-example" class="exampleblock">
+<div class="title">Example 13. <code>@BatchSize</code> mapping example</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">@Entity(name = "Department")
+public static class Department {
+
+    @Id
+    private Long id;
+
+    @OneToMany(mappedBy = "department")
+    //@BatchSize(size = 5)
+    private List&lt;Employee&gt; employees = new ArrayList&lt;&gt;();
+
+    //Getters and setters omitted for brevity
+
+}
+
+@Entity(name = "Employee")
+public static class Employee {
+
+    @Id
+    private Long id;
+
+    @NaturalId
+    private String name;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Department department;
+
+    //Getters and setters omitted for brevity
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Considering that we have previously fetched several <code>Department</code> entities,
+and now we need to initialize the <code>employees</code> entity collection for each particular <code>Department</code>,
+the <code>@BatchSize</code> annotations allows us to load multiple <code>Employee</code> entities in a single database roundtrip.</p>
+</div>
+<div id="fetching-batch-fetching-example" class="exampleblock">
+<div class="title">Example 14. <code>@BatchSize</code> fetching example</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">List&lt;Department&gt; departments = entityManager.createQuery(
+    "select d " +
+    "from Department d " +
+    "inner join d.employees e " +
+    "where e.name like 'John%'", Department.class)
+.getResultList();
+
+for ( Department department : departments ) {
+    log.infof(
+        "Department %d has {} employees",
+        department.getId(),
+        department.getEmployees().size()
+    );
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-SQL" data-lang="SQL">SELECT
+    d.id as id1_0_
+FROM
+    Department d
+INNER JOIN
+    Employee employees1_
+    ON d.id=employees1_.department_id
+
+SELECT
+    e.department_id as departme3_1_1_,
+    e.id as id1_1_1_,
+    e.id as id1_1_0_,
+    e.department_id as departme3_1_0_,
+    e.name as name2_1_0_
+FROM
+    Employee e
+WHERE
+    e.department_id IN (
+        0, 2, 3, 4, 5
+    )
+
+SELECT
+    e.department_id as departme3_1_1_,
+    e.id as id1_1_1_,
+    e.id as id1_1_0_,
+    e.department_id as departme3_1_0_,
+    e.name as name2_1_0_
+FROM
+    Employee e
+WHERE
+    e.department_id IN (
+        6, 7, 8, 9, 1
+    )</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>As you can see in the example above, there are only two SQL statements used to fetch the <code>Employee</code> entities associated to multiple <code>Department</code> entities.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Without <code>@BatchSize</code>, you&#8217;d run into a N+1 query issue, so,
+instead of 2 SQL statements, there would be 10 queries needed for fetching the <code>Employee</code> child entities.</p>
+</div>
+<div class="paragraph">
+<p>However, although <code>@BatchSize</code> is better than running into an N+1 query issue,
+most of the time, a DTO projection or a <code>JOIN FETCH</code> is a much better alternative since
+it allows you to fetch all the required data with a single query.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="fetching-fetch-annotation">The <code>@Fetch</code> annotation mapping</h3>
+<div class="paragraph">
+<p>Besides the <code>FetchType.LAZY</code> or <code>FetchType.EAGER</code> JPA annotations,
+you can also use the Hibernate-specific <code>@Fetch</code> annotation that accepts one of the following <code>FetchMode(s)</code>:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">SELECT</dt>
+<dd>
+<p>The association is going to be fetched lazily using a secondary select for each individual entity,
+collection, or join load.
+It&#8217;s equivalent to JPA <code>FetchType.LAZY</code> fetching strategy.</p>
+</dd>
+<dt class="hdlist1">JOIN</dt>
+<dd>
+<p>Use an outer join to load the related entities, collections or joins when using direct fetching.
+It&#8217;s equivalent to JPA <code>FetchType.EAGER</code> fetching strategy.</p>
+</dd>
+<dt class="hdlist1">SUBSELECT</dt>
+<dd>
+<p>Available for collections only. When accessing a non-initialized collection,
+this fetch mode will trigger loading all elements of all collections of the same role for all owners associated
+with the persistence context using a single secondary select.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="fetching-fetchmode-select"><code>FetchMode.SELECT</code></h3>
+<div class="paragraph">
+<p>To demonstrate how <code>FetchMode.SELECT</code> works, consider the following entity mapping:</p>
+</div>
+<div id="fetching-strategies-fetch-mode-select-mapping-example" class="exampleblock">
+<div class="title">Example 15. <code>FetchMode.SELECT</code> mapping example</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">@Entity(name = "Department")
+public static class Department {
+
+    @Id
+    private Long id;
+
+    @OneToMany(mappedBy = "department", fetch = FetchType.LAZY)
+    @Fetch(FetchMode.SELECT)
+    private List&lt;Employee&gt; employees = new ArrayList&lt;&gt;();
+
+    //Getters and setters omitted for brevity
+
+}
+
+@Entity(name = "Employee")
+public static class Employee {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    @NaturalId
+    private String username;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Department department;
+
+    //Getters and setters omitted for brevity
+
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Considering there are multiple <code>Department</code> entities, each one having multiple <code>Employee</code> entities,
+when executing the following test case, Hibernate fetches every uninitialized <code>Employee</code>
+collection using a secondary <code>SELECT</code> statement upon accessing the child collection for the first time:</p>
+</div>
+<div id="fetching-strategies-fetch-mode-select-example" class="exampleblock">
+<div class="title">Example 16. <code>FetchMode.SELECT</code> mapping example</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">List&lt;Department&gt; departments = entityManager.createQuery(
+    "select d from Department d", Department.class )
+.getResultList();
+
+log.infof( "Fetched %d Departments", departments.size());
+
+for (Department department : departments ) {
+    assertEquals( 3, department.getEmployees().size() );
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-SQL" data-lang="SQL">SELECT
+    d.id as id1_0_
+FROM
+    Department d
+
+-- Fetched 2 Departments
+
+SELECT
+    e.department_id as departme3_1_0_,
+    e.id as id1_1_0_,
+    e.id as id1_1_1_,
+    e.department_id as departme3_1_1_,
+    e.username as username2_1_1_
+FROM
+    Employee e
+WHERE
+    e.department_id = 1
+
+SELECT
+    e.department_id as departme3_1_0_,
+    e.id as id1_1_0_,
+    e.id as id1_1_1_,
+    e.department_id as departme3_1_1_,
+    e.username as username2_1_1_
+FROM
+    Employee e
+WHERE
+    e.department_id = 2</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>The more <code>Department</code> entities are fetched by the first query, the more secondary <code>SELECT</code> statements are executed to initialize the <code>employees</code> collections.
+Therefore, <code>FetchMode.SELECT</code> can lead to N+1 query issues.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="fetching-fetchmode-subselect"><code>FetchMode.SUBSELECT</code></h3>
+<div class="paragraph">
+<p>To demonstrate how <code>FetchMode.SUBSELECT</code> works, we are going to modify the <a href="#fetching-strategies-fetch-mode-select-mapping-example"><code>FetchMode.SELECT</code> mapping example</a> to use
+<code>FetchMode.SUBSELECT</code>:</p>
+</div>
+<div id="fetching-strategies-fetch-mode-subselect-mapping-example" class="exampleblock">
+<div class="title">Example 17. <code>FetchMode.SUBSELECT</code> mapping example</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">@OneToMany(mappedBy = "department", fetch = FetchType.LAZY)
+@Fetch(FetchMode.SUBSELECT)
+private List&lt;Employee&gt; employees = new ArrayList&lt;&gt;();</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Now, we are going to fetch all <code>Department</code> entities that match a given filtering criteria
+and then navigate their <code>employees</code> collections.</p>
+</div>
+<div class="paragraph">
+<p>Hibernate is going to avoid the N+1 query issue by generating a single SQL statement to initialize all <code>employees</code> collections
+for all <code>Department</code> entities that were previously fetched.
+Instead of using passing all entity identifiers, Hibernate simply reruns the previous query that fetched the <code>Department</code> entities.</p>
+</div>
+<div id="fetching-strategies-fetch-mode-subselect-example" class="exampleblock">
+<div class="title">Example 18. <code>FetchMode.SUBSELECT</code> mapping example</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">List&lt;Department&gt; departments = entityManager.createQuery(
+    "select d " +
+    "from Department d " +
+    "where d.name like :token", Department.class )
+.setParameter( "token", "Department%" )
+.getResultList();
+
+log.infof( "Fetched %d Departments", departments.size());
+
+for (Department department : departments ) {
+    assertEquals( 3, department.getEmployees().size() );
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-SQL" data-lang="SQL">SELECT
+    d.id as id1_0_
+FROM
+    Department d
+where
+    d.name like 'Department%'
+
+-- Fetched 2 Departments
+
+SELECT
+    e.department_id as departme3_1_1_,
+    e.id as id1_1_1_,
+    e.id as id1_1_0_,
+    e.department_id as departme3_1_0_,
+    e.username as username2_1_0_
+FROM
+    Employee e
+WHERE
+    e.department_id in (
+        SELECT
+            fetchmodes0_.id
+        FROM
+            Department fetchmodes0_
+        WHERE
+            d.name like 'Department%'
+    )</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="fetching-fetchmode-join"><code>FetchMode.JOIN</code></h3>
+<div class="paragraph">
+<p>To demonstrate how <code>FetchMode.JOIN</code> works, we are going to modify the <a href="#fetching-strategies-fetch-mode-select-mapping-example"><code>FetchMode.SELECT</code> mapping example</a> to use
+<code>FetchMode.JOIN</code> instead:</p>
+</div>
+<div id="fetching-strategies-fetch-mode-join-mapping-example" class="exampleblock">
+<div class="title">Example 19. <code>FetchMode.JOIN</code> mapping example</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">@OneToMany(mappedBy = "department")
+@Fetch(FetchMode.JOIN)
+private List&lt;Employee&gt; employees = new ArrayList&lt;&gt;();</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Now, we are going to fetch one <code>Department</code> and navigate its <code>employees</code> collections.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The reason why we are not using a JPQL query to fetch multiple <code>Department</code> entities is because
+the <code>FetchMode.JOIN</code> strategy would be overridden by the query fetching directive.</p>
+</div>
+<div class="paragraph">
+<p>To fetch multiple relationships with a JPQL query, the <code>JOIN FETCH</code> directive must be used instead.</p>
+</div>
+<div class="paragraph">
+<p>Therefore, <code>FetchMode.JOIN</code> is useful for when entities are fetched directly, via their identifier or natural-id.</p>
+</div>
+<div class="paragraph">
+<p>Also, the <code>FetchMode.JOIN</code> acts as a <code>FetchType.EAGER</code> strategy.
+Even if we mark the association as <code>FetchType.LAZY</code>, the <code>FetchMode.JOIN</code> will load the association eagerly.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Hibernate is going to avoid the secondary query by issuing an OUTER JOIN for the <code>employees</code> collection.</p>
+</div>
+<div id="fetching-strategies-fetch-mode-join-example" class="exampleblock">
+<div class="title">Example 20. <code>FetchMode.JOIN</code> mapping example</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">Department department = entityManager.find( Department.class, 1L );
+
+log.infof( "Fetched department: %s", department.getId());
+
+assertEquals( 3, department.getEmployees().size() );</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-SQL" data-lang="SQL">SELECT
+    d.id as id1_0_0_,
+    e.department_id as departme3_1_1_,
+    e.id as id1_1_1_,
+    e.id as id1_1_2_,
+    e.department_id as departme3_1_2_,
+    e.username as username2_1_2_
+FROM
+    Department d
+LEFT OUTER JOIN
+    Employee e
+        on d.id = e.department_id
+WHERE
+    d.id = 1
+
+-- Fetched department: 1</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>This time, there was no secondary query because the child collection was loaded along with the parent entity.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="fetching-LazyCollection"><code>@LazyCollection</code></h3>
+<div class="paragraph">
+<p>The <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/annotations/LazyCollection.html"><code>@LazyCollection</code></a> annotation is used to specify the lazy fetching behavior of a given collection.
+The possible values are given by the <code><a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/annotations/LazyCollectionOption.html">LazyCollectionOption</a></code> enumeration:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>TRUE</code></dt>
+<dd>
+<p>Load it when the state is requested.</p>
+</dd>
+<dt class="hdlist1"><code>FALSE</code></dt>
+<dd>
+<p>Eagerly load it.</p>
+</dd>
+<dt class="hdlist1"><code>EXTRA</code></dt>
+<dd>
+<p>Prefer extra queries over full collection loading.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>The <code>TRUE</code> and <code>FALSE</code> values are deprecated since you should be using the JPA <a href="http://docs.oracle.com/javaee/7/api/javax/persistence/FetchType.html"><code>FetchType</code></a> attribute of the <a href="#annotations-jpa-elementcollection">[annotations-jpa-elementcollection]</a>, <a href="#annotations-jpa-onetomany">[annotations-jpa-onetomany]</a>, or <a href="#annotations-jpa-manytomany">[annotations-jpa-manytomany]</a> collection.</p>
+</div>
+<div class="paragraph">
+<p>The <code>EXTRA</code> value has no equivalent in the JPA specification, and it&#8217;s used to avoid loading the entire collection even when the collection is accessed for the first time.
+Each element is fetched individually using a secondary query.</p>
+</div>
+<div id="fetching-LazyCollection-domain-model-example" class="exampleblock">
+<div class="title">Example 21. <code>LazyCollectionOption.EXTRA</code> mapping example</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">@Entity(name = "Department")
+public static class Department {
+
+    @Id
+    private Long id;
+
+    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
+    @OrderColumn(name = "order_id")
+    @LazyCollection( LazyCollectionOption.EXTRA )
+    private List&lt;Employee&gt; employees = new ArrayList&lt;&gt;();
+
+    //Getters and setters omitted for brevity
+
+}
+
+@Entity(name = "Employee")
+public static class Employee {
+
+    @Id
+    private Long id;
+
+    @NaturalId
+    private String username;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Department department;
+
+    //Getters and setters omitted for brevity
+
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>LazyCollectionOption.EXTRA</code> only works for ordered collections,
+either List(s) that are annotated with @OrderColumn or Map(s).</p>
+</div>
+<div class="paragraph">
+<p>For bags (e.g. regular List(s) of entities that do not preserve any certain ordering),
+the @LazyCollection(LazyCollectionOption.EXTRA)` behaves like any other <code>FetchType.LAZY</code> collection
+(the collection is fetched entirely upon being accessed for the first time).</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Now, considering we have the following entities:</p>
+</div>
+<div id="fetching-LazyCollection-persist-example" class="exampleblock">
+<div class="title">Example 22. <code>LazyCollectionOption.EXTRA</code> Domain Model example</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">Department department = new Department();
+department.setId( 1L );
+entityManager.persist( department );
+
+for (long i = 1; i &lt;= 3; i++ ) {
+    Employee employee = new Employee();
+    employee.setId( i );
+    employee.setUsername( String.format( "user_%d", i ) );
+    department.addEmployee(employee);
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>When fetching the <code>employee</code> collection entries by their position in the <code>List</code>,
+Hibernate generates the following SQL statements:</p>
+</div>
+<div id="fetching-LazyCollection-select-example" class="exampleblock">
+<div class="title">Example 23. <code>LazyCollectionOption.EXTRA</code> fetching example</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">Department department = entityManager.find(Department.class, 1L);
+
+int employeeCount = department.getEmployees().size();
+
+for(int i = 0; i &lt; employeeCount; i++ ) {
+    log.infof( "Fetched employee: %s", department.getEmployees().get( i ).getUsername());
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-SQL" data-lang="SQL">SELECT
+    max(order_id) + 1
+FROM
+    Employee
+WHERE
+    department_id = ?
+
+-- binding parameter [1] as [BIGINT] - [1]
+
+SELECT
+    e.id as id1_1_0_,
+    e.department_id as departme3_1_0_,
+    e.username as username2_1_0_
+FROM
+    Employee e
+WHERE
+    e.department_id=?
+    AND e.order_id=?
+
+-- binding parameter [1] as [BIGINT]  - [1]
+-- binding parameter [2] as [INTEGER] - [0]
+
+SELECT
+    e.id as id1_1_0_,
+    e.department_id as departme3_1_0_,
+    e.username as username2_1_0_
+FROM
+    Employee e
+WHERE
+    e.department_id=?
+    AND e.order_id=?
+
+-- binding parameter [1] as [BIGINT]  - [1]
+-- binding parameter [2] as [INTEGER] - [1]
+
+SELECT
+    e.id as id1_1_0_,
+    e.department_id as departme3_1_0_,
+    e.username as username2_1_0_
+FROM
+    Employee e
+WHERE
+    e.department_id=?
+    AND e.order_id=?
+
+-- binding parameter [1] as [BIGINT]  - [1]
+-- binding parameter [2] as [INTEGER] - [2]</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Therefore, the child entities were fetched one after the other without triggering a full collection initialization.</p>
+</div>
+<div class="paragraph">
+<p>For this reason, caution is advised because <code>LazyCollectionOption.EXTRA</code> lazy collections are prone to N+1 query issues.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2018-05-25 11:38:17 -04:00
+</div>
+</div>
+</body>
+</html>

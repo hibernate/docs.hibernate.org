@@ -1,0 +1,1945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 1.5.2">
+<title>Configurations</title>
+<link rel="stylesheet" href="./css/hibernate.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js"></script>
+<script>document.addEventListener('DOMContentLoaded', prettyPrint)</script>
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="configurations">Configurations</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="configurations-strategy">Strategy configurations</h3>
+<div class="paragraph">
+<p>Many configuration settings define pluggable strategies that Hibernate uses for various purposes.
+The configuration of many of these strategy type settings accept definition in various forms.
+The documentation of such configuration settings refer here.
+The types of forms available in such cases include:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">short name (if defined)</dt>
+<dd>
+<p>Certain built-in strategy implementations have a corresponding short name.</p>
+</dd>
+<dt class="hdlist1">strategy instance</dt>
+<dd>
+<p>An instance of the strategy implementation to use can be specified</p>
+</dd>
+<dt class="hdlist1">strategy Class reference</dt>
+<dd>
+<p>A <code>java.lang.Class</code> reference of the strategy implementation to use</p>
+</dd>
+<dt class="hdlist1">strategy Class name</dt>
+<dd>
+<p>The class name (<code>java.lang.String</code>) of the strategy implementation to use</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configurations-general">General configuration</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.dialect</strong></code> (e.g. <code>org.hibernate.dialect.PostgreSQL94Dialect</code>)</dt>
+<dd>
+<p>The classname of a Hibernate <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/dialect/Dialect.html"><code>Dialect</code></a> from which Hibernate can generate SQL optimized for a particular relational database.</p>
+<div class="paragraph">
+<p>In most cases Hibernate can choose the correct <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/dialect/Dialect.html"><code>Dialect</code></a> implementation based on the JDBC metadata returned by the JDBC driver.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.current_session_context_class</strong></code> (e.g. <code>jta</code>, <code>thread</code>, <code>managed</code>, or a custom class implementing <code>org.hibernate.context.spi.CurrentSessionContext</code>)</dt>
+<dd>
+<div class="paragraph">
+<p>Supply a custom strategy for the scoping of the <em>current</em> <code>Session</code>.</p>
+</div>
+<div class="paragraph">
+<p>The definition of what exactly <em>current</em> means is controlled by the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/context/spi/CurrentSessionContext.html"><code>CurrentSessionContext</code></a> implementation in use.</p>
+</div>
+<div class="paragraph">
+<p>Note that for backwards compatibility, if a <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/context/spi/CurrentSessionContext.html"><code>CurrentSessionContext</code></a> is not configured but JTA is configured this will default to the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/context/internal/JTASessionContext.html"><code>JTASessionContext</code></a>.</p>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configurations-jpa-compliance">JPA compliance</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.jpa.compliance.transaction</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>This setting controls if Hibernate  <code>Transaction</code> should behave as defined by the spec for JPA&#8217;s <code>javax.persistence.EntityTransaction</code>
+since it extends the JPA one.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.jpa.compliance.query</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Controls whether Hibernate&#8217;s handling of <code>javax.persistence.Query</code> (JPQL, Criteria and native-query) should strictly follow the JPA spec.</p>
+<div class="paragraph">
+<p>This includes both in terms of parsing or translating a query as well as calls to the <code>javax.persistence.Query</code> methods throwing spec
+defined exceptions where as Hibernate might not.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.jpa.compliance.list</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Controls whether Hibernate should recognize what it considers a "bag" (<code>org.hibernate.collection.internal.PersistentBag</code>)
+as a List (<code>org.hibernate.collection.internal.PersistentList</code>) or as a bag.</p>
+<div class="paragraph">
+<p>If enabled, we will recognize it as a List where <code>javax.persistence.OrderColumn</code>
+is just missing (and its defaults will apply).</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.jpa.compliance.closed</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>JPA defines specific exceptions upon calling specific methods on <code>javax.persistence.EntityManager</code> and <code>javax.persistence.EntityManagerFactory</code>
+objects which have been closed previously.</p>
+<div class="paragraph">
+<p>This setting controls whether the JPA spec defined behavior or the Hibernate behavior will be used.</p>
+</div>
+<div class="paragraph">
+<p>If enabled, Hibernate will operate in the JPA specified way, throwing exceptions when the spec says it should.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.jpa.compliance.proxy</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>The JPA spec says that a <code>javax.persistence.EntityNotFoundException</code> should be thrown when accessing an entity Proxy
+which does not have an associated table row in the database.</p>
+<div class="paragraph">
+<p>Traditionally, Hibernate does not initialize an entity Proxy when accessing its identifier since we already know the identifier value,
+hence we can save a database roundtrip.</p>
+</div>
+<div class="paragraph">
+<p>If enabled Hibernate will initialize the entity Proxy even when accessing its identifier.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.jpa.compliance.global_id_generators</strong></code> (e.g. <code>true</code> or <code>false</code> (default value) )</dt>
+<dd>
+<p>The JPA spec says that the scope of TableGenerator and SequenceGenerator names is global to the persistence unit (across all generator types).</p>
+<div class="paragraph">
+<p>Traditionally, Hibernate has considered the names locally scoped.</p>
+</div>
+<div class="paragraph">
+<p>If enabled, the names used by <code>@TableGenerator</code> and <code>@SequenceGenerator</code> will be considered global so configuring two different generators
+with the same name will cause a `java.lang.IllegalArgumentException' to be thrown at boot time.</p>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configurations-database-connection">Database connection properties</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.connection.driver_class</strong></code> or <code><strong>javax.persistence.jdbc.driver</strong></code> (e.g. <code>org.postgresql.Driver</code>)</dt>
+<dd>
+<p>Names the JDBC <code>Driver</code> class name.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.connection.url</strong></code> or <code><strong>javax.persistence.jdbc.url</strong></code> (e.g. <code>jdbc:postgresql:hibernate_orm_test</code>)</dt>
+<dd>
+<p>Names the JDBC connection URL.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.connection.username</strong></code> or <code><strong>javax.persistence.jdbc.user</strong></code></dt>
+<dd>
+<p>Names the JDBC connection user name.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.connection.password</strong></code> or <code><strong>javax.persistence.jdbc.password</strong></code></dt>
+<dd>
+<p>Names the JDBC connection password.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.connection.isolation</strong></code> (e.g. <code>REPEATABLE_READ</code> or <code>Connection.TRANSACTION_REPEATABLE_READ</code>)</dt>
+<dd>
+<p>Names the JDBC connection transaction isolation level.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.connection.autocommit</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Names the initial autocommit mode for JDBC Connections returned from a connection pool created in certain ConnectionProvider impl.</p>
+<div class="paragraph">
+<p>See discussion of <code>hibernate.connection.provider_disables_autocommit</code> as well.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.connection.provider_disables_autocommit</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Indicates a promise by the user that Connections that Hibernate obtains from the configured ConnectionProvider
+have auto-commit disabled when they are obtained from that provider, whether that provider is backed by
+a DataSource or some other Connection pooling mechanism.  Generally this occurs when:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Hibernate is configured to get Connections from an underlying DataSource, and that DataSource is already configured to disable auto-commit on its managed Connections</p>
+</li>
+<li>
+<p>Hibernate is configured to get Connections from a non-DataSource connection pool and that connection pool is already configured to disable auto-commit.
+For the Hibernate provided implementation this will depend on the value of <code>hibernate.connection.autocommit</code> setting.</p>
+<div class="paragraph">
+<p>Hibernate uses this assurance as an opportunity to opt-out of certain operations that may have a performance
+impact (although this impact is general negligible).  Specifically, when a transaction is started via the
+Hibernate or JPA transaction APIs Hibernate will generally immediately acquire a Connection from the
+provider and:</p>
+</div>
+</li>
+<li>
+<p>check whether the Connection is initially in auto-commit mode via a call to <code>Connection#getAutocommit</code> to know how to clean up the Connection when released.</p>
+</li>
+<li>
+<p>start a JDBC transaction by calling <code>Connection#setAutocommit(false)</code></p>
+<div class="paragraph">
+<p>We can skip both of those steps if we know that the ConnectionProvider will always return Connections with auto-commit disabled.
+That is the purpose of this setting.  By setting it to <code>true</code>, the <code>Connection</code> acquisition can be delayed until the first
+SQL statement is needed to be executed.  The connection acquisition delay allows you to reduce the database connection lease
+time, therefore allowing you to increase the transaction throughput.</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>It is <strong>inappropriate</strong> to set this value to <code>true</code> when the Connections Hibernate gets
+from the provider do not, in fact, have auto-commit disabled.</p>
+</div>
+<div class="paragraph">
+<p>Doing so will lead to Hibernate executing SQL operations outside of any JDBC/SQL transaction.</p>
+</div>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.connection.datasource</strong></code></dt>
+<dd>
+<p>Either a <code>javax.sql.DataSource</code> instance or a JNDI name under which to locate the <code>DataSource</code>.</p>
+<div class="paragraph">
+<p>For JNDI names, ses also <code>hibernate.jndi.class</code>, <code>hibernate.jndi.url</code>, <code>hibernate.jndi</code>.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.connection</strong></code></dt>
+<dd>
+<p>Names a prefix used to define arbitrary JDBC connection properties. These properties are passed along to the JDBC provider when creating a connection.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.connection.provider_class</strong></code> (e.g. <code>org.hibernate.hikaricp.internal. HikariCPConnectionProvider</code>)</dt>
+<dd>
+<p>Names the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/engine/jdbc/connections/spi/ConnectionProvider.html"><code>ConnectionProvider</code></a> to use for obtaining JDBC connections.</p>
+<div class="paragraph">
+<p>Can reference:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>an instance of <code>ConnectionProvider</code></p>
+</li>
+<li>
+<p>a <code>Class&lt;? extends ConnectionProvider</code> object reference</p>
+</li>
+<li>
+<p>a fully qualified name of a class implementing <code>ConnectionProvider</code></p>
+<div class="paragraph">
+<p>The term <code>class</code> appears in the setting name due to legacy reasons; however it can accept instances.</p>
+</div>
+</li>
+</ul>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.jndi.class</strong></code></dt>
+<dd>
+<p>Names the JNDI <code>javax.naming.InitialContext</code> class.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.jndi.url</strong></code> (e.g. java:global/jdbc/default)</dt>
+<dd>
+<p>Names the JNDI provider/connection url.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.jndi</strong></code></dt>
+<dd>
+<p>Names a prefix used to define arbitrary JNDI <code>javax.naming.InitialContext</code> properties.</p>
+<div class="paragraph">
+<p>These properties are passed along to <code>javax.naming.InitialContext#InitialContext(java.util.Hashtable)</code></p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.connection.acquisition_mode</strong></code> (e.g. <code>immediate</code>)</dt>
+<dd>
+<p>Specifies how Hibernate should acquire JDBC connections. The possible values are given by <code>org.hibernate.ConnectionAcquisitionMode</code>.</p>
+<div class="paragraph">
+<p>Should generally only configure this or <code>hibernate.connection.release_mode</code>, not both.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.connection.release_mode</strong></code> (e.g. <code>auto</code> (default value))</dt>
+<dd>
+<p>Specifies how Hibernate should release JDBC connections. The possible values are given by the current transaction mode (<code>after_transaction</code> for JDBC transactions and <code>after_statement</code> for JTA transactions).</p>
+<div class="paragraph">
+<p>Should generally only configure this or <code>hibernate.connection.acquisition_mode</code>, not both.</p>
+</div>
+</dd>
+</dl>
+</div>
+<div class="sect3">
+<h4 id="_hibernate_internal_connection_pool_options">Hibernate internal connection pool options</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.connection.initial_pool_size</strong></code> (e.g. 1 (default value))</dt>
+<dd>
+<p>Minimum number of connections for the built-in Hibernate connection pool.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.connection.pool_size</strong></code> (e.g. 20 (default value))</dt>
+<dd>
+<p>Maximum number of connections for the built-in Hibernate connection pool.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.connection.pool_validation_interval</strong></code> (e.g. 30 (default value))</dt>
+<dd>
+<p>The number of seconds between two consecutive pool validations. During validation, the pool size can increase or decreases based on the connection acquisition request count.</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configurations-c3p0">c3p0 properties</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.c3p0.min_size</strong></code> (e.g. 1)</dt>
+<dd>
+<p>Minimum size of C3P0 connection pool. Refers to <a href="http://www.mchange.com/projects/c3p0/#minPoolSize">c3p0 <code>minPoolSize</code> setting</a>.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.c3p0.max_size</strong></code> (e.g. 5)</dt>
+<dd>
+<p>Maximum size of C3P0 connection pool. Refers to <a href="http://www.mchange.com/projects/c3p0/#maxPoolSize">c3p0 <code>maxPoolSize</code> setting</a>.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.c3p0.timeout</strong></code> (e.g. 30)</dt>
+<dd>
+<p>Maximum idle time for C3P0 connection pool. Refers to <a href="http://www.mchange.com/projects/c3p0/#maxIdleTime">c3p0 <code>maxIdleTime</code> setting</a>.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.c3p0.max_statements</strong></code> (e.g. 5)</dt>
+<dd>
+<p>Maximum size of C3P0 statement cache. Refers to <a href="http://www.mchange.com/projects/c3p0/#maxStatements">c3p0 <code>maxStatements</code> setting</a>.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.c3p0.acquire_increment</strong></code> (e.g. 2)</dt>
+<dd>
+<p>Number of connections acquired at a time when there&#8217;s no connection available in the pool. Refers to <a href="http://www.mchange.com/projects/c3p0/#acquireIncrement">c3p0 <code>acquireIncrement</code> setting</a>.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.c3p0.idle_test_period</strong></code> (e.g. 5)</dt>
+<dd>
+<p>Idle time before a C3P0 pooled connection is validated. Refers to <a href="http://www.mchange.com/projects/c3p0/#idleConnectionTestPeriod">c3p0 <code>idleConnectionTestPeriod</code> setting</a>.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.c3p0</strong></code></dt>
+<dd>
+<p>A setting prefix used to indicate additional c3p0 properties that need to be passed to the underlying c3p0 connection pool.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configurations-mapping">Mapping Properties</h3>
+<div class="sect3">
+<h4 id="_table_qualifying_options">Table qualifying options</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.default_catalog</strong></code> (e.g. A catalog name)</dt>
+<dd>
+<p>Qualifies unqualified table names with the given catalog in generated SQL.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.default_schema</strong></code> (e.g. A schema name)</dt>
+<dd>
+<p>Qualify unqualified table names with the given schema or tablespace in generated SQL.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.schema_name_resolver</strong></code> (e.g. The fully qualified name of an <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/engine/jdbc/env/spi/SchemaNameResolver.html"><code>org.hibernate.engine.jdbc.env.spi.SchemaNameResolver</code></a> implementation class)</dt>
+<dd>
+<p>By default, Hibernate uses the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/dialect/Dialect.html#getSchemaNameResolver--"><code>org.hibernate.dialect.Dialect#getSchemaNameResolver</code></a>.
+You can customize how the schema name is resolved by providing a custom implementation of the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/engine/jdbc/env/spi/SchemaNameResolver.html"><code>SchemaNameResolver</code></a> interface.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_identifier_options">Identifier options</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.id.new_generator_mappings</strong></code> (e.g. <code>true</code> (default value) or <code>false</code>)</dt>
+<dd>
+<p>Setting which indicates whether or not the new <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/id/IdentifierGenerator.html"><code>IdentifierGenerator</code></a> are used for <code>AUTO</code>, <code>TABLE</code> and <code>SEQUENCE</code>.</p>
+<div class="paragraph">
+<p>Existing applications may want to disable this (set it <code>false</code>) for upgrade compatibility from 3.x and 4.x to 5.x.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.use_identifier_rollback</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>If true, generated identifier properties are reset to default values when objects are deleted.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.id.optimizer.pooled.preferred</strong></code> (e.g. <code>none</code>, <code>hilo</code>, <code>legacy-hilo</code>, <code>pooled</code> (default value), <code>pooled-lo</code>, <code>pooled-lotl</code> or a fully-qualified name of the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/id/enhanced/Optimizer.html"><code>Optimizer</code></a> implementation)</dt>
+<dd>
+<p>When a generator specified an increment-size and an optimizer was not explicitly specified, which of the <em>pooled</em> optimizers should be preferred?</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.id.generator.stored_last_used</strong></code> (e.g. <code>true</code> (default value) or <code>false</code>)</dt>
+<dd>
+<p>If true, the value stored in the table used by the <code>@TableGenerator</code> is the last value used, if false the value is the next value to be used.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.model.generator_name_as_sequence_name</strong></code> (e.g. <code>true</code> (default value) or <code>false</code>)</dt>
+<dd>
+<p>If true, the value specified by the <code>generator</code> attribute of the <code>@GeneratedValue</code> annotation should be used as the sequence/table name when no matching
+<code>@SequenceGenerator</code> or <code>TableGenerator</code> is found.</p>
+<div class="paragraph">
+<p>The default value is <code>true</code> meaning that <code>@GeneratedValue.generator()</code> will be used as the sequence/table name by default.
+Users migrating from earlier versions using the legacy <code>hibernate_sequence</code> name should disable this setting.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.ejb.identifier_generator_strategy_provider</strong></code> (e.g. fully-qualified class name or an actual the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/jpa/spi/IdentifierGeneratorStrategyProvider.html"><code>IdentifierGeneratorStrategyProvider</code></a> instance)</dt>
+<dd>
+<p>This setting allows you to provide an instance or the class implementing the <code>org.hibernate.jpa.spi.IdentifierGeneratorStrategyProvider</code> interface,
+so you can provide a set of <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/id/IdentifierGenerator.html"><code>IdentifierGenerator</code></a> strategies allowing to override the Hibernate Core default ones.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_quoting_options">Quoting options</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.globally_quoted_identifiers</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Should all database identifiers be quoted.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.globally_quoted_identifiers_skip_column_definitions</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Assuming <code>hibernate.globally_quoted_identifiers</code> is <code>true</code>, this allows the global quoting to skip column-definitions as defined by <code>javax.persistence.Column</code>,
+<code>javax.persistence.JoinColumn</code>, etc, and while it avoids column-definitions being quoted due to global quoting, they can still be explicitly quoted in the annotation/xml mappings.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.auto_quote_keyword</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Specifies whether to automatically quote any names that are deemed keywords.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_discriminator_options">Discriminator options</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.discriminator.implicit_for_joined</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>The legacy behavior of Hibernate is to not use discriminators for joined inheritance (Hibernate does not need the discriminator).
+However, some JPA providers do need the discriminator for handling joined inheritance so, in the interest of portability, this capability has been added to Hibernate too.</p>
+<div class="paragraph">
+<p>Because want to make sure that legacy applications continue to work as well, that puts us in a bind in terms of how to handle <em>implicit</em> discriminator mappings.
+The solution is to assume that the absence of discriminator metadata means to follow the legacy behavior <em>unless</em> this setting is enabled.</p>
+</div>
+<div class="paragraph">
+<p>With this setting enabled, Hibernate will interpret the absence of discriminator metadata as an indication to use the JPA-defined defaults for these absent annotations.</p>
+</div>
+<div class="paragraph">
+<p>See Hibernate Jira issue <a href="https://hibernate.atlassian.net/browse/HHH-6911">HHH-6911</a> for additional background info.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.discriminator.ignore_explicit_for_joined</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>The legacy behavior of Hibernate is to not use discriminators for joined inheritance (Hibernate does not need the discriminator).
+However, some JPA providers do need the discriminator for handling joined inheritance so, in the interest of portability, this capability has been added to Hibernate too.</p>
+<div class="paragraph">
+<p>Existing applications rely (implicitly or explicitly) on Hibernate ignoring any <code>DiscriminatorColumn</code> declarations on joined inheritance hierarchies.
+This setting allows these applications to maintain the legacy behavior of <code>DiscriminatorColumn</code> annotations being ignored when paired with joined inheritance.</p>
+</div>
+<div class="paragraph">
+<p>See Hibernate Jira issue <a href="https://hibernate.atlassian.net/browse/HHH-6911">HHH-6911</a> for additional background info.</p>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_naming_strategies">Naming strategies</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.implicit_naming_strategy</strong></code> (e.g. <code>default</code> (default value), <code>jpa</code>, <code>legacy-jpa</code>, <code>legacy-hbm</code>, <code>component-path</code>)</dt>
+<dd>
+<p>Used to specify the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/boot/model/naming/ImplicitNamingStrategy.html"><code>ImplicitNamingStrategy</code></a> class to use.
+The following short names are defined for this setting:</p>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>default</code></dt>
+<dd>
+<p>Uses the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/boot/model/naming/ImplicitNamingStrategyJpaCompliantImpl.html"><code>ImplicitNamingStrategyJpaCompliantImpl</code></a></p>
+</dd>
+<dt class="hdlist1"><code>jpa</code></dt>
+<dd>
+<p>Uses the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/boot/model/naming/ImplicitNamingStrategyJpaCompliantImpl.html"><code>ImplicitNamingStrategyJpaCompliantImpl</code></a></p>
+</dd>
+<dt class="hdlist1"><code>legacy-jpa</code></dt>
+<dd>
+<p>Uses the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/boot/model/naming/ImplicitNamingStrategyLegacyJpaImpl.html"><code>ImplicitNamingStrategyLegacyJpaImpl</code></a></p>
+</dd>
+<dt class="hdlist1"><code>legacy-hbm</code></dt>
+<dd>
+<p>Uses the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/boot/model/naming/ImplicitNamingStrategyLegacyHbmImpl.html"><code>ImplicitNamingStrategyLegacyHbmImpl</code></a></p>
+</dd>
+<dt class="hdlist1"><code>component-path</code></dt>
+<dd>
+<p>Uses the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/boot/model/naming/ImplicitNamingStrategyComponentPathImpl.html"><code>ImplicitNamingStrategyComponentPathImpl</code></a></p>
+<div class="paragraph">
+<p>If this property happens to be empty, the fallback is to use <code>default</code> strategy.</p>
+</div>
+</dd>
+</dl>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.physical_naming_strategy</strong></code> (e.g. <code>org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl</code> (default value))</dt>
+<dd>
+<p>Used to specify the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/boot/model/naming/PhysicalNamingStrategy.html"><code>PhysicalNamingStrategy</code></a> class to use.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_metadata_scanning_options">Metadata scanning options</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.archive.scanner</strong></code></dt>
+<dd>
+<p>Pass an implementation of <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/boot/archive/scan/spi/Scanner.html"><code>Scanner</code></a>.
+By default, <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/boot/archive/scan/internal/StandardScanner.html"><code>StandardScanner</code></a> is used.</p>
+<div class="paragraph">
+<p>Accepts either:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>an actual <code>Scanner</code> instance</p>
+</li>
+<li>
+<p>a reference to a Class that implements <code>Scanner</code></p>
+</li>
+<li>
+<p>a fully qualified name of a Class that implements <code>Scanner</code></p>
+</li>
+</ul>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.archive.interpreter</strong></code></dt>
+<dd>
+<p>Pass <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/boot/archive/spi/ArchiveDescriptorFactory.html"><code>ArchiveDescriptorFactory</code></a> to use in the scanning process.</p>
+<div class="paragraph">
+<p>Accepts either:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>an actual <code>ArchiveDescriptorFactory</code> instance</p>
+</li>
+<li>
+<p>a reference to a Class that implements <code>ArchiveDescriptorFactory</code></p>
+</li>
+<li>
+<p>a fully qualified name of a Class that implements <code>ArchiveDescriptorFactory</code></p>
+<div class="paragraph">
+<p>See information on <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/boot/archive/scan/spi/Scanner.html"><code>Scanner</code></a> about expected constructor forms.</p>
+</div>
+</li>
+</ul>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.archive.autodetection</strong></code> (e.g. <code>hbm,class</code> (default value))</dt>
+<dd>
+<p>Identifies a comma-separate list of values indicating the mapping types we should auto-detect during scanning.</p>
+<div class="paragraph">
+<p>Allowable values include:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>class</code></dt>
+<dd>
+<p>scan classes (e.g. <code>.class</code>) to extract entity mapping metadata</p>
+</dd>
+<dt class="hdlist1"><code>hbm</code></dt>
+<dd>
+<p>scan <code>hbm</code> mapping files (e.g. <code>hbm.xml</code>) to extract entity mapping metadata</p>
+<div class="paragraph">
+<p>By default both HBM, annotations, and JPA XML mappings are scanned.</p>
+</div>
+<div class="paragraph">
+<p>When using JPA, to disable the automatic scanning of all entity classes, the <code>exclude-unlisted-classes</code> <code>persistence.xml</code> element must be set to true.
+Therefore, when setting <code>exclude-unlisted-classes</code> to true, only the classes that are explicitly declared in the <code>persistence.xml</code> configuration files are going to be taken into consideration.</p>
+</div>
+</dd>
+</dl>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.mapping.precedence</strong></code> (e.g. <code>hbm,class</code> (default value))</dt>
+<dd>
+<p>Used to specify the order in which metadata sources should be processed.
+Value is a delimited-list whose elements are defined by <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/cfg/MetadataSourceType.html"><code>MetadataSourceType</code></a>.</p>
+<div class="paragraph">
+<p>Default is <code>hbm,class"</code>, therefore <code>hbm.xml</code> files are processed first, followed by annotations (combined with <code>orm.xml</code> mappings).</p>
+</div>
+<div class="paragraph">
+<p>When using JPA, the XML mapping overrides a conflicting annotation mapping that targets the same entity attribute.</p>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_jdbc_related_options">JDBC-related options</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.use_nationalized_character_data</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Enable nationalized character support on all string / clob based attribute ( string, char, clob, text etc ).</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.jdbc.lob.non_contextual_creation</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Should we not use contextual LOB creation (aka based on <code>java.sql.Connection#createBlob()</code> et al)? The default value for HANA, H2, and PostgreSQL is <code>true</code>.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.jdbc.time_zone</strong></code> (e.g. A <code>java.util.TimeZone</code>, a <code>java.time.ZoneId</code> or a <code>String</code> representation of a <code>ZoneId</code>)</dt>
+<dd>
+<p>Unless specified, the JDBC Driver uses the default JVM time zone. If a different time zone is configured via this setting, the JDBC <a href="https://docs.oracle.com/javase/8/docs/api/java/sql/PreparedStatement.html#setTimestamp-int-java.sql.Timestamp-java.util.Calendar-">PreparedStatement#setTimestamp</a> is going to use a <code>Calendar</code> instance according to the specified time zone.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.dialect.oracle.prefer_long_raw</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>This setting applies to Oracle Dialect only, and it specifies whether <code>byte[]</code> or <code>Byte[]</code> arrays should be mapped to the deprecated <code>LONG RAW</code> (when this configuration property value is <code>true</code>) or to a <code>BLOB</code> column type (when this configuration property value is <code>false</code>).</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_bean_validation_options">Bean Validation options</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>javax.persistence.validation.factory</strong></code> (e.g. <code>javax.validation.ValidationFactory</code> implementation)</dt>
+<dd>
+<p>Specify the  <code>javax.validation.ValidationFactory</code> implementation to use for Bean Validation.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.check_nullability</strong></code> (e.g. <code>true</code> or <code>false</code>)</dt>
+<dd>
+<p>Enable nullability checking. Raises an exception if a property marked as not-null is null.</p>
+<div class="paragraph">
+<p>Default to <code>false</code> if Bean Validation is present in the classpath and Hibernate Annotations is used, <code>true</code> otherwise.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.validator.apply_to_ddl</strong></code> (e.g. <code>true</code> (default value) or <code>false</code>)</dt>
+<dd>
+<div class="paragraph">
+<p>Bean Validation constraints will be applied in DDL if the automatic schema generation is enabled.
+In other words, the database schema will reflect the Bean Validation constraints.</p>
+</div>
+<div class="paragraph">
+<p>To disable constraint propagation to DDL, set up <code>hibernate.validator.apply_to_ddl</code> to <code>false</code> in the configuration file.
+Such a need is very uncommon and not recommended.</p>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_misc_options">Misc options</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.create_empty_composites.enabled</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Enable instantiation of composite/embeddable objects when all of its attribute values are <code>null</code>. The default (and historical) behavior is that a <code>null</code> reference will be used to represent the composite when all of its attributes are <code>null</code>.</p>
+<div class="paragraph">
+<p>This is an experimental feature that has known issues. It should not be used in production until it is stabilized. See Hibernate Jira issue <a href="https://hibernate.atlassian.net/browse/HHH-11936">HHH-11936</a> for details.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.entity_dirtiness_strategy</strong></code> (e.g. fully-qualified class name or an actual <code>CustomEntityDirtinessStrategy</code> instance)</dt>
+<dd>
+<p>Setting to identify a <code>org.hibernate.CustomEntityDirtinessStrategy</code> to use.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.default_entity_mode</strong></code> (e.g. <code>pojo</code> (default value) or <code>dynamic-map</code>)</dt>
+<dd>
+<p>Default <code>EntityMode</code> for entity representation for all sessions opened from this <code>SessionFactory</code>, defaults to <code>pojo</code>.</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configurations-bytecode-enhancement">Bytecode Enhancement Properties</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.enhancer.enableDirtyTracking</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Enable dirty tracking feature in runtime bytecode enhancement.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.enhancer.enableLazyInitialization</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Enable lazy loading feature in runtime bytecode enhancement. This way, even basic types (e.g. <code>@Basic(fetch = FetchType.LAZY</code>)) can be fetched lazily.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.enhancer.enableAssociationManagement</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Enable association management feature in runtime bytecode enhancement which automatically synchronizes a bidirectional association when only one side is changed.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.bytecode.provider</strong></code> (e.g. <code>bytebuddy</code> (default value))</dt>
+<dd>
+<p>The <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/bytecode/spi/BytecodeProvider.html"><code>BytecodeProvider</code></a> built-in implementation flavor. Currently, only <code>bytebuddy</code> and <code>javassist</code> are valid values.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.bytecode.use_reflection_optimizer</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Should we use reflection optimization? The reflection optimizer implements the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/bytecode/spi/ReflectionOptimizer.html"><code>ReflectionOptimizer</code></a> interface and improves entity instantiation and property getter/setter calls.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.bytecode.enforce_legacy_proxy_classnames</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Some other libraries, such as Spring, used to depend on a specific naming pattern used for proxy classes generated at runtime. Set this to <code>true</code> to have proxy class names conform to the old pattern.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configurations-query">Query settings</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.query.plan_cache_max_size</strong></code> (e.g. <code>2048</code> (default value))</dt>
+<dd>
+<p>The maximum number of entries including:
+<a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/engine/query/spi/HQLQueryPlan.html"><code>HQLQueryPlan</code></a>,
+<a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/engine/query/spi/FilterQueryPlan.html"><code>FilterQueryPlan</code></a>,
+<a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/engine/query/spi/NativeSQLQueryPlan.html"><code>NativeSQLQueryPlan</code></a>.</p>
+<div class="paragraph">
+<p>Maintained by <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/engine/query/spi/QueryPlanCache.html"><code>QueryPlanCache</code></a>.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.query.plan_parameter_metadata_max_size</strong></code> (e.g. <code>128</code> (default value))</dt>
+<dd>
+<p>The maximum number of strong references associated with <code>ParameterMetadata</code> maintained by <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/engine/query/spi/QueryPlanCache.html"><code>QueryPlanCache</code></a>.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.order_by.default_null_ordering</strong></code> (e.g. <code>none</code>, <code>first</code> or <code>last</code>)</dt>
+<dd>
+<p>Defines precedence of null values in <code>ORDER BY</code> clause. Defaults to <code>none</code> which varies between RDBMS implementation.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.discriminator.force_in_select</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>For entities which do not explicitly say, should we force discriminators into SQL selects?</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.query.substitutions</strong></code> (e.g. <code>true=1,false=0</code>)</dt>
+<dd>
+<p>A comma-separated list of token substitutions to use when translating a Hibernate query to SQL.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.query.factory_class</strong></code> (e.g. <code>org.hibernate.hql.internal.ast.ASTQueryTranslatorFactory</code> (default value) or <code>org.hibernate.hql.internal.classic.ClassicQueryTranslatorFactory</code>)</dt>
+<dd>
+<p>Chooses the HQL parser implementation.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.query.jpaql_strict_compliance</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Map from tokens in Hibernate queries to SQL tokens, such as function or literal names.</p>
+<div class="paragraph">
+<p>Should we strictly adhere to JPA Query Language (JPQL) syntax, or more broadly support all of Hibernate&#8217;s superset (HQL)?</p>
+</div>
+<div class="paragraph">
+<p>Setting this to <code>true</code> may cause valid HQL to throw an exception because it violates the JPQL subset.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.query.startup_check</strong></code> (e.g. <code>true</code> (default value) or <code>false</code>)</dt>
+<dd>
+<p>Should named queries be checked during startup?</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.proc.param_null_passing</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Global setting for whether <code>null</code> parameter bindings should be passed to database procedure/function calls as part of <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/procedure/ProcedureCall.html"><code>ProcedureCall</code></a> handling.
+Implicitly Hibernate will not pass the <code>null</code>, the intention being to allow any default argument values to be applied.</p>
+<div class="paragraph">
+<p>This defines a global setting, which can then be controlled per parameter via <code>org.hibernate.procedure.ParameterRegistration#enablePassingNulls(boolean)</code></p>
+</div>
+<div class="paragraph">
+<p>Values are <code>true</code> (pass the NULLs) or <code>false</code> (do not pass the NULLs).</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.jdbc.log.warnings</strong></code> (e.g. <code>true</code> or <code>false</code>)</dt>
+<dd>
+<p>Enable fetching JDBC statement warning for logging. Default value is given by <code>org.hibernate.dialect.Dialect#isJdbcLogWarningsEnabledByDefault()</code>.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.session_factory.statement_inspector</strong></code> (e.g. A fully-qualified class name, an instance, or a <code>Class</code> object reference)</dt>
+<dd>
+<p>Names a <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/resource/jdbc/spi/StatementInspector.html"><code>StatementInspector</code></a> implementation to be applied to every <code>Session</code> created by the current <code>SessionFactory</code>.</p>
+<div class="paragraph">
+<p>Can reference a
+<code>StatementInspector</code> instance,
+<code>StatementInspector</code> implementation <code>Class</code> reference or
+<code>StatementInspector</code> implementation class name (fully-qualified class name).</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.query.validate_parameters</strong></code> (e.g. <code>true</code> (default value) or <code>false</code>)</dt>
+<dd>
+<p>This configuration property can be used to disable parameters validation performed by <code>org.hibernate.query.Query#setParameter</code> when the the Session is bootstrapped via JPA
+<code>javax.persistence.EntityManagerFactory</code></p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.criteria.literal_handling_mode</strong></code> (e.g. <code>AUTO</code> (default value), <code>BIND</code> or <code>INLINE</code>)</dt>
+<dd>
+<p>By default, Criteria queries uses bind parameters for any literal that is not a numeric value.
+However, to increase the likelihood of JDBC statement caching, you might want to use bind parameters for numeric values too.</p>
+<div class="paragraph">
+<p>The <code>org.hibernate.query.criteria.LiteralHandlingMode#BIND</code> mode will use bind variables for any literal value.
+The <code>org.hibernate.query.criteria.LiteralHandlingMode#INLINE</code> mode will inline literal values as-is.</p>
+</div>
+<div class="paragraph">
+<p>To prevent SQL injection, never use <code>org.hibernate.query.criteria.LiteralHandlingMode#INLINE</code> with String variables.
+Always use constants with the <code>org.hibernate.query.criteria.LiteralHandlingMode#INLINE</code> mode.</p>
+</div>
+<div class="paragraph">
+<p>Valid options are defined by the <code>org.hibernate.query.criteria.LiteralHandlingMode</code> enum.
+The default value is <code>org.hibernate.query.criteria.LiteralHandlingMode#AUTO</code>.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.query.fail_on_pagination_over_collection_fetch</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Raises an exception when in-memory pagination over collection fetch is about to be performed.</p>
+<div class="paragraph">
+<p>Disabled by default. Set to true to enable.</p>
+</div>
+</dd>
+</dl>
+</div>
+<div class="sect3">
+<h4 id="_multi_table_bulk_hql_operations">Multi-table bulk HQL operations</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.hql.bulk_id_strategy</strong></code> (e.g. A fully-qualified class name, an instance, or a <code>Class</code> object reference)</dt>
+<dd>
+<p>Provide a custom <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/hql/spi/id/MultiTableBulkIdStrategy.html"><code>org.hibernate.hql.spi.id.MultiTableBulkIdStrategy</code></a> implementation for handling multi-table bulk HQL operations.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.hql.bulk_id_strategy.global_temporary.drop_tables</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>For databases that don&#8217;t support local tables, but just global ones, this configuration property allows you to DROP the global tables used for multi-table bulk HQL operations when the <code>SessionFactory</code> or the <code>EntityManagerFactory</code> is closed.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.hql.bulk_id_strategy.persistent.drop_tables</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>This configuration property is used by the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/hql/spi/id/persistent/PersistentTableBulkIdStrategy.html"><code>PersistentTableBulkIdStrategy</code></a>, that mimics temporary tables for databases which do not support temporary tables.
+It follows a pattern similar to the ANSI SQL definition of global temporary table using a "session id" column to segment rows from the various sessions.</p>
+<div class="paragraph">
+<p>This configuration property allows you to DROP the tables used for multi-table bulk HQL operations when the <code>SessionFactory</code> or the <code>EntityManagerFactory</code> is closed.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.hql.bulk_id_strategy.persistent.schema</strong></code> (e.g. Database schema name. By default, the <code>hibernate.default_schema</code> is used.)</dt>
+<dd>
+<p>This configuration property is used by the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/hql/spi/id/persistent/PersistentTableBulkIdStrategy.html"><code>PersistentTableBulkIdStrategy</code></a>, that mimics temporary tables for databases which do not support temporary tables.
+It follows a pattern similar to the ANSI SQL definition of global temporary table using a "session id" column to segment rows from the various sessions.</p>
+<div class="paragraph">
+<p>This configuration property defines the database schema used for storing the temporary tables used for bulk HQL operations.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.hql.bulk_id_strategy.persistent.catalog</strong></code> (e.g. Database catalog name. By default, the <code>hibernate.default_catalog</code> is used.)</dt>
+<dd>
+<p>This configuration property is used by the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/hql/spi/id/persistent/PersistentTableBulkIdStrategy.html"><code>PersistentTableBulkIdStrategy</code></a>, that mimics temporary tables for databases which do not support temporary tables.
+It follows a pattern similar to the ANSI SQL definition of global temporary table using a "session id" column to segment rows from the various sessions.</p>
+<div class="paragraph">
+<p>This configuration property defines the database catalog used for storing the temporary tables used for bulk HQL operations.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.legacy_limit_handler</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Setting which indicates whether or not to use <code>org.hibernate.dialect.pagination.LimitHandler</code>
+implementations that sacrifices performance optimizations to allow legacy 4.x limit behavior.</p>
+<div class="paragraph">
+<p>Legacy 4.x behavior favored performing pagination in-memory by avoiding the use of the offset value, which is overall poor performance.
+In 5.x, the limit handler behavior favors performance, thus, if the dialect doesn&#8217;t support offsets, an exception is thrown instead.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.query.conventional_java_constants</strong></code> (e.g. <code>true</code> (default value) or <code>false</code>)</dt>
+<dd>
+<p>Setting which indicates whether or not Java constant follow the <a href="https://docs.oracle.com/javase/tutorial/java/nutsandbolts/variables.html">Java Naming conventions</a>.</p>
+<div class="paragraph">
+<p>Default is <code>true</code>.
+Existing applications may want to disable this (set it <code>false</code>) if non-conventional Java constants are used.
+However, there is a significant performance overhead for using non-conventional Java constants
+since Hibernate cannot determine if aliases should be treated as Java constants or not.</p>
+</div>
+<div class="paragraph">
+<p>Check out <a href="https://hibernate.atlassian.net/browse/HHH-4959">HHH-4959</a> for more details.</p>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configurations-batch">Batching properties</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.jdbc.batch_size</strong></code> (e.g. 5)</dt>
+<dd>
+<p>Maximum JDBC batch size. A nonzero value enables batch updates.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.order_inserts</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Forces Hibernate to order SQL inserts by the primary key value of the items being inserted. This preserves batching when using cascading.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.order_updates</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Forces Hibernate to order SQL updates by the primary key value of the items being updated. This preserves batching when using cascading and reduces the likelihood of transaction deadlocks in highly-concurrent systems.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.jdbc.batch_versioned_data</strong></code> (e.g. <code>true</code>(default value) or <code>false</code>)</dt>
+<dd>
+<p>Should versioned entities be included in batching?</p>
+<div class="paragraph">
+<p>Set this property to <code>true</code> if your JDBC driver returns correct row counts from executeBatch(). This option is usually safe, but is disabled by default. If enabled, Hibernate uses batched DML for automatically versioned data.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.batch_fetch_style</strong></code> (e.g. <code>LEGACY</code>(default value))</dt>
+<dd>
+<p>Names the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/loader/BatchFetchStyle.html"><code>BatchFetchStyle</code></a> to use.</p>
+<div class="paragraph">
+<p>Can specify either the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/loader/BatchFetchStyle.html"><code>BatchFetchStyle</code></a> name (insensitively), or a <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/loader/BatchFetchStyle.html"><code>BatchFetchStyle</code></a> instance. <code>LEGACY}</code> is the default value.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.jdbc.batch.builder</strong></code> (e.g. The fully qualified name of an <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/engine/jdbc/batch/spi/BatchBuilder.html"><code>BatchBuilder</code></a> implementation class type or an actual object instance)</dt>
+<dd>
+<p>Names the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/engine/jdbc/batch/spi/BatchBuilder.html"><code>BatchBuilder</code></a> implementation to use.</p>
+</dd>
+</dl>
+</div>
+<div class="sect3">
+<h4 id="configurations-database-fetch">Fetching properties</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.max_fetch_depth</strong></code> (e.g. A value between <code>0</code> and <code>3</code>)</dt>
+<dd>
+<p>Sets a maximum depth for the outer join fetch tree for single-ended associations. A single-ended association is a one-to-one or many-to-one assocation. A value of <code>0</code> disables default outer join fetching.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.default_batch_fetch_size</strong></code> (e.g. <code>4</code>,<code>8</code>, or <code>16</code>)</dt>
+<dd>
+<p>Default size for Hibernate Batch fetching of associations (lazily fetched associations can be fetched in batches to prevent N+1 query problems).</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.jdbc.fetch_size</strong></code> (e.g. <code>0</code> or an integer)</dt>
+<dd>
+<p>A non-zero value determines the JDBC fetch size, by calling <code>Statement.setFetchSize()</code>.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.jdbc.use_scrollable_resultset</strong></code> (e.g. <code>true</code> or <code>false</code>)</dt>
+<dd>
+<p>Enables Hibernate to use JDBC2 scrollable resultsets. This property is only relevant for user-supplied JDBC connections. Otherwise, Hibernate uses connection metadata.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.jdbc.use_streams_for_binary</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Use streams when writing or reading <code>binary</code> or <code>serializable</code> types to or from JDBC. This is a system-level property.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.jdbc.use_get_generated_keys</strong></code> (e.g. <code>true</code> or <code>false</code>)</dt>
+<dd>
+<p>Allows Hibernate to use JDBC3 <code>PreparedStatement.getGeneratedKeys()</code> to retrieve natively-generated keys after insert. You need the JDBC3+ driver and JRE1.4+. Disable this property if your driver has problems with the Hibernate identifier generators. By default, it tries to detect the driver capabilities from connection metadata.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.jdbc.wrap_result_sets</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Enable wrapping of JDBC result sets in order to speed up column name lookups for broken JDBC drivers.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.enable_lazy_load_no_trans</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Initialize Lazy Proxies or Collections outside a given Transactional Persistence Context.</p>
+<div class="paragraph">
+<p>Although enabling this configuration can make <code>LazyInitializationException</code> go away, it&#8217;s better to use a fetch plan that guarantees that all properties are properly initialised before the Session is closed.</p>
+</div>
+<div class="paragraph">
+<p>In reality, you shouldn&#8217;t probably enable this setting anyway.</p>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configurations-logging">Statement logging and statistics</h3>
+<div class="sect3">
+<h4 id="_sql_statement_logging">SQL statement logging</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.show_sql</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Write all SQL statements to the console. This is an alternative to setting the log category <code>org.hibernate.SQL</code> to debug.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.format_sql</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Pretty-print the SQL in the log and console.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.use_sql_comments</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>If true, Hibernate generates comments inside the SQL, for easier debugging.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_statistics_settings">Statistics settings</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.generate_statistics</strong></code> (e.g. <code>true</code> or <code>false</code>)</dt>
+<dd>
+<p>Causes Hibernate to collect statistics for performance tuning.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.stats.factory</strong></code> (e.g. the fully qualified name of an <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/stat/spi/StatisticsFactory.html"><code>StatisticsFactory</code></a> implementation or an actual instance)</dt>
+<dd>
+<p>The <code>StatisticsFactory</code> allow you to customize how the Hibernate Statistics are being collected.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.session.events.log</strong></code> (e.g. <code>true</code> or <code>false</code>)</dt>
+<dd>
+<p>A setting to control whether the <code>org.hibernate.engine.internal.StatisticalLoggingSessionEventListener</code> is enabled on all <code>Sessions</code> (unless explicitly disabled for a given <code>Session</code>).</p>
+<div class="paragraph">
+<p>The default value of this setting is determined by the value for <code>hibernate.generate_statistics</code>, meaning that if statistics are enabled, then logging of Session metrics is enabled by default too.</p>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configurations-cache">Cache Properties</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.cache.region.factory_class</strong></code> (e.g. <code>org.hibernate.cache.infinispan.InfinispanRegionFactory</code>)</dt>
+<dd>
+<p>The fully-qualified name of the <code>RegionFactory</code> implementation class.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.cache.default_cache_concurrency_strategy</strong></code></dt>
+<dd>
+<p>Setting used to give the name of the default <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/annotations/CacheConcurrencyStrategy.html"><code>CacheConcurrencyStrategy</code></a> to use
+when either <code>@javax.persistence.Cacheable</code> or <code>@org.hibernate.annotations.Cache</code>.  <code>@org.hibernate.annotations.Cache</code> is used to override the global setting.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.cache.use_minimal_puts</strong></code> (e.g. <code>true</code> (default value) or <code>false</code>)</dt>
+<dd>
+<p>Optimizes second-level cache operation to minimize writes, at the cost of more frequent reads. This is most useful for clustered caches and is enabled by default for clustered cache implementations.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.cache.use_query_cache</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Enables the query cache. You still need to set individual queries to be cachable.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.cache.use_second_level_cache</strong></code> (e.g. <code>true</code> (default value) or <code>false</code>)</dt>
+<dd>
+<p>Enable/disable the second level cache, which is enabled by default, although the default <code>RegionFactor</code> is <code>NoCachingRegionFactory</code> (meaning there is no actual caching implementation).</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.cache.query_cache_factory</strong></code> (e.g. Fully-qualified classname)</dt>
+<dd>
+<p>A custom <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/cache/spi/QueryCacheFactory.html"><code>QueryCacheFactory</code></a> interface. The default is the built-in <code>StandardQueryCacheFactory</code>.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.cache.region_prefix</strong></code> (e.g. A string)</dt>
+<dd>
+<p>A prefix for second-level cache region names.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.cache.use_structured_entries</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Forces Hibernate to store data in the second-level cache in a more human-readable format.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.cache.auto_evict_collection_cache</strong></code> (e.g. <code>true</code> or <code>false</code> (default: false))</dt>
+<dd>
+<p>Enables the automatic eviction of a bi-directional association&#8217;s collection cache when an element in the <code>ManyToOne</code> collection is added/updated/removed without properly managing the change on the <code>OneToMany</code> side.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.cache.use_reference_entries</strong></code> (e.g. <code>true</code> or <code>false</code>)</dt>
+<dd>
+<p>Optimizes second-level cache operation to store immutable entities (aka "reference") which do not have associations into cache directly, this case, lots of disasseble and deep copy operations can be avoid. Default value of this property is <code>false</code>.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.ejb.classcache</strong></code> (e.g. <code>hibernate.ejb.classcache.org.hibernate.ejb.test.Item</code> = <code>read-write</code>)</dt>
+<dd>
+<p>Sets the associated entity class cache concurrency strategy for the designated region. Caching configuration should follow the following pattern <code>hibernate.ejb.classcache.&lt;fully.qualified.Classname&gt;</code> usage[, region] where usage is the cache strategy used and region the cache region name.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.ejb.collectioncache</strong></code> (e.g. <code>hibernate.ejb.collectioncache.org.hibernate.ejb.test.Item.distributors</code> = <code>read-write, RegionName</code>)</dt>
+<dd>
+<p>Sets the associated collection cache concurrency strategy for the designated region. Caching configuration should follow the following pattern <code>hibernate.ejb.collectioncache.&lt;fully.qualified.Classname&gt;.&lt;role&gt;</code> usage[, region] where usage is the cache strategy used and region the cache region name</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configurations-infinispan">Infinispan properties</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.cache.infinispan.cfg</strong></code> (e.g. <code>org/hibernate/cache/infinispan/builder/infinispan-configs.xml</code>)</dt>
+<dd>
+<p>Classpath or filesystem resource containing the Infinispan configuration settings.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.cache.infinispan.statistics</strong></code></dt>
+<dd>
+<p>Property name that controls whether Infinispan statistics are enabled. The property value is expected to be a boolean true or false, and it overrides statistic configuration in base Infinispan configuration, if provided.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.cache.infinispan.use_synchronization</strong></code></dt>
+<dd>
+<p>Deprecated setting because Infinispan is designed to always register a <code>Synchronization</code> for <code>TRANSACTIONAL</code> caches.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.cache.infinispan.cachemanager</strong></code> (e.g. There is no default value, the user must specify the property.)</dt>
+<dd>
+<p>Specifies the JNDI name under which the <code>EmbeddedCacheManager</code> is bound.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configurations-transactions">Transactions properties</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.transaction.jta.platform</strong></code> (e.g. <code>JBossAS</code>, <code>BitronixJtaPlatform</code>)</dt>
+<dd>
+<p>Names the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/engine/transaction/jta/platform/spi/JtaPlatform.html"><code>JtaPlatform</code></a> implementation to use for integrating with JTA systems.
+Can reference either a <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/engine/transaction/jta/platform/spi/JtaPlatform.html"><code>JtaPlatform</code></a> instance or the name of the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/engine/transaction/jta/platform/spi/JtaPlatform.html"><code>JtaPlatform</code></a> implementation class</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.jta.prefer_user_transaction</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Should we prefer using the <code>org.hibernate.engine.transaction.jta.platform.spi.JtaPlatform#retrieveUserTransaction</code> over using <code>org.hibernate.engine.transaction.jta.platform.spi.JtaPlatform#retrieveTransactionManager</code></p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.transaction.jta.platform_resolver</strong></code></dt>
+<dd>
+<p>Names the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/engine/transaction/jta/platform/spi/JtaPlatformResolver.html"><code>JtaPlatformResolver</code></a> implementation to use.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.jta.cacheTransactionManager</strong></code> (e.g. <code>true</code> (default value) or <code>false</code>)</dt>
+<dd>
+<p>A configuration value key used to indicate that it is safe to cache.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.jta.cacheUserTransaction</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>A configuration value key used to indicate that it is safe to cache.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.transaction.flush_before_completion</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Causes the session be flushed during the before completion phase of the transaction. If possible, use built-in and automatic session context management instead.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.transaction.auto_close_session</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Causes the session to be closed during the after completion phase of the transaction. If possible, use built-in and automatic session context management instead.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.transaction.coordinator_class</strong></code></dt>
+<dd>
+<p>Names the implementation of <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/resource/transaction/spi/TransactionCoordinatorBuilder.html"><code>TransactionCoordinatorBuilder</code></a> to use for creating <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/resource/transaction/spi/TransactionCoordinator.html"><code>TransactionCoordinator</code></a> instances.</p>
+<div class="paragraph">
+<p>Can be a`TransactionCoordinatorBuilder` instance, <code>TransactionCoordinatorBuilder</code> implementation <code>Class</code> reference, a <code>TransactionCoordinatorBuilder</code> implementation class name (fully-qualified name) or a short name.</p>
+</div>
+<div class="paragraph">
+<p>The following short names are defined for this setting:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>jdbc</code></dt>
+<dd>
+<p>Manages transactions via calls to <code>java.sql.Connection</code> (default for non-JPA applications)</p>
+</dd>
+<dt class="hdlist1"><code>jta</code></dt>
+<dd>
+<p>Manages transactions via JTA. See <a href="chapters/bootstrap/Bootstrap.html#bootstrap-jpa-compliant">Java EE bootstrapping</a></p>
+<div class="paragraph">
+<p>If a JPA application does not provide a setting for <code>hibernate.transaction.coordinator_class</code>, Hibernate will
+automatically build the proper transaction coordinator based on the transaction type for the persistence unit.</p>
+</div>
+<div class="paragraph">
+<p>If a non-JPA application does not provide a setting for <code>hibernate.transaction.coordinator_class</code>, Hibernate
+will use <code>jdbc</code> as the default. This default will cause problems if the application actually uses JTA-based transactions.
+A non-JPA application that uses JTA-based transactions should explicitly set <code>hibernate.transaction.coordinator_class=jta</code>
+or provide a custom <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/resource/transaction/TransactionCoordinatorBuilder.html"><code>TransactionCoordinatorBuilder</code></a> that builds a <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/resource/transaction/TransactionCoordinator.html"><code>TransactionCoordinator</code></a> that properly coordinates with JTA-based transactions.</p>
+</div>
+</dd>
+</dl>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.jta.track_by_thread</strong></code> (e.g. <code>true</code> (default value) or <code>false</code>)</dt>
+<dd>
+<p>A transaction can be rolled back by another thread ("tracking by thread") and not the original application.
+Examples of this include a JTA transaction timeout handled by a background reaper thread.</p>
+<div class="paragraph">
+<p>The ability to handle this situation requires checking the Thread ID every time Session is called, so enabling this can certainly have a performance impact.</p>
+</div>
+</dd>
+<dt class="hdlist1"><span class="line-through"><code><strong>hibernate.transaction.factory_class</strong></code></span></dt>
+<dd>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+This is a legacy setting that&#8217;s been deprecated and you should use the <code>hibernate.transaction.jta.platform</code> instead.
+</td>
+</tr>
+</table>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.jta.allowTransactionAccess</strong></code>(e.g. <code>true</code> (default value) or <code>false</code>)</dt>
+<dd>
+<p>It allows access to the underlying <code>org.hibernate.Transaction</code> even when using JTA
+since the JPA specification prohibits this behavior.</p>
+<div class="paragraph">
+<p>If this configuration property is set to <code>true</code>, access is granted to the underlying <code>org.hibernate.Transaction</code>.
+If it&#8217;s set to <code>false</code>, you won&#8217;t be able to access the <code>org.hibernate.Transaction</code>.</p>
+</div>
+<div class="paragraph">
+<p>The default behavior is to allow access unless the <code>Session</code> is bootstrapped via JPA.</p>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configurations-multi-tenancy">Multi-tenancy settings</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.multiTenancy</strong></code> (e.g. <code>NONE</code> (default value), <code>SCHEMA</code>, <code>DATABASE</code>, and <code>DISCRIMINATOR</code> (not implemented yet))</dt>
+<dd>
+<p>The multi-tenancy strategy in use.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.multi_tenant_connection_provider</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Names a <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/engine/jdbc/connections/spi/MultiTenantConnectionProvider.html"><code>MultiTenantConnectionProvider</code></a> implementation to use. As <code>MultiTenantConnectionProvider</code> is also a service, can be configured directly through the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/boot/registry/StandardServiceRegistryBuilder.html"><code>StandardServiceRegistryBuilder</code></a>.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.tenant_identifier_resolver</strong></code></dt>
+<dd>
+<p>Names a <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/context/spi/CurrentTenantIdentifierResolver.html"><code>CurrentTenantIdentifierResolver</code></a> implementation to resolve the resolve the current tenant identifier so that calling <code>SessionFactory#openSession()</code> would get a <code>Session</code> that&#8217;s connected to the right tenant.</p>
+<div class="paragraph">
+<p>Can be a <code>CurrentTenantIdentifierResolver</code> instance, <code>CurrentTenantIdentifierResolver</code> implementation <code>Class</code> object reference or a <code>CurrentTenantIdentifierResolver</code> implementation class name.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.multi_tenant.datasource.identifier_for_any</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>When the <code>hibernate.connection.datasource</code> property value is resolved to a <code>javax.naming.Context</code> object, this configuration property defines the JNDI name used to locate the <code>DataSource</code> used for fetching the initial <code>Connection</code> which is used to access to the database metadata of the underlying database(s) (in situations where we do not have a tenant id, like startup processing).</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configurations-hbmddl">Automatic schema generation</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.hbm2ddl.auto</strong></code> (e.g. <code>none</code> (default value), <code>create-only</code>, <code>drop</code>, <code>create</code>, <code>create-drop</code>, <code>validate</code>, and <code>update</code>)</dt>
+<dd>
+<p>Setting to perform <code>SchemaManagementTool</code> actions automatically as part of the <code>SessionFactory</code> lifecycle.
+Valid options are defined by the <code>externalHbm2ddlName</code> value of the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/tool/schema/Action.html"><code>Action</code></a> enum:</p>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>none</code></dt>
+<dd>
+<p>No action will be performed.</p>
+</dd>
+<dt class="hdlist1"><code>create-only</code></dt>
+<dd>
+<p>Database creation will be generated.</p>
+</dd>
+<dt class="hdlist1"><code>drop</code></dt>
+<dd>
+<p>Database dropping will be generated.</p>
+</dd>
+<dt class="hdlist1"><code>create</code></dt>
+<dd>
+<p>Database dropping will be generated followed by database creation.</p>
+</dd>
+<dt class="hdlist1"><code>create-drop</code></dt>
+<dd>
+<p>Drop the schema and recreate it on SessionFactory startup.  Additionally, drop the schema on SessionFactory shutdown.</p>
+</dd>
+<dt class="hdlist1"><code>validate</code></dt>
+<dd>
+<p>Validate the database schema</p>
+</dd>
+<dt class="hdlist1"><code>update</code></dt>
+<dd>
+<p>Update the database schema</p>
+</dd>
+</dl>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>javax.persistence.schema-generation.database.action</strong></code> (e.g. <code>none</code> (default value), <code>create-only</code>, <code>drop</code>, <code>create</code>, <code>create-drop</code>, <code>validate</code>, and <code>update</code>)</dt>
+<dd>
+<p>Setting to perform <code>SchemaManagementTool</code> actions automatically as part of the <code>SessionFactory</code> lifecycle.
+Valid options are defined by the <code>externalJpaName</code> value of the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/tool/schema/Action.html"><code>Action</code></a> enum:</p>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>none</code></dt>
+<dd>
+<p>No action will be performed.</p>
+</dd>
+<dt class="hdlist1"><code>create</code></dt>
+<dd>
+<p>Database creation will be generated.</p>
+</dd>
+<dt class="hdlist1"><code>drop</code></dt>
+<dd>
+<p>Database dropping will be generated.</p>
+</dd>
+<dt class="hdlist1"><code>drop-and-create</code></dt>
+<dd>
+<p>Database dropping will be generated followed by database creation.</p>
+</dd>
+</dl>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>javax.persistence.schema-generation.scripts.action</strong></code> (e.g. <code>none</code> (default value), <code>create-only</code>, <code>drop</code>, <code>create</code>, <code>create-drop</code>, <code>validate</code>, and <code>update</code>)</dt>
+<dd>
+<p>Setting to perform <code>SchemaManagementTool</code> actions writing the commands into a DDL script file.
+Valid options are defined by the <code>externalJpaName</code> value of the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/tool/schema/Action.html"><code>Action</code></a> enum:</p>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>none</code></dt>
+<dd>
+<p>No action will be performed.</p>
+</dd>
+<dt class="hdlist1"><code>create</code></dt>
+<dd>
+<p>Database creation will be generated.</p>
+</dd>
+<dt class="hdlist1"><code>drop</code></dt>
+<dd>
+<p>Database dropping will be generated.</p>
+</dd>
+<dt class="hdlist1"><code>drop-and-create</code></dt>
+<dd>
+<p>Database dropping will be generated followed by database creation.</p>
+</dd>
+</dl>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>javax.persistence.schema-generation-connection</strong></code></dt>
+<dd>
+<p>Allows passing a specific <code>java.sql.Connection</code> instance to be used by <code>SchemaManagementTool</code></p>
+</dd>
+<dt class="hdlist1"><code><strong>javax.persistence.database-product-name</strong></code></dt>
+<dd>
+<p>Specifies the name of the database provider in cases where a Connection to the underlying database is not available (aka, mainly in generating scripts).
+In such cases, a value for this setting <em>must</em> be specified.</p>
+<div class="paragraph">
+<p>The value of this setting is expected to match the value returned by <code>java.sql.DatabaseMetaData#getDatabaseProductName()</code> for the target database.</p>
+</div>
+<div class="paragraph">
+<p>Additionally, specifying <code>javax.persistence.database-major-version</code> and/or <code>javax.persistence.database-minor-version</code> may be required to understand exactly how to generate the required schema commands.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>javax.persistence.database-major-version</strong></code></dt>
+<dd>
+<p>Specifies the major version of the underlying database, as would be returned by <code>java.sql.DatabaseMetaData#getDatabaseMajorVersion</code> for the target database.</p>
+<div class="paragraph">
+<p>This value is used to help more precisely determine how to perform schema generation tasks for the underlying database in cases where <code>javax.persistence.database-product-name</code> does not provide enough distinction.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>javax.persistence.database-minor-version</strong></code></dt>
+<dd>
+<p>Specifies the minor version of the underlying database, as would be returned by <code>java.sql.DatabaseMetaData#getDatabaseMinorVersion</code> for the target database.</p>
+<div class="paragraph">
+<p>This value is used to help more precisely determine how to perform schema generation tasks for the underlying database in cases where <code>javax.persistence.database-product-name</code> and <code>javax.persistence.database-major-version</code> does not provide enough distinction.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>javax.persistence.schema-generation.create-source</strong></code></dt>
+<dd>
+<p>Specifies whether schema generation commands for schema creation are to be determine based on object/relational mapping metadata, DDL scripts, or a combination of the two.
+See <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/tool/schema/SourceType.html"><code>SourceType</code></a> for valid set of values.</p>
+<div class="paragraph">
+<p>If no value is specified, a default is assumed as follows:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>if source scripts are specified (per <code>javax.persistence.schema-generation.create-script-source</code>), then <code>scripts</code> is assumed</p>
+</li>
+<li>
+<p>otherwise, <code>metadata</code> is assumed</p>
+</li>
+</ul>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>javax.persistence.schema-generation.drop-source</strong></code></dt>
+<dd>
+<p>Specifies whether schema generation commands for schema dropping are to be determine based on object/relational mapping metadata, DDL scripts, or a combination of the two.
+See <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/tool/schema/SourceType.html"><code>SourceType</code></a> for valid set of values.</p>
+<div class="paragraph">
+<p>If no value is specified, a default is assumed as follows:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>if source scripts are specified (per <code>javax.persistence.schema-generation.create-script-source</code>), then <code>scripts</code> is assumed</p>
+</li>
+<li>
+<p>otherwise, <code>metadata</code> is assumed</p>
+</li>
+</ul>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>javax.persistence.schema-generation.create-script-source</strong></code></dt>
+<dd>
+<p>Specifies the <code>create</code> script file as either a <code>java.io.Reader</code> configured for reading of the DDL script file or a string designating a file <code>java.net.URL</code> for the DDL script.</p>
+<div class="paragraph">
+<p>Hibernate historically also accepted <code>hibernate.hbm2ddl.import_files</code> for a similar purpose, but <code>javax.persistence.schema-generation.create-script-source</code> should be preferred over <code>hibernate.hbm2ddl.import_files</code>.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>javax.persistence.schema-generation.drop-script-source</strong></code></dt>
+<dd>
+<p>Specifies the <code>drop</code> script file as either a <code>java.io.Reader</code> configured for reading of the DDL script file or a string designating a file <code>java.net.URL</code> for the DDL script.</p>
+</dd>
+<dt class="hdlist1"><code><strong>javax.persistence.schema-generation.scripts.create-target</strong></code></dt>
+<dd>
+<p>For cases where the <code>javax.persistence.schema-generation.scripts.action</code> value indicates that schema creation commands should be written to DDL script file, <code>javax.persistence.schema-generation.scripts.create-target</code> specifies either a <code>java.io.Writer</code> configured for output of the DDL script or a string specifying the file URL for the DDL script.</p>
+</dd>
+<dt class="hdlist1"><code><strong>javax.persistence.schema-generation.scripts.drop-target</strong></code></dt>
+<dd>
+<p>For cases where the <code>javax.persistence.schema-generation.scripts.action</code> value indicates that schema dropping commands should be written to DDL script file, <code>javax.persistence.schema-generation.scripts.drop-target</code> specifies either a <code>java.io.Writer</code> configured for output of the DDL script or a string specifying the file URL for the DDL script.</p>
+</dd>
+<dt class="hdlist1"><code><strong>javax.persistence.hibernate.hbm2ddl.import_files</strong></code> (e.g. <code>import.sql</code> (default value))</dt>
+<dd>
+<p>Comma-separated names of the optional files containing SQL DML statements executed during the <code>SessionFactory</code> creation.
+File order matters, the statements of a give file are executed before the statements of the following one.</p>
+<div class="paragraph">
+<p>These statements are only executed if the schema is created, meaning that <code>hibernate.hbm2ddl.auto</code> is set to <code>create</code>, <code>create-drop</code>, or <code>update</code>.
+<code>javax.persistence.schema-generation.create-script-source</code> / <code>javax.persistence.schema-generation.drop-script-source</code> should be preferred.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>javax.persistence.sql-load-script-source</strong></code></dt>
+<dd>
+<p>JPA variant of <code>hibernate.hbm2ddl.import_files</code>. Specifies a <code>java.io.Reader</code> configured for reading of the SQL load script or a string designating the file <code>java.net.URL</code> for the SQL load script.
+A "SQL load script" is a script that performs some database initialization (INSERT, etc).</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.hbm2ddl.import_files_sql_extractor</strong></code></dt>
+<dd>
+<p>Reference to the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/tool/hbm2ddl/ImportSqlCommandExtractor.html"><code>ImportSqlCommandExtractor</code></a> implementation class to use for parsing source/import files as defined by <code>javax.persistence.schema-generation.create-script-source</code>,
+<code>javax.persistence.schema-generation.drop-script-source</code> or <code>hibernate.hbm2ddl.import_files</code>.</p>
+<div class="paragraph">
+<p>Reference may refer to an instance, a Class implementing <code>ImportSqlCommandExtractor</code> of the fully-qualified name of the <code>ImportSqlCommandExtractor</code> implementation.
+If the fully-qualified name is given, the implementation must provide a no-arg constructor.</p>
+</div>
+<div class="paragraph">
+<p>The default value is <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/tool/hbm2ddl/SingleLineSqlCommandExtractor.html"><code>SingleLineSqlCommandExtractor</code></a>.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.hbm2dll.create_namespaces</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Specifies whether to automatically create also the database schema/catalog.</p>
+</dd>
+<dt class="hdlist1"><code><strong>javax.persistence.create-database-schemas</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>The JPA variant of <code>hibernate.hbm2dll.create_namespaces</code>. Specifies whether the persistence provider is to create the database schema(s) in addition to creating database objects (tables, sequences, constraints, etc).
+The value of this boolean property should be set to <code>true</code> if the persistence provider is to create schemas in the database or to generate DDL that contains "CREATE SCHEMA" commands.</p>
+<div class="paragraph">
+<p>If this property is not supplied (or is explicitly <code>false</code>), the provider should not attempt to create database schemas.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.hbm2ddl.schema_filter_provider</strong></code></dt>
+<dd>
+<p>Used to specify the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/tool/schema/spi/SchemaFilterProvider.html"><code>SchemaFilterProvider</code></a> to be used by <code>create</code>, <code>drop</code>, <code>migrate</code>, and <code>validate</code> operations on the database schema.
+<code>SchemaFilterProvider</code> provides filters that can be used to limit the scope of these operations to specific namespaces, tables and sequences. All objects are included by default.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.hbm2ddl.jdbc_metadata_extraction_strategy</strong></code> (e.g. <code>grouped</code> (default value) or <code>individually</code>)</dt>
+<dd>
+<p>Setting to choose the strategy used to access the JDBC Metadata.
+Valid options are defined by the <code>strategy</code> value of the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/tool/schema/JdbcMetadaAccessStrategy.html"><code>JdbcMetadaAccessStrategy</code></a> enum:</p>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>grouped</code></dt>
+<dd>
+<p><a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/tool/schema/spi/SchemaMigrator.html"><code>SchemaMigrator</code></a> and <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/tool/schema/spi/SchemaValidator.html"><code>SchemaValidator</code></a> execute a single <code>java.sql.DatabaseMetaData#getTables(String, String, String, String[])</code> call to retrieve all the database table in order to determine if all the <code>javax.persistence.Entity</code> have a corresponding mapped database tables.This strategy may require <code>hibernate.default_schema</code> and/or <code>hibernate.default_catalog</code> to be provided.</p>
+</dd>
+<dt class="hdlist1"><code>individually</code></dt>
+<dd>
+<p><a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/tool/schema/spi/SchemaMigrator.html"><code>SchemaMigrator</code></a> and <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/tool/schema/spi/SchemaValidator.html"><code>SchemaValidator</code></a> execute one <code>java.sql.DatabaseMetaData#getTables(String, String, String, String[])</code> call for each <code>javax.persistence.Entity</code> in order to determine if a corresponding database table exists.</p>
+</dd>
+</dl>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.hbm2ddl.delimiter</strong></code> (e.g. <code>;</code>)</dt>
+<dd>
+<p>Identifies the delimiter to use to separate schema management statements in script outputs.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.schema_management_tool</strong></code> (e.g. A schema name)</dt>
+<dd>
+<p>Used to specify the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/tool/schema/spi/SchemaManagementTool.html"><code>SchemaManagementTool</code></a> to use for performing schema management. The default is to use <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/tool/schema/internal/HibernateSchemaManagementTool.html"><code>HibernateSchemaManagementTool</code></a></p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.synonyms</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>If enabled, allows schema update and validation to support synonyms. Due to the possibility that this would return duplicate tables (especially in Oracle), this is disabled by default.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.hbm2dll.extra_physical_table_types</strong></code> (e.g. <code>BASE TABLE</code>)</dt>
+<dd>
+<p>Identifies a comma-separated list of values to specify extra table types, other than the default <code>TABLE</code> value, to recognize as defining a physical table by schema update, creation and validation.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.schema_update.unique_constraint_strategy</strong></code> (e.g. <code>DROP_RECREATE_QUIETLY</code>, <code>RECREATE_QUIETLY</code>, <code>SKIP</code>)</dt>
+<dd>
+<p>Unique columns and unique keys both use unique constraints in most dialects.
+<code>SchemaUpdate</code> needs to create these constraints, but DBs support for finding existing constraints is extremely inconsistent.
+Further, non-explicitly-named unique constraints use randomly generated characters.</p>
+<div class="paragraph">
+<p>Therefore, the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/tool/hbm2ddl/UniqueConstraintSchemaUpdateStrategy.html"><code>UniqueConstraintSchemaUpdateStrategy</code></a> offers the following options:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>DROP_RECREATE_QUIETLY</code></dt>
+<dd>
+<p>Default option.
+Attempt to drop, then (re-)create each unique constraint. Ignore any exceptions being thrown.</p>
+</dd>
+<dt class="hdlist1"><code>RECREATE_QUIETLY</code></dt>
+<dd>
+<p>Attempts to (re-)create unique constraints, ignoring exceptions thrown if the constraint already existed</p>
+</dd>
+<dt class="hdlist1"><code>SKIP</code></dt>
+<dd>
+<p>Does not attempt to create unique constraints on a schema update.</p>
+</dd>
+</dl>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.hbm2ddl.charset_name</strong></code> (e.g. <code>Charset.defaultCharset()</code>)</dt>
+<dd>
+<p>Defines the charset (encoding) used for all input/output schema generation resources. By default, Hibernate uses the default charset given by <code>Charset.defaultCharset()</code>. This configuration property allows you to override the default JVM setting so that you can specify which encoding is used when reading and writing schema generation resources (e.g. File, URL).</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.hbm2ddl.halt_on_error</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Whether the schema migration tool should halt on error, therefore terminating the bootstrap process. By default, the <code>EntityManagerFactory</code> or <code>SessionFactory</code> are created even if the schema migration throws exceptions. To prevent this default behavior, set this property value to <code>true</code>.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configurations-exception-handling">Exception handling</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.jdbc.sql_exception_converter</strong></code> (e.g. Fully-qualified name of class implementing <code>SQLExceptionConverter</code>)</dt>
+<dd>
+<p>The <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/exception/spi/SQLExceptionConverter.html"><code>SQLExceptionConverter</code></a> to use for converting <code>SQLExceptions</code> to Hibernate&#8217;s <code>JDBCException</code> hierarchy. The default is to use the configured <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/dialect/Dialect.html"><code>Dialect</code></a>'s preferred <code>SQLExceptionConverter</code>.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configurations-session-events">Session events</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.session.events.auto</strong></code></dt>
+<dd>
+<p>Fully qualified class name implementing the <code>SessionEventListener</code> interface.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.session_factory.interceptor</strong></code> (e.g. <code>org.hibernate.EmptyInterceptor</code> (default value))</dt>
+<dd>
+<p>Names a <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/Interceptor"><code>Interceptor</code></a> implementation to be applied to every <code>Session</code> created by the current <code>org.hibernate.SessionFactory</code></p>
+<div class="paragraph">
+<p>Can reference:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>Interceptor</code> instance</p>
+</li>
+<li>
+<p><code>Interceptor</code> implementation <code>Class</code> object reference</p>
+</li>
+<li>
+<p><code>Interceptor</code> implementation class name</p>
+</li>
+</ul>
+</div>
+</dd>
+<dt class="hdlist1"><span class="line-through"><code><strong>hibernate.ejb.interceptor</strong></code></span> (e.g. <code>hibernate.session_factory.interceptor</code> (default value))</dt>
+<dd>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+Deprecated setting. Use <code>hibernate.session_factory.session_scoped_interceptor</code> instead.
+</td>
+</tr>
+</table>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.session_factory.session_scoped_interceptor</strong></code> (e.g. fully-qualified class name or class reference)</dt>
+<dd>
+<p>Names a <code>org.hibernate.Interceptor</code> implementation to be applied to the <code>org.hibernate.SessionFactory</code> and propagated to each <code>Session</code> created from the <code>SessionFactory</code>.</p>
+<div class="paragraph">
+<p>This setting identifies an <code>Interceptor</code> implementation that is to be applied to every <code>Session</code> opened from the <code>SessionFactory</code>,
+but unlike <code>hibernate.session_factory.interceptor</code>, a unique instance of the <code>Interceptor</code> is
+used for each <code>Session</code>.</p>
+</div>
+<div class="paragraph">
+<p>Can reference:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>Interceptor</code> instance</p>
+</li>
+<li>
+<p><code>Interceptor</code> implementation <code>Class</code> object reference</p>
+</li>
+<li>
+<p><code>java.util.function.Supplier</code> instance which is used to retrieve the <code>Interceptor</code> instance.</p>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Specifically, this setting cannot name an <code>Interceptor</code> instance.
+</td>
+</tr>
+</table>
+</div>
+</li>
+</ul>
+</div>
+</dd>
+<dt class="hdlist1"><span class="line-through"><code><strong>hibernate.ejb.interceptor.session_scoped</strong></code></span> (e.g. fully-qualified class name or class reference)</dt>
+<dd>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+Deprecated setting. Use <code>hibernate.session_factory.session_scoped_interceptor</code> instead.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>An optional Hibernate interceptor.</p>
+</div>
+<div class="paragraph">
+<p>The interceptor instance is specific to a given Session instance (and hence is not thread-safe) has to implement <code>org.hibernate.Interceptor</code> and have a no-arg constructor.</p>
+</div>
+<div class="paragraph">
+<p>This property cannot be combined with <code>hibernate.ejb.interceptor</code>.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.ejb.session_factory_observer</strong></code> (e.g. fully-qualified class name or class reference)</dt>
+<dd>
+<p>Specifies a <code>SessionFactoryObserver</code> to be applied to the SessionFactory. The class must have a no-arg constructor.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.ejb.event</strong></code> (e.g. <code>hibernate.ejb.event.pre-load</code> = <code>com.acme.SecurityListener,com.acme.AuditListener</code>)</dt>
+<dd>
+<p>Event listener list for a given event type. The list of event listeners is a comma separated fully qualified class name list.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configurations-jmx">JMX settings</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.jmx.enabled</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Enable JMX.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.jmx.usePlatformServer</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Uses the platform MBeanServer as returned by <code>ManagementFactory#getPlatformMBeanServer()</code>.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.jmx.agentId</strong></code></dt>
+<dd>
+<p>The agent identifier of the associated <code>MBeanServer</code>.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.jmx.defaultDomain</strong></code></dt>
+<dd>
+<p>The domain name of the associated <code>MBeanServer</code>.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.jmx.sessionFactoryName</strong></code></dt>
+<dd>
+<p>The <code>SessionFactory</code> name appended to the object name the Manageable Bean is registered with. If null, the <code>hibernate.session_factory_name</code> configuration value is used.</p>
+</dd>
+<dt class="hdlist1"><code><strong>org.hibernate.core</strong></code></dt>
+<dd>
+<p>The default object domain appended to the object name the Manageable Bean is registered with.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configurations-jacc">JACC settings</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.jacc.enabled</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Is JACC enabled?</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.jacc</strong></code> (e.g. <code>hibernate.jacc.allowed.org.jboss.ejb3.test.jacc.AllEntity</code>)</dt>
+<dd>
+<p>The property name defines the role (e.g. <code>allowed</code>) and the entity class name (e.g. <code>org.jboss.ejb3.test.jacc.AllEntity</code>), while the property value defines the authorized actions (e.g. <code>insert,update,read</code>).</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.jacc_context_id</strong></code></dt>
+<dd>
+<p>A String identifying the policy context whose PolicyConfiguration interface is to be returned. The value passed to this parameter must not be null.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configurations-misc">ClassLoaders properties</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.classLoaders</strong></code></dt>
+<dd>
+<p>Used to define a <code>java.util.Collection&lt;ClassLoader&gt;</code> or the <code>ClassLoader</code> instance Hibernate should use for class-loading and resource-lookups.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.classLoader.application</strong></code></dt>
+<dd>
+<p>Names the <code>ClassLoader</code> used to load user application classes.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.classLoader.resources</strong></code></dt>
+<dd>
+<p>Names the <code>ClassLoader</code> Hibernate should use to perform resource loading.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.classLoader.hibernate</strong></code></dt>
+<dd>
+<p>Names the <code>ClassLoader</code> responsible for loading Hibernate classes.  By default this is the <code>ClassLoader</code> that loaded this class.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.classLoader.environment</strong></code></dt>
+<dd>
+<p>Names the <code>ClassLoader</code> used when Hibernate is unable to locates classes on the <code>hibernate.classLoader.application</code> or <code>hibernate.classLoader.hibernate</code>.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configurations-bootstrap">Bootstrap properties</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.integrator_provider</strong></code> (e.g. The fully qualified name of an <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/jpa/boot/spi/IntegratorProvider.html"><code>IntegratorProvider</code></a>)</dt>
+<dd>
+<p>Used to define a list of  <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/integrator/spi/Integrator.html"><code>Integrator</code></a> which are used during bootstrap process to integrate various services.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.strategy_registration_provider</strong></code> (e.g. The fully qualified name of an <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/jpa/boot/spi/StrategyRegistrationProviderList.html"><code>StrategyRegistrationProviderList</code></a>)</dt>
+<dd>
+<p>Used to define a list of  <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/boot/registry/selector/StrategyRegistrationProvider.html"><code>StrategyRegistrationProvider</code></a> which are used during bootstrap process to provide registrations of strategy selector(s).</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.type_contributors</strong></code> (e.g. The fully qualified name of an <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/jpa/boot/spi/TypeContributorList.html"><code>TypeContributorList</code></a>)</dt>
+<dd>
+<p>Used to define a list of  <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/boot/model/TypeContributor.html"><code>TypeContributor</code></a> which are used during bootstrap process to contribute types.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.persister.resolver</strong></code> (e.g. The fully qualified name of a <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/persister/spi/PersisterClassResolver.html"><code>PersisterClassResolver</code></a> or a <code>PersisterClassResolver</code> instance)</dt>
+<dd>
+<p>Used to define an implementation of the <code>PersisterClassResolver</code> interface which can be used to customize how an entity or a collection is being persisted.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.persister.factory</strong></code> (e.g. The fully qualified name of a <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/persister/spi/PersisterFactory.html"><code>PersisterFactory</code></a> or a <code>PersisterFactory</code> instance)</dt>
+<dd>
+<p>Like a <code>PersisterClassResolver</code>, the <code>PersisterFactory</code> can be used to customize how an entity or a collection are being persisted.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.service.allow_crawling</strong></code> (e.g. <code>true</code> (default value) or <code>false</code>)</dt>
+<dd>
+<p>Crawl all available service bindings for an alternate registration of a given Hibernate <code>Service</code>.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.metadata_builder_contributor</strong></code> (e.g. The instance, the class or the fully qualified class name of an <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/jpa/boot/spi/MetadataBuilderContributor.html"><code>MetadataBuilderContributor</code></a>)</dt>
+<dd>
+<p>Used to define a instance, the class or the fully qualified class name of an <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/jpa/boot/spi/MetadataBuilderContributor.html"><code>MetadataBuilderContributor</code></a> which can be used to configure the <code>MetadataBuilder</code> when bootstrapping via the JPA <code>EntityManagerFactory</code>.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configurations-misc">Miscellaneous properties</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.dialect_resolvers</strong></code></dt>
+<dd>
+<p>Names any additional <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/engine/jdbc/dialect/spi/DialectResolver.html"><code>DialectResolver</code></a> implementations to  register with the standard <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/engine/jdbc/dialect/spi/DialectFactory.html"><code>DialectFactory</code></a></p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.session_factory_name</strong></code> (e.g. A JNDI name)</dt>
+<dd>
+<p>Setting used to name the Hibernate <code>SessionFactory</code>.
+Naming the <code>SessionFactory</code> allows for it to be properly serialized across JVMs as long as the same name is used on each JVM.</p>
+<div class="paragraph">
+<p>If <code>hibernate.session_factory_name_is_jndi</code> is set to <code>true</code>, this is also the name under which the <code>SessionFactory</code> is bound into JNDI on startup and from which it can be obtained from JNDI.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.session_factory_name_is_jndi</strong></code> (e.g. <code>true</code> (default value) or <code>false</code>)</dt>
+<dd>
+<p>Does the value defined by <code>hibernate.session_factory_name</code> represent a JNDI namespace into which the <code>org.hibernate.SessionFactory</code> should be bound and made accessible?</p>
+<div class="paragraph">
+<p>Defaults to <code>true</code> for backwards compatibility. Set this to <code>false</code> if naming a SessionFactory is needed for serialization purposes, but no writable JNDI context exists in the runtime environment or if the user simply does not want JNDI to be used.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.ejb.entitymanager_factory_name</strong></code> (e.g. By default, the persistence unit name is used, otherwise a randomly generated UUID)</dt>
+<dd>
+<p>Internally, Hibernate keeps track of all <code>EntityManagerFactory</code> instances using the <code>EntityManagerFactoryRegistry</code>. The name is used as a key to identify a given <code>EntityManagerFactory</code> reference.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.ejb.cfgfile</strong></code> (e.g. <code>hibernate.cfg.xml</code> (default value))</dt>
+<dd>
+<p>XML configuration file to use to configure Hibernate.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.ejb.discard_pc_on_close</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>If true, the persistence context will be discarded (think <code>clear()</code> when the method is called.
+Otherwise, the persistence context will stay alive till the transaction completion: all objects will remain managed, and any change will be synchronized with the database (default to false, ie wait for transaction completion).</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.ejb.metamodel.population</strong></code> (e.g. <code>enabled</code> or <code>disabled</code>, or <code>ignoreUnsupported</code> (default value))</dt>
+<dd>
+<p>Setting that indicates whether to build the JPA types.</p>
+<div class="paragraph">
+<p>Accepts three values:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">enabled</dt>
+<dd>
+<p>Do the build</p>
+</dd>
+<dt class="hdlist1">disabled</dt>
+<dd>
+<p>Do not do the build</p>
+</dd>
+<dt class="hdlist1">ignoreUnsupported</dt>
+<dd>
+<p>Do the build, but ignore any non-JPA features that would otherwise result in a failure (e.g. <code>@Any</code> annotation).</p>
+</dd>
+</dl>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.jpa.static_metamodel.population</strong></code> (e.g. <code>enabled</code> or <code>disabled</code>, or <code>skipUnsupported</code> (default value))</dt>
+<dd>
+<p>Setting that controls whether we seek out JPA <em>static metamodel</em> classes and populate them.</p>
+<div class="paragraph">
+<p>Accepts three values:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">enabled</dt>
+<dd>
+<p>Do the population</p>
+</dd>
+<dt class="hdlist1">disabled</dt>
+<dd>
+<p>Do not do the population</p>
+</dd>
+<dt class="hdlist1">skipUnsupported</dt>
+<dd>
+<p>Do the population, but ignore any non-JPA features that would otherwise result in the population failing (e.g. <code>@Any</code> annotation).</p>
+</dd>
+</dl>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.delay_cdi_access</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Defines delayed access to CDI <code>BeanManager</code>. Starting in 5.1 the preferred means for CDI bootstrapping is through <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/jpa/event/spi/jpa/ExtendedBeanManager.html"><code>ExtendedBeanManager</code></a>.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.resource.beans.container</strong></code> (e.g. fully-qualified class name)</dt>
+<dd>
+<p>Identifies an explicit <code>org.hibernate.resource.beans.container.spi.BeanContainer</code> to be used.</p>
+<div class="paragraph">
+<p>Note that, for CDI-based containers, setting this is not necessary.
+Simply pass the <code>BeanManager</code> to use via <code>javax.persistence.bean.manager</code> and optionally specify <code>hibernate.delay_cdi_access</code>.</p>
+</div>
+<div class="paragraph">
+<p>This setting is more meant to integrate non-CDI bean containers such as Spring.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.allow_update_outside_transaction</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Setting that allows to perform update operations outside of a transaction boundary.</p>
+<div class="paragraph">
+<p>Accepts two values:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">true</dt>
+<dd>
+<p>allows to flush an update out of a transaction</p>
+</dd>
+<dt class="hdlist1">false</dt>
+<dd>
+<p>does not allow</p>
+</dd>
+</dl>
+</div>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.collection_join_subquery</strong></code> (e.g. <code>true</code> (default value) or <code>false</code>)</dt>
+<dd>
+<p>Setting which indicates whether or not the new JOINS over collection tables should be rewritten to subqueries.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.allow_refresh_detached_entity</strong></code> (e.g. <code>true</code> (default value when using Hibernate native bootstrapping) or <code>false</code> (default value when using JPA bootstrapping))</dt>
+<dd>
+<p>Setting that allows to call <code>javax.persistence.EntityManager#refresh(entity)</code> or <code>Session#refresh(entity)</code> on a detached instance even when the <code>org.hibernate.Session</code> is obtained from a JPA <code>javax.persistence.EntityManager</code>.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.event.merge.entity_copy_observer</strong></code> (e.g. <code>disallow</code> (default value), <code>allow</code>, <code>log</code> (testing purpose only) or fully-qualified class name)</dt>
+<dd>
+<p>Setting that specifies how Hibernate will respond when multiple representations of the same persistent entity ("entity copy") is detected while merging.</p>
+<div class="paragraph">
+<p>The possible values are:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">disallow (the default)</dt>
+<dd>
+<p>throws <code>IllegalStateException</code> if an entity copy is detected</p>
+</dd>
+<dt class="hdlist1">allow</dt>
+<dd>
+<p>performs the merge operation on each entity copy that is detected</p>
+</dd>
+<dt class="hdlist1">log</dt>
+<dd>
+<p>(provided for testing only) performs the merge operation on each entity copy that is detected and logs information about the entity copies.
+This setting requires DEBUG logging be enabled for <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/event/internal/EntityCopyAllowedLoggedObserver.html"><code>EntityCopyAllowedLoggedObserver</code></a>.</p>
+<div class="paragraph">
+<p>In addition, the application may customize the behavior by providing an implementation of <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/event/spi/EntityCopyObserver.html"><code>EntityCopyObserver</code></a> and setting <code>hibernate.event.merge.entity_copy_observer</code> to the class name.
+When this property is set to <code>allow</code> or <code>log</code>, Hibernate will merge each entity copy detected while cascading the merge operation.
+In the process of merging each entity copy, Hibernate will cascade the merge operation from each entity copy to its associations with <code>cascade=CascadeType.MERGE</code> or <code>CascadeType.ALL</code>.
+The entity state resulting from merging an entity copy will be overwritten when another entity copy is merged.</p>
+</div>
+<div class="paragraph">
+<p>For more details, check out the <a href="chapters/pc/PersistenceContext.html#pc-merge-gotchas">Merge gotchas</a> section.</p>
+</div>
+</dd>
+</dl>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configurations-envers">Envers properties</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.envers.autoRegisterListeners</strong></code> (e.g. <code>true</code> (default value) or <code>false</code>)</dt>
+<dd>
+<p>When set to <code>false</code>, the Envers entity listeners are no longer auto-registered, so you need to register them manually during the bootstrap process.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.integration.envers.enabled</strong></code> (e.g. <code>true</code> (default value) or <code>false</code>)</dt>
+<dd>
+<p>Enable or disable the Hibernate Envers <code>Service</code> integration.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.listeners.envers.autoRegister</strong></code></dt>
+<dd>
+<p>Legacy setting. Use <code>hibernate.envers.autoRegisterListeners</code> or <code>hibernate.integration.envers.enabled</code> instead.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configurations-spatial">Spatial properties</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.integration.spatial.enabled</strong></code> (e.g. <code>true</code> (default value) or <code>false</code>)</dt>
+<dd>
+<p>Enable or disable the Hibernate Spatial <code>Service</code> integration.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.spatial.connection_finder</strong></code> (e.g. <code>org.geolatte.geom.codec.db.oracle.DefaultConnectionFinder</code>)</dt>
+<dd>
+<p>Define the fully-qualified name of class implementing the <code>org.geolatte.geom.codec.db.oracle.ConnectionFinder</code> interface.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configurations-internal">Internal properties</h3>
+<div class="paragraph">
+<p>The following configuration properties are used internally, and you shouldn&#8217;t probably have to configured them in your application.</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code><strong>hibernate.enable_specj_proprietary_syntax</strong></code> (e.g. <code>true</code> or <code>false</code> (default value))</dt>
+<dd>
+<p>Enable or disable the SpecJ proprietary mapping syntax which differs from JPA specification. Used during performance testing only.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.temp.use_jdbc_metadata_defaults</strong></code> (e.g. <code>true</code> (default value) or <code>false</code>)</dt>
+<dd>
+<p>This setting is used to control whether we should consult the JDBC metadata to determine certain Settings default values when the database may not be available (mainly in tools usage).</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.connection_provider.injection_data</strong></code> (e.g. <code>java.util.Map</code>)</dt>
+<dd>
+<p>Connection provider settings to be injected in the currently configured connection provider.</p>
+</dd>
+<dt class="hdlist1"><code><strong>hibernate.jandex_index</strong></code> (e.g. <code>org.jboss.jandex.Index</code>)</dt>
+<dd>
+<p>Names a Jandex <code>org.jboss.jandex.Index</code> instance to use.</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2018-05-25 17:18:11 -04:00
+</div>
+</div>
+</body>
+</html>

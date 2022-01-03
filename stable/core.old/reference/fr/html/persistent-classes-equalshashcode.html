@@ -1,0 +1,103 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>4.3.&nbsp;Impl&eacute;menter equals() et hashCode()</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="persistent-classes.html" title="Chapitre&nbsp;4.&nbsp;Classes persistantes">
+      <link rel="prev" href="persistent-classes-inheritance.html" title="4.2.&nbsp;Impl&eacute;menter l'h&eacute;ritage">
+      <link rel="next" href="persistent-classes-dynamicmodels.html" title="4.4.&nbsp;Mod&egrave;les dynamiques">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">4.3.&nbsp;Impl&eacute;menter <code class="literal">equals()</code> et <code class="literal">hashCode()</code></th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="persistent-classes-inheritance.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;4.&nbsp;Classes persistantes</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="persistent-classes-dynamicmodels.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="persistent-classes-equalshashcode"></a>4.3.&nbsp;Impl&eacute;menter <code class="literal">equals()</code> et <code class="literal">hashCode()</code></h2>
+               </div>
+            </div>
+         </div>
+         <p>Vous devez surcharger les m&eacute;thodes <code class="literal">equals()</code> et <code class="literal">hashCode()</code> si vous 
+         </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p>avez l'intention de mettre des instances de classes persistantes dans un <code class="literal">Set</code> (la mani&egrave;re recommand&eacute;e pour repr&eacute;senter des associations pluri-valu&eacute;es) <span class="emphasis"><em>et</em></span> 
+                  </p>
+               </li>
+               <li>
+                  <p>avez l'intention d'utiliser le r&eacute;attachement d'instances d&eacute;tach&eacute;es </p>
+               </li>
+            </ul>
+         </div>
+         <p>Hibernate garantit l'&eacute;quivalence de l'identit&eacute; persistante (ligne de base de donn&eacute;es) et l'identit&eacute; Java seulement &agrave; l'int&eacute;rieur
+            de la port&eacute;e d'une session particuli&egrave;re. Donc d&egrave;s que nous m&eacute;langeons des instances venant de diff&eacute;rentes sessions, nous devons
+            impl&eacute;menter <code class="literal">equals()</code> et <code class="literal">hashCode()</code> si nous souhaitons avoir une s&eacute;mantique correcte pour les <code class="literal">Set</code>s. 
+         </p>
+         <p>La mani&egrave;re la plus &eacute;vidente est d'impl&eacute;menter <code class="literal">equals()</code>/<code class="literal">hashCode()</code> en comparant la valeur de l'identifiant des deux objets. Si cette valeur est identique, les deux doivent repr&eacute;senter la m&ecirc;me
+            ligne de base de donn&eacute;es, ils sont donc &eacute;gaux (si les deux sont ajout&eacute;s &agrave; un <code class="literal">Set</code>, nous n'aurons qu'un seul &eacute;l&eacute;ment dans le <code class="literal">Set</code>). Malheureusement, nous ne pouvons pas utiliser cette approche avec des identifiants g&eacute;n&eacute;r&eacute;s ! Hibernate n'assignera de valeur
+            d'identifiant qu'aux objets qui sont persistants, une instance nouvellement cr&eacute;&eacute;e n'aura donc pas de valeur d'identifiant
+            ! De plus, si une instance est non sauvegard&eacute;e et actuellement dans un <code class="literal">Set</code>, le sauvegarder assignera une valeur d'identifiant &agrave; l'objet. Si <code class="literal">equals()</code> et <code class="literal">hashCode()</code> sont bas&eacute;es sur la valeur de l'identifiant, le code de hachage devrait changer, rompant le contrat du <code class="literal">Set</code>. Regardez sur le site web d'Hibernate pour une discussion compl&egrave;te de ce probl&egrave;me. Notez que ceci n'est pas un probl&egrave;me d'Hibernate,
+            mais la s&eacute;mantique normale de Java pour l'identit&eacute; d'un objet et l'&eacute;galit&eacute;. 
+         </p>
+         <p>Nous recommandons donc d'impl&eacute;menter <code class="literal">equals()</code> et <code class="literal">hashCode()</code> en utilisant <span class="emphasis"><em> l'&eacute;galit&eacute; par cl&eacute; m&eacute;tier</em></span>.L'&eacute;galit&eacute; par cl&eacute; m&eacute;tier signifie que la m&eacute;thode <code class="literal">equals()</code> compare uniquement les propri&eacute;t&eacute;s qui forment une cl&eacute; m&eacute;tier, une cl&eacute; qui identifierait notre instance dans le monde r&eacute;el
+            (une cl&eacute; candidate <span class="emphasis"><em>naturelle</em></span>) : 
+         </p><pre class="programlisting">public class Cat {
+
+    ...
+    public boolean equals(Object other) {
+        if (this == other) return true;
+        if ( !(other instanceof Cat) ) return false;
+
+        final Cat cat = (Cat) other;
+
+        if ( !cat.getLitterId().equals( getLitterId() ) ) return false;
+        if ( !cat.getMother().equals( getMother() ) ) return false;
+
+        return true;
+    }
+
+    public int hashCode() {
+        int result;
+        result = getMother().hashCode();
+        result = 29 * result + getLitterId();
+        return result;
+    }
+
+}</pre><p>Notez qu'une clef m&eacute;tier ne doit pas &ecirc;tre solide comme une clef primaire de base de donn&eacute;es (voir <a href="transactions.html#transactions-basics-identity" title="11.1.3.&nbsp;L'identit&eacute; des objets">Section&nbsp;11.1.3, &laquo;&nbsp;L'identit&eacute; des objets&nbsp;&raquo;</a>). Les propri&eacute;t&eacute;s immuables ou uniques sont g&eacute;n&eacute;ralement de bonnes candidates pour une clef m&eacute;tier. 
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="persistent-classes-inheritance.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="persistent-classes.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="persistent-classes-dynamicmodels.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">4.2.&nbsp;Impl&eacute;menter l'h&eacute;ritage&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;4.4.&nbsp;Mod&egrave;les dynamiques</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

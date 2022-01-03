@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory">Chapter 1. Introduction</title><link rel="stylesheet" href="css/hibernate.css" type="text/css"/><meta xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" name="generator" content="DocBook XSL Stylesheets V1.74.0"/><link rel="home" href="index.html" title="Technology Compatibility Kit Reference Guide for JSR-303: Bean Validation"/><link rel="up" href="pt01.html" title="Part I. Getting Acquainted with the TCK"/><link rel="prev" href="pt01.html" title="Part I. Getting Acquainted with the TCK"/><link rel="next" href="appeals-process.html" title="Chapter 2. Appeals Process"/></head><body><p id="title"><a href="http://www.hibernate.org" class="site_href"><strong>Hibernate.org</strong></a><a href="http://hibernate.org/Documentation/DocumentationOverview" class="doc_href"><strong>Community Documentation</strong></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="pt01.html"><strong>Prev</strong></a></li><li class="next"><a accesskey="n" href="appeals-process.html"><strong>Next</strong></a></li></ul><div class="chapter" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="introduction"/>Chapter 1. Introduction</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="introduction.html#d0e115">1.1. TCK Primer</a></span></dt><dt><span class="section"><a href="introduction.html#d0e124">1.2. Compatibility Testing</a></span></dt><dd><dl><dt><span class="section"><a href="introduction.html#d0e133">1.2.1. Why Compatibility Is Important</a></span></dt></dl></dd><dt><span class="section"><a href="introduction.html#d0e153">1.3. About the Bean Validation TCK</a></span></dt><dd><dl><dt><span class="section"><a href="introduction.html#d0e165">1.3.1. Bean Validation TCK Specifications and Requirements</a></span></dt><dt><span class="section"><a href="introduction.html#d0e198">1.3.2. Bean Validation TCK Components</a></span></dt></dl></dd></dl></div><p>This chapter explains the purpose of a TCK and identifies the
+  foundation elements of the Bean Validation TCK.</p><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="d0e115"/>1.1. TCK Primer</h2></div></div></div><p>A TCK, or Technology Compatibility Kit, is one of the three required
+    pieces for any JSR (the other two being the specification document and the
+    reference implementation). The TCK is a set of tools and tests to verify
+    that an implementation of the technology conforms to the specification.
+    The tests are the primary component, but the tools serve an equally
+    critical role of providing a framework and/or set of SPIs for executing
+    the tests.</p><p>The tests in the TCK are derived from assertions in the written
+    specification document. The assertions are itemized in an XML document,
+    where they each get assigned a unique identifier, and materialize as a
+    suite of automated tests that collectively validate whether an
+    implementation complies with the aforementioned assertions, and in turn
+    the specification. For a particular implementation to be certified, all of
+    the required tests must pass (i.e., the provided test suite must be run
+    unmodified).</p><p>A TCK is entirely implementation agnostic. It should validate
+    assertions by consulting the specficiation's public API.</p></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="d0e124"/>1.2. Compatibility Testing</h2></div></div></div><p>The goal of any specification is to eliminate portability problems
+    so long as the program which uses the implementation also conforms to the
+    rules laid out in the specification.</p><p>Executing the TCK is a form of compatibility testing. It's important
+    to understand that compatibility testing is distinctly different from
+    product testing. The TCK is not concerned with robustness, performance or
+    ease of use, and therefore cannot vouch for how well an implementation
+    meets these criteria. What a TCK can do is to ensure the exactness of an
+    implementation as it relates to the specification.</p><p>Compatibility testing of any feature relies on both a complete
+    specification and a complete reference implementation. The reference
+    implementation demonstrates how each test can be passed and provides
+    additional context to the implementor during development for the
+    corresponding assertion.</p><div class="section" lang="en-US"><div class="titlepage"><div><div><h3 class="title"><a id="d0e133"/>1.2.1. Why Compatibility Is Important</h3></div></div></div><p>Java platform compatibility is important to different groups
+      involved with Java technologies for different reasons:</p><div class="itemizedlist"><ul><li><p>Compatibility testing is the means by which the JCP ensures
+          that the Java platform does not become fragmented as it's ported to
+          different operating systems and hardware.</p></li><li><p>Compatibility testing benefits developers working in the Java
+          programming language, enabling them to write applications once and
+          deploy them across heterogeneous computing environments without
+          porting.</p></li><li><p>Compatibility testing enables application users to obtain
+          applications from disparate sources and deploy them with
+          confidence.</p></li><li><p>Conformance testing benefits Java platform implementors by
+          ensuring the same extent of reliability for all Java platform
+          ports.</p></li></ul></div><p>The Bean Validation specification goes to great lengths to ensure
+      that programs written for Java EE are compatible and the TCK is rigorous
+      about enforcing the rules the specification lays down.</p></div></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="d0e153"/>1.3. About the Bean Validation TCK</h2></div></div></div><p>The Bean Validation TCK is designed as a portable, configurable and
+    automated test suite for verifying the compatibility of an implementation
+    of JSR-303: Bean Validation specification. The test suite is built atop
+    TestNG and provides a series of extensions that allow runtime packaging
+    and deployment of JEE artifacts for in-container testing (JBoss Test
+    Harness).</p><div xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="note"><h2>Note</h2><p>The Bean Validation TCK harness is based on the JBoss Test
+      harness, which provides most of the aforementioned functionality.</p></div><p>Each test class in the suite acts as a deployable unit. The
+    deployable units, or artifacts, are defined declaratively using
+    annotations.</p><p>The declarative approach allows many of the tests to be executed in
+    a standalone implementation of Bean Validation, accounting for a boast in
+    developer productivity. However, an implementation is only valid if all
+    tests pass using the in-container execution mode. The standalone mode is
+    merely a developer convenience.</p><div class="section" lang="en-US"><div class="titlepage"><div><div><h3 class="title"><a id="d0e165"/>1.3.1. Bean Validation TCK Specifications and Requirements</h3></div></div></div><p>This section lists the applicable requirements and specifications
+      for the Bean Validation TCK.</p><div class="itemizedlist"><ul><li><p><span class="bold"><strong>Bean Validation API</strong></span> - The
+          Java API defined in the Bean Validation specification and provided
+          by the reference implementation.</p></li><li><p><span class="bold"><strong>JBoss Test Harness</strong></span> - The Bean
+          Validation TCK requires version 1.x of the JBoss Test Harness. The
+          Harness is based on <a class="ulink" href="http://testng.org">TestNG
+          5.x</a>. You can read more about the harness in <a class="xref" href="test-harness.html" title="Part III. JBoss Test Harness">Part III, “JBoss Test Harness”</a>.</p></li><li><p><span class="bold"><strong>TCK Audit Tool</strong></span> - An
+          itemization of the assertions in the specification documents which
+          are cross referenced by the individual tests. Describes how well the
+          TCK covers the specification.</p></li><li><p><span class="bold"><strong>Reference runtime</strong></span> - The
+          designated reference runtimes for compatibility testing of the Bean
+          Validation specification is the Sun Java Platform, Enterprise
+          Edition (Java EE) 6 reference implementation (RI). See details at
+          <a class="ulink" href="http://java.sun.com/javaee/6/docs/api/">Java EE
+          6</a></p></li></ul></div></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h3 class="title"><a id="d0e198"/>1.3.2. Bean Validation TCK Components</h3></div></div></div><p>The Bean Validation TCK includes the following components:</p><div class="itemizedlist"><ul><li><p><span class="bold"><strong>JBoss Test Harness 1.x</strong></span> and
+          related documentation.</p></li><li><p><span class="bold"><strong>TestNG 5.9</strong></span>, the testing
+          framework on which the JBoss Test Harness is based and which
+          provides the extension points for selecting an executing the tests
+          in the test suite.</p></li><li><p><span class="bold"><strong>The test suite</strong></span>, which is a
+          collection of TestNG tests, the TestNG test suite descriptor and
+          supplemental resources that configure Bean Validation and other
+          software components.</p></li><li><p><span class="bold"><strong>The TCK audit</strong></span> is used to list
+          out the assertions identified in the Bean Validation specification.
+          It matches the assertions to testcases in the test suite by unique
+          identifier and produces a coverage report.</p><p>The audit document is provided along with the TCK. Each
+          assertion is defined with a reference to a chapter, section and
+          paragraph from the specification document, making it easy for the
+          implementor to locate the language in the specification document
+          that supports the feature being tested.</p></li><li><p><span class="bold"><strong>TCK documentation</strong></span> accompanied
+          by release notes identifying updates between versions.</p></li></ul></div><p>The Bean Validation TCK has been tested run on following
+      platforms:</p><div class="itemizedlist"><ul><li><p>JBoss AS 5.1.0.GA using Sun Java SE 6 on Red Hat Enterprise
+          Linux 5.2</p></li></ul></div></div></div></div><HR xmlns=""/><a xmlns="" href=""><p xmlns="http://www.w3.org/1999/xhtml" class="copyright">Copyright © 2009 - 2011 Red Hat, Inc.</p></a><ul class="docnav"><li class="previous"><a accesskey="p" href="pt01.html"><strong>Prev</strong>Part I. Getting Acquainted with the TCK</a></li><li class="up"><a accesskey="u" href="#"><strong>Top of page</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Front page</strong></a></li><li class="next"><a accesskey="n" href="appeals-process.html"><strong>Next</strong>Chapter 2. Appeals Process</a></li></ul></body></html>

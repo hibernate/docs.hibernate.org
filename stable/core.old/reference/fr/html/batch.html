@@ -1,0 +1,100 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>Chapitre&nbsp;13.&nbsp;Traitement par paquet</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="prev" href="objectstate-decl-security.html" title="12.3.&nbsp;S&eacute;curit&eacute; d&eacute;clarative d'Hibernate">
+      <link rel="next" href="batch-update.html" title="13.2.&nbsp;L'interface StatelessSession">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">Chapitre&nbsp;13.&nbsp;Traitement par paquet</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="objectstate-decl-security.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">&nbsp;</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="batch-update.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="chapter" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title"><a name="batch"></a>Chapitre&nbsp;13.&nbsp;Traitement par paquet
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Une approche na&Atilde;&macr;ve pour ins&Atilde;&copy;rer 100 000 lignes dans la base de donn&Atilde;&copy;es en utilisant Hibernate pourrait ressembler &Atilde;&nbsp; &Atilde;&sect;a
+            : 
+         </p><pre class="programlisting">Session session = sessionFactory.openSession();
+Transaction tx = session.beginTransaction();
+for ( int i=0; i&lt;100000; i++ ) {
+    Customer customer = new Customer(.....);
+    session.save(customer);
+}
+tx.commit();
+session.close();</pre><p>Ceci devrait s'&Atilde;&copy;crouler avec une <code class="literal">OutOfMemoryException</code> quelque part aux alentours de la 50 000&Atilde;&uml;me ligne. C'est parce qu'Hibernate cache toutes les instances de <code class="literal">Customer</code> nouvellement ins&Atilde;&copy;r&Atilde;&copy;es dans le cache de second niveau. 
+         </p>
+         <p>Dans ce chapitre nous montrerons comment &Atilde;&copy;viter ce probl&Atilde;&uml;me. D'abord, cependant, si vous faites des traitements par batch,
+            il est absolument critique que vous activiez l'utilisation ds paquet JDBC (NdT : JDBC batching), si vous avez l'intention
+            d'obtenir des performances raisonnables. Configurez la taille du paquet JDBC avec un nombre raisonnable (disons, 10-50) :
+            
+         </p><pre class="programlisting">hibernate.jdbc.batch_size 20</pre><p><a name="disablebatching"></a>Vous pourriez aussi vouloir faire cette sorte de travail dans un traitement o&Atilde;&sup1; l'interaction avec le cache de second niveau
+            est compl&Atilde;&uml;tement d&Atilde;&copy;sactiv&Atilde;&copy; : 
+         </p>
+         <p>Insertions en paquet </p><pre class="programlisting">hibernate.cache.use_second_level_cache false</pre><p>Lorsque vous rendez des nouveaux objets persistants, vous devez r&Atilde;&copy;guli&Atilde;&uml;rement appeler <code class="literal">flush()</code> et puis <code class="literal">clear()</code> sur la session, pour contr&Atilde;&acute;ler la taille du cache de premier niveau. 
+         </p>
+         <div class="sect1" lang="fr-FR">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="batch-inserts"></a>13.1.&nbsp;Paquet de mises &Atilde;&nbsp; jour
+                     </h2>
+                  </div>
+               </div>
+            </div>
+            <p>Pour r&Atilde;&copy;cup&Atilde;&copy;rer et mettre &Atilde;&nbsp; jour des donn&Atilde;&copy;es les m&Atilde;&ordf;mes id&Atilde;&copy;es s'appliquent. En plus, vous avez besoin d'utiliser <code class="literal">scroll()</code> pour tirer partie des curseurs c&Atilde;&acute;t&Atilde;&copy; serveur pour les requ&Atilde;&ordf;tes qui retournent beaucoup de lignes de donn&Atilde;&copy;es. 
+            </p><pre class="programlisting">Session session = sessionFactory.openSession();
+Transaction tx = session.beginTransaction();
+   
+for ( int i=0; i&lt;100000; i++ ) {
+    Customer customer = new Customer(.....);
+    session.save(customer);
+    if ( i % 20 == 0 ) { //20, same as the JDBC batch size
+        //flush a batch of inserts and release memory:
+        session.flush();
+        session.clear();
+    }
+}
+   
+tx.commit();
+session.close();</pre></div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="objectstate-decl-security.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center">&nbsp;</td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="batch-update.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">12.3.&nbsp;S&eacute;curit&eacute; d&eacute;clarative d'Hibernate&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;13.2.&nbsp;L'interface StatelessSession</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

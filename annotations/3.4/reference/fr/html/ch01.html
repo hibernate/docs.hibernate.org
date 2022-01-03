@@ -1,0 +1,99 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>Chapitre&nbsp;1.&nbsp;Configurer un projet avec des annotations</title><link rel="stylesheet" href="../shared/css/html.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.65.1"><link rel="home" href="index.html" title="Hibernate Annotations"><link rel="up" href="index.html" title="Hibernate Annotations"><link rel="previous" href="preface.html" title="Pr&eacute;face"><link rel="next" href="entity.html" title="Chapitre&nbsp;2.&nbsp;Entity Beans"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapitre&nbsp;1.&nbsp;Configurer un projet avec des annotations</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="preface.html">Pr&eacute;c&eacute;dent</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="entity.html">Suivant</a></td></tr></table><hr></div><div class="chapter" lang="fr"><div class="titlepage"><div><div><h2 class="title"><a name="d0e35"></a>Chapitre&nbsp;1.&nbsp;Configurer un projet avec des annotations</h2></div></div><div></div></div><div class="section" lang="fr"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="setup-requirements"></a>1.1.&nbsp;Pr&eacute;requis</h2></div></div><div></div></div><div class="itemizedlist"><ul type="disc"><li><p>T&eacute;l&eacute;chargez et installez la distribution Hibernate Annotations &agrave;
+        partir du site web d'Hibernate.</p></li><li><p><span class="emphasis"><em>Cette version requiert Hibernate 3.2.0.GA ou
+        sup&eacute;rieur. N'utilisez pas cette version d'Hibernate Annotations avec
+        une version plus ancienne d'Hibernate 3.x !</em></span></p></li><li><p>Cette version est connue pour fonctionner avec le noyau 3.2.0.CR5
+        et 3.2.0.GA d'Hibernate.</p></li><li><p>Assurez-vous que vous avez le JDK 5.0 d'install&eacute;. Vous pouvez
+        bien s&ucirc;r continuer &agrave; utiliser XDoclet et avoir certains des avantages
+        des m&eacute;ta-donn&eacute;es bas&eacute;es sur les annotations avec des versions plus
+        anciennes du JDK. Notez que ce document d&eacute;crit seulement les annotations
+        du JDK 5.0 et que vous devez vous r&eacute;f&eacute;rer &agrave; la documentation de XDoclet
+        pour plus d'informations.</p></li></ul></div></div><div class="section" lang="fr"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="setup-configuration"></a>1.2.&nbsp;Configuration</h2></div></div><div></div></div><p>Tout d'abord, param&eacute;trez votre classpath (apr&egrave;s avoir cr&eacute;er un nouveau
+    projet dans votre IDE favori) :</p><div class="itemizedlist"><ul type="disc"><li><p>Copiez toutes les biblioth&egrave;ques du noyau Hibernate3 et toutes
+          les biblioth&egrave;ques tierces requises (voir lib/README.txt dans
+          Hibernate).</p></li><li><p>Copiez aussi <tt class="filename">hibernate-annotations.jar</tt> et
+          <tt class="filename">lib/ejb3-persistence.jar</tt> de la distribution
+          Hibernate Annotations dans votre classpath.</p></li><li><p>Pour utiliser <a href="lucene.html" title="Chapitre&nbsp;5.&nbsp;Int&eacute;gration de Lucene avec Hibernate">Chapitre&nbsp;5, <i>Int&eacute;gration de Lucene avec Hibernate</i></a>, ajouter le fichier jar
+          de lucene.</p></li></ul></div><p>Nous recommandons aussi un petit wrapper pour d&eacute;marrer Hibernate dans
+    un bloc statique d'initialisation, connu en tant que
+    <tt class="classname">HibernateUtil</tt>. Vous pourriez avoir vu cette classe
+    sous diverses formes dans d'autres parties de la documentation Hibernate.
+    Pour prendre en charge Annotation vous devez modifier cette classe d'aide
+    de la mani&egrave;re suivante :</p><pre class="programlisting">package hello;
+
+import org.hibernate.*;
+import org.hibernate.cfg.*;
+import test.*;
+import test.animals.Dog;
+
+public class HibernateUtil {
+
+private static final SessionFactory sessionFactory;
+
+    static {
+        try {
+
+            sessionFactory = new <span class="bold"><b>AnnotationConfiguration()</b></span>.buildSessionFactory();
+        } catch (Throwable ex) {
+            // Log exception!
+            throw new ExceptionInInitializerError(ex);
+        }
+    }
+
+    public static Session getSession()
+            throws HibernateException {
+        return sessionFactory.openSession();
+    }
+}
+            </pre><p>La partie int&eacute;ressante ici est l'utilisation de
+    <tt class="classname">AnnotationConfiguration</tt>. Les packages et les classes
+    annot&eacute;es sont d&eacute;clar&eacute;s dans votre fichier de configuration XML habituel
+    (g&eacute;n&eacute;ralement <tt class="filename">hibernate.cfg.xml</tt>). Voici un &eacute;quivalent
+    de la d&eacute;claration ci-dessus :</p><pre class="programlisting">&lt;!DOCTYPE hibernate-configuration PUBLIC
+    "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd"&gt;
+
+        &lt;hibernate-configuration&gt;
+          &lt;session-factory&gt;
+            <span class="bold"><b>&lt;mapping package="test.animals"/&gt;
+            &lt;mapping class="test.Flight"/&gt;
+            &lt;mapping class="test.Sky"/&gt;
+            &lt;mapping class="test.Person"/&gt;
+            &lt;mapping class="test.animals.Dog"/&gt;</b></span>
+<span class="bold"><b>            &lt;mapping resource="test/animals/orm.xml"/&gt;</b></span>
+          &lt;/session-factory&gt;
+        &lt;/hibernate-configuration&gt;
+        </pre><p>Notez que vous pouvez m&eacute;langer l'utilisation du fichier hbm.xml et
+    celle des annotations. L'&eacute;l&eacute;ment de ressource peut &ecirc;tre un fichier hbm ou
+    un descripteur de d&eacute;ploiement XML EJB3. Cette distinction est transparente
+    pour votre proc&eacute;dure de configuration.</p><p>Alternativement, vous pouvez d&eacute;finir les classes annot&eacute;es et des
+    packages en utilisant l'API :</p><pre class="programlisting">            sessionFactory = new <span class="bold"><b>AnnotationConfiguration()
+                    .addPackage("test.animals") // le nom complet du package
+                    .addAnnotatedClass(Flight.class)
+                    .addAnnotatedClass(Sky.class)
+                    .addAnnotatedClass(Person.class)
+                    .addAnnotatedClass(Dog.class)</b></span>
+<span class="bold"><b>                    .addResource("test/animals/orm.xml")</b></span>
+                    .buildSessionFactory();</pre><p>Vous pouvez aussi utiliser Hibernate EntityManager qui a son propre
+    m&eacute;canisme de configuration. Veullez vous r&eacute;f&eacute;rer &agrave; la documentation de ce
+    projet pour plus de d&eacute;tails.</p><p>Il n'y a pas d'autres diff&eacute;rences dans la fa&ccedil;on d'utiliser les APIs
+    d'Hibernate, except&eacute; ce changement de routine de d&eacute;marrage ou le fichier
+    de configuration. Vous pouvez utiliser votre m&eacute;thode de configuration
+    favorite pour d'autres propri&eacute;t&eacute;s (<tt class="filename">hibernate.properties</tt>,
+    <tt class="filename">hibernate.cfg.xml</tt>, utilisation des APIs, etc). Vous
+    pouvez m&ecirc;me m&eacute;langer les classes persistantes annot&eacute;es et des d&eacute;clarations
+    <tt class="filename">hbm.cfg.xml</tt> classiques avec la m&ecirc;me
+    <tt class="classname">SessionFactory</tt>. Vous ne pouvez cependant pas d&eacute;clarer
+    une classe plusieurs fois (soit avec les annotations, soit avec un fichier
+    hbm.xml). Vous ne pouvez pas non plus m&eacute;langer des strat&eacute;gies de
+    configuration (hbm vs annotations) dans une hi&eacute;rarchie d'entit&eacute;s
+    mapp&eacute;es.</p><p>Pour faciliter la proc&eacute;dure de migration de fichiers hbm vers les
+    annotations, le m&eacute;canisme de configuration d&eacute;tecte la duplication de mappings
+    entre les annotations et les fichiers hbm. Les classes d&eacute;crites dans les
+    fichiers hbm se voient alors affecter une priorit&eacute; plus grande que les
+    classes annot&eacute;es. Vous pouvez changer cette priorit&eacute; avec la propri&eacute;t&eacute;
+    <tt class="literal">hibernate.mapping.precedence</tt>. La valeur par d&eacute;faut est :
+    <tt class="literal">hbm, class</tt> ; la changer en : <tt class="literal">class, hbm</tt>
+    donne alors la priorit&eacute; aux classes annot&eacute;es lorsqu'un conflit
+    survient.</p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="preface.html">Pr&eacute;c&eacute;dent</a>&nbsp;</td><td width="20%" align="center"><a accesskey="u" href="index.html">Niveau sup&eacute;rieur</a></td><td width="40%" align="right">&nbsp;<a accesskey="n" href="entity.html">Suivant</a></td></tr><tr><td width="40%" align="left" valign="top">Pr&eacute;face&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td><td width="40%" align="right" valign="top">&nbsp;Chapitre&nbsp;2.&nbsp;Entity Beans</td></tr></table></div></body></html>

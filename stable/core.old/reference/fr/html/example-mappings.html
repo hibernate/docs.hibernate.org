@@ -1,0 +1,150 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>Chapitre&nbsp;23.&nbsp;Exemple : quelques mappings</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="prev" href="example-weblog-code.html" title="22.3.&nbsp;Code Hibernate">
+      <link rel="next" href="example-mappings-authorwork.html" title="23.2.&nbsp;Auteur/Travail (Author/Work)">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">Chapitre&nbsp;23.&nbsp;Exemple : quelques mappings</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="example-weblog-code.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">&nbsp;</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="example-mappings-authorwork.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="chapter" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title"><a name="example-mappings"></a>Chapitre&nbsp;23.&nbsp;Exemple : quelques mappings
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Ce chapitre montre quelques mappings plus complexes. </p>
+         <div class="sect1" lang="fr-FR">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="example-mappings-emp"></a>23.1.&nbsp;Employeur/Employ&eacute; (Employer/Employee)
+                     </h2>
+                  </div>
+               </div>
+            </div>
+            <p>Le mod&egrave;le suivant de relation entre <code class="literal">Employer</code> et <code class="literal">Employee</code> utilise une vraie classe entit&eacute; (<code class="literal">Employment</code>) pour repr&eacute;senter l'association. On a fait cela parce qu'il peut y avoir plus d'une p&eacute;riode d'emploi pour les deux m&ecirc;mes
+               parties. Des composants sont utilis&eacute;s pour mod&eacute;liser les valeurs mon&eacute;taires et les noms des employ&eacute;s. 
+            </p>
+            <div class="mediaobject" align="center"><img src="images/EmployerEmployee.png" align="middle"></div>
+            <p>Voici un document de mapping possible : </p><pre class="programlisting">&lt;hibernate-mapping&gt;
+        
+    &lt;class name="Employer" table="employers"&gt;
+        &lt;id name="id"&gt;
+            &lt;generator class="sequence"&gt;
+                &lt;param name="sequence"&gt;employer_id_seq&lt;/param&gt;
+            &lt;/generator&gt;
+        &lt;/id&gt;
+        &lt;property name="name"/&gt;
+    &lt;/class&gt;
+
+    &lt;class name="Employment" table="employment_periods"&gt;
+
+        &lt;id name="id"&gt;
+            &lt;generator class="sequence"&gt;
+                &lt;param name="sequence"&gt;employment_id_seq&lt;/param&gt;
+            &lt;/generator&gt;
+        &lt;/id&gt;
+        &lt;property name="startDate" column="start_date"/&gt;
+        &lt;property name="endDate" column="end_date"/&gt;
+
+        &lt;component name="hourlyRate" class="MonetaryAmount"&gt;
+            &lt;property name="amount"&gt;
+                &lt;column name="hourly_rate" sql-type="NUMERIC(12, 2)"/&gt;
+            &lt;/property&gt;
+            &lt;property name="currency" length="12"/&gt;
+        &lt;/component&gt;
+
+        &lt;many-to-one name="employer" column="employer_id" not-null="true"/&gt;
+        &lt;many-to-one name="employee" column="employee_id" not-null="true"/&gt;
+
+    &lt;/class&gt;
+
+    &lt;class name="Employee" table="employees"&gt;
+        &lt;id name="id"&gt;
+            &lt;generator class="sequence"&gt;
+                &lt;param name="sequence"&gt;employee_id_seq&lt;/param&gt;
+            &lt;/generator&gt;
+        &lt;/id&gt;
+        &lt;property name="taxfileNumber"/&gt;
+        &lt;component name="name" class="Name"&gt;
+            &lt;property name="firstName"/&gt;
+            &lt;property name="initial"/&gt;
+            &lt;property name="lastName"/&gt;
+        &lt;/component&gt;
+    &lt;/class&gt;
+
+&lt;/hibernate-mapping&gt;</pre><p>Et voici le sch&eacute;ma des tables g&eacute;n&eacute;r&eacute;es par <code class="literal">SchemaExport</code>. 
+            </p><pre class="programlisting">create table employers (
+    id BIGINT not null, 
+    name VARCHAR(255), 
+    primary key (id)
+)
+
+create table employment_periods (
+    id BIGINT not null,
+    hourly_rate NUMERIC(12, 2),
+    currency VARCHAR(12), 
+    employee_id BIGINT not null, 
+    employer_id BIGINT not null, 
+    end_date TIMESTAMP, 
+    start_date TIMESTAMP, 
+    primary key (id)
+)
+
+create table employees (
+    id BIGINT not null, 
+    firstName VARCHAR(255), 
+    initial CHAR(1), 
+    lastName VARCHAR(255), 
+    taxfileNumber VARCHAR(255), 
+    primary key (id)
+)
+
+alter table employment_periods 
+    add constraint employment_periodsFK0 foreign key (employer_id) references employers
+alter table employment_periods 
+    add constraint employment_periodsFK1 foreign key (employee_id) references employees
+create sequence employee_id_seq
+create sequence employment_id_seq
+create sequence employer_id_seq</pre></div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="example-weblog-code.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center">&nbsp;</td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="example-mappings-authorwork.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">22.3.&nbsp;Code Hibernate&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;23.2.&nbsp;Auteur/Travail (Author/Work)</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

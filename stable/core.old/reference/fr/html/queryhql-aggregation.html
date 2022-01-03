@@ -1,0 +1,87 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>14.7.&nbsp;Fonctions d'aggr&eacute;gation</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="queryhql.html" title="Chapitre&nbsp;14.&nbsp;HQL: Langage de requ&ecirc;tage d'Hibernate">
+      <link rel="prev" href="queryhql-select.html" title="14.6.&nbsp;La clause select">
+      <link rel="next" href="queryhql-polymorphism.html" title="14.8.&nbsp;Requ&ecirc;tes polymorphiques">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">14.7.&nbsp;Fonctions d'aggr&eacute;gation</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="queryhql-select.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;14.&nbsp;HQL: Langage de requ&ecirc;tage d'Hibernate</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="queryhql-polymorphism.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="queryhql-aggregation"></a>14.7.&nbsp;Fonctions d'aggr&eacute;gation
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Les requ&ecirc;tes HQL peuvent aussi retourner le r&eacute;sultat de fonctions d'aggr&eacute;gation sur les propri&eacute;t&eacute;s : </p><pre class="programlisting">select avg(cat.weight), sum(cat.weight), max(cat.weight), count(cat)
+from Cat cat</pre><p>Les fonctions support&eacute;es sont </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p>
+                                         <code class="literal">avg(...), sum(...), min(...), max(...)</code>
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         <code class="literal">count(*)</code>
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         <code class="literal">count(...), count(distinct ...), count(all...)</code>
+                                     
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p>Vous pouvez utiliser des op&eacute;rateurs arithm&eacute;tiques, la concat&eacute;nation, et des fonctions SQL reconnues dans la clause select
+            : 
+         </p><pre class="programlisting">select cat.weight + sum(kitten.weight)
+from Cat cat
+    join cat.kittens kitten
+group by cat.id, cat.weight</pre><pre class="programlisting">select firstName||' '||initial||' '||upper(lastName) from Person</pre><p>Les mots cl&eacute; <code class="literal">distinct</code> et <code class="literal">all</code> peuvent &ecirc;tre utilis&eacute;s et ont la m&ecirc;me signification qu'en SQL. 
+         </p><pre class="programlisting">select distinct cat.name from Cat cat
+
+select count(distinct cat.name), count(cat) from Cat cat</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="queryhql-select.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="queryhql.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="queryhql-polymorphism.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">14.6.&nbsp;La clause select&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;14.8.&nbsp;Requ&ecirc;tes polymorphiques</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

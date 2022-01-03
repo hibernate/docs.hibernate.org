@@ -1,0 +1,1862 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>Hibernate EntityManager</title><link rel="stylesheet" href="../shared/css/html.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.65.1"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="book" lang="en"><div class="titlepage"><div><div><h1 class="title"><a name="d0e1"></a>Hibernate EntityManager</h1></div><div><h2 class="subtitle">User guide</h2></div><div><p class="releaseinfo">3.4.0.GA</p></div></div><div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="preface"><a href="#d0e13">Introducing EJB3 Persistence</a></span></dt><dt><span class="chapter"><a href="#architecture">1. Architecture</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e27">1.1. Definitions</a></span></dt><dt><span class="section"><a href="#d0e96">1.2. EJB container environment</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e99">1.2.1. Container-managed entity manager</a></span></dt><dt><span class="section"><a href="#d0e104">1.2.2. Application-managed entity manager</a></span></dt><dt><span class="section"><a href="#architecture-ejb-persistctxscope">1.2.3. Persistence context scope</a></span></dt><dt><span class="section"><a href="#architecture-ejb-persistctxpropagation">1.2.4. Persistence context propagation</a></span></dt></dl></dd><dt><span class="section"><a href="#architecture-javase">1.3. Java SE environments</a></span></dt></dl></dd><dt><span class="chapter"><a href="#configuration">2. Setup and configuration</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e176">2.1. Setup</a></span></dt><dt><span class="section"><a href="#setup-configuration">2.2. Configuration and bootstrapping</a></span></dt><dd><dl><dt><span class="section"><a href="#setup-configuration-packaging">2.2.1. Packaging</a></span></dt><dt><span class="section"><a href="#setup-configuration-bootstrapping">2.2.2. Bootstrapping</a></span></dt></dl></dd><dt><span class="section"><a href="#d0e500">2.3. Event listeners</a></span></dt><dt><span class="section"><a href="#d0e612">2.4. Obtaining an EntityManager in a Java SE environment</a></span></dt><dt><span class="section"><a href="#d0e631">2.5. Various</a></span></dt></dl></dd><dt><span class="chapter"><a href="#objectstate">3. Working with objects</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e639">3.1. Entity states</a></span></dt><dt><span class="section"><a href="#d0e662">3.2. Making objects persistent</a></span></dt><dt><span class="section"><a href="#d0e686">3.3. Loading an object</a></span></dt><dt><span class="section"><a href="#d0e713">3.4. Querying objects</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e718">3.4.1. Executing queries</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e736">3.4.1.1. Projection</a></span></dt><dt><span class="section"><a href="#d0e743">3.4.1.2. Scalar results</a></span></dt><dt><span class="section"><a href="#d0e750">3.4.1.3. Bind parameters</a></span></dt><dt><span class="section"><a href="#d0e763">3.4.1.4. Pagination</a></span></dt><dt><span class="section"><a href="#d0e772">3.4.1.5. Externalizing named queries</a></span></dt><dt><span class="section"><a href="#d0e785">3.4.1.6. Native queries</a></span></dt><dt><span class="section"><a href="#d0e801">3.4.1.7. Query hints</a></span></dt></dl></dd></dl></dd><dt><span class="section"><a href="#d0e879">3.5. Modifying persistent objects</a></span></dt><dt><span class="section"><a href="#d0e891">3.6. Modifying detached objects</a></span></dt><dt><span class="section"><a href="#d0e913">3.7. Automatic state detection</a></span></dt><dt><span class="section"><a href="#d0e987">3.8. Deleting managed objects</a></span></dt><dt><span class="section"><a href="#d0e997">3.9. Flush the persistence context</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e1000">3.9.1. In a transaction</a></span></dt><dt><span class="section"><a href="#d0e1074">3.9.2. Outside a transaction</a></span></dt></dl></dd><dt><span class="section"><a href="#objectstate-transitive">3.10. Transitive persistence</a></span></dt><dt><span class="section"><a href="#d0e1173">3.11. Locking</a></span></dt></dl></dd><dt><span class="chapter"><a href="#transactions">4. Transactions and Concurrency</a></span></dt><dd><dl><dt><span class="sect1"><a href="#transactions-basics">4.1. Entity manager and transaction scopes</a></span></dt><dd><dl><dt><span class="sect2"><a href="#transactions-basics-uow">4.1.1. Unit of work</a></span></dt><dt><span class="sect2"><a href="#transactions-basics-apptx">4.1.2. Long units of work</a></span></dt><dt><span class="sect2"><a href="#transactions-basics-identity">4.1.3. Considering object identity</a></span></dt><dt><span class="sect2"><a href="#transactions-basics-issues">4.1.4. Common concurrency control issues</a></span></dt></dl></dd><dt><span class="sect1"><a href="#transactions-demarcation">4.2. Database transaction demarcation</a></span></dt><dd><dl><dt><span class="sect2"><a href="#transactions-demarcation-nonmanaged">4.2.1. Non-managed environment</a></span></dt><dd><dl><dt><span class="sect3"><a href="#d0e1530">4.2.1.1. EntityTransaction</a></span></dt></dl></dd><dt><span class="sect2"><a href="#transactions-demarcation-jta">4.2.2. Using JTA</a></span></dt><dt><span class="sect2"><a href="#transactions-demarcation-exceptions">4.2.3. Exception handling</a></span></dt></dl></dd><dt><span class="sect1"><a href="#d0e1799">4.3. EXTENDED Persistence Context</a></span></dt><dd><dl><dt><span class="sect2"><a href="#d0e1837">4.3.1. Container Managed Entity Manager</a></span></dt><dt><span class="sect2"><a href="#d0e1852">4.3.2. Application Managed Entity Manager</a></span></dt></dl></dd><dt><span class="sect1"><a href="#transactions-optimistic">4.4. Optimistic concurrency control</a></span></dt><dd><dl><dt><span class="sect2"><a href="#transactions-optimistic-manual">4.4.1. Application version checking</a></span></dt><dt><span class="sect2"><a href="#transactions-optimistic-longsession">4.4.2. Extended entity manager and automatic versioning</a></span></dt><dt><span class="sect2"><a href="#transactions-optimistic-detached">4.4.3. Detached objects and automatic versioning</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="#listeners">5. Entity listeners and Callback methods</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e1979">5.1. Definition</a></span></dt><dt><span class="section"><a href="#d0e2063">5.2. Callbacks and listeners inheritance</a></span></dt><dt><span class="section"><a href="#d0e2096">5.3. XML definition</a></span></dt></dl></dd><dt><span class="chapter"><a href="#batch">6. Batch processing</a></span></dt><dd><dl><dt><span class="sect1"><a href="#batch-direct">6.1. Bulk update/delete</a></span></dt></dl></dd><dt><span class="chapter"><a href="#queryhql">7. EJB-QL: The Object Query Language</a></span></dt><dd><dl><dt><span class="sect1"><a href="#queryhql-casesensitivity">7.1. Case Sensitivity</a></span></dt><dt><span class="sect1"><a href="#queryhql-from">7.2. The from clause</a></span></dt><dt><span class="sect1"><a href="#queryhql-joins">7.3. Associations and joins</a></span></dt><dt><span class="sect1"><a href="#queryhql-select">7.4. The select clause</a></span></dt><dt><span class="sect1"><a href="#queryhql-aggregation">7.5. Aggregate functions</a></span></dt><dt><span class="sect1"><a href="#queryhql-polymorphism">7.6. Polymorphic queries</a></span></dt><dt><span class="sect1"><a href="#queryhql-where">7.7. The where clause</a></span></dt><dt><span class="sect1"><a href="#queryhql-expressions">7.8. Expressions</a></span></dt><dt><span class="sect1"><a href="#queryhql-ordering">7.9. The order by clause</a></span></dt><dt><span class="sect1"><a href="#queryhql-grouping">7.10. The group by clause</a></span></dt><dt><span class="sect1"><a href="#queryhql-subqueries">7.11. Subqueries</a></span></dt><dt><span class="sect1"><a href="#queryhql-examples">7.12. EJB-QL examples</a></span></dt><dt><span class="sect1"><a href="#queryhql-bulk">7.13. Bulk UPDATE &amp; DELETE Statements</a></span></dt><dt><span class="sect1"><a href="#queryhql-tipstricks">7.14. Tips &amp; Tricks</a></span></dt></dl></dd><dt><span class="chapter"><a href="#query_native">8. Native query</a></span></dt><dd><dl><dt><span class="sect1"><a href="#d0e3135">8.1. Expressing the resultset</a></span></dt><dt><span class="sect1"><a href="#d0e3167">8.2. Using native SQL Queries</a></span></dt><dt><span class="sect1"><a href="#d0e3188">8.3. Named queries</a></span></dt></dl></dd></dl></div><div class="preface" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="d0e13"></a>Introducing EJB3 Persistence</h2></div></div><div></div></div><p>The EJB3 specification recognizes the interest and the success of
+    the transparent object/relational mapping paradigm. The EJB3 specification
+    standardizes the basic APIs and the metadata needed for any
+    object/relational persistence mechanism. <span class="emphasis"><em>Hibernate
+    EntityManager</em></span> implements the programming interfaces and
+    lifecycle rules as defined by the EJB3 persistence specification. Together
+    with <span class="emphasis"><em>Hibernate Annotations</em></span>, this wrapper implements a
+    complete (and standalone) EJB3 persistence solution on top of the mature
+    Hibernate core. You may use a combination of all three together,
+    annotations without EJB3 programming interfaces and lifecycle, or even
+    pure native Hibernate, depending on the business and technical needs of
+    your project. You can at all times fall back to Hibernate native APIs, or
+    if required, even to native JDBC and SQL.</p></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="architecture"></a>Chapter&nbsp;1.&nbsp;Architecture</h2></div></div><div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e27"></a>1.1.&nbsp;Definitions</h2></div></div><div></div></div><p>EJB3 is part of the Java EE 5.0 platform. Persistence in EJB3 is
+    available in EJB3 containers, as well as for standalone J2SE applications
+    that execute outside of a particular container. The following programming
+    interfaces and artifacts are available in both environments.</p><div class="variablelist"><dl><dt><span class="term">
+          <tt class="literal">EntityManagerFactory</tt>
+        </span></dt><dd><p>An entity manager factory provides entity manager instances,
+          all instances are configured to connect to the same database, to use
+          the same default settings as defined by the particular
+          implementation, etc. You can prepare several entity manager
+          factories to access several data stores. This interface is similar
+          to the <tt class="literal">SessionFactory</tt> in native Hibernate.</p></dd><dt><span class="term">
+          <tt class="literal">EntityManager</tt>
+        </span></dt><dd><p>The <tt class="literal">EntityManager</tt> API is used to access a
+          database in a particular unit of work. It is used to create and
+          remove persistent entity instances, to find entities by their
+          primary key identity, and to query over all entities. This interface
+          is similar to the <tt class="literal">Session</tt> in Hibernate.</p></dd><dt><span class="term">Persistence context</span></dt><dd><p>A persistence context is a set of entity instances in which
+          for any persistent entity identity there is a unique entity
+          instance. Within the persistence context, the entity instances and
+          their lifecycle is managed by a particular entity manager. The scope
+          of this context can either be the transaction, or an extended unit
+          of work.</p></dd><dt><span class="term">Persistence unit</span></dt><dd><p>The set of entity types that can be managed by a given entity
+          manager is defined by a persistence unit. A persistence unit defines
+          the set of all classes that are related or grouped by the
+          application, and which must be collocated in their mapping to a
+          single data store.</p></dd><dt><span class="term">Container-managed entity manager</span></dt><dd><p>An Entity Manager whose lifecycle is managed by the
+          container</p></dd><dt><span class="term">Application-managed entity manager</span></dt><dd><p>An Entity Manager whose lifecycle is managed by the
+          application.</p></dd><dt><span class="term">JTA entity manager</span></dt><dd><p>Entity manager involved in a JTA transaction</p></dd><dt><span class="term">Resource-local entity manager</span></dt><dd><p>Entity manager using a resource transaction (not a JTA
+          transaction).</p></dd></dl></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e96"></a>1.2.&nbsp;EJB container environment</h2></div></div><div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e99"></a>1.2.1.&nbsp;Container-managed entity manager</h3></div></div><div></div></div><p>The most common and widely used entity manager in a Java EE
+      environment is the container-managed entity manager. In this mode, the
+      container is responsible for the opening and closing of the entity
+      manager (this is transparent to the application). It is also responsible
+      for transaction boundaries. A container-managed entity manager is
+      obtained in an application through dependency injection or through JNDI
+      lookup, A container-managed entity manger requires the use of a JTA
+      transaction.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e104"></a>1.2.2.&nbsp;Application-managed entity manager</h3></div></div><div></div></div><p>An application-managed entity manager allows you to control the
+      entity manager in application code. This entity manager is retrieved
+      through the <tt class="literal">EntityManagerFactory</tt> API. An application
+      managed entity manager can be either involved in the current JTA
+      transaction (a JTA entity manager), or the transaction may be controlled
+      through the <tt class="literal">EntityTransaction</tt> API (a resource-local
+      entity manager). The resource-local entity manager transaction maps to a
+      direct resource transaction (i. e. in Hibernate's case a JDBC
+      transaction). The entity manager type (JTA or resource-local) is defined
+      at configuration time, when setting up the entity manager
+      factory.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="architecture-ejb-persistctxscope"></a>1.2.3.&nbsp;Persistence context scope</h3></div></div><div></div></div><p>An entity manager is the API to interact with the persistence
+      context. Two common strategies can be used: binding the persistence
+      context to the transaction boundaries, or keeping the persistence
+      context available across several transactions.</p><p>The most common case is to bind the persistence context scope to
+      the current transaction scope. This is only doable when JTA transactions
+      are used: the persistence context is associated with the JTA transaction
+      life cycle. When a entity manager is invoked, the persistence context is
+      also opened, if there is no persistence context associated with the
+      current JTA transaction. Otherwise, the associated persistence context
+      is used. The persistence context ends when the JTA transaction
+      completes. This means that during the JTA transaction, an application
+      will be able to work on managed entities of the same persistence
+      context. In other words, you don't have to pass the entity manager's
+      persistence context across your EJB method calls, but simply use
+      dependency injection or lookup whenever you need an entity
+      manager.</p><p>You can also use an extended persistence context. This can be
+      combined with stateful session beans, if you use a container-managed
+      entity manager: the persistence context is created when an entity
+      manager is retrieved from dependency injection or JNDI lookup , and is
+      kept until the container closes it after the completion of the
+      <tt class="literal">Remove</tt> stateful session bean method. This is a
+      perfect mechanism for implementing a "long" unit of work pattern. For
+      example, if you have to deal with multiple user interaction cycles as a
+      single unit of work (e.g. a wizard dialog that has to be fully
+      completed), you usually model this as a unit of work from the point of
+      view of the application user, and implement it using an extended
+      persistence context. Please refer to the Hibernate reference manual or
+      the book Hibernate In Action for more information about this pattern.
+      JBoss Seam is a framework tht link together JSF and EJB3 around the
+      notion of conversation and unit of work. For an application-managed
+      entity manager the persistence context is created when the entity
+      manager is created and kept until the entity manager is closed. In an
+      extended persistence context, all modification operations (persist,
+      merge, remove) executed outside a transaction are queued until the
+      persistence context is attached to a transaction. The transaction
+      typically occurs at the user process end, allowing the whole process to
+      be commited or rollbacked. For application-managed entity manager only
+      support the exctended persistence context.</p><p>A resource-local entity manager or an entity manager created with
+      <tt class="literal">EntityManagerFactory.createEntityManager()</tt>
+      (application-managed) has a one-to-one relationship with a persistence
+      context. In other situations <span class="emphasis"><em>persistence context
+      propagation</em></span> occurs.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="architecture-ejb-persistctxpropagation"></a>1.2.4.&nbsp;Persistence context propagation</h3></div></div><div></div></div><p>Persistence context propagation occurs for container-managed
+      entity managers.</p><p>In a transaction-scoped container managed entity manager (common
+      case in a Java EE environment), the JTA transaction propagation is the
+      same as the persistence context resource propagation. In other words,
+      container-managed transaction-scoped entity managers retrieved within a
+      given JTA transaction all share the same persistence context. In
+      Hibernate terms, this means all managers share the same session.</p><p>Important: persistence context are never shared between different
+      JTA transactions or between entity manager that do not came from the
+      same entity manager factory. There are some noteworthy exceptions for
+      context propagation when using extended persistence contexts:</p><div class="itemizedlist"><ul type="disc"><li><p>If a stateless session bean, message-driven bean, or stateful
+          session bean with a transaction-scoped persistence context calls a
+          stateful session bean with an extended persistence context in the
+          same JTA transaction, an IllegalStateException is thrown.</p></li><li><p>If a stateful session bean with an extended persistence
+          context calls as stateless session bean or a stateful session bean
+          with a transaction-scoped persistence context in the same JTA
+          transaction, the persistence context is propagated.</p></li><li><p>If a stateful session bean with an extended persistence
+          context calls a stateless or stateful session bean in a different
+          JTA transaction context, the persistence context is not
+          propagated.</p></li><li><p>If a stateful session bean with an extended persistence
+          context instantiates another stateful session bean with an extended
+          persistence context, the extended persistence context is inherited
+          by the second stateful session bean. If the second stateful session
+          bean is called with a different transaction context than the first,
+          an IllegalStateException is thrown.</p></li><li><p>If a stateful session bean with an extended persistence
+          context calls a stateful session bean with a different extended
+          persistence context in the same transaction, an
+          IllegalStateException is thrown.</p></li></ul></div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="architecture-javase"></a>1.3.&nbsp;Java SE environments</h2></div></div><div></div></div><p>In a Java SE environment only extented context application-managed
+    entity managers are available. You can retrieve an entity manger using the
+    <tt class="literal">EntityManagerFactory</tt> API. Only resource-local entity
+    managers are available. In other words, JTA transactions and persistence
+    context propagation are not supported in Java SE (you will have to
+    propagate the persistence context yourself, e.g. using the thread local
+    session pattern popular in the Hibernate community).</p><p>Extended context means that a persistence context is created when
+    the entity manager is retrieved (using
+    <tt class="literal">EntityManagerFactory.createEntityManager(...)</tt> ) and
+    closed when the entity manager is closed. Many resource-local transaction
+    share the same persistence context, in this case.</p></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="configuration"></a>Chapter&nbsp;2.&nbsp;Setup and configuration</h2></div></div><div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e176"></a>2.1.&nbsp;Setup</h2></div></div><div></div></div><p>The EJB 3.0 / JPA compatible Hibernate EntityManager is built on top
+    of Hibernate core and Hibernate Annotations. You have to use compatible
+    versions of each module. Please consult the compatibility matrix in the
+    hibernate.org download section. The following libraries have to be in your
+    classpath: hibernate3.jar, hibernate-annotations.jar,
+    hibernate-commons-annotations.jar, hibernate-entitymanager.jar and all
+    needed third party libraries for each package (incl.
+    ejb-persistence.jar).</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="setup-configuration"></a>2.2.&nbsp;Configuration and bootstrapping</h2></div></div><div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="setup-configuration-packaging"></a>2.2.1.&nbsp;Packaging</h3></div></div><div></div></div><p>The configuration for entity managers both inside an application
+      server and in a standalone application reside in a persistence archive.
+      A persistence archive is a JAR file which must define a
+      <tt class="literal">persistence.xml</tt> file that resides in the
+      <tt class="filename">META-INF</tt> folder. All properly annotated classes
+      included in the archive (ie having an <tt class="literal">@Entity</tt>
+      annotation), all annotated packages and all Hibernate hbm.xml files
+      included in the archive will be added to the persistence unit
+      configuration, so by default, your persistence.xml will be quite
+      minimalist:</p><pre class="programlisting">&lt;persistence xmlns="http://java.sun.com/xml/ns/persistence"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"
+   version="1.0"&gt;
+   &lt;persistence-unit name="sample"&gt;
+      &lt;jta-data-source&gt;java:/DefaultDS&lt;/jta-data-source&gt;
+      &lt;properties&gt;
+         &lt;property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect"/&gt;
+         &lt;property name="hibernate.hbm2ddl.auto" value="create-drop"/&gt;
+      &lt;/properties&gt;
+   &lt;/persistence-unit&gt;
+&lt;/persistence&gt;</pre><p>Here's a more complete example of a
+      <tt class="filename"><tt class="literal">persistence.xml</tt></tt> file</p><pre class="programlisting">&lt;persistence xmlns="http://java.sun.com/xml/ns/persistence"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"
+   version="1.0"&gt;
+   &lt;persistence-unit name="manager1" transaction-type="JTA"&gt;
+      &lt;provider&gt;org.hibernate.ejb.HibernatePersistence&lt;/provider&gt;
+      &lt;jta-data-source&gt;java:/DefaultDS&lt;/jta-data-source&gt;
+      &lt;mapping-file&gt;ormap.xml&lt;/mapping-file&gt;
+      &lt;jar-file&gt;MyApp.jar&lt;/jar-file&gt;
+      &lt;class&gt;org.acme.Employee&lt;/class&gt;
+      &lt;class&gt;org.acme.Person&lt;/class&gt;
+      &lt;class&gt;org.acme.Address&lt;/class&gt;
+      &lt;properties&gt;
+         &lt;property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect"/&gt;
+         &lt;property name="hibernate.hbm2ddl.auto" value="create-drop"/&gt;
+      &lt;/properties&gt;
+   &lt;/persistence-unit&gt;
+&lt;/persistence&gt;</pre><div class="variablelist"><dl><dt><span class="term"><tt class="code">name</tt></span></dt><dd><p>(attribute) Every entity manager must have a name.</p></dd><dt><span class="term"><tt class="code">transaction-type</tt></span></dt><dd><p>(attribute) Transaction type used. Either JTA or
+            RESOURCE_LOCAL (default to JTA in a JavaEE environment and to
+            RESOURCE_LOCAL in a JavaSE environment). When a jta-datasource is
+            used, the default is JTA, if non-jta-datasource is used,
+            RESOURCE_LOCAL is used.</p></dd><dt><span class="term"><tt class="code">provider</tt></span></dt><dd><p>The provider is a fully-qualified class name of the EJB
+            Persistence provider. You do not have to define it if you don't
+            work with several EJB3 implementations. This is needed when you
+            are using multiple vendor implementations of EJB
+            Persistence.</p></dd><dt><span class="term"><tt class="code">jta-data-source</tt>,
+          <tt class="code">non-jta-data-source</tt></span></dt><dd><p>This is the JNDI name of where the javax.sql.DataSource is
+            located. When running without a JNDI available Datasource, you
+            must specify JDBC connections with Hibernate specific properties
+            (see below).</p></dd><dt><span class="term"><tt class="code">mapping-file</tt></span></dt><dd><p>The class element specifies a EJB3 compliant XML mapping
+            file that you will map. The file has to be in the classpath. As
+            per the EJB3 specification, Hibernate EntityManager will try to
+            load the mapping file located in the jar file at
+            <tt class="literal">META_INF/orm.xml</tt>. Of course any explicit
+            mapping file will be loaded too. As a matter of fact, you can
+            provides any XML file in the mapping file element ie. either hbm
+            files or EJB3 deployment descriptor.</p></dd><dt><span class="term"><tt class="code">jar-file</tt></span></dt><dd><p>The jar-file elements specifies a jar to analyse. All
+            properly annotated classes, annotated packages and all hbm.xml
+            files part of this jar file will be added to the persistence unit
+            configuration. This element is mainly used in Java EE environment.
+            Use of this one in Java SE should be considered as non portable,
+            in this case a absolute url is needed. You can alternatively point
+            to a directory (This is especially useful when in your test
+            environment, the persistence.xml file is not under the same root
+            directory or jar than your domain model).</p><pre class="programlisting">        &lt;jar-file&gt;file:/home/turin/work/local/lab8/build/classes&lt;/jar-file&gt;</pre></dd><dt><span class="term"><tt class="code">exclude-unlisted-classes</tt></span></dt><dd><p>Do not check the main jar file for annotated classes. Only
+            explicit classes will be part of the persistence unit.</p></dd><dt><span class="term"><tt class="code">class</tt></span></dt><dd><p>The class element specifies a fully qualified class name
+            that you will map. By default all properly annotated classes and
+            all hbm.xml files found inside the archive are added to the
+            persistence unit configuration. You can add some external entity
+            through the class element though. As an extension to the
+            specification, you can add a package name in the
+            <tt class="literal">&lt;class&gt;</tt> element (eg
+            <tt class="code">&lt;class&gt;org.hibernate.eg&lt;/class&gt;</tt>).
+            Caution, the package will include the metadata defined at the
+            package level (ie in <tt class="filename">package-info.java</tt>), it
+            will not include all the classes of a given package.</p></dd><dt><span class="term"><tt class="code">properties</tt></span></dt><dd><p>The properties element is used to specify vendor specific
+            properties. This is where you will define your Hibernate specific
+            configurations. This is also where you will have to specify JDBC
+            connection information as well.</p></dd></dl></div><p>Be sure to define the grammar definition in the
+      <tt class="literal">persistence</tt> element since the EJB3 specification
+      requires the schema validation. If the systemId ends with
+      <tt class="literal">persistence_1_0.xsd</tt>, Hibernate entityManager will use
+      the version embedded in the hibernate-entitymanager.jar. No internet
+      access will be processed.</p><pre class="programlisting">&lt;persistence xmlns="http://java.sun.com/xml/ns/persistence"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"
+   version="1.0"&gt;</pre></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="setup-configuration-bootstrapping"></a>2.2.2.&nbsp;Bootstrapping</h3></div></div><div></div></div><p>The EJB3 specification defines a bootstrap procedure to access the
+      <tt class="classname">EntityManagerFactory</tt> and the
+      <tt class="classname">EntityManager</tt>. The bootstrap class is
+      <tt class="classname">javax.persistence.Persistence</tt>, e.g.</p><pre class="programlisting">EntityManagerFactory emf = Persistence.createEntityManagerFactory("manager1");
+//or
+Map configOverrides = new HashMap();
+configOverrides.put("hibernate.hbm2ddl.auto", "create-drop");
+EntityManagerFactory programmaticEmf =
+    Persistence.createEntityManagerFactory("manager1", configOverrides);</pre><p>The first version is equivalent to the second with an empty map.
+      The map version is a set of overrides that will take precedence over any
+      properties defined in your persistence.xml files. There are a couple of
+      EJB3 properties usable in the map:</p><div class="itemizedlist"><ul type="disc"><li><p>javax.persistence.provider to define the provider class
+          used</p></li><li><p>javax.persistence.transactionType to define the transaction
+          type used (either JTA or RESOURCE_LOCAL)</p></li><li><p>javax.persistence.jtaDataSource to define the JTA datasource
+          name in JNDI</p></li><li><p>javax.persistence.nonJtaDataSource to define the non JTA
+          datasource name in JNDI</p></li></ul></div><p>When <tt class="code">Persistence.createEntityManagerFactory()</tt> is
+      called, the persistence implementation will search your classpath for
+      any <tt class="code">META-INF/persistence.xml</tt> files using the
+      <tt class="code">ClassLoader.getResource("META-INF/persistence.xml")</tt> method.
+      Actually the <tt class="classname">Persistence</tt> class will look at all
+      the Persistence Providers available in the classpath and ask each of
+      them if they are responsible for the creation of the entity manager
+      factory <tt class="literal">manager1</tt>. Each provider, from this list of
+      resources, it will try to find an entity manager that matches the name
+      you specify in the command line with what is specified in the
+      persistence.xml file (of course the provider <tt class="literal">element</tt>
+      must match the current persistent provider). If no persistence.xml with
+      the correct name are found or if the expected persistence provider is
+      not found, a <tt class="classname">PersistenceException</tt> is
+      raised.</p><p>Apart from Hibernate system-level settings, all the properties
+      available in Hibernate can be set in <tt class="code">properties</tt> element of
+      the persistence.xml file or as an override in the map you pass to
+      <tt class="code">createEntityManagerFactory()</tt>. Please refer to the Hibernate
+      reference documentation for a complete listing. There are however a
+      couple of properties available in the EJB3 provider only.</p><p></p><div class="table"><a name="d0e362"></a><p class="title"><b>Table&nbsp;2.1.&nbsp;Hibernate Entity Manager specific properties</b></p><table summary="Hibernate Entity Manager specific properties" border="1"><colgroup><col align="left"><col></colgroup><thead><tr><th align="left">Property name</th><th>Description</th></tr></thead><tbody><tr><td align="left">hibernate.ejb.classcache.&lt;classname&gt;</td><td>class cache strategy [comma cache region] of the class
+              Default to no cache, and default region cache to
+              fully.qualified.classname (eg.
+              hibernate.ejb.classcache.com.acme.Cat read-write or
+              hibernate.ejb.classcache.com.acme.Cat read-write,
+              MyRegion).</td></tr><tr><td align="left">hibernate.ejb.collectioncache.&lt;collectionrole&gt;</td><td>collection cache strategy [comma cache region] of the
+              class Default to no cache, and default region cache to
+              fully.qualified.classname.role (eg.
+              hibernate.ejb.classcache.com.acme.Cat read-write or
+              hibernate.ejb.classcache.com.acme.Cat read-write,
+              MyRegion).</td></tr><tr><td align="left">hibernate.ejb.cfgfile</td><td>XML configuration file to use to configure Hibernate (eg.
+              <tt class="filename">/hibernate.cfg.xml</tt>).</td></tr><tr><td align="left">hibernate.archive.autodetection</td><td>Determine which element is auto discovered by Hibernate
+              Entity Manager while parsing the .par archive. (default to
+              <tt class="literal">class,hbm</tt>).</td></tr><tr><td align="left">hibernate.ejb.interceptor</td><td>An optional Hibernate interceptor. The interceptor
+              instance is shared by all <tt class="classname">Session</tt>
+              instances. This interceptor has to implement
+              <tt class="classname">org.hibernate.Interceptor</tt> and have a
+              no-arg constructor. This property can not be combined with
+              <tt class="literal">hibernate.ejb.interceptor.session_scoped</tt>.</td></tr><tr><td align="left">hibernate.ejb.interceptor.session_scoped</td><td>An optional Hibernate interceptor. The interceptor
+              instance is specific to a given <tt class="classname">Session</tt>
+              instance (and hence can be non thread-safe). This interceptor
+              has to implement
+              <tt class="classname">org.hibernate.Interceptor</tt> and have a
+              no-arg constructor. This property can not be combined with
+              <tt class="literal">hibernate.ejb.interceptor</tt>.</td></tr><tr><td align="left">hibernate.ejb.naming_strategy</td><td>An optional naming strategy. The default naming strategy
+              used is <tt class="classname">EJB3NamingStrategy</tt>. You also
+              might want to consider the
+              <tt class="classname">DefaultComponentSafeNamingStrategy</tt>.</td></tr><tr><td align="left">hibernate.ejb.event.&lt;eventtype&gt;</td><td>Event listener list for a given eventtype. The list of
+              event listeners is a comma separated fully qualified class name
+              list (eg. hibernate.ejb.event.pre-load
+              com.acme.SecurityListener, com.acme.AuditListener)</td></tr><tr><td align="left">hibernate.ejb.use_class_enhancer</td><td>Whether or not use Application server class enhancement
+              at deployment time (default to false)</td></tr><tr><td align="left">hibernate.ejb.discard_pc_on_close</td><td>If true, the persistence context will be discarded (think
+              clear() when the method is called. Otherwise the persistence
+              context will stay alive till the transaction completion: all
+              objects will remain managed, and any change will be sy,chronized
+              with the database (default to false, ie wait the transaction
+              completion)</td></tr></tbody></table></div><p>Note that you can mix XML <tt class="literal">&lt;class&gt;</tt>
+      declaration and <tt class="literal">hibernate.ejb.cfgfile</tt> usage in the
+      same configuration. Be aware of the potential clashed. The properties
+      set in <tt class="filename">persistence.xml</tt> will override the one in the
+      defined <tt class="filename">hibernate.cfg.xml</tt>.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>It is important that you do not override
+        <tt class="literal">hibernate.transaction.factory_class</tt>, Hibernate
+        EntityManager automatically set the appropriate transaction factory
+        depending on the EntityManager type (ie <tt class="literal">JTA</tt> versus
+        <tt class="literal">RESOURSE_LOCAL</tt>). If you are working in a Java EE
+        environment, you might want to set the
+        <tt class="literal">hibernate.transaction.manager_lookup_class</tt>
+        though.</p></div><p>Here is a typical configuration in a J2SE environment</p><pre class="programlisting">&lt;persistence&gt;
+   &lt;persistence-unit name="manager1" transaction-type="RESOURCE_LOCAL"&gt;
+      &lt;class&gt;org.hibernate.ejb.test.Cat&lt;/class&gt;
+      &lt;class&gt;org.hibernate.ejb.test.Distributor&lt;/class&gt;
+      &lt;class&gt;org.hibernate.ejb.test.Item&lt;/class&gt;
+      &lt;properties&gt;
+         &lt;property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect"/&gt;
+         &lt;property name="hibernate.connection.driver_class" value="org.hsqldb.jdbcDriver"/&gt;
+         &lt;property name="hibernate.connection.username" value="sa"/&gt;
+         &lt;property name="hibernate.connection.password" value=""/&gt;
+         &lt;property name="hibernate.connection.url" value="jdbc:hsqldb:."/&gt;
+         &lt;property name="hibernate.max_fetch_depth" value="3"/&gt;
+       
+         &lt;!-- cache configuration --&gt;
+         &lt;property name="hibernate.ejb.classcache.org.hibernate.ejb.test.Item" value="read-write"/&gt;
+         &lt;property name="hibernate.ejb.collectioncache.org.hibernate.ejb.test.Item.distributors" value="read-write, RegionName"/&gt;
+
+         &lt;!-- alternatively to &lt;class&gt; and &lt;property&gt; declarations, you can use a regular hibernate.cfg.xml file --&gt;
+         &lt;!-- property name="hibernate.ejb.cfgfile" value="/org/hibernate/ejb/test/hibernate.cfg.xml"/ --&gt;
+      &lt;/properties&gt;
+   &lt;/persistence-unit&gt;
+&lt;/persistence&gt;</pre><p>To ease the programmatic configuration, Hibernate Entity Manager
+      provide a proprietary API. This API is very similar to the
+      <tt class="classname">Configuration</tt> API and share the same concepts:
+      <tt class="classname">Ejb3Configuration</tt>. Refer to the JavaDoc and the
+      Hibernate reference guide for more detailed informations on how to use
+      it.</p><p>TODO: me more descriptive on some APIs like setDatasource()</p><pre class="programlisting">Ejb3Configuration cfg = new Ejb3Configuration();
+EntityManagerFactory emf = 
+  cfg.addProperties( properties ) //add some properties
+     .setInterceptor( myInterceptorImpl ) // set an interceptor
+     .addAnnotatedClass( MyAnnotatedClass.class ) //add a class to be mapped
+     .addClass( NonAnnotatedClass.class ) //add an hbm.xml file using the Hibernate convention
+     .addRerousce( "mypath/MyOtherCLass.hbm.xml ) //add an hbm.xml file
+     .addRerousce( "mypath/orm.xml ) //add an EJB3 deployment descriptor
+     .configure("/mypath/hibernate.cfg.xml") //add a regular hibernate.cfg.xml
+     .buildEntityManagerFactory(); //Create the entity manager factory</pre></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e500"></a>2.3.&nbsp;Event listeners</h2></div></div><div></div></div><p>Hibernate Entity Manager needs to enhance Hibernate core to
+    implements all the EJB3 semantics. It does that through the event listener
+    system of Hibernate. Be careful when you use the event system yourself,
+    you might override some of the EJB3 semantics. A safe way is to add your
+    event listeners to the list given below.</p><div class="table"><a name="d0e505"></a><p class="title"><b>Table&nbsp;2.2.&nbsp;Hibernate Entity Manager default event listeners</b></p><table summary="Hibernate Entity Manager default event listeners" border="1"><colgroup><col align="left"><col></colgroup><thead><tr><th align="left">Event</th><th>Listeners</th></tr></thead><tbody><tr><td align="left">flush</td><td>org.hibernate.ejb.event.EJB3FlushEventListener</td></tr><tr><td align="left">auto-flush</td><td>org.hibernate.ejb.event.EJB3AutoFlushEventListener</td></tr><tr><td align="left">delete</td><td>org.hibernate.ejb.event.EJB3DeleteEventListener</td></tr><tr><td align="left">flush-entity</td><td>org.hibernate.ejb.event.EJB3FlushEntityEventListener</td></tr><tr><td align="left">merge</td><td>org.hibernate.ejb.event.EJB3MergeEventListener</td></tr><tr><td align="left">create</td><td>org.hibernate.ejb.event.EJB3PersistEventListener</td></tr><tr><td align="left">create-onflush</td><td>org.hibernate.ejb.event.EJB3PersistOnFlushEventListener</td></tr><tr><td align="left">save</td><td>org.hibernate.ejb.event.EJB3SaveEventListener</td></tr><tr><td align="left">save-update</td><td>org.hibernate.ejb.event.EJB3SaveOrUpdateEventListener</td></tr><tr><td align="left">pre-insert</td><td>org.hibernate.secure.JACCPreInsertEventListener,
+            org.hibernate.valitator.event.ValidateEventListener</td></tr><tr><td align="left">pre-insert</td><td>org.hibernate.secure.JACCPreUpdateEventListener,
+            org.hibernate.valitator.event.ValidateEventListener</td></tr><tr><td align="left">pre-delete</td><td>org.hibernate.secure.JACCPreDeleteEventListener</td></tr><tr><td align="left">pre-load</td><td>org.hibernate.secure.JACCPreLoadEventListener</td></tr><tr><td align="left">post-delete</td><td>org.hibernate.ejb.event.EJB3PostDeleteEventListener</td></tr><tr><td align="left">post-insert</td><td>org.hibernate.ejb.event.EJB3PostInsertEventListener</td></tr><tr><td align="left">post-load</td><td>org.hibernate.ejb.event.EJB3PostLoadEventListener</td></tr><tr><td align="left">post-update</td><td>org.hibernate.ejb.event.EJB3PostUpdateEventListener</td></tr></tbody></table></div><p>Note that the JACC*EventListeners are removed if the security is not
+    enabled.</p><p>You can configure the event listeners either through the properties
+    (see <a href="#setup-configuration">Configuration and bootstrapping</a>) or through the
+    <tt class="methodname">ejb3configuration.getEventListeners()</tt> API.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e612"></a>2.4.&nbsp;Obtaining an EntityManager in a Java SE environment</h2></div></div><div></div></div><p>An entity manager factory should be considered as an immutable
+    configuration holder, it is defined to point to a single datasource and to
+    map a defined set of entities. This is the entry point to create and
+    manage <tt class="classname">EntityManager</tt>s. The
+    <tt class="classname">Persistence</tt> class is bootstrap class to create an
+    entity manager factory.</p><pre class="programlisting">// Use persistence.xml configuration
+EntityManagerFactory emf = Persistence.createEntityManagerFactory("manager1")
+EntityManager em = emf.createEntityManager(); // Retrieve an application managed entity manager
+// Work with the EM
+em.close();
+...
+emf.close(); //close at application end</pre><p>An entity manager factory is typically create at application
+    initialization time and closed at application end. It's creation is an
+    expensive process. For those who are familiar with Hibernate, an entity
+    manager factory is very much like a session factory. Actually, an entity
+    manager factory is a wrapper on top of a session factory. Calls to the
+    entityManagerFactory are thread safe.</p><p>Thanks to the EntityManagerFactory, you can retrieve an extended
+    entity manager. The extended entity manager keep the same persistence
+    context for the lifetime of the entity manager: in other words, the
+    entities are still managed between two transactions (unless you call
+    entityManager.clear() in between). You can see an entity manager as a
+    small wrapper on top of an Hibernate session.</p><p>TODO explains emf.createEntityManager(Map)</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e631"></a>2.5.&nbsp;Various</h2></div></div><div></div></div><p>Hibernate Entity Manager comes with Hibernate Validator configured
+    out of the box. You don't have to override any event yourself. If you do
+    not use Hibernate Validator annotations in your domain model, there will
+    be no performance cost. For more information on Hibernate Validator,
+    please refer to the Hibernate Annotations reference guide.</p></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="objectstate"></a>Chapter&nbsp;3.&nbsp;Working with objects</h2></div></div><div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e639"></a>3.1.&nbsp;Entity states</h2></div></div><div></div></div><p>Like in Hibernate (comparable terms in parantheses), an entity
+    instance is in one of the following states:</p><div class="itemizedlist"><ul type="disc"><li><p>New (transient): an entity is new if it has just been
+        instantiated using the new operator, and it is not associated with a
+        persistence context. It has no persistent representation in the
+        database and no identifier value has been assigned.</p></li><li><p>Managed (persistent): a managed entity instance is an instance
+        with a persistent identity that is currently associated with a
+        persistence context.</p></li><li><p>Detached: the entity instance is an instance with a persistent
+        identity that is no longer associated with a persistence context,
+        usually because the persistence context was closed or the instance was
+        evicted from the context.</p></li><li><p>Removed: a removed entity instance is an instance with a
+        persistent identity, associated with a persistence context, but
+        scheduled for removal from the database.</p></li></ul></div><p>The <tt class="classname">EntityManager</tt> API allows you to change
+    the state of an entity, or in other words, to load and store objects. You
+    will find persistence with EJB3 easier to understand if you think about
+    object state management, not managing of SQL statements.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e662"></a>3.2.&nbsp;Making objects persistent</h2></div></div><div></div></div><p>Once you've created a new entity instance (using the common
+    <tt class="literal">new</tt> operator) it is in <tt class="literal">new</tt> state.
+    You can make it persistent by associating it to an entity manager:</p><pre class="programlisting">DomesticCat fritz = new DomesticCat();
+fritz.setColor(Color.GINGER);
+fritz.setSex('M');
+fritz.setName("Fritz");
+em.persist(fritz);</pre><p>If the <tt class="literal">DomesticCat</tt> entity type has a generated
+    identifier, the value is associated to the instance when
+    <tt class="code">persist()</tt> is called. If the identifier is not automatically
+    generated, the application-assigned (usually natural) key value has to be
+    set on the instance before <tt class="code">persist()</tt> is called.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e686"></a>3.3.&nbsp;Loading an object</h2></div></div><div></div></div><p>Load an entity instance by its identifier value with the entity
+    manager's <tt class="code">find()</tt> method:</p><pre class="programlisting">cat = em.find(Cat.class, catId);
+
+// You may need to wrap the primitive identifiers
+long catId = 1234;
+em.find( Cat.class, new Long(catId) );</pre><p>In some cases, you don't really want to load the object state, but
+    just having a reference to it (ie a proxy). You can get this reference
+    using the <tt class="literal">getReference()</tt> method. This is especially
+    useful to link a child to its parent wo having to load the parent.</p><pre class="programlisting">child = new Child();
+child.SetName("Henry");
+Parent parent = em.getReference(Parent.class, parentId); //no query to the DB
+child.setParent(parent);
+em.persist(child);</pre><p>You can reload an entity instance and it's collections at any time
+    using the <tt class="code">em.refresh()</tt> operation. This is useful when
+    database triggers are used to initialize some of the properties of the
+    entity. Note that only the entity instance and its collections are
+    refreshed unless you specify <tt class="literal">REFRESH</tt> as a cascade style
+    of any associations:</p><pre class="programlisting">em.persist(cat);
+em.flush(); // force the SQL insert and triggers to run
+em.refresh(cat); //re-read the state (after the trigger executes)</pre></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e713"></a>3.4.&nbsp;Querying objects</h2></div></div><div></div></div><p>If you don't know the identifier values of the objects you are
+    looking for, you need a query. The Hibernate EntityManager implementation
+    supports an easy-to-use but powerful object-oriented query language
+    (EJB3-QL) which has been inspired by HQL (and vice-versa). Both query
+    languages are portable across databases, the use entity and property names
+    as identifiers (instead of table and column names). You may also express
+    your query in the native SQL of your database, with optional support from
+    EJB3 for result set conversion into Java business objects.</p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e718"></a>3.4.1.&nbsp;Executing queries</h3></div></div><div></div></div><p>EJB3QL and SQL queries are represented by an instance of
+      <tt class="classname">javax.persistence.Query</tt>. This interface offers
+      methods for parameter binding, result set handling, and for execution of
+      the query. Queries are always created using the current entity
+      manager:</p><pre class="programlisting">List cats = em.createQuery(
+    "select cat from Cat as cat where cat.birthdate &lt; ?1")
+    .setParameter(1, date, TemporalType.DATE)
+    .getResultList();
+
+List mothers = em.createQuery(
+    "select mother from Cat as cat join cat.mother as mother where cat.name = ?1")
+    .setParameter(1, name)
+    .getResultList();
+
+List kittens = em.createQuery(
+    "from Cat as cat where cat.mother = ?1")
+    .setEntity(1, pk)
+    .getResultList();
+
+Cat mother = (Cat) em.createQuery(
+    "select cat.mother from Cat as cat where cat = ?1")
+    .setParameter(1, izi)
+    .getSingleResult();</pre><p>A query is usually executed by invoking
+      <tt class="methodname">getResultList()</tt>. This method loads the
+      resulting instances of the query completly into memory. Entity instances
+      retrieved by a query are in persistent state. The
+      <tt class="methodname">getSingleResult() </tt>method offers a shortcut if
+      you know your query will only return a single object.</p><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="d0e736"></a>3.4.1.1.&nbsp;Projection</h4></div></div><div></div></div><p>An EJB3QL query queries can return tuples of objects if
+        projection is used. Each result tuple is returned as an object
+        array:</p><pre class="programlisting">Iterator kittensAndMothers = sess.createQuery(
+            "select kitten, mother from Cat kitten join kitten.mother mother")
+            .getResultList()
+            .iterator();
+
+while ( kittensAndMothers.hasNext() ) {
+    Object[] tuple = (Object[]) kittensAndMothers.next();
+    Cat kitten = (Cat) tuple[0];
+    Cat mother = (Cat) tuple[1];
+    ....
+}</pre></div><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="d0e743"></a>3.4.1.2.&nbsp;Scalar results</h4></div></div><div></div></div><p>Queries may specify a particular property of an entity in the
+        select clause, instead of an entity alias. You may call SQL aggregate
+        functions as well. Returned non-transactional objects or aggregation
+        results are considered "scalar" results and are not entities in
+        persistent state (in other words, they are considered "read
+        only"):</p><pre class="programlisting">Iterator results = em.createQuery(
+        "select cat.color, min(cat.birthdate), count(cat) from Cat cat " +
+        "group by cat.color")
+        .getResultList()
+        .iterator();
+
+while ( results.hasNext() ) {
+    Object[] row = results.next();
+    Color type = (Color) row[0];
+    Date oldest = (Date) row[1];
+    Integer count = (Integer) row[2];
+    .....
+}</pre></div><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="d0e750"></a>3.4.1.3.&nbsp;Bind parameters</h4></div></div><div></div></div><p>Both named and positional query parameters are supported, the
+        <tt class="literal">Query</tt> API offers several methods to bind arguments.
+        The EJB3 specification numbers positional parameters from one. Named
+        parameters are identifiers of the form <tt class="literal">:paramname</tt>
+        in the query string. Named parameters should be prefered, they are
+        more robust and easier to read and understand:</p><pre class="programlisting">// Named parameter (preferred)
+Query q = em.createQuery("select cat from DomesticCat cat where cat.name = :name");
+q.setParameter("name", "Fritz");
+List cats = q.getResultList();
+
+// Positional parameter
+Query q = em.createQuery("select cat from DomesticCat cat where cat.name = ?1");
+q.setParameter(1, "Izi");
+List cats = q.getResultList();
+
+// Named parameter list
+List names = new ArrayList();
+names.add("Izi");
+names.add("Fritz");
+Query q = em.createQuery("select cat from DomesticCat cat where cat.name in (:namesList)");
+q.setParameter("namesList", names);
+List cats = q.list();</pre></div><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="d0e763"></a>3.4.1.4.&nbsp;Pagination</h4></div></div><div></div></div><p>If you need to specify bounds upon your result set (the maximum
+        number of rows you want to retrieve and/or the first row you want to
+        retrieve), use the following methods:</p><pre class="programlisting">Query q = em.createQuery("select cat from DomesticCat cat");
+q.setFirstResult(20);
+q.setMaxResults(10);
+List cats = q.getResultList(); //return cats from the 20th position to 29th</pre><p>Hibernate knows how to translate this limit query into the
+        native SQL of your DBMS.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="d0e772"></a>3.4.1.5.&nbsp;Externalizing named queries</h4></div></div><div></div></div><p>You may also define named queries through annotations:</p><pre class="programlisting">@javax.persistence.NamedQuery(name="eg.DomesticCat.by.name.and.minimum.weight", 
+  query="select cat from eg.DomesticCat as cat  where cat.name = ?1 and cat.weight &gt; ?2")</pre><p>Parameters are bound programatically to the named query, before
+        it is executed:</p><pre class="programlisting">Query q = em.createNamedQuery("eg.DomesticCat.by.name.and.minimum.weight");
+q.setString(1, name);
+q.setInt(2, minWeight);
+List cats = q.getResultList();</pre><p>Note that the actual program code is independent of the query
+        language that is used, you may also define native SQL queries in
+        metadata, or use Hibernate's native facilities by placing them in XML
+        mapping files.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="d0e785"></a>3.4.1.6.&nbsp;Native queries</h4></div></div><div></div></div><p>You may express a query in SQL, using
+        <tt class="methodname">createNativeQuery()</tt> and let Hibernate take
+        care mapping from JDBC result sets to business objects. Use the
+        <tt class="literal">@SqlResultSetMapping</tt> (please see the Hibernate
+        Annotations reference documentation on how to map a SQL resultset
+        mapping) or the entity mapping (if the column names of the query
+        result are the same as the names declared in the entity mapping;
+        remember that all entity columns have to be returned for this
+        mechanism to work):</p><pre class="programlisting">@SqlResultSetMapping(name="getItem", entities = 
+        @EntityResult(entityClass=org.hibernate.ejb.test.Item.class, fields= {
+            @FieldResult(name="name", column="itemname"),
+            @FieldResult(name="descr", column="itemdescription")
+        })
+)
+
+Query q = em.createNativeQuery("select name as itemname, descr as itemdescription from Item", "getItem");
+item = (Item) q.getSingleResult(); //from a resultset
+
+Query q = em.createNativeQuery("select * from Item", Item.class);
+item = (Item) q.getSingleResult(); //from a class columns names match the mapping</pre><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>For more information about scalar support in named queries,
+          please refers to the Hibenate Annotations documentation</p></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="d0e801"></a>3.4.1.7.&nbsp;Query hints</h4></div></div><div></div></div><p>Query hints (for performance optimization, usually) are
+        implementation specific. Hints are declared using the
+        <tt class="methodname">query.setHint(String name, Object value)</tt>
+        method, or through the <tt class="literal">@Named(Native)Query(hints)</tt>
+        annotation Note that these are not SQL query hints! The Hibernate EJB3
+        implementation offers the following query hints:</p><div class="table"><a name="d0e812"></a><p class="title"><b>Table&nbsp;3.1.&nbsp;Hibernate query hints</b></p><table summary="Hibernate query hints" border="1"><colgroup><col><col></colgroup><thead><tr><th align="center">Hint</th><th align="center">Description</th></tr></thead><tbody><tr><td>org.hibernate.timeout</td><td>Query timeout in seconds ( eg. new Integer(10)
+                )</td></tr><tr><td>org.hibernate.fetchSize</td><td>Number of rows fetched by the JDBC driver per roundtrip
+                ( eg. new Integer(50) )</td></tr><tr><td>org.hibernate.comment</td><td>Add a comment to the SQL query, useful for the DBA (
+                e.g. new String("fetch all orders in 1 statement") )</td></tr><tr><td>org.hibernate.cacheable</td><td>Whether or not a query is cacheable ( eg. new
+                Boolean(true) ), defaults to false</td></tr><tr><td>org.hibernate.cacheMode</td><td>Override the cache mode for this query ( eg.
+                CacheMode.REFRESH )</td></tr><tr><td>org.hibernate.cacheRegion</td><td>Cache region of this query ( eg. new
+                String("regionName") )</td></tr><tr><td>org.hibernate.readOnly</td><td>Entities retrieved by this query will be loaded in a
+                read-only mode where Hibernate will never dirty-check them or
+                make changes persistent ( eg. new Boolean(true) ), default to
+                false</td></tr><tr><td>org.hibernate.flushMode</td><td>Flush mode used for this query</td></tr><tr><td>org.hibernate.cacheMode</td><td>Cache mode used for this query</td></tr></tbody></table></div><p>The value object accept both the native type or its string
+        equivalent (eg. <tt class="literal">CaheMode.REFRESH</tt> or
+        &#8220;<span class="quote"><tt class="literal">REFRESH</tt></span>&#8221;). Please refer to the
+        Hibernate reference documentation for more information.</p></div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e879"></a>3.5.&nbsp;Modifying persistent objects</h2></div></div><div></div></div><p>Transactional managed instances (ie. objects loaded, saved, created
+    or queried by the entity manager) may be manipulated by the application
+    and any changes to persistent state will be persisted when the Entity
+    manager is flushed (discussed later in this chapter). There is no need to
+    call a particular method to make your modifications persistent. A
+    straightforward wayt to update the state of an entity instance is to
+    <tt class="methodname">find()</tt> it, and then manipulate it directly, while
+    the persistence context is open:</p><pre class="programlisting">Cat cat = em.find( Cat.class, new Long(69) );
+cat.setName("PK");
+em.flush();  // changes to cat are automatically detected and persisted</pre><p>Sometimes this programming model is inefficient since it would
+    require both an SQL SELECT (to load an object) and an SQL UPDATE (to
+    persist its updated state) in the same session. Therefore Hibernate offers
+    an alternate approach, using detached instances.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e891"></a>3.6.&nbsp;Modifying detached objects</h2></div></div><div></div></div><p>Many applications need to retrieve an object in one transaction,
+    send it to the presentation layer for manipulation, and later save the
+    changes in a new transaction. There can be significant user think and
+    waiting time between both transactions. Applications that use this kind of
+    approach in a high-concurrency environment usually use versioned data to
+    ensure isolation for the "long" unit of work.</p><p>The EJB3 specifications supports this development model by providing
+    for persistence of modifications made to detached instances using the
+    <tt class="methodname">EntityManager.merge()</tt> method:</p><pre class="programlisting">// in the first entity manager
+Cat cat = firstEntityManager.find(Cat.class, catId);
+Cat potentialMate = new Cat();
+firstEntityManager.persist(potentialMate);
+
+// in a higher layer of the application
+cat.setMate(potentialMate);
+
+// later, in a new entity manager
+secondEntityManager.merge(cat);  // update cat
+secondEntityManager.merge(mate); // update mate</pre><p>The <tt class="literal">merge()</tt> method merges modifications made to
+    the detached instance into the corresponding managed instance, if any,
+    without consideration of the state of the persistence context. In other
+    words, the merged objects state overrides the persistent entity state in
+    the persistence context, if one is already present. The application should
+    individually <tt class="methodname">merge()</tt> detached instances reachable
+    from the given detached instance if and only if it wants their state also
+    to be persistent. This can be cascaded to associated entities and
+    collections, using transitive persistence, see <a href="#objectstate-transitive">Transitive persistence</a>.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e913"></a>3.7.&nbsp;Automatic state detection</h2></div></div><div></div></div><p>The merge operation is clever enough to automatically detect whether
+    the merging of the detached instance has to result in an insert or update.
+    In other words, you don't have to worry about passing a new instance (and
+    not a detached instance) to <tt class="literal">merge()</tt>, the entity manager
+    will figure this out for you:</p><pre class="programlisting">// In the first entity manager
+Cat cat = firstEntityManager.find(Cat.class, catID);
+
+// In a higher layer of the application, detached
+Cat mate = new Cat();
+cat.setMate(mate);
+
+// Later, in a new entity manager
+secondEntityManager.merge(cat);   // update existing state
+secondEntityManager.merge(mate);  // save the new instance</pre><p>The usage and semantics of <tt class="literal">merge()</tt> seems to be
+    confusing for new users. Firstly, as long as you are not trying to use
+    object state loaded in one entity manager in another new entity manager,
+    you should not need to use <tt class="methodname">merge()</tt> at all. Some
+    whole applications will never use this method.</p><p>Usually <tt class="methodname">merge()</tt> is used in the following
+    scenario:</p><div class="itemizedlist"><ul type="disc"><li><p>the application loads an object in the first entity
+        manager</p></li><li><p>the object is passed up to the presentation layer</p></li><li><p>some modifications are made to the object</p></li><li><p>the object is passed back down to the business logic
+        layer</p></li><li><p>the application persists these modifications by calling
+        <tt class="methodname">merge()</tt> in a second entity manager</p></li></ul></div><p>Here is the exact semantic of
+    <tt class="methodname">merge()</tt>:</p><div class="itemizedlist"><ul type="disc"><li><p>if there is a managed instance with the same identifier
+        currently associated with the persistence context, copy the state of
+        the given object onto the managed instance</p></li><li><p>if there is no managed instance currently associated with the
+        persistence context, try to load it from the database, or create a new
+        managed instance</p></li><li><p>the managed instance is returned</p></li><li><p>the given instance does not become associated with the
+        persistence context, it remains detached and is usually
+        discarded</p></li></ul></div><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Merging vs. saveOrUpdate/saveOrUpdateCopy</h3><p>Merging in EJB3 is similar to the
+      <tt class="literal">saveOrUpdateCopy()</tt> method in native Hibernate.
+      However, it is not the same as the <tt class="literal">saveOrUpdate()</tt>
+      method, the given instance is not reattached with the persistence
+      context, but a managed instance is returned by the
+      <tt class="methodname">merge()</tt> method.</p></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e987"></a>3.8.&nbsp;Deleting managed objects</h2></div></div><div></div></div><p><tt class="methodname">EntityManager.remove()</tt> will remove an
+    objects state from the database. Of course, your application might still
+    hold a reference to a deleted object. You can think of
+    <tt class="methodname">remove()</tt> as making a persistent instance new (aka
+    transient) again. It is not detached, and a merge would result in an
+    insertion.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e997"></a>3.9.&nbsp;Flush the persistence context</h2></div></div><div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e1000"></a>3.9.1.&nbsp;In a transaction</h3></div></div><div></div></div><p>From time to time the entity manager will execute the SQL DML
+      statements needed to synchronize the data store with the state of
+      objects held in memory. This process, flush, occurs by default (this is
+      Hibernate specific and not defined by the specification) at the
+      following points:</p><div class="itemizedlist"><ul type="disc"><li><p>before query execution*</p></li><li><p>from
+          <tt class="methodname">javax.persistence.EntityTransaction.commit()*</tt></p></li><li><p>when <tt class="methodname">EntityManager.flush()</tt> is
+          called*</p></li></ul></div><p>(*) if a transaction is active</p><p>The SQL statements are issued in the following order</p><div class="itemizedlist"><ul type="disc"><li><p>all entity insertions, in the same order the corresponding
+          objects were saved using
+          <tt class="methodname">EntityManager.persist()</tt></p></li><li><p>all entity updates</p></li><li><p>all collection deletions</p></li><li><p>all collection element deletions, updates and
+          insertions</p></li><li><p>all collection insertions</p></li><li><p>all entity deletions, in the same order the corresponding
+          objects were deleted using
+          <tt class="methodname">EntityManager.remove()</tt></p></li></ul></div><p>(Exception: entity instances using application-assigned
+      identifiers are inserted when they are saved.)</p><p>Except when you explicity <tt class="methodname">flush()</tt>, there
+      are absolutely no guarantees about when the entity manager executes the
+      JDBC calls, only the order in which they are executed. However,
+      Hibernate does guarantee that the
+      <tt class="methodname">Query.getResultList()</tt>/<tt class="methodname">Query.getSingleResult()</tt>
+      will never return stale data; nor will they return wrong data if
+      executed in an active transaction.</p><p>It is possible to change the default behavior so that flush occurs
+      less frequently. The <tt class="classname">FlushModeType</tt> for an entity
+      manager defines two different modes: only flush at commit time or flush
+      automatically using the explained routine unless
+      <tt class="methodname">flush()</tt> is called explicitly.</p><pre class="programlisting">em = emf.createEntityManager();
+Transaction tx = em.getTransaction().begin();
+em.setFlushMode(FlushModeType.COMMIT); // allow queries to return stale state
+
+Cat izi = em.find(Cat.class, id);
+izi.setName(iznizi);
+
+// might return stale data
+em.createQuery("from Cat as cat left outer join cat.kittens kitten").getResultList();
+
+// change to izi is not flushed!
+...
+em.getTransaction().commit(); // flush occurs</pre><p>During flush, an exception might happen (e.g. if a DML operation
+      violates a constraint). TODO: Add link to exception handling.</p><p>Hibernate provides more flush modes than the one described in the
+      EJB3 specification. Please refer to the Hibernate core reference
+      documentation for more informations.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e1074"></a>3.9.2.&nbsp;Outside a transaction</h3></div></div><div></div></div><p>In an <tt class="literal">EXTENDED</tt> persistence context, all read
+      only operations of the entity manager can be executed outside a
+      transaction (<tt class="literal">find()</tt>,
+      <tt class="literal">getReference()</tt>, <tt class="literal">refresh()</tt>, and
+      read queries). Some modifications operations can be executed outside a
+      transaction, but they are queued until the persistence context join a
+      transaction. This is the case of <tt class="literal">persist()</tt>,
+      <tt class="literal"><tt class="literal">merge()</tt></tt>,
+      <tt class="literal">remove()</tt>. Some operations cannot be called outside a
+      transaction: <tt class="literal">flush()</tt>, <tt class="literal">lock()</tt>, and
+      update/delete queries.</p></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="objectstate-transitive"></a>3.10.&nbsp;Transitive persistence</h2></div></div><div></div></div><p>It is quite cumbersome to save, delete, or reattach individual
+    objects, especially if you deal with a graph of associated objects. A
+    common case is a parent/child relationship. Consider the following
+    example:</p><p>If the children in a parent/child relationship would be value typed
+    (e.g. a collection of addresses or strings), their lifecycle would depend
+    on the parent and no further action would be required for convenient
+    "cascading" of state changes. When the parent is persisted, the
+    value-typed child objects are persisted as well, when the parent is
+    removed, the children will be removed, etc. This even works for operations
+    such as the removal of a child from the collection; Hibernate will detect
+    this and, since value-typed objects can't have shared references, remove
+    the child from the database.</p><p>Now consider the same scenario with parent and child objects being
+    entities, not value-types (e.g. categories and items, or parent and child
+    cats). Entities have their own lifecycle, support shared references (so
+    removing an entity from the collection does not mean it can be deleted),
+    and there is by default no cascading of state from one entity to any other
+    associated entities. The EJB3 specification does not require persistence
+    by reachability. It supports a more flexible model of transitive
+    persistence, as first seen in Hibernate.</p><p>For each basic operation of the entity manager - including
+    <tt class="methodname">persist()</tt>, <tt class="methodname">merge()</tt>,
+    <tt class="methodname">remove()</tt>, <tt class="methodname">refresh()</tt> -
+    there is a corresponding cascade style. Respectively, the cascade styles
+    are named PERSIST, MERGE, REMOVE, REFRESH. If you want an operation to be
+    cascaded to associated entity (or collection of entities), you must
+    indicate that in the association annotation:</p><pre class="programlisting">@OneToOne(cascade=CascadeType.PERSIST)</pre><p>Cascading options can be combined:</p><pre class="programlisting">@OneToOne(cascade= { CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.REFRESH } )</pre><p>You may even use CascadeType.ALL to specify that all operations
+    should be cascaded for a particular association. Remember that by default,
+    no operation is cascaded.</p><p>Hibernate offers more native cascading options, please refer to the
+    Hibernate Annotations manual and the Hibernate reference guide for more
+    informations.</p><p>Recommendations:</p><div class="itemizedlist"><ul type="disc"><li><p>It doesn't usually make sense to enable cascade on a
+        <tt class="literal">@ManyToOne</tt> or <tt class="literal">@ManyToMany</tt>
+        association. Cascade is often useful for <tt class="literal">@OneToOne</tt>
+        and <tt class="literal">@OneToMany</tt> associations.</p></li><li><p>If the child object's lifespan is bounded by the lifespan of the
+        parent object, make the parent a full lifecycle object by specifying
+        <tt class="literal">CascadeType.ALL</tt> and
+        <tt class="literal">org.hibernate.annotations.CascadeType.DELETE_ORPHAN</tt>
+        (please refer to the Hibernate reference guide for the semantics of
+        orphan delete)</p></li><li><p>Otherwise, you might not need cascade at all. But if you think
+        that you will often be working with the parent and children together
+        in the same transaction, and you want to save yourself some typing,
+        consider using <tt class="code">cascade={PERSIST, MERGE}</tt>. These options
+        can even make sense for a many-to-many association.</p></li></ul></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e1173"></a>3.11.&nbsp;Locking</h2></div></div><div></div></div><p>The default locking system in EJB3 is mostly based on optimistic
+    locking (ie using a version column to check any concurrency issues). EJB3
+    has defined an additional mechanism to increase the concurrency
+    guaranties. You can apply a lock on a given entity (and it's associated
+    entities if <tt class="literal">LOCK</tt> is cascaded) through the
+    <tt class="methodname">lock(Object entity)</tt> method. Depending on the
+    concurrency guaranties you requires, you choose a lock mode:</p><div class="itemizedlist"><ul type="disc"><li><p><tt class="literal">LockMode.READ</tt> prevents dirty-reads and non
+        repeatable read on a given entity.</p></li><li><p><tt class="literal">LockMode.WRITE</tt> prevents dirty-reads and non
+        repeatable read on a given entity and force an increase of the version
+        number if any.</p></li></ul></div></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="transactions"></a>Chapter&nbsp;4.&nbsp;Transactions and Concurrency</h2></div></div><div></div></div><p>The most important point about Hibernate Entity Manager and
+  concurrency control is that it is very easy to understand. Hibernate Entity
+  Manager directly uses JDBC connections and JTA resources without adding any
+  additional locking behavior. We highly recommend you spend some time with
+  the JDBC, ANSI, and transaction isolation specification of your database
+  management system. Hibernate Entity Manager only adds automatic versioning
+  but does not lock objects in memory or change the isolation level of your
+  database transactions. Basically, use Hibernate Entity Manager like you
+  would use direct JDBC (or JTA/CMT) with your database resources.</p><p>We start the discussion of concurrency control in Hibernate with the
+  granularity of <tt class="literal">EntityManagerFactory</tt>, and
+  <tt class="literal">EntityManager</tt>, as well as database transactions and long
+  units of work..</p><p>In this chapter, and unless explicitly expressed, we will mix and
+  match the concept of entity manager and persistence context. One is an API
+  and programming object, the other a definition of scope. However, keep in
+  mind the essential difference. A persistence context is usually bound to a
+  JTA transaction in Java EE, and a persistence context starts and ends at
+  transaction boundaries (transaction-scoped) unless you use an extended
+  entity manager. Please refer to <a href="#architecture-ejb-persistctxscope" title="1.2.3.&nbsp;Persistence context scope">Section&nbsp;1.2.3, &#8220;Persistence context scope&#8221;</a> for more information.</p><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="transactions-basics"></a>4.1.&nbsp;Entity manager and transaction scopes</h2></div></div><div></div></div><p>A <tt class="literal">EntityManagerFactory</tt> is an expensive-to-create,
+    threadsafe object intended to be shared by all application threads. It is
+    created once, usually on application startup.</p><p>An <tt class="literal">EntityManager</tt> is an inexpensive,
+    non-threadsafe object that should be used once, for a single business
+    process, a single unit of work, and then discarded. An
+    <tt class="literal">EntityManager</tt> will not obtain a JDBC
+    <tt class="literal">Connection</tt> (or a <tt class="literal">Datasource</tt>) unless
+    it is needed, so you may safely open and close an
+    <tt class="literal">EntityManager</tt> even if you are not sure that data access
+    will be needed to serve a particular request. (This becomes important as
+    soon as you are implementing some of the following patterns using request
+    interception.)</p><p>To complete this picture you also have to think about database
+    transactions. A database transaction has to be as short as possible, to
+    reduce lock contention in the database. Long database transactions will
+    prevent your application from scaling to highly concurrent load.</p><p>What is the scope of a unit of work? Can a single Hibernate
+    <tt class="literal">EntityManager</tt> span several database transactions or is
+    this a one-to-one relationship of scopes? When should you open and close a
+    <tt class="literal">Session</tt> and how do you demarcate the database
+    transaction boundaries?</p><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="transactions-basics-uow"></a>4.1.1.&nbsp;Unit of work</h3></div></div><div></div></div><p>First, don't use the
+      <span class="emphasis"><em>entitymanager-per-operation</em></span> antipattern, that is,
+      don't open and close an <tt class="literal">EntityManager</tt> for every
+      simple database call in a single thread! Of course, the same is true for
+      database transactions. Database calls in an application are made using a
+      planned sequence, they are grouped into atomic units of work. (Note that
+      this also means that auto-commit after every single SQL statement is
+      useless in an application, this mode is intended for ad-hoc SQL console
+      work.)</p><p>The most common pattern in a multi-user client/server application
+      is <span class="emphasis"><em>entitymanager-per-request</em></span>. In this model, a
+      request from the client is send to the server (where the EJB3
+      persistence layer runs), a new <tt class="literal">EntityManager</tt> is
+      opened, and all database operations are executed in this unit of work.
+      Once the work has been completed (and the response for the client has
+      been prepared), the persistence context is flushed and closed, as well
+      as the entity manager object. You would also use a single database
+      transaction to serve the clients request. The relationship between the
+      two is one-to-one and this model is a perfect fit for many
+      applications.</p><p>This is the default EJB3 persistence model in a Java EE
+      environment (JTA bounded, transaction-scoped persistence context);
+      injected (or looked up) entity managers share the same persistence
+      context for a particular JTA transaction. The beauty of EJB3 is that you
+      don't have to care about that anymore and just see data access through
+      entity manager and demaraction of transaction scope on session beans as
+      completely orthogonal.</p><p>The challenge is the implementation of this (and other) behavior
+      outside an EJB3 container: not only has the
+      <tt class="literal">EntityManager</tt> and resource-local transaction to be
+      started and ended correctly, but they also have to be accessible for
+      data access operations. The demarcation of a unit of work is ideally
+      implemented using an interceptor that runs when a request hits the
+      non-EJB3 container server and before the response will be send (i.e. a
+      <tt class="literal">ServletFilter</tt> if you are using a standalone servlet
+      container). We recommend to bind the <tt class="literal">EntityManager</tt> to
+      the thread that serves the request, using a
+      <tt class="literal">ThreadLocal</tt> variable. This allows easy access (like
+      accessing a static variable) in all code that runs in this thread.
+      Depending on the database transaction demarcation mechanism you chose,
+      you might also keep the transaction context in a
+      <tt class="literal">ThreadLocal</tt> variable. The implementation patterns for
+      this are known as <span class="emphasis"><em>ThreadLocal Session</em></span> and
+      <span class="emphasis"><em>Open Session in View</em></span> in the Hibernate community.
+      You can easily extend the <tt class="literal">HibernateUtil</tt> shown in the
+      Hibernate reference documentation to implement this pattern, you don't
+      need any external software (it's in fact very trivial). Of course, you'd
+      have to find a way to implement an interceptor and set it up in your
+      environment. See the Hibernate website for tips and examples. Once
+      again, remember that your first choice is naturally an EJB3 container -
+      preferably a light and modular one such as JBoss application
+      server.</p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="transactions-basics-apptx"></a>4.1.2.&nbsp;Long units of work</h3></div></div><div></div></div><p>The entitymanager-per-request pattern is not the only useful
+      concept you can use to design units of work. Many business processes
+      require a whole series of interactions with the user interleaved with
+      database accesses. In web and enterprise applications it is not
+      acceptable for a database transaction to span a user interaction with
+      possibly long waiting time between requests. Consider the following
+      example:</p><div class="itemizedlist"><ul type="disc"><li><p>The first screen of a dialog opens, the data seen by the user
+          has been loaded in a particular <tt class="literal">EntityManager</tt> and
+          resource-local transaction. The user is free to modify the detached
+          objects.</p></li><li><p>The user clicks "Save" after 5 minutes and expects his
+          modifications to be made persistent; he also expects that he was the
+          only person editing this information and that no conflicting
+          modification can occur.</p></li></ul></div><p>We call this unit of work, from the point of view of the user, a
+      long running <span class="emphasis"><em>application transaction</em></span>. There are
+      many ways how you can implement this in your application.</p><p>A first naive implementation might keep the
+      <tt class="literal">EntityManager</tt> and database transaction open during
+      user think time, with locks held in the database to prevent concurrent
+      modification, and to guarantee isolation and atomicity. This is of
+      course an anti-pattern, a pessimistic approach, since lock contention
+      would not allow the application to scale with the number of concurrent
+      users.</p><p>Clearly, we have to use several database transactions to implement
+      the application transaction. In this case, maintaining isolation of
+      business processes becomes the partial responsibility of the application
+      tier. A single application transaction usually spans several database
+      transactions. It will be atomic if only one of these database
+      transactions (the last one) stores the updated data, all others simply
+      read data (e.g. in a wizard-style dialog spanning several
+      request/response cycles). This is easier to implement than it might
+      sound, especially if you use EJB3 entity manager and persistence context
+      features:</p><div class="itemizedlist"><ul type="disc"><li><p><span class="emphasis"><em>Automatic Versioning</em></span> - An entity manager
+          can do automatic optimistic concurrency control for you, it can
+          automatically detect if a concurrent modification occured during
+          user think time (usually by comparing version numbers or timestamps
+          when updating the data in the final resource-local
+          transaction).</p></li><li><p><span class="emphasis"><em>Detached Entities</em></span> - If you decide to use
+          the already discussed <span class="emphasis"><em>entity-per-request</em></span>
+          pattern, all loaded instances will be in detached state during user
+          think time. The entity manager allows you to merge the detached
+          (modified) state and persist the modifications, the pattern is
+          called
+          <span class="emphasis"><em>entitymanager-per-request-with-detached-entities</em></span>.
+          Automatic versioning is used to isolate concurrent
+          modifications.</p></li><li><p><span class="emphasis"><em>Extended Entity Manager</em></span> - The Hibernate
+          Entity Manager may be disconnected from the underlying JDBC
+          connection between two client calls and reconnected when a new
+          client request occurs. This pattern is known as
+          <span class="emphasis"><em>entitymanager-per-application-transaction</em></span> and
+          makes even merging unnecessary. An extend persistence context is
+          responsible to collect and retain any modification (persist, merge,
+          remove) made outside a transaction. The next client call made inside
+          an active transaction (typically the last operation of a user
+          conversation) will execute all queued modifications. Automatic
+          versioning is used to isolate concurrent modifications.</p></li></ul></div><p>Both
+      <span class="emphasis"><em>entitymanager-per-request-with-detached-objects</em></span> and
+      <span class="emphasis"><em>entitymanager-per-application-transaction</em></span> have
+      advantages and disadvantages, we discuss them later in this chapter in
+      the context of optimistic concurrency control.</p><p>TODO: This note should probably come later.</p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="transactions-basics-identity"></a>4.1.3.&nbsp;Considering object identity</h3></div></div><div></div></div><p>An application may concurrently access the same persistent state
+      in two different persistence contexts. However, an instance of a managed
+      class is never shared between two persistence contexts. Hence there are
+      two different notions of identity:</p><div class="variablelist"><dl><dt><span class="term">Database Identity</span></dt><dd><p>
+              <tt class="literal">foo.getId().equals( bar.getId() )</tt>
+            </p></dd><dt><span class="term">JVM Identity</span></dt><dd><p>
+              <tt class="literal">foo==bar</tt>
+            </p></dd></dl></div><p>Then for objects attached to a <span class="emphasis"><em>particular</em></span>
+      persistence context (i.e. in the scope of an
+      <tt class="literal">EntityManager</tt>) the two notions are equivalent, and
+      JVM identity for database identity is guaranteed by the Hibernate Entity
+      Manager. However, while the application might concurrently access the
+      "same" (persistent identity) business object in two different
+      persistence contexts, the two instances will actually be "different"
+      (JVM identity). Conflicts are resolved using (automatic versioning) at
+      flush/commit time, using an optimistic approach.</p><p>This approach leaves Hibernate and the database to worry about
+      concurrency; it also provides the best scalability, since guaranteeing
+      identity in single-threaded units of work only doesn't need expensive
+      locking or other means of synchronization. The application never needs
+      to synchronize on any business object, as long as it sticks to a single
+      thread per <tt class="literal">EntityManager</tt>. Within a persistence
+      context, the application may safely use <tt class="literal">==</tt> to compare
+      entities.</p><p>However, an application that uses <tt class="literal">==</tt> outside of
+      a persistence context might see unexpected results. This might occur
+      even in some unexpected places, for example, if you put two detached
+      instances into the same <tt class="literal">Set</tt>. Both might have the same
+      database identity (i.e. they represent the same row), but JVM identity
+      is by definition not guaranteed for instances in detached state. The
+      developer has to override the <tt class="literal">equals()</tt> and
+      <tt class="literal">hashCode()</tt> methods in persistent classes and
+      implement his own notion of object equality. There is one caveat: Never
+      use the database identifier to implement equality, use a business key, a
+      combination of unique, usually immutable, attributes. The database
+      identifier will change if a transient entity is made persistent (see the
+      contract of the <tt class="literal">persist()</tt> operation). If the
+      transient instance (usually together with detached instances) is held in
+      a <tt class="literal">Set</tt>, changing the hashcode breaks the contract of
+      the <tt class="literal">Set</tt>. Attributes for good business keys don't have
+      to be as stable as database primary keys, you only have to guarantee
+      stability as long as the objects are in the same <tt class="literal">Set</tt>.
+      See the Hibernate website for a more thorough discussion of this issue.
+      Also note that this is not a Hibernate issue, but simply how Java object
+      identity and equality has to be implemented.</p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="transactions-basics-issues"></a>4.1.4.&nbsp;Common concurrency control issues</h3></div></div><div></div></div><p>Never use the anti-patterns
+      <span class="emphasis"><em>entitymanager-per-user-session</em></span> or
+      <span class="emphasis"><em>entitymanager-per-application</em></span> (of course, there are
+      rare exceptions to this rule, e.g. entitymanager-per-application might
+      be acceptable in a desktop application, with manual flushing of the
+      persistence context). Note that some of the following issues might also
+      appear with the recommended patterns, make sure you understand the
+      implications before making a design decision:</p><div class="itemizedlist"><ul type="disc"><li><p>An entity manager is not thread-safe. Things which are
+          supposed to work concurrently, like HTTP requests, session beans, or
+          Swing workers, will cause race conditions if an
+          <tt class="literal">EntityManager</tt> instance would be shared. If you
+          keep your Hibernate <tt class="literal">EntityManager</tt> in your
+          <tt class="literal">HttpSession</tt> (discussed later), you should
+          consider synchronizing access to your Http session. Otherwise, a
+          user that clicks reload fast enough may use the same
+          <tt class="literal">EntityManager</tt> in two concurrently running
+          threads. You will very likely have provisions for this case already
+          in place, for other non-threadsafe but session-scoped
+          objects.</p></li><li><p>An exception thrown by the Entity Manager means you have to
+          rollback your database transaction and close the
+          <tt class="literal">EntityManager</tt> immediately (discussed later in
+          more detail). If your <tt class="literal">EntityManager</tt> is bound to
+          the application, you have to stop the application. Rolling back the
+          database transaction doesn't put your business objects back into the
+          state they were at the start of the transaction. This means the
+          database state and the business objects do get out of sync. Usually
+          this is not a problem, because exceptions are not recoverable and
+          you have to start over your unit of work after rollback
+          anyway.</p></li><li><p>The persistence context caches every object that is in managed
+          state (watched and checked for dirty state by Hibernate). This means
+          it grows endlessly until you get an
+          <tt class="classname">OutOfMemoryException</tt>, if you keep it open for
+          a long time or simply load too much data. One solution for this is
+          some kind batch processing with regular flushing of the persistence
+          context, but you should consider using a database stored procedure
+          if you need mass data operations. Some solutions for this problem
+          are shown in <a href="#batch" title="Chapter&nbsp;6.&nbsp;Batch processing">Chapter&nbsp;6, <i>Batch processing</i></a>. Keeping a persistence context
+          open for the duration of a user session also means a high
+          probability of stale data, which you have to know about and control
+          appropriately.</p></li></ul></div></div></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="transactions-demarcation"></a>4.2.&nbsp;Database transaction demarcation</h2></div></div><div></div></div><p>Datatabase (or system) transaction boundaries are always necessary.
+    No communication with the database can occur outside of a database
+    transaction (this seems to confuse many developers who are used to the
+    auto-commit mode). Always use clear transaction boundaries, even for
+    read-only operations. Depending on your isolation level and database
+    capabilities this might not be required but there is no downside if you
+    always demarcate transactions explicitly. You'll have to do operations
+    outside a transaction, though, when you'll need to retain modifications in
+    an <tt class="literal">EXTENDED</tt> persistence context.</p><p>An EJB3 application can run in non-managed (i.e. standalone, simple
+    Web- or Swing applications) and managed J2EE environments. In a
+    non-managed environment, an <tt class="literal">EntityManagerFactory</tt> is
+    usually responsible for its own database connection pool. The application
+    developer has to manually set transaction boundaries, in other words,
+    begin, commit, or rollback database transactions itself. A managed
+    environment usually provides container-managed transactions, with the
+    transaction assembly defined declaratively through annotations of EJB
+    session beans, for example. Programmatic transaction demarcation is then
+    no longer necessary, even flushing the <tt class="literal">EntityManager</tt> is
+    done automatically.</p><p>Usually, ending a unit of work involves four distinct phases:</p><div class="itemizedlist"><ul type="disc" compact><li><p>commit the (resource-local or JTA) transaction (this
+        automatically flushes the entity manager and persistence
+        context)</p></li><li><p>close the entity manager (if using an application-managed entity
+        manager)</p></li><li><p>handle exceptions</p></li></ul></div><p>We'll now have a closer look at transaction demarcation and
+    exception handling in both managed- and non-managed environments.</p><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="transactions-demarcation-nonmanaged"></a>4.2.1.&nbsp;Non-managed environment</h3></div></div><div></div></div><p>If an EJB3 persistence layer runs in a non-managed environment,
+      database connections are usually handled by Hibernate's pooling
+      mechanism behind the scenes. The common entity manager and transaction
+      handling idiom looks like this:</p><pre class="programlisting">// Non-managed environment idiom
+EntityManager em = emf.createEntityManager();
+EntityTransaction tx = null;
+try {
+    tx = em.getTransaction();
+    tx.begin();
+
+    // do some work
+    ...
+
+    tx.commit();
+}
+catch (RuntimeException e) {
+    if ( tx != null &amp;&amp; tx.isActive() ) tx.rollback();
+    throw e; // or display error message
+}
+finally {
+    em.close();
+}</pre><p>You don't have to <tt class="literal">flush()</tt> the
+      <tt class="literal">EntityManager</tt> explicitly - the call to
+      <tt class="literal">commit()</tt> automatically triggers the
+      synchronization.</p><p>A call to <tt class="literal">close()</tt> marks the end of an
+      <tt class="literal">EntityManager</tt>. The main implication of
+      <tt class="literal">close()</tt> is the release of resources - make sure you
+      always close and never outside of guaranteed finally block.</p><p>You will very likely never see this idiom in business code in a
+      normal application; fatal (system) exceptions should always be caught at
+      the "top". In other words, the code that executes entity manager calls
+      (in the persistence layer) and the code that handles
+      <tt class="literal">RuntimeException</tt> (and usually can only clean up and
+      exit) are in different layers. This can be a challenge to design
+      yourself and you should use J2EE/EJB container services whenever they
+      are available. Exception handling is discussed later in this
+      chapter.</p><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="d0e1530"></a>4.2.1.1.&nbsp;EntityTransaction</h4></div></div><div></div></div><p>In a JTA environment, you don't need any extra API to interact
+        with the transaction in your environment. Simply use transaction
+        declaration or the JTA APIs.</p><p>If you are using a <tt class="literal">RESOURCE_LOCAL</tt> entity
+        manager, you need to demarcate your transaction boundaries through the
+        <tt class="literal">EntityTransaction</tt> API. You can get an
+        <tt class="literal">EntityTransaction</tt> through
+        <tt class="literal">entityManager.getTransaction()</tt>. This
+        <tt class="literal">EntityTransaction</tt> API provides the regular
+        <tt class="methodname">begin()</tt>, <tt class="methodname">commit()</tt>,
+        <tt class="methodname">rollback()</tt> and
+        <tt class="methodname">isActive()</tt> methods. It also provide a way to
+        mark a transaction as rollback only, ie force the transaction to
+        rollback. This is very similar to the JTA operation
+        <tt class="methodname">setRollbackOnly()</tt>. When a
+        <tt class="literal">commit()</tt> operation fail and/or if the transaction
+        is marked as <tt class="literal">setRollbackOnly()</tt>, the
+        <tt class="literal">commit()</tt> method will try to rollback the
+        transaction and raise a
+        <tt class="literal">javax.transaction.RollbackException</tt>.</p><p>In a <tt class="literal">JTA</tt> entity manager,
+        <tt class="literal">entityManager.getTransaction()</tt> calls are not
+        permitted.</p></div></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="transactions-demarcation-jta"></a>4.2.2.&nbsp;Using JTA</h3></div></div><div></div></div><p>If your persistence layer runs in an application server (e.g.
+      behind EJB3 session beans), every datasource connection obtained
+      internally by the entity manager will automatically be part of the
+      global JTA transaction. Hibernate offers two strategies for this
+      integration.</p><p>If you use bean-managed transactions (BMT), the code will look
+      like this:</p><pre class="programlisting">// BMT idiom
+@Resource public UserTransaction utx;
+@Resource public EntityManagerFactory factory;
+
+public void doBusiness() {
+    EntityManager em = factory.createEntityManager();
+    try {
+
+    // do some work
+    ...
+
+    utx.commit();
+}
+catch (RuntimeException e) {
+    if (utx != null) utx.rollback();
+    throw e; // or display error message
+}
+finally {
+    em.close();
+}</pre><p>With Container Managed Transactions (CMT) in an EJB3 container,
+      transaction demarcation is done in session bean annotations or
+      deployment descriptors, not programatically. The
+      <tt class="literal">EntityManager</tt> will automatically be flushed on
+      transaction completion (and if you have injected or lookup the
+      <tt class="literal">EntityManager</tt>, it will be also closed automatically).
+      If an exception occurs during the <tt class="literal">EntityManager</tt> use,
+      transaction rollback occurs automatically if you don't catch the
+      exception. Since <tt class="literal">EntityManager</tt> exceptions are
+      <tt class="literal">RuntimeException</tt>s they will rollback the transaction
+      as per the EJB specification (system exception vs. application
+      exception).</p><p>It is important to let Hibernate EntityManager define the
+      <tt class="literal">hibernate.transaction.factory_class</tt> (ie not
+      overriding this value). Remember to also set
+      <tt class="literal">org.hibernate.transaction.manager_lookup_class</tt>.</p><p>If you work in a CMT environment, you might also want to use the
+      same entity manager in different parts of your code. Typically, in a
+      non-managed environment you would use a <tt class="literal">ThreadLocal</tt>
+      variable to hold the entity manager, but a single EJB request might
+      execute in different threads (e.g. session bean calling another session
+      bean). The EJB3 container takes care of the persistence context
+      propagation for you. Either using injection or lookup, the EJB3
+      container will return an entity manager with the same persistence
+      context bound to the JTA context if any, or create a new one and bind it
+      (see <a href="#architecture-ejb-persistctxpropagation" title="1.2.4.&nbsp;Persistence context propagation">Section&nbsp;1.2.4, &#8220;Persistence context propagation&#8221;</a> .)</p><p>Our entity manager/transaction management idiom for CMT and EJB3
+      container-use is reduced to this:</p><pre class="programlisting">//CMT idiom through injection
+@PersistenceContext(name="sample") EntityManager em;</pre><p>In other words, all you have to do in a managed environment is to
+      inject the <tt class="literal">EntityManager</tt>, do your data access work,
+      and leave the rest to the container. Transaction boundaries are set
+      declaratively in the annotations or deployment descriptors of your
+      session beans. The lifecycle of the entity manager and persistence
+      context is completely managed by the container.</p><p>TODO: The following paragraph is very confusing, especially the
+      beginning...</p><p>When using particular Hibernate native APIs, one caveat has to be
+      remembered: <tt class="literal">after_statement</tt> connection release mode.
+      Due to a silly limitation of the JTA spec, it is not possible for
+      Hibernate to automatically clean up any unclosed
+      <tt class="literal">ScrollableResults</tt> or <tt class="literal">Iterator</tt>
+      instances returned by <tt class="literal">scroll()</tt> or
+      <tt class="literal">iterate()</tt>. You <span class="emphasis"><em>must</em></span> release the
+      underlying database cursor by calling
+      <tt class="literal">ScrollableResults.close()</tt> or
+      <tt class="literal">Hibernate.close(Iterator)</tt> explicity from a
+      <tt class="literal">finally</tt> block. (Of course, most applications can
+      easily avoid using <tt class="literal">scroll()</tt> or
+      <tt class="literal">iterate()</tt> at all from the CMT code.)</p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="transactions-demarcation-exceptions"></a>4.2.3.&nbsp;Exception handling</h3></div></div><div></div></div><p>If the <tt class="literal">EntityManager</tt> throws an exception
+      (including any <tt class="literal">SQLException</tt>), you should immediately
+      rollback the database transaction, call
+      <tt class="literal">EntityManager.close()</tt> (if
+      <tt class="methodname">createEntityManager()</tt> has been called) and
+      discard the <tt class="literal">EntityManager</tt> instance. Certain methods
+      of <tt class="literal">EntityManager</tt> will <span class="emphasis"><em>not</em></span> leave
+      the persistence context in a consistent state. No exception thrown by an
+      entity manager can be treated as recoverable. Ensure that the
+      <tt class="literal">EntityManager</tt> will be closed by calling
+      <tt class="literal">close()</tt> in a <tt class="literal">finally</tt> block. Note
+      that a container managed entity manager will do that for you. You just
+      have to let the RuntimeException propagate up to the container.</p><p>The Hibernate entity manager generally raises exceptions which
+      encapsulate the Hibernate core exception. Common exceptions raised by
+      the <tt class="literal">EntityManager</tt> API are</p><div class="itemizedlist"><ul type="disc"><li><p>IllegalArgumentException: something wrong happen</p></li><li><p>EntityNotFoundException: an entity was expected but none match
+          the requirement</p></li><li><p>TransactionRequiredException: this operation has to be in a
+          transaction</p></li><li><p>IllegalStateException: the entity manager is used in a wrong
+          way</p></li></ul></div><p>The <tt class="literal">HibernateException</tt>, which wraps most of the
+      errors that can occur in a Hibernate persistence layer, is an unchecked
+      exception. Note that Hibernate might also throw other unchecked
+      exceptions which are not a <tt class="literal">HibernateException</tt>. These
+      are, again, not recoverable and appropriate action should be
+      taken.</p><p>Hibernate wraps <tt class="literal">SQLException</tt>s thrown while
+      interacting with the database in a <tt class="literal">JDBCException</tt>. In
+      fact, Hibernate will attempt to convert the eexception into a more
+      meningful subclass of <tt class="literal">JDBCException</tt>. The underlying
+      <tt class="literal">SQLException</tt> is always available via
+      <tt class="literal">JDBCException.getCause()</tt>. Hibernate converts the
+      <tt class="literal">SQLException</tt> into an appropriate
+      <tt class="literal">JDBCException</tt> subclass using the
+      <tt class="literal">SQLExceptionConverter</tt> attached to the
+      <tt class="literal">SessionFactory</tt>. By default, the
+      <tt class="literal">SQLExceptionConverter</tt> is defined by the configured
+      dialect; however, it is also possible to plug in a custom implementation
+      (see the javadocs for the
+      <tt class="literal">SQLExceptionConverterFactory</tt> class for details). The
+      standard <tt class="literal">JDBCException</tt> subtypes are:</p><div class="itemizedlist"><ul type="disc" compact><li><p><tt class="literal">JDBCConnectionException</tt> - indicates an
+          error with the underlying JDBC communication.</p></li><li><p><tt class="literal">SQLGrammarException</tt> - indicates a grammar
+          or syntax problem with the issued SQL.</p></li><li><p><tt class="literal">ConstraintViolationException</tt> - indicates
+          some form of integrity constraint violation.</p></li><li><p><tt class="literal">LockAcquisitionException</tt> - indicates an
+          error acquiring a lock level necessary to perform the requested
+          operation.</p></li><li><p><tt class="literal">GenericJDBCException</tt> - a generic exception
+          which did not fall into any of the other categories.</p></li></ul></div></div></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e1799"></a>4.3.&nbsp;EXTENDED Persistence Context</h2></div></div><div></div></div><p>All application managed entity manager and container managed
+    persistence contexts defined as such are <tt class="literal">EXTENDED</tt>. This
+    means that the persistence context type goes beyond the transaction life
+    cycle. We should then understand what happens to operations made outside
+    the scope of a transaction.</p><p>In an <tt class="literal">EXTENDED</tt> persistence context, all read only
+    operations of the entity manager can be executed outside a transaction
+    (<tt class="literal">find()</tt>, <tt class="literal">getReference()</tt>,
+    <tt class="literal">refresh()</tt>, and read queries). Some modifications
+    operations can be executed outside a transaction, but they are queued
+    until the persistence context join a transaction: this is the case of
+    <tt class="literal">persist()</tt>,
+    <tt class="literal"><tt class="literal">merge()</tt></tt>,
+    <tt class="literal">remove()</tt>. Some operations cannot be called outside a
+    transaction: <tt class="literal">flush()</tt>, <tt class="literal">lock()</tt>, and
+    update/delete queries.</p><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e1837"></a>4.3.1.&nbsp;Container Managed Entity Manager</h3></div></div><div></div></div><p>When using an EXTENDED persistence context with a container
+      managed entity manager, the lifecycle of the persistence context is
+      binded to the lifecycle of the Stateful Session Bean. Plus if the entity
+      manager is created outside a transaction, modifications operations
+      (persist, merge, remove) are queued in the persistence context and not
+      executed to the database.</p><p>When a method of the stateful session bean involved or starting a
+      transaction is later called, the entity manager join the transaction.
+      All queued operation will then be executed to synchronize the
+      persistence context.</p><p>This is perfect to implement the
+      <tt class="literal">entitymanager-per-conversation</tt> pattern. A stateful
+      session bean represents the conversation implementation. All
+      intermediate conversation work will be processed in methods not
+      involving transaction. The end of the conversation will be processed
+      inside a <tt class="literal">JTA</tt> transaction. Hence all queued operations
+      will be executed to the database and commited. If you are interested in
+      the notion of conversation inside your application, have a look at JBoss
+      Seam. Jboss Seam emphasizes the concept of conversation and entity
+      manager lifecycle and bind EJB3 and JSF together.</p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e1852"></a>4.3.2.&nbsp;Application Managed Entity Manager</h3></div></div><div></div></div><p>Application-managed entity manager are always
+      <tt class="literal">EXTENDED</tt>. When you create an entity manager inside a
+      transaction, the entity manager automatically join the current
+      transaction. If the entity manager is created outside a transaction, the
+      entity manager will queue the modification operations. When</p><div class="itemizedlist"><ul type="disc"><li><p><tt class="methodname">entityManager.joinTransaction()</tt> is
+          called when a JTA transaction is active for a <tt class="literal">JTA</tt>
+          entity manager</p></li><li><p><tt class="literal">entityManager.getTransaction().begin()</tt> is
+          called for a <tt class="literal">RESOURCE_LOCAL</tt> entity manager</p></li></ul></div><p>the entity manager join the transaction and all the queued
+      operations will then be executed to synchronize the persistence
+      context.</p><p>It is not legal to call
+      <tt class="methodname">entityManager.joinTransaction()</tt> if no JTA
+      transaction is involved.</p></div></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="transactions-optimistic"></a>4.4.&nbsp;Optimistic concurrency control</h2></div></div><div></div></div><p>The only approach that is consistent with high concurrency and high
+    scalability is optimistic concurrency control with versioning. Version
+    checking uses version numbers, or timestamps, to detect conflicting
+    updates (and to prevent lost updates). Hibernate provides for three
+    possible approaches to writing application code that uses optimistic
+    concurrency. The use cases we show are in the context of long application
+    transactions but version checking also has the benefit of preventing lost
+    updates in single database transactions.</p><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="transactions-optimistic-manual"></a>4.4.1.&nbsp;Application version checking</h3></div></div><div></div></div><p>In an implementation without much help from the persistence
+      mechanism, each interaction with the database occurs in a new
+      <tt class="literal">EntityManager</tt> and the developer is responsible for
+      reloading all persistent instances from the database before manipulating
+      them. This approach forces the application to carry out its own version
+      checking to ensure application transaction isolation. This approach is
+      the least efficient in terms of database access. It is the approach most
+      similar to EJB2 entities:</p><pre class="programlisting">// foo is an instance loaded by a previous entity manager
+em = factory.createEntityManager();
+EntityTransaction t = em.getTransaction();
+t.begin();
+int oldVersion = foo.getVersion();
+Foo dbFoo = em.find( foo.getClass(), foo.getKey() ); // load the current state
+if ( dbFoo.getVersion()!=foo.getVersion ) throw new StaleObjectStateException();
+dbFoo.setProperty("bar");
+t.commit();
+em.close();</pre><p>The <tt class="literal">version</tt> property is mapped using
+      <tt class="literal">@Version</tt>, and the entity manager will automatically
+      increment it during flush if the entity is dirty.</p><p>Of course, if you are operating in a low-data-concurrency
+      environment and don't require version checking, you may use this
+      approach and just skip the version check. In that case, <span class="emphasis"><em>last
+      commit wins</em></span> will be the default strategy for your long
+      application transactions. Keep in mind that this might confuse the users
+      of the application, as they might experience lost updates without error
+      messages or a chance to merge conflicting changes.</p><p>Clearly, manual version checking is only feasible in very trivial
+      circumstances and not practical for most applications. Often not only
+      single instances, but complete graphs of modified ojects have to be
+      checked. Hibernate offers automatic version checking with either
+      detached instances or an extended entity manager and persistence context
+      as the design paradigm.</p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="transactions-optimistic-longsession"></a>4.4.2.&nbsp;Extended entity manager and automatic versioning</h3></div></div><div></div></div><p>A single persistence context is used for the whole application
+      transaction. The entity manager checks instance versions at flush time,
+      throwing an exception if concurrent modification is detected. It's up to
+      the developer to catch and handle this exception (common options are the
+      opportunity for the user to merge his changes or to restart the business
+      process with non-stale data).</p><p>In an <tt class="literal">EXTENDED</tt> persistence context, all
+      operations made outside an active transaction are queued. The
+      <tt class="literal">EXTENDED</tt> persistence context is flushed when executed
+      in an active transaction (at worse at commit time).</p><p>The <tt class="literal">Entity Manager</tt> is disconnected from any
+      underlying JDBC connection when waiting for user interaction. In an
+      application-managed extended entity manager, this occurs automatically
+      at transaction completion. In a stateful session bean holding a
+      container-managed extended entity manager (i.e. a SFSB annotated with
+      <tt class="literal">@PersistenceContext(EXTENDED)</tt>), this occurs
+      transparently as well. This approach is the most efficient in terms of
+      database access. The application need not concern itself with version
+      checking or with merging detached instances, nor does it have to reload
+      instances in every database transaction. For those who might be
+      concerned by the number of connections opened and closed, remember that
+      the connection provider should be a connection pool, so there is no
+      performance impact. The following examples show the idiom in a
+      non-managed environment:</p><pre class="programlisting">// foo is an instance loaded earlier by the extended entity manager
+em.getTransaction.begin(); // new connection to data store is obtained and tx started
+foo.setProperty("bar");
+em.getTransaction().commit();  // End tx, flush and check version, disconnect</pre><p>The <tt class="literal">foo</tt> object still knows which
+      <tt class="literal">persistence context</tt> it was loaded in. With
+      <tt class="literal">getTransaction.begin();</tt> the entity manager obtains a
+      new connection and resumes the persistence context. The method
+      <tt class="literal">getTransaction().commit()</tt> will not only flush and
+      check versions, but also disconnects the entity manager from the JDBC
+      connection and return the connection to the pool.</p><p>This pattern is problematic if the persistence context is too big
+      to be stored during user think time, and if you don't know where to
+      store it. E.g. the <tt class="literal">HttpSession</tt> should be kept as
+      small as possible. As the persistence context is also the (mandatory)
+      first-level cache and contains all loaded objects, we can probably use
+      this strategy only for a few request/response cycles. This is indeed
+      recommended, as the persistence context will soon also have stale
+      data.</p><p>It is up to you where you store the extended entity manager during
+      requests, inside an EJB3 container you simply use a stateful session
+      bean as described above. Don't transfer it to the web layer (or even
+      serialize it to a separate tier) to store it in the
+      <tt class="literal">HttpSession</tt>. In a non-managed, two-tiered environment
+      the <tt class="literal">HttpSession</tt> might indeed be the right place to
+      store it.</p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="transactions-optimistic-detached"></a>4.4.3.&nbsp;Detached objects and automatic versioning</h3></div></div><div></div></div><p>With this paradigm, each interaction with the data store occurs in
+      a new persistence context. However, the same persistent instances are
+      reused for each interaction with the database. The application
+      manipulates the state of detached instances originally loaded in another
+      persistence context and then merges the changes using
+      <tt class="literal">EntityManager.merge()</tt>:</p><pre class="programlisting">// foo is an instance loaded by a non-extended entity manager
+foo.setProperty("bar");
+entityManager = factory.createEntityManager();
+entityManager.getTransaction().begin();
+managedFoo = session.merge(foo); // discard foo and from now on use managedFoo
+entityManager.getTransaction().commit();
+entityManager.close();</pre><p>Again, the entity manager will check instance versions during
+      flush, throwing an exception if conflicting updates occured.</p></div></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="listeners"></a>Chapter&nbsp;5.&nbsp;Entity listeners and Callback methods</h2></div></div><div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e1979"></a>5.1.&nbsp;Definition</h2></div></div><div></div></div><p>It is often useful for the application to react to certain events
+    that occur inside the persistence mechanism. This allows the
+    implementation of certain kinds of generic functionality, and extension of
+    built-in functionality. The EJB3 specification provides two related
+    mechanisms for this purpose.</p><p>A method of the entity may be designated as a callback method to
+    receive notification of a particular entity life cycle event. Callbacks
+    methods are annotated by a callback annotation. You can also define an
+    entity listener class to be used instead of the callback methods defined
+    directly inside the entity class. An entity listener is a stateless class
+    with a no-arg constructor. An entity listener is defined by annotating the
+    entity class with the <tt class="literal">@EntityListeners</tt>
+    annotation:</p><pre class="programlisting">@Entity 
+@EntityListeners(class=Audit.class)
+public class Cat {
+    @Id private Integer id;
+    private String name;
+    private Calendar dateOfBirth;
+    @Transient private int age;
+    private Date lastUpdate;
+    //getters and setters
+
+    /**
+     * Set my transient property at load time based on a calculation,
+     * note that a native Hibernate formula mapping is better for this purpose.
+     */
+    @PostLoad
+    public void calculateAge() {
+        Calendar birth = new GregorianCalendar();
+        birth.setTime(dateOfBirth);
+        Calendar now = new GregorianCalendar();
+        now.setTime( new Date() );
+        int adjust = 0;
+        if ( now.get(Calendar.DAY_OF_YEAR) - birth.get(Calendar.DAY_OF_YEAR) &lt; 0) {
+            adjust = -1;
+        }
+        age = now.get(Calendar.YEAR) - birth.get(Calendar.YEAR) + adjust;
+    }
+}
+
+public class LastUpdateListener {
+    /**
+     * automatic property set before any database persistence
+     */
+    @PreUpdate
+    @PrePersist
+    public void setLastUpdate(Cat o) {
+        o.setLastUpdate( new Date() );
+    }
+}</pre><p>The same callback method or entity listener method can be annotated
+    with more than one callback annotation. For a given entity, you cannot
+    have two methods being annotated by the same callback annotation whether
+    it is a callback method or an entity listener method. A callback method is
+    a no-arg method with no return type and any arbitrary name. An entity
+    listener has the signature <tt class="code">void &lt;METHOD&gt;(Object)</tt>
+    where Object is of the actual entity type (note that Hibernate Entity
+    Manager relaxed this constraint and allows <tt class="literal">Object</tt> of
+    <tt class="literal">java.lang.Object</tt> type (allowing sharing of listeners
+    accross several entities.)</p><p>A callback method can raise a
+    <tt class="classname">RuntimeException</tt>. The current transaction, if any,
+    must be rolled back. The following callbacks are defined:</p><div class="table"><a name="d0e2007"></a><p class="title"><b>Table&nbsp;5.1.&nbsp;Callbacks</b></p><table summary="Callbacks" border="1"><colgroup><col><col></colgroup><thead><tr><th align="center">Type</th><th align="center">Description</th></tr></thead><tbody><tr><td>@PrePersist</td><td>Executed before the entity manager persist operation is
+            actually executed or cascaded. This call is synchronous with the
+            persist operation.</td></tr><tr><td>@PreRemove</td><td>Executed before the entity manager remove operation is
+            actually executed or cascaded. This call is synchronous with the
+            remove operation.</td></tr><tr><td>@PostPersist</td><td>Executed after the entity manager persist operation is
+            actually executed or cascaded. This call is invoked after the
+            database INSERT is executed.</td></tr><tr><td>@PostRemove</td><td>Executed after the entity manager remove operation is
+            actually executed or cascaded. This call is synchronous with the
+            remove operation.</td></tr><tr><td>@PreUpdate</td><td>Executed before the database UPDATE operation.</td></tr><tr><td>@PostUpdate</td><td>Executed after the database UPDATE operation.</td></tr><tr><td>@PostLoad</td><td>Eexecuted after an entity has been loaded into the current
+            persistence context or an entity has been refreshed.</td></tr></tbody></table></div><p>A callback method must not invoke
+    <tt class="classname">EntityManager</tt> or <tt class="classname">Query</tt>
+    methods!</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e2063"></a>5.2.&nbsp;Callbacks and listeners inheritance</h2></div></div><div></div></div><p>You can define several entity listeners per entity at different
+    level of the hierarchy.You can also define several callbacks at different
+    level of the hierarchy. But you cannot define two listeners for the same
+    event in the same entity or the same entity listener.</p><p>When an event is raised, the listeners are executed in this
+    order:</p><div class="itemizedlist"><ul type="disc"><li><p><tt class="literal">@EntityListeners</tt> for a given entity or
+        superclass in the array order</p></li><li><p>Entity listeners for the superclasses (highest first)</p></li><li><p>Entity Listeners for the entity</p></li><li><p>Callbacks of the superclasses (highest first)</p></li><li><p>Callbacks of the entity</p></li></ul></div><p>You can stop the entity listeners inheritance by using the
+    <tt class="literal">@ExcludeSuperclassListeners</tt>, all superclasses
+    <tt class="literal">@EntityListeners</tt> will then be ignored.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e2096"></a>5.3.&nbsp;XML definition</h2></div></div><div></div></div><p>The EJB3 specification allows annotation overriding through EJB3
+    deployment descriptor. There is also an additional feature that can be
+    useful: default event listeners.</p><pre class="programlisting">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+
+&lt;entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_1_0.xsd"
+                 version="1.0"
+        &gt;
+    &lt;persistence-unit-metadata&gt;
+        &lt;persistence-unit-defaults&gt;
+            &lt;entity-listeners&gt;
+                &lt;entity-listener class="org.hibernate.ejb.test.pack.defaultpar.IncrementListener"&gt;
+                    &lt;pre-persist method-name="increment"/&gt;
+                &lt;/entity-listener&gt;
+            &lt;/entity-listeners&gt;
+        &lt;/persistence-unit-defaults&gt;
+    &lt;/persistence-unit-metadata&gt;
+    &lt;package&gt;org.hibernate.ejb.test.pack.defaultpar&lt;/package&gt;
+    &lt;entity class="ApplicationServer"&gt;
+        &lt;entity-listeners&gt;
+            &lt;entity-listener class="OtherIncrementListener"&gt;
+                &lt;pre-persist method-name="increment"/&gt;
+            &lt;/entity-listener&gt;
+        &lt;/entity-listeners&gt;
+
+
+        &lt;pre-persist method-name="calculate"/&gt;
+    &lt;/entity&gt;
+&lt;/entity-mappings&gt;</pre><p>You can override entity listeners on a given entity. An entity
+    listener correspond to a given class and one or several event fire a given
+    method call. You can also define event on the entity itself to describe
+    the callbacks.</p><p>Last but not least, you can define some default entity listeners
+    that will apply first on the entity listener stack of all the mapped
+    entities of a given persistence unit. If you don't want an entity to
+    inherit the default listeners, you can use @ExcludeDefaultListeners (or
+    &lt;exclude-default-listeners/&gt;).</p></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="batch"></a>Chapter&nbsp;6.&nbsp;Batch processing</h2></div></div><div></div></div><p>Batch processing has traditionally been difficult in full
+  object/relational mapping. ORM is all about object state management, which
+  implies that object state is available in memory. However, Hibernate has
+  some features to optimize batch processing which are discussed in the
+  Hibernate reference guide, however, EJB3 persistence differs
+  slightly.</p><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="batch-direct"></a>6.1.&nbsp;Bulk update/delete</h2></div></div><div></div></div><p>As already discussed, automatic and transparent object/relational
+    mapping is concerned with the management of object state. This implies
+    that the object state is available in memory, hence updating or deleting
+    (using SQL <tt class="literal">UPDATE</tt> and <tt class="literal">DELETE</tt>) data
+    directly in the database will not affect in-memory state. However,
+    Hibernate provides methods for bulk SQL-style <tt class="literal">UPDATE</tt>
+    and <tt class="literal">DELETE</tt> statement execution which are performed
+    through EJB-QL (<a href="#queryhql" title="Chapter&nbsp;7.&nbsp;EJB-QL: The Object Query Language">Chapter&nbsp;7, <i>EJB-QL: The Object Query Language</i></a>).</p><p>The pseudo-syntax for <tt class="literal">UPDATE</tt> and
+    <tt class="literal">DELETE</tt> statements is: <tt class="literal">( UPDATE | DELETE )
+    FROM? ClassName (WHERE WHERE_CONDITIONS)?</tt>. Note that:</p><div class="itemizedlist"><ul type="disc" compact><li><p>In the from-clause, the FROM keyword is optional.</p></li><li><p>There can only be a single class named in the from-clause, and
+        it <span class="emphasis"><em>cannot</em></span> have an alias (this is a current
+        Hibernate limitation and will be removed soon).</p></li><li><p>No joins (either implicit or explicit) can be specified in a
+        bulk EJB-QL query. Sub-queries may be used in the where-clause.</p></li><li><p>The where-clause is also optional.</p></li></ul></div><p>As an example, to execute an EJB-QL <tt class="literal">UPDATE</tt>, use
+    the <tt class="literal">Query.executeUpdate()</tt> method:</p><pre class="programlisting">EntityManager entityManager = entityManagerFactory.createEntityManager();
+entityManager.getTransaction().begin();
+
+String ejbqlUpdate = "update Customer set name = :newName where name = :oldName"
+int updatedEntities = entityManager.createQuery( hqlUpdate )
+                            .setParameter( "newName", newName )
+                            .setParameter( "oldName", oldName )
+                            .executeUpdate();
+entityManager.getTransaction().commit();
+entityManager.close();</pre><p>To execute an EJB-QL <tt class="literal">DELETE</tt>, use the same
+    <tt class="literal">Query.executeUpdate()</tt> method (the method is named for
+    those familiar with JDBC's
+    <tt class="literal">PreparedStatement.executeUpdate()</tt>):</p><pre class="programlisting">EntityManager entityManager = entityManagerFactory.createEntityManager();
+entityManager.getTransaction().begin();
+
+String hqlDelete = "delete Customer where name = :oldName";
+int deletedEntities = entityManager.createQuery( hqlDelete )
+                            .setParameter( "oldName", oldName )
+                            .executeUpdate();
+entityManager.getTransaction().commit();
+entityManager.close();</pre><p>The <tt class="literal">int</tt> value returned by the
+    <tt class="literal">Query.executeUpdate()</tt> method indicate the number of
+    entities effected by the operation. This may or may not correlate with the
+    number of rows effected in the database. An EJB-QL bulk operation might
+    result in multiple actual SQL statements being executed, for
+    joined-subclass, for example. The returned number indicates the number of
+    actual entities affected by the statement. Going back to the example of
+    joined-subclass, a delete against one of the subclasses may actually
+    result in deletes against not just the table to which that subclass is
+    mapped, but also the "root" table and potentially joined-subclass tables
+    further down the inheritence hierarchy.</p></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="queryhql"></a>Chapter&nbsp;7.&nbsp;EJB-QL: The Object Query Language</h2></div></div><div></div></div><p>
+    EJB3-QL has been heavily inspired by HQL, the native Hibernate Query Language. Both
+    are therefore very close to SQL, but portable and independent of the database schema.
+    People familiar with HQL shouldn't have any problem using EJB-QL. Actually, you
+    use the same query API for EJB-QL and HQL queries. Portable EJB3 applications however
+    should stick to EJB-QL or similar vendor extensions are needed.
+    </p><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="queryhql-casesensitivity"></a>7.1.&nbsp;Case Sensitivity</h2></div></div><div></div></div><p>Queries are case-insensitive, except for names of Java classes and
+    properties. So <tt class="literal">SeLeCT</tt> is the same as
+    <tt class="literal">sELEct</tt> is the same as <tt class="literal">SELECT</tt> but
+    <tt class="literal">org.hibernate.eg.FOO</tt> is not
+    <tt class="literal">org.hibernate.eg.Foo</tt> and <tt class="literal">foo.barSet</tt>
+    is not <tt class="literal">foo.BARSET</tt>.</p><p>This manual uses lowercase EJBQL keywords. Some users find queries
+    with uppercase keywords more readable, but we find this convention ugly
+    when embedded in Java code.</p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="queryhql-from"></a>7.2.&nbsp;The from clause</h2></div></div><div></div></div><p>The simplest possible EJB-QL query is of the form:</p><pre class="programlisting">select c from eg.Cat c</pre><p>which simply returns all instances of the class
+    <tt class="literal">eg.Cat</tt>. Unlike HQL, the select clause is not optional
+    in EJB-QL. We don't usually need to qualify the class name, since the
+    entity name defaults to the unqualified class name
+    (<tt class="literal">@Entity</tt>). So we almost always just write:</p><pre class="programlisting">select c from Cat c</pre><p>As you may have noticed you can assign aliases to classes, the
+    <tt class="literal">as</tt> keywork is optional. An alias allows you to refer
+    to <tt class="literal">Cat</tt> in other parts of the query.</p><pre class="programlisting">select cat from Cat as cat</pre><p>Multiple classes may appear, resulting in a cartesian product or
+    "cross" join.</p><pre class="programlisting">select form, param from Formula as form, Parameter as param</pre><p>It is considered good practice to name query aliases using an
+    initial lowercase, consistent with Java naming standards for local
+    variables (eg. <tt class="literal">domesticCat</tt>).</p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="queryhql-joins"></a>7.3.&nbsp;Associations and joins</h2></div></div><div></div></div><p>You may also assign aliases to associated entities, or even to
+    elements of a collection of values, using a
+    <tt class="literal">join</tt>.</p><pre class="programlisting">select cat, mate, kitten from Cat as cat 
+    inner join cat.mate as mate
+    left outer join cat.kittens as kitten</pre><pre class="programlisting">select cat from Cat as cat left join cat.mate.kittens as kittens</pre><p>The supported join types are borrowed from ANSI SQL</p><div class="itemizedlist"><ul type="disc" compact><li><p><tt class="literal">inner join</tt></p></li><li><p><tt class="literal">left outer join</tt></p></li></ul></div><p>The <tt class="literal">inner join</tt>, <tt class="literal">left outer
+    join</tt> constructs may be abbreviated.</p><pre class="programlisting">select cat, mate, kitten from Cat as cat 
+    join cat.mate as mate
+    left join cat.kittens as kitten</pre><p>In addition, a "fetch" join allows associations or collections of
+    values to be initialized along with their parent objects, using a single
+    select. This is particularly useful in the case of a collection. It
+    effectively overrides the fetching options in the associations and collection
+    mapping metadata. See the Performance chapter of the Hibernate reference guide
+    for more information.</p><pre class="programlisting">select cat from Cat as cat 
+    inner join fetch cat.mate
+    left join fetch cat.kittens</pre><p>A fetch join does not usually need to assign an alias, because the
+    associated objects should not be used in the <tt class="literal">where</tt>
+    clause (or any other clause). Also, the associated objects are not
+    returned directly in the query results. Instead, they may be accessed via
+    the parent object. The only reason we might need an alias is if we are
+    recursively join fetching a further collection:</p><pre class="programlisting">select cat from Cat as cat 
+    inner join fetch cat.mate
+    left join fetch cat.kittens child
+    left join fetch child.kittens</pre><p>Note that the <tt class="literal">fetch</tt> construct may not be used in
+    queries called using <tt class="literal">scroll()</tt> or
+    <tt class="literal">iterate()</tt>. Nor should <tt class="literal">fetch</tt> be used
+    together with <tt class="literal">setMaxResults()</tt> or
+    <tt class="literal">setFirstResult()</tt>. It is possible to create a cartesian
+    product by join fetching more than one collection in a query (as in the example
+    above), be careful the result of this product isn't bigger than you expect.
+    Join fetching multiple collection roles also sometimes gives unexpected results for
+    bag mappings, so be careful about how you formulate your queries in this case.</p><p>
+      TODO: The last statement is useless and typical developer thinking, please elaborate.
+        The word "sometimes" should never appear in any technical documentation.
+    </p><p>If you are using property-level lazy fetching (with bytecode
+    instrumentation), it is possible to force Hibernate to fetch the lazy
+    properties immediately (in the first query) using <tt class="literal">fetch all
+    properties</tt>. This is Hibernate specific option:</p><pre class="programlisting">select doc from Document doc fetch all properties order by doc.name</pre><pre class="programlisting">select doc from Document doc fetch all properties where lower(doc.name) like '%cats%'</pre></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="queryhql-select"></a>7.4.&nbsp;The select clause</h2></div></div><div></div></div><p>The <tt class="literal">select</tt> clause picks which objects and
+    properties to return in the query result set. Consider:</p><pre class="programlisting">select mate 
+from Cat as cat 
+    inner join cat.mate as mate</pre><p>The query will select <tt class="literal">mate</tt>s of other
+    <tt class="literal">Cat</tt>s. Actually, you may express this query more
+    compactly as:</p><pre class="programlisting">select cat.mate from Cat cat</pre><p>Queries may return properties of any value type including properties
+    of component type:</p><pre class="programlisting">select cat.name from DomesticCat cat
+where cat.name like 'fri%'</pre><pre class="programlisting">select cust.name.firstName from Customer as cust</pre><p>Queries may return multiple objects and/or properties as an array of
+    type <tt class="literal">Object[]</tt>,</p><pre class="programlisting">select mother, offspr, mate.name 
+from DomesticCat as mother
+    inner join mother.mate as mate
+    left outer join mother.kittens as offspr</pre><p>or as a <tt class="literal">List</tt> (HQL specific feature)</p><pre class="programlisting">select new list(mother, offspr, mate.name)
+from DomesticCat as mother
+    inner join mother.mate as mate
+    left outer join mother.kittens as offspr</pre><p>or as an actual typesafe Java object,</p><pre class="programlisting">select new Family(mother, mate, offspr)
+from DomesticCat as mother
+    join mother.mate as mate
+    left join mother.kittens as offspr</pre><p>assuming that the class <tt class="literal">Family</tt> has an appropriate
+    constructor.</p><p>You may assign aliases to selected expressions using
+    <tt class="literal">as</tt>:</p><pre class="programlisting">select max(bodyWeight) as max, min(bodyWeight) as min, count(*) as n
+from Cat cat</pre><p>This is most useful when used together with <tt class="literal">select new
+    map</tt> (HQL specific feature):</p><pre class="programlisting">select new map( max(bodyWeight) as max, min(bodyWeight) as min, count(*) as n )
+from Cat cat</pre><p>This query returns a <tt class="literal">Map</tt> from aliases to selected
+    values.</p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="queryhql-aggregation"></a>7.5.&nbsp;Aggregate functions</h2></div></div><div></div></div><p>HQL queries may even return the results of aggregate functions on
+    properties:</p><pre class="programlisting">select avg(cat.weight), sum(cat.weight), max(cat.weight), count(cat)
+from Cat cat</pre><p>The supported aggregate functions are</p><div class="itemizedlist"><ul type="disc" compact><li><p><tt class="literal">avg(...), avg(distinct ...), sum(...), sum(distinct
+        ...), min(...), max(...)</tt></p></li><li><p><tt class="literal">count(*)</tt></p></li><li><p><tt class="literal">count(...), count(distinct ...),
+        count(all...)</tt></p></li></ul></div><p>You may use arithmetic operators, concatenation, and recognized SQL
+    functions in the select clause (dpending on configured dialect, HQL specific feature):</p><pre class="programlisting">select cat.weight + sum(kitten.weight) 
+from Cat cat 
+    join cat.kittens kitten
+group by cat.id, cat.weight</pre><pre class="programlisting">select firstName||' '||initial||' '||upper(lastName) from Person</pre><p>The <tt class="literal">distinct</tt> and <tt class="literal">all</tt> keywords
+    may be used and have the same semantics as in SQL.</p><pre class="programlisting">select distinct cat.name from Cat cat
+
+select count(distinct cat.name), count(cat) from Cat cat</pre></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="queryhql-polymorphism"></a>7.6.&nbsp;Polymorphic queries</h2></div></div><div></div></div><p>A query like:</p><pre class="programlisting">select cat from Cat as cat</pre><p>returns instances not only of <tt class="literal">Cat</tt>, but also of
+    subclasses like <tt class="literal">DomesticCat</tt>. Hibernate queries may name
+    <span class="emphasis"><em>any</em></span> Java class or interface in the
+    <tt class="literal">from</tt> clause (portable EJB-QL queries should only name
+    mapped entities). The query will return instances of all persistent
+    classes that extend that class or implement the interface. The following
+    query would return all persistent objects:</p><pre class="programlisting">from java.lang.Object o // HQL only</pre><p>The interface <tt class="literal">Named</tt> might be implemented by
+    various persistent classes:</p><pre class="programlisting">from Named n, Named m where n.name = m.name // HQL only</pre><p>Note that these last two queries will require more than one SQL
+    <tt class="literal">SELECT</tt>. This means that the <tt class="literal">order by</tt>
+    clause does not correctly order the whole result set. (It also means you
+    can't call these queries using <tt class="literal">Query.scroll()</tt>.)</p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="queryhql-where"></a>7.7.&nbsp;The where clause</h2></div></div><div></div></div><p>The <tt class="literal">where</tt> clause allows you to narrow the list of
+    instances returned. If no alias exists, you may refer to properties by
+    name:</p><pre class="programlisting">select cat from Cat cat where cat.name='Fritz'</pre><p>returns instances of <tt class="literal">Cat</tt> named 'Fritz'.</p><pre class="programlisting">select foo 
+from Foo foo, Bar bar
+where foo.startDate = bar.date</pre><p>will return all instances of <tt class="literal">Foo</tt> for which there
+    exists an instance of <tt class="literal">bar</tt> with a
+    <tt class="literal">date</tt> property equal to the <tt class="literal">startDate</tt>
+    property of the <tt class="literal">Foo</tt>. Compound path expressions make the
+    <tt class="literal">where</tt> clause extremely powerful. Consider:</p><pre class="programlisting">select cat from Cat cat where cat.mate.name is not null</pre><p>This query translates to an SQL query with a table (inner) join. If
+    you were to write something like</p><pre class="programlisting">select foo from Foo foo  
+where foo.bar.baz.customer.address.city is not null</pre><p>you would end up with a query that would require four table joins in
+    SQL.</p><p>The <tt class="literal">=</tt> operator may be used to compare not only
+    properties, but also instances:</p><pre class="programlisting">select cat, rival from Cat cat, Cat rival where cat.mate = rival.mate</pre><pre class="programlisting">select cat, mate 
+from Cat cat, Cat mate
+where cat.mate = mate</pre><p>The special property (lowercase) <tt class="literal">id</tt> may be used
+    to reference the unique identifier of an object. (You may also use its
+    mapped identifer property name.). Note that this keyword is specific to HQL.</p><pre class="programlisting">select cat from Cat as cat where cat.id = 123
+
+select cat from Cat as cat where cat.mate.id = 69</pre><p>The second query is efficient. No table join is required!</p><p>Properties of composite identifiers may also be used. Suppose
+    <tt class="literal">Person</tt> has a composite identifier consisting of
+    <tt class="literal">country</tt> and <tt class="literal">medicareNumber</tt>.</p><pre class="programlisting">select person from bank.Person person
+where person.id.country = 'AU' 
+    and person.id.medicareNumber = 123456</pre><pre class="programlisting">select account from bank.Account account
+where account.owner.id.country = 'AU' 
+    and account.owner.id.medicareNumber = 123456</pre><p>Once again, the second query requires no table join.</p><p>Likewise, the special property <tt class="literal">class</tt> accesses the
+    discriminator value of an instance in the case of polymorphic persistence.
+    A Java class name embedded in the where clause will be translated to its
+    discriminator value. Once again, this is specific to HQL.</p><pre class="programlisting">select cat from Cat cat where cat.class = DomesticCat</pre><p>You may also specify properties of components or composite user
+    types (and of components of components, etc). Never try to use a
+    path-expression that ends in a property of component type (as opposed to a
+    property of a component). For example, if <tt class="literal">store.owner</tt>
+    is an entity with a component <tt class="literal">address</tt></p><pre class="programlisting">store.owner.address.city    // okay
+store.owner.address         // error!</pre><p>An "any" type has the special properties <tt class="literal">id</tt> and
+    <tt class="literal">class</tt>, allowing us to express a join in the following
+    way (where <tt class="literal">AuditLog.item</tt> is a property mapped with
+    <tt class="literal">&lt;any&gt;</tt>). <tt class="literal">Any</tt> is specific to
+    Hibernate</p><pre class="programlisting">from AuditLog log, Payment payment 
+where log.item.class = 'Payment' and log.item.id = payment.id</pre><p>Notice that <tt class="literal">log.item.class</tt> and
+    <tt class="literal">payment.class</tt> would refer to the values of completely
+    different database columns in the above query.</p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="queryhql-expressions"></a>7.8.&nbsp;Expressions</h2></div></div><div></div></div><p>Expressions allowed in the <tt class="literal">where</tt> clause include
+    most of the kind of things you could write in SQL:</p><div class="itemizedlist"><ul type="disc" compact><li><p>mathematical operators <tt class="literal">+, -, *, /</tt></p></li><li><p>binary comparison operators <tt class="literal">=, &gt;=, &lt;=, &lt;&gt;,
+        !=, like</tt></p></li><li><p>logical operations <tt class="literal">and, or, not</tt></p></li><li><p>Parentheses <tt class="literal">( )</tt>, indicating grouping</p></li><li><p><tt class="literal">in</tt>, <tt class="literal">not in</tt>,
+        <tt class="literal">between</tt>, <tt class="literal">is null</tt>, <tt class="literal">is
+        not null</tt>, <tt class="literal">is empty</tt>, <tt class="literal">is not
+        empty</tt>, <tt class="literal">member of</tt> and <tt class="literal">not member
+        of</tt></p></li><li><p>"Simple" case, <tt class="literal">case ... when ... then ... else ...
+        end</tt>, and "searched" case, <tt class="literal">case when ... then ...
+        else ... end (specific to HQL)</tt></p></li><li><p>string concatenation <tt class="literal">...||...</tt> or
+        <tt class="literal">concat(...,...) (use concat() for portable EJB-QL
+        queries)</tt></p></li><li><p><tt class="literal">current_date()</tt>,
+        <tt class="literal">current_time()</tt>,
+        <tt class="literal">current_timestamp()</tt></p></li><li><p><tt class="literal">second(...)</tt>, <tt class="literal">minute(...)</tt>,
+        <tt class="literal">hour(...)</tt>, <tt class="literal">day(...)</tt>,
+        <tt class="literal">month(...)</tt>, <tt class="literal">year(...)</tt>, (specific
+        to HQL)</p></li><li><p>Any function or operator defined by EJB-QL 3.0:
+        <tt class="literal">substring(), trim(), lower(), upper(), length(), locate(),
+        abs(), sqrt(), bit_length()</tt></p></li><li><p><tt class="literal">coalesce()</tt> and
+        <tt class="literal">nullif()</tt></p></li><li><p><tt class="literal">cast(... as ...)</tt>, where the second argument
+        is the name of a Hibernate type, and <tt class="literal">extract(... from
+        ...)</tt> if ANSI <tt class="literal">cast()</tt> and
+        <tt class="literal">extract()</tt> is supported by the underlying
+        database</p></li><li><p>Any database-supported SQL scalar function like
+        <tt class="literal">sign()</tt>, <tt class="literal">trunc()</tt>,
+        <tt class="literal">rtrim()</tt>, <tt class="literal">sin()</tt></p></li><li><p>JDBC IN parameters <tt class="literal">?</tt></p></li><li><p>named parameters <tt class="literal">:name</tt>,
+        <tt class="literal">:start_date</tt>, <tt class="literal">:x1</tt></p></li><li><p>SQL literals <tt class="literal">'foo'</tt>, <tt class="literal">69</tt>,
+        <tt class="literal">'1970-01-01 10:00:01.0'</tt></p></li><li><p>Java <tt class="literal">public static final</tt> constants
+        <tt class="literal">eg.Color.TABBY</tt></p></li></ul></div><p><tt class="literal">in</tt> and <tt class="literal">between</tt> may be used as
+    follows:</p><pre class="programlisting">select cat from DomesticCat cat where cat.name between 'A' and 'B'</pre><pre class="programlisting">select cat from DomesticCat cat where cat.name in ( 'Foo', 'Bar', 'Baz' )</pre><p>and the negated forms may be written</p><pre class="programlisting">select cat from DomesticCat cat where cat.name not between 'A' and 'B'</pre><pre class="programlisting">select cat from DomesticCat cat where cat.name not in ( 'Foo', 'Bar', 'Baz' )</pre><p>Likewise, <tt class="literal">is null</tt> and <tt class="literal">is not
+    null</tt> may be used to test for null values.</p><p>Booleans may be easily used in expressions by declaring HQL query
+    substitutions in Hibernate configuration:</p><pre class="programlisting">hibernate.query.substitutions true 1, false 0</pre><p>This will replace the keywords <tt class="literal">true</tt> and
+    <tt class="literal">false</tt> with the literals <tt class="literal">1</tt> and
+    <tt class="literal">0</tt> in the translated SQL from this HQL:</p><pre class="programlisting">select cat from Cat cat where cat.alive = true</pre><p>You may test the size of a collection with the special property
+    <tt class="literal">size</tt>, or the special <tt class="literal">size()</tt> function
+    (HQL specific feature).</p><pre class="programlisting">select cat from Cat cat where cat.kittens.size &gt; 0</pre><pre class="programlisting">select cat from Cat cat where size(cat.kittens) &gt; 0</pre><p>For indexed collections, you may refer to the minimum and maximum
+    indices using <tt class="literal">minindex</tt> and <tt class="literal">maxindex</tt>
+    functions. Similarly, you may refer to the minimum and maximum elements of
+    a collection of basic type using the <tt class="literal">minelement</tt> and
+    <tt class="literal">maxelement</tt> functions. These are HQL specific
+    features.</p><pre class="programlisting">select cal from Calendar cal where maxelement(cal.holidays) &gt; current date</pre><pre class="programlisting">select order from Order order where maxindex(order.items) &gt; 100</pre><pre class="programlisting">select order from Order order where minelement(order.items) &gt; 10000</pre><p>The SQL functions <tt class="literal">any, some, all, exists, in</tt> are
+    supported when passed the element or index set of a collection
+    (<tt class="literal">elements</tt> and <tt class="literal">indices</tt> functions) or
+    the result of a subquery (see below). While subqueries are supported by
+    EJB-QL, <tt class="literal">elements</tt> and <tt class="literal">indices</tt> are
+    specific HQL features.</p><pre class="programlisting">select mother from Cat as mother, Cat as kit
+where kit in elements(foo.kittens)</pre><pre class="programlisting">select p from NameList list, Person p
+where p.name = some elements(list.names)</pre><pre class="programlisting">select cat from Cat cat where exists elements(cat.kittens)</pre><pre class="programlisting">select cat from Player p where 3 &gt; all elements(p.scores)</pre><pre class="programlisting">select cat from Show show where 'fizard' in indices(show.acts)</pre><p>Note that these constructs - <tt class="literal">size</tt>,
+    <tt class="literal">elements</tt>, <tt class="literal">indices</tt>,
+    <tt class="literal">minindex</tt>, <tt class="literal">maxindex</tt>,
+    <tt class="literal">minelement</tt>, <tt class="literal">maxelement</tt> - may only be
+    used in the where clause in Hibernate3.</p><p>In HQL, elements of indexed collections (arrays, lists, maps) may be
+    referred to by index (in a where clause only):</p><pre class="programlisting">select order from Order order where order.items[0].id = 1234</pre><pre class="programlisting">select person from Person person, Calendar calendar
+where calendar.holidays['national day'] = person.birthDay
+    and person.nationality.calendar = calendar</pre><pre class="programlisting">select item from Item item, Order order
+where order.items[ order.deliveredItemIndices[0] ] = item and order.id = 11</pre><pre class="programlisting">select item from Item item, Order order
+where order.items[ maxindex(order.items) ] = item and order.id = 11</pre><p>The expression inside <tt class="literal">[]</tt> may even be an
+    arithmetic expression.</p><pre class="programlisting">select item from Item item, Order order
+where order.items[ size(order.items) - 1 ] = item</pre><p>HQL also provides the built-in <tt class="literal">index()</tt> function,
+    for elements of a one-to-many association or collection of values.</p><pre class="programlisting">select item, index(item) from Order order 
+    join order.items item
+where index(item) &lt; 5</pre><p>Scalar SQL functions supported by the underlying database may be
+    used</p><pre class="programlisting">select cat from DomesticCat cat where upper(cat.name) like 'FRI%'</pre><p>If you are not yet convinced by all this, think how much longer and
+    less readable the following query would be in SQL:</p><pre class="programlisting">select cust
+from Product prod,
+    Store store
+    inner join store.customers cust
+where prod.name = 'widget'
+    and store.location.name in ( 'Melbourne', 'Sydney' )
+    and prod = all elements(cust.currentOrder.lineItems)</pre><p><span class="emphasis"><em>Hint:</em></span> something like</p><pre class="programlisting">SELECT cust.name, cust.address, cust.phone, cust.id, cust.current_order
+FROM customers cust,
+    stores store,
+    locations loc,
+    store_customers sc,
+    product prod
+WHERE prod.name = 'widget'
+    AND store.loc_id = loc.id
+    AND loc.name IN ( 'Melbourne', 'Sydney' )
+    AND sc.store_id = store.id
+    AND sc.cust_id = cust.id
+    AND prod.id = ALL(
+        SELECT item.prod_id
+        FROM line_items item, orders o
+        WHERE item.order_id = o.id
+            AND cust.current_order = o.id
+    )</pre></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="queryhql-ordering"></a>7.9.&nbsp;The order by clause</h2></div></div><div></div></div><p>The list returned by a query may be ordered by any property of a
+    returned class or components:</p><pre class="programlisting">select cat from DomesticCat cat
+order by cat.name asc, cat.weight desc, cat.birthdate</pre><p>The optional <tt class="literal">asc</tt> or <tt class="literal">desc</tt>
+    indicate ascending or descending order respectively.</p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="queryhql-grouping"></a>7.10.&nbsp;The group by clause</h2></div></div><div></div></div><p>A query that returns aggregate values may be grouped by any property
+    of a returned class or components:</p><pre class="programlisting">select cat.color, sum(cat.weight), count(cat) 
+from Cat cat
+group by cat.color</pre><pre class="programlisting">select foo.id, avg(name), max(name) 
+from Foo foo join foo.names name
+group by foo.id</pre><p>A <tt class="literal">having</tt> clause is also allowed.</p><pre class="programlisting">select cat.color, sum(cat.weight), count(cat) 
+from Cat cat
+group by cat.color 
+having cat.color in (eg.Color.TABBY, eg.Color.BLACK)</pre><p>SQL functions and aggregate functions are allowed in the
+    <tt class="literal">having</tt> and <tt class="literal">order by</tt> clauses, if
+    supported by the underlying database (eg. not in MySQL).</p><pre class="programlisting">select cat
+from Cat cat
+    join cat.kittens kitten
+group by cat
+having avg(kitten.weight) &gt; 100
+order by count(kitten) asc, sum(kitten.weight) desc</pre><p>Note that neither the <tt class="literal">group by</tt> clause nor the
+    <tt class="literal">order by</tt> clause may contain arithmetic
+    expressions.</p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="queryhql-subqueries"></a>7.11.&nbsp;Subqueries</h2></div></div><div></div></div><p>For databases that support subselects, EJB-QL supports subqueries
+    within queries. A subquery must be surrounded by parentheses (often by an
+    SQL aggregate function call). Even correlated subqueries (subqueries that
+    refer to an alias in the outer query) are allowed.</p><pre class="programlisting">select fatcat from Cat as fatcat 
+where fatcat.weight &gt; ( 
+    select avg(cat.weight) from DomesticCat cat 
+)</pre><pre class="programlisting">select cat from DomesticCat as cat 
+where cat.name = some ( 
+    select name.nickName from Name as name 
+)</pre><pre class="programlisting">select cat from Cat as cat 
+where not exists ( 
+    from Cat as mate where mate.mate = cat 
+)</pre><pre class="programlisting">select cat from DomesticCat as cat 
+where cat.name not in ( 
+    select name.nickName from Name as name 
+)</pre><p>For subqueries with more than one expression in the select list, you
+    can use a tuple constructor:</p><pre class="programlisting">select cat from Cat as cat 
+where not ( cat.name, cat.color ) in ( 
+    select cat.name, cat.color from DomesticCat cat 
+)</pre><p>Note that on some databases (but not Oracle or HSQLDB), you can use
+    tuple constructors in other contexts, for example when querying components
+    or composite user types:</p><pre class="programlisting">select cat from Person where name = ('Gavin', 'A', 'King')</pre><p>Which is equivalent to the more verbose:</p><pre class="programlisting">select cat from Person where name.first = 'Gavin' and name.initial = 'A' and name.last = 'King')</pre><p>There are two good reasons you might not want to do this kind of
+    thing: first, it is not completely portable between database platforms;
+    second, the query is now dependent upon the ordering of properties in the
+    mapping document.</p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="queryhql-examples"></a>7.12.&nbsp;EJB-QL examples</h2></div></div><div></div></div><p>Hibernate queries can be quite powerful and complex. In fact, the
+    power of the query language is one of Hibernate's main selling points (and
+    now EJB-QL). Here are some example queries very similar to queries that I
+    used on a recent project. Note that most queries you will write are much
+    simpler than these!</p><p>The following query returns the order id, number of items and total
+    value of the order for all unpaid orders for a particular customer and
+    given minimum total value, ordering the results by total value. In
+    determining the prices, it uses the current catalog. The resulting SQL
+    query, against the <tt class="literal">ORDER</tt>,
+    <tt class="literal">ORDER_LINE</tt>, <tt class="literal">PRODUCT</tt>,
+    <tt class="literal">CATALOG</tt> and <tt class="literal">PRICE</tt> tables has four
+    inner joins and an (uncorrelated) subselect.</p><pre class="programlisting">select order.id, sum(price.amount), count(item)
+from Order as order
+    join order.lineItems as item
+    join item.product as product,
+    Catalog as catalog
+    join catalog.prices as price
+where order.paid = false
+    and order.customer = :customer
+    and price.product = product
+    and catalog.effectiveDate &lt; sysdate
+    and catalog.effectiveDate &gt;= all (
+        select cat.effectiveDate 
+        from Catalog as cat
+        where cat.effectiveDate &lt; sysdate
+    )
+group by order
+having sum(price.amount) &gt; :minAmount
+order by sum(price.amount) desc</pre><p>What a monster! Actually, in real life, I'm not very keen on
+    subqueries, so my query was really more like this:</p><pre class="programlisting">select order.id, sum(price.amount), count(item)
+from Order as order
+    join order.lineItems as item
+    join item.product as product,
+    Catalog as catalog
+    join catalog.prices as price
+where order.paid = false
+    and order.customer = :customer
+    and price.product = product
+    and catalog = :currentCatalog
+group by order
+having sum(price.amount) &gt; :minAmount
+order by sum(price.amount) desc</pre><p>The next query counts the number of payments in each status,
+    excluding all payments in the <tt class="literal">AWAITING_APPROVAL</tt> status
+    where the most recent status change was made by the current user. It
+    translates to an SQL query with two inner joins and a correlated subselect
+    against the <tt class="literal">PAYMENT</tt>, <tt class="literal">PAYMENT_STATUS</tt>
+    and <tt class="literal">PAYMENT_STATUS_CHANGE</tt> tables.</p><pre class="programlisting">select count(payment), status.name 
+from Payment as payment 
+    join payment.currentStatus as status
+    join payment.statusChanges as statusChange
+where payment.status.name &lt;&gt; PaymentStatus.AWAITING_APPROVAL
+    or (
+        statusChange.timeStamp = ( 
+            select max(change.timeStamp) 
+            from PaymentStatusChange change 
+            where change.payment = payment
+        )
+        and statusChange.user &lt;&gt; :currentUser
+    )
+group by status.name, status.sortOrder
+order by status.sortOrder</pre><p>If I would have mapped the <tt class="literal">statusChanges</tt>
+    collection as a list, instead of a set, the query would have been much
+    simpler to write.</p><pre class="programlisting">select count(payment), status.name 
+from Payment as payment
+    join payment.currentStatus as status
+where payment.status.name &lt;&gt; PaymentStatus.AWAITING_APPROVAL
+    or payment.statusChanges[ maxIndex(payment.statusChanges) ].user &lt;&gt; :currentUser
+group by status.name, status.sortOrder
+order by status.sortOrder</pre><p>However the query would have been HQL specific.</p><p>The next query uses the MS SQL Server <tt class="literal">isNull()</tt>
+    function to return all the accounts and unpaid payments for the
+    organization to which the current user belongs. It translates to an SQL
+    query with three inner joins, an outer join and a subselect against the
+    <tt class="literal">ACCOUNT</tt>, <tt class="literal">PAYMENT</tt>,
+    <tt class="literal">PAYMENT_STATUS</tt>, <tt class="literal">ACCOUNT_TYPE</tt>,
+    <tt class="literal">ORGANIZATION</tt> and <tt class="literal">ORG_USER</tt>
+    tables.</p><pre class="programlisting">select account, payment
+from Account as account
+    join account.holder.users as user
+    left outer join account.payments as payment
+where :currentUser = user
+    and PaymentStatus.UNPAID = isNull(payment.currentStatus.name, PaymentStatus.UNPAID)
+order by account.type.sortOrder, account.accountNumber, payment.dueDate</pre></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="queryhql-bulk"></a>7.13.&nbsp;Bulk UPDATE &amp; DELETE Statements</h2></div></div><div></div></div><p>Hibernate now supports UPDATE and DELETE statements in HQL/EJB-QL. See <a href="#batch-direct" title="6.1.&nbsp;Bulk update/delete">Section&nbsp;6.1, &#8220;Bulk update/delete&#8221;</a> for details.</p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="queryhql-tipstricks"></a>7.14.&nbsp;Tips &amp; Tricks</h2></div></div><div></div></div><p>To order a result by the size of a collection, use the following
+    query:</p><pre class="programlisting">select usr.id, usr.name
+from User as usr 
+    left join usr.messages as msg
+group by usr.id, usr.name
+order by count(msg)</pre><p>If your database supports subselects, you can place a condition upon
+    selection size in the where clause of your query:</p><pre class="programlisting">from User usr where size(usr.messages) &gt;= 1</pre><p>If your database doesn't support subselects, use the following
+    query:</p><pre class="programlisting">select usr.id, usr.name
+from User usr.name
+    join usr.messages msg
+group by usr.id, usr.name
+having count(msg) &gt;= 1</pre><p>As this solution can't return a <tt class="literal">User</tt> with zero
+    messages because of the inner join, the following form is also
+    useful:</p><pre class="programlisting">select usr.id, usr.name
+from User as usr
+    left join usr.messages as msg
+group by usr.id, usr.name
+having count(msg) = 0</pre></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="query_native"></a>Chapter&nbsp;8.&nbsp;Native query</h2></div></div><div></div></div><p>You may also express queries in the native SQL dialect of your
+  database. This is useful if you want to utilize database specific features
+  such as query hints or the CONNECT BY option in Oracle. It also provides a
+  clean migration path from a direct SQL/JDBC based application to Hibernate.
+  Note that Hibernate3 allows you to specify handwritten SQL (including stored
+  procedures) for all create, update, delete, and load operations (please
+  refer to the reference guide for more information.)</p><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e3135"></a>8.1.&nbsp;Expressing the resultset</h2></div></div><div></div></div><p>To use a SQL query, you need to describe the SQL resultset, this
+    description will help the <tt class="literal">EntityManager</tt> to map your
+    columns onto entity properties. This is done using the
+    <tt class="literal">@SqlResultSetMapping</tt> annotation. Each
+    <tt class="literal">@SqlResultSetMapping </tt>has a name wich is used when
+    creating a SQL query on <tt class="literal">EntityManager</tt>.</p><pre class="programlisting">@SqlResultSetMapping(name="GetNightAndArea", entities={
+    @EntityResult(name="org.hibernate.test.annotations.query.Night", fields = {
+        @FieldResult(name="id", column="nid"),
+        @FieldResult(name="duration", column="night_duration"),
+        @FieldResult(name="date", column="night_date"),
+        @FieldResult(name="area", column="area_id")
+    }),
+    @EntityResult(name="org.hibernate.test.annotations.query.Area", fields = {
+        @FieldResult(name="id", column="aid"),
+        @FieldResult(name="name", column="name")
+    })
+    }
+)
+
+//or
+@SqlResultSetMapping(name="defaultSpaceShip", entities=@EntityResult(name="org.hibernate.test.annotations.query.SpaceShip"))</pre><p>You can also define scalar results and even mix entity results and
+    scalar results</p><pre class="programlisting">@SqlResultSetMapping(name="ScalarAndEntities", 
+    entities={
+        @EntityResult(name="org.hibernate.test.annotations.query.Night", fields = {
+            @FieldResult(name="id", column="nid"),
+            @FieldResult(name="duration", column="night_duration"),
+            @FieldResult(name="date", column="night_date"),
+            @FieldResult(name="area", column="area_id")
+        }),
+        @EntityResult(name="org.hibernate.test.annotations.query.Area", fields = {
+            @FieldResult(name="id", column="aid"),
+            @FieldResult(name="name", column="name")
+        })
+    },
+    columns={
+        @ColumnResult(name="durationInSec")
+    }
+)</pre><p>The SQL query will then have to return a column alias
+    <tt class="literal">durationInSec</tt>.</p><p>Please refer to the Hibernate Annotations reference guide for more
+    information about <tt class="literal">@SqlResultSetMapping.</tt></p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e3167"></a>8.2.&nbsp;Using native SQL Queries</h2></div></div><div></div></div><p>TODO: This sounds like a dupe...</p><p>Now that the result set is described, we are capable of executing
+    the native SQL query. <tt class="literal">EntityManager</tt> provides all the
+    needed APIs. The first method is to use a SQL resultset name to do the
+    binding, the second one uses the entity default mapping (the column
+    returned has to have the same names as the one used in the mapping). A
+    third one (not yet supported by Hibernate entity manager), returns pure
+    scalar results.</p><pre class="programlisting">String sqlQuery = "select night.id nid, night.night_duration, night.night_date, area.id aid, "
+    + "night.area_id, area.name from Night night, Area area where night.area_id = area.id "
+    + "and night.night_duration &gt;= ?";
+Query q = entityManager.createNativeQuery(sqlQuery, "GetNightAndArea");
+q.setParameter( 1, expectedDuration );
+q.getResultList();</pre><p>This native query returns nights and area based on the
+    <tt class="literal">GetNightAndArea</tt> result set.</p><pre class="programlisting">String sqlQuery = "select * from tbl_spaceship where owner = ?";
+Query q = entityManager.createNativeQuery(sqlQuery, SpaceShip.class);
+q.setParameter( 1, "Han" );
+q.getResultList();</pre><p>The second version is useful when your SQL query returns one entity
+    reusing the same columns as the ones mapped in metadata.</p></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e3188"></a>8.3.&nbsp;Named queries</h2></div></div><div></div></div><p>Native named queries share the same calling API than EJB-QL named
+    queries. Your code doesn't need to know the difference between the two.
+    This is very useful for migration from SQL to EJB-QL:</p><pre class="programlisting">Query q = entityManager.createNamedQuery("getSeasonByNativeQuery");
+q.setParameter( 1, name );
+Season season = (Season) q.getSingleResult();</pre></div></div></div></body></html>

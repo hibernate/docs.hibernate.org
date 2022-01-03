@@ -1,0 +1,641 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>HIBERNATE - Persistance relationnelle en Java standard</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="next" href="preface.html" title="Pr&eacute;face">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">HIBERNATE - Persistance relationnelle en Java standard</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left">&nbsp;</td>
+               <th width="60%" align="center">&nbsp;</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="preface.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="book" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div class="mediaobject">
+                  <table border="0" summary="manufactured viewport for HTML img" cellspacing="0" cellpadding="0">
+                     <tr style="height: 106px">
+                        <td><img src="images/hibernate_logo_a.png" height="106"></td>
+                     </tr>
+                  </table>
+               </div>
+               <div>
+                  <h1 class="title"><a name="d0e2"></a>HIBERNATE - Persistance relationnelle en Java standard
+                  </h1>
+               </div>
+               <div>
+                  <h2 class="subtitle">Documentation de r&eacute;f&eacute;rence d'Hibernate</h2>
+               </div>
+               <div>
+                  <p class="releaseinfo">3.3.1</p>
+               </div>
+               <div>
+                  <p class="copyright">Copyright &copy; 2004 Red Hat Middleware, LLC.</p>
+               </div>
+               <div>
+                  <div class="legalnotice"><a name="Legal_Notice"></a><p class="legalnotice-title"><b>Legal Notice</b></p>
+                     <p>
+                                
+                     </p>
+                     <div class="address">
+                        <p><span class="street">1801&nbsp;Varsity&nbsp;Drive</span>&nbsp;<span class="city">Raleigh</span>,&nbsp;<span class="state">NC</span><span class="postcode">27606-2072</span><span class="country">USA</span>&nbsp;<span class="phone">Phone:&nbsp;+1&nbsp;919&nbsp;754&nbsp;3700</span>&nbsp;<span class="phone">Phone:&nbsp;888&nbsp;733&nbsp;4281</span>&nbsp;<span class="fax">Fax:&nbsp;+1&nbsp;919&nbsp;754&nbsp;3701</span>&nbsp;<span class="pob">PO&nbsp;Box&nbsp;13588</span><span class="city">Research&nbsp;Triangle&nbsp;Park</span>,&nbsp;<span class="state">NC</span><span class="postcode">27709</span><span class="country">USA</span>&nbsp;
+                        </p>
+                     </div>
+                     <p>
+                            
+                     </p>
+                     <p>Copyright <span class="trademark"></span>&copy; 2007 by Red Hat, Inc. This copyrighted material is made available to anyone wishing to use, modify, copy, or redistribute
+                        it subject to the terms and conditions of the GNU <a xmlns:xlink="http://www.w3.org/1999/xlink" href="http://www.gnu.org/licenses/lgpl-2.1.html" target="_top">Lesser General Public License</a>, as published by the Free Software Foundation. 
+                     </p>
+                     <p>Red Hat and the Red Hat "Shadow Man" logo are registered trademarks of Red Hat, Inc. in the United States and other countries.
+                        
+                     </p>
+                     <p>All other trademarks referenced herein are the property of their respective owners. </p>
+                     <p>The GPG fingerprint of the security@redhat.com key is: </p>
+                     <p>CA 20 86 86 2B D6 9D FC 65 F6 EC C4 21 91 80 CD DB 42 A6 0E </p>
+                  </div>
+               </div>
+            </div>
+            <hr>
+         </div>
+         <div class="toc">
+            <dl>
+               <dt><span class="preface"><a href="preface.html">Pr&eacute;face</a></span></dt>
+               <dt><span class="chapter"><a href="tutorial.html">1.  Introduction &agrave; Hibernate</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="sect1"><a href="tutorial.html#tutorial-intro">1.1.  Pr&eacute;face</a></span></dt>
+                     <dt><span class="sect1"><a href="tutorial-firstapp.html">1.2.  Partie 1 - Premi&egrave;re application Hibernate</a></span></dt>
+                     <dd>
+                        <dl>
+                           <dt><span class="sect2"><a href="tutorial-firstapp.html#tutorial-firstapp-firstclass">1.2.1.  La premi&egrave;re classe</a></span></dt>
+                           <dt><span class="sect2"><a href="tutorial-firstapp.html#tutorial-firstapp-mapping">1.2.2.  Le fichier de mapping</a></span></dt>
+                           <dt><span class="sect2"><a href="tutorial-firstapp.html#tutorial-firstapp-configuration">1.2.3.  Configuration d'Hibernate</a></span></dt>
+                           <dt><span class="sect2"><a href="tutorial-firstapp.html#tutorial-firstapp-ant">1.2.4.  Construction avec Ant</a></span></dt>
+                           <dt><span class="sect2"><a href="tutorial-firstapp.html#tutorial-firstapp-helpers">1.2.5.  D&eacute;marrage et aides</a></span></dt>
+                           <dt><span class="sect2"><a href="tutorial-firstapp.html#tutorial-firstapp-workingpersistence">1.2.6.  Charger et stocker des objets</a></span></dt>
+                        </dl>
+                     </dd>
+                     <dt><span class="sect1"><a href="tutorial-associations.html">1.3.  Partie 2 - Mapper des associations</a></span></dt>
+                     <dd>
+                        <dl>
+                           <dt><span class="sect2"><a href="tutorial-associations.html#tutorial-associations-mappinguser">1.3.1.  Mapper la classe Person</a></span></dt>
+                           <dt><span class="sect2"><a href="tutorial-associations.html#tutorial-associations-unidirset">1.3.2.  Une association unidirectionnelle bas&eacute;e sur Set</a></span></dt>
+                           <dt><span class="sect2"><a href="tutorial-associations.html#tutorial-associations-working">1.3.3.  Travailler avec l'association</a></span></dt>
+                           <dt><span class="sect2"><a href="tutorial-associations.html#tutorial-associations-valuecollections">1.3.4.  Collection de valeurs</a></span></dt>
+                           <dt><span class="sect2"><a href="tutorial-associations.html#tutorial-associations-bidirectional">1.3.5.  Associations bidirectionnelles</a></span></dt>
+                           <dt><span class="sect2"><a href="tutorial-associations.html#tutorial-associations-usingbidir">1.3.6.  Travailler avec des liens bidirectionnels</a></span></dt>
+                        </dl>
+                     </dd>
+                     <dt><span class="sect1"><a href="tutorial-webapp.html">1.4.  Part 3 - L'application web EventManager</a></span></dt>
+                     <dd>
+                        <dl>
+                           <dt><span class="sect2"><a href="tutorial-webapp.html#tutorial-webapp-servlet">1.4.1.  Ecrire la servlet de base</a></span></dt>
+                           <dt><span class="sect2"><a href="tutorial-webapp.html#tutorial-webapp-processing">1.4.2.  Proc&eacute;der et rendre</a></span></dt>
+                           <dt><span class="sect2"><a href="tutorial-webapp.html#tutorial-webapp-deploy">1.4.3.  D&eacute;ployer et tester</a></span></dt>
+                        </dl>
+                     </dd>
+                     <dt><span class="sect1"><a href="tutorial-summary.html">1.5.  R&eacute;sum&eacute;</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="chapter"><a href="architecture.html">2.  Architecture</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="sect1"><a href="architecture.html#architecture-overview">2.1.  G&eacute;n&eacute;ralit&eacute;s</a></span></dt>
+                     <dt><span class="sect1"><a href="architecture-states.html">2.2.  Etats des instances</a></span></dt>
+                     <dt><span class="sect1"><a href="architecture-jmx.html">2.3.  Int&eacute;gration JMX</a></span></dt>
+                     <dt><span class="sect1"><a href="architecture-jca.html">2.4.  Support JCA</a></span></dt>
+                     <dt><span class="sect1"><a href="architecture-current-session.html">2.5.  Sessions Contextuelles</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="chapter"><a href="session-configuration.html">3.  Configuration</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="sect1"><a href="session-configuration.html#configuration-programmatic">3.1.  Configuration par programmation</a></span></dt>
+                     <dt><span class="sect1"><a href="configuration-sessionfactory.html">3.2.  Obtenir une SessionFactory</a></span></dt>
+                     <dt><span class="sect1"><a href="configuration-hibernatejdbc.html">3.3.  Connexions JDBC</a></span></dt>
+                     <dt><span class="sect1"><a href="configuration-optional.html">3.4.  Propri&eacute;t&eacute;s de configuration optionnelles</a></span></dt>
+                     <dd>
+                        <dl>
+                           <dt><span class="sect2"><a href="configuration-optional.html#configuration-optional-dialects">3.4.1.  Dialectes SQL</a></span></dt>
+                           <dt><span class="sect2"><a href="configuration-optional.html#configuration-optional-outerjoin">3.4.2.  Chargement par Jointure Ouverte</a></span></dt>
+                           <dt><span class="sect2"><a href="configuration-optional.html#configuration-optional-binarystreams">3.4.3.  Flux binaires</a></span></dt>
+                           <dt><span class="sect2"><a href="configuration-optional.html#configuration-optional-cacheprovider">3.4.4.  Cache de second niveau et cache de requ&ecirc;tes</a></span></dt>
+                           <dt><span class="sect2"><a href="configuration-optional.html#configuration-optional-querysubstitution">3.4.5.  Substitution dans le langage de requ&ecirc;tage</a></span></dt>
+                           <dt><span class="sect2"><a href="configuration-optional.html#configuration-optional-statistics">3.4.6.  Statistiques Hibernate</a></span></dt>
+                        </dl>
+                     </dd>
+                     <dt><span class="sect1"><a href="configuration-logging.html">3.5.  Tracer</a></span></dt>
+                     <dt><span class="sect1"><a href="configuration-namingstrategy.html">3.6.  Impl&eacute;menter une <code class="literal">NamingStrategy</code></a></span></dt>
+                     <dt><span class="sect1"><a href="configuration-xmlconfig.html">3.7.  Fichier de configuration XML</a></span></dt>
+                     <dt><span class="sect1"><a href="configuration-j2ee.html">3.8.  Int&eacute;gration &agrave; un serveur d'application J2EE</a></span></dt>
+                     <dd>
+                        <dl>
+                           <dt><span class="sect2"><a href="configuration-j2ee.html#configuration-optional-transactionstrategy">3.8.1.  Configuration de la strat&eacute;gie transactionnelle</a></span></dt>
+                           <dt><span class="sect2"><a href="configuration-j2ee.html#configuration-optional-jndi">3.8.2.  <code class="literal">SessionFactory</code> associ&eacute;e au JNDI</a></span></dt>
+                           <dt><span class="sect2"><a href="configuration-j2ee.html#configuration-j2ee-currentsession">3.8.3.  Association automatique de la Session &agrave; JTA</a></span></dt>
+                           <dt><span class="sect2"><a href="configuration-j2ee.html#configuration-j2ee-jmx">3.8.4.  D&eacute;ploiement JMX</a></span></dt>
+                        </dl>
+                     </dd>
+                  </dl>
+               </dd>
+               <dt><span class="chapter"><a href="persistent-classes.html">4.  Classes persistantes</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="sect1"><a href="persistent-classes.html#persistent-classes-pojo">4.1.  Un exemple simple de POJO</a></span></dt>
+                     <dd>
+                        <dl>
+                           <dt><span class="sect2"><a href="persistent-classes.html#persistent-classes-pojo-constructor">4.1.1.  Impl&eacute;menter un constructeur sans argument</a></span></dt>
+                           <dt><span class="sect2"><a href="persistent-classes.html#persistent-classes-pojo-identifier">4.1.2.  Fournir une propri&eacute;t&eacute; d'indentifiant (optionnel)</a></span></dt>
+                           <dt><span class="sect2"><a href="persistent-classes.html#persistent-classes-pojo-final">4.1.3.  Favoriser les classes non finales (optionnel)</a></span></dt>
+                           <dt><span class="sect2"><a href="persistent-classes.html#persistent-classes-pojo-accessors">4.1.4.  D&eacute;clarer les accesseurs et mutateurs des attributs persistants (optionnel)</a></span></dt>
+                        </dl>
+                     </dd>
+                     <dt><span class="sect1"><a href="persistent-classes-inheritance.html">4.2.  Impl&eacute;menter l'h&eacute;ritage</a></span></dt>
+                     <dt><span class="sect1"><a href="persistent-classes-equalshashcode.html">4.3.  Impl&eacute;menter <code class="literal">equals()</code> et <code class="literal">hashCode()</code></a></span></dt>
+                     <dt><span class="sect1"><a href="persistent-classes-dynamicmodels.html">4.4.  Mod&egrave;les dynamiques</a></span></dt>
+                     <dt><span class="sect1"><a href="persistent-classes-tuplizers.html">4.5.  Tuplizers</a></span></dt>
+                     <dt><span class="sect1"><a href="persistent-classes-extensions.html">4.6.  Extentsions</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="chapter"><a href="mapping.html">5.  Mapping O/R basique</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="sect1"><a href="mapping.html#mapping-declaration">5.1.  D&eacute;claration de Mapping</a></span></dt>
+                     <dd>
+                        <dl>
+                           <dt><span class="sect2"><a href="mapping.html#mapping-declaration-doctype">5.1.1.  Doctype</a></span></dt>
+                           <dd>
+                              <dl>
+                                 <dt><span class="sect3"><a href="mapping.html#mapping-declaration-entity-resolution">5.1.1.1.  EntityResolver</a></span></dt>
+                              </dl>
+                           </dd>
+                           <dt><span class="sect2"><a href="mapping.html#mapping-declaration-mapping">5.1.2.  hibernate-mapping</a></span></dt>
+                           <dt><span class="sect2"><a href="mapping.html#mapping-declaration-class">5.1.3.  class</a></span></dt>
+                           <dt><span class="sect2"><a href="mapping.html#mapping-declaration-id">5.1.4.  id</a></span></dt>
+                           <dd>
+                              <dl>
+                                 <dt><span class="sect3"><a href="mapping.html#mapping-declaration-id-generator">5.1.4.1.  Generator</a></span></dt>
+                                 <dt><span class="sect3"><a href="mapping.html#mapping-declaration-id-hilo">5.1.4.2.  algorithme Hi/lo</a></span></dt>
+                                 <dt><span class="sect3"><a href="mapping.html#mapping-declaration-id-uuid">5.1.4.3.  UUID algorithm</a></span></dt>
+                                 <dt><span class="sect3"><a href="mapping.html#mapping-declaration-id-sequences">5.1.4.4.  Colonnes identifiantes et s&eacute;quences</a></span></dt>
+                                 <dt><span class="sect3"><a href="mapping.html#mapping-declaration-id-assigned">5.1.4.5.  Identifiants assign&eacute;s</a></span></dt>
+                                 <dt><span class="sect3"><a href="mapping.html#mapping-declaration-id-select">5.1.4.6.  Clefs primaires assign&eacute;es par trigger</a></span></dt>
+                              </dl>
+                           </dd>
+                           <dt><span class="sect2"><a href="mapping.html#mapping-declaration-id-enhanced">5.1.5.  Enhanced identifier generators</a></span></dt>
+                           <dt><span class="sect2"><a href="mapping.html#mapping-declaration-id-enhanced-optimizers">5.1.6.  Identifier generator optimization</a></span></dt>
+                           <dt><span class="sect2"><a href="mapping.html#mapping-declaration-compositeid">5.1.7.  composite-id</a></span></dt>
+                           <dt><span class="sect2"><a href="mapping.html#mapping-declaration-discriminator">5.1.8.  discriminator</a></span></dt>
+                           <dt><span class="sect2"><a href="mapping.html#mapping-declaration-version">5.1.9.  version (optionnel)</a></span></dt>
+                           <dt><span class="sect2"><a href="mapping.html#mapping-declaration-timestamp">5.1.10.  timestamp (optionnel)</a></span></dt>
+                           <dt><span class="sect2"><a href="mapping.html#mapping-declaration-property">5.1.11.  property</a></span></dt>
+                           <dt><span class="sect2"><a href="mapping.html#mapping-declaration-manytoone">5.1.12.  many-to-one</a></span></dt>
+                           <dt><span class="sect2"><a href="mapping.html#mapping-declaration-onetoone">5.1.13.  Une association one-to-one vers une autre classe persistante est d&eacute;clar&eacute;e avec l'&eacute;l&eacute;ment <code class="literal">one-to-one</code>.</a></span></dt>
+                           <dt><span class="sect2"><a href="mapping.html#mapping-declaration-naturalid">5.1.14.  Bien que nous recommandions l'utilisation de cl&eacute; primaire g&eacute;n&eacute;r&eacute;e, vous devriez toujours essayer d'identifier des
+                                    cl&eacute; m&eacute;tier (naturelles) pour toutes vos entit&eacute;s. Une cl&eacute; naturelle est une propri&eacute;t&eacute; ou une combinaison de propri&eacute;t&eacute;s uniques
+                                    et non nulles. Si elle est aussi immuable, c'est encore mieux. Mappez les propri&eacute;t&eacute;s de la cl&eacute; naturelle dans l'&eacute;l&eacute;ment <code class="literal">&lt;natural-id&gt;</code>. Hibernate g&eacute;n&eacute;rera la cl&eacute; unique n&eacute;cessaire et les contraintes de non-nullit&eacute;, et votre mapping s'auto-documentera.</a></span></dt>
+                           <dt><span class="sect2"><a href="mapping.html#mapping-declaration-component">5.1.15.  L'&eacute;l&eacute;ment <code class="literal">&lt;component&gt;</code> mappe les propri&eacute;t&eacute;s d'un objet fils aux colonnes d'une classe parente. Les composants peuvent en retour d&eacute;clarer leurs propres
+                                    propri&eacute;t&eacute;s, composants ou collections. Voir "Components" plus bas.</a></span></dt>
+                           <dt><span class="sect2"><a href="mapping.html#mapping-declaration-properties">5.1.16.  L'&eacute;l&eacute;ment <code class="literal">&lt;properties&gt;</code> permet la d&eacute;finition d'un groupement logique nomm&eacute; des propri&eacute;t&eacute;s d'une classe. L'utilisation la plus importante de cette
+                                    construction est la possibilit&eacute; pour une combinaison de propri&eacute;t&eacute;s d'&ecirc;tre la cible d'un <code class="literal">property-ref</code>. C'est aussi un moyen pratique de d&eacute;finir une contrainte d'unicit&eacute; multi-colonnes.</a></span></dt>
+                           <dt><span class="sect2"><a href="mapping.html#mapping-declaration-subclass">5.1.17.  Pour finir, la persistance polymorphique n&eacute;cessite la d&eacute;claration de chaque sous-classe de la classe persistante
+                                    de base. pour la strat&eacute;gie de mapping de type table-per-class-hierarchy, on utilise la d&eacute;claration <code class="literal">&lt;subclass&gt;</code>.</a></span></dt>
+                           <dt><span class="sect2"><a href="mapping.html#mapping-declaration-joinedsubclass">5.1.18.  joined-subclass</a></span></dt>
+                           <dt><span class="sect2"><a href="mapping.html#mapping-declaration-unionsubclass">5.1.19.  union-subclass</a></span></dt>
+                           <dt><span class="sect2"><a href="mapping.html#mapping-declaration-join">5.1.20.  join</a></span></dt>
+                           <dt><span class="sect2"><a href="mapping.html#mapping-declaration-key">5.1.21.  key</a></span></dt>
+                           <dt><span class="sect2"><a href="mapping.html#mapping-column">5.1.22.  &eacute;l&eacute;ments column et formula</a></span></dt>
+                           <dt><span class="sect2"><a href="mapping.html#mapping-declaration-import">5.1.23.  import</a></span></dt>
+                           <dt><span class="sect2"><a href="mapping.html#mapping-types-anymapping">5.1.24.  any</a></span></dt>
+                        </dl>
+                     </dd>
+                     <dt><span class="sect1"><a href="mapping-types.html">5.2.  Hibernate Types</a></span></dt>
+                     <dd>
+                        <dl>
+                           <dt><span class="sect2"><a href="mapping-types.html#mapping-types-entitiesvalues">5.2.1.  Entit&eacute;s et valeurs</a></span></dt>
+                           <dt><span class="sect2"><a href="mapping-types.html#mapping-types-basictypes">5.2.2.  Basic value types</a></span></dt>
+                           <dt><span class="sect2"><a href="mapping-types.html#mapping-types-custom">5.2.3.  Types de valeur d&eacute;finis par l'utilisateur</a></span></dt>
+                        </dl>
+                     </dd>
+                     <dt><span class="sect1"><a href="mapping-entityname.html">5.3.  Mapper une classe plus d'une fois</a></span></dt>
+                     <dt><span class="sect1"><a href="mapping-quotedidentifiers.html">5.4.  SQL quoted identifiers</a></span></dt>
+                     <dt><span class="sect1"><a href="mapping-alternatives.html">5.5.  alternatives Metadata</a></span></dt>
+                     <dd>
+                        <dl>
+                           <dt><span class="sect2"><a href="mapping-alternatives.html#mapping-xdoclet">5.5.1.  utilisation de XDoclet</a></span></dt>
+                           <dt><span class="sect2"><a href="mapping-alternatives.html#mapping-annotations">5.5.2.  Utilisation des annotations JDK 5.0</a></span></dt>
+                        </dl>
+                     </dd>
+                     <dt><span class="sect1"><a href="mapping-generated.html">5.6.  Propri&eacute;t&eacute;s g&eacute;n&eacute;r&eacute;es</a></span></dt>
+                     <dt><span class="sect1"><a href="mapping-database-object.html">5.7.  Objets auxiliaires de la base de donn&eacute;es</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="chapter"><a href="collections.html">6.  Mapping des collections</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="sect1"><a href="collections.html#collections-persistent">6.1.  Collections persistantes</a></span></dt>
+                     <dt><span class="sect1"><a href="collections-mapping.html">6.2.  Mapper une collection</a></span></dt>
+                     <dd>
+                        <dl>
+                           <dt><span class="sect2"><a href="collections-mapping.html#collections-foreignkeys">6.2.1.  Les clefs &eacute;trang&egrave;res d'une collection</a></span></dt>
+                           <dt><span class="sect2"><a href="collections-mapping.html#collections-elements">6.2.2.  Les &eacute;l&eacute;ments d'une collection</a></span></dt>
+                           <dt><span class="sect2"><a href="collections-mapping.html#collections-indexed">6.2.3.  Collections index&eacute;es</a></span></dt>
+                           <dt><span class="sect2"><a href="collections-mapping.html#collections-ofvalues">6.2.4.  Collections de valeurs et associations plusieurs-vers-plusieurs</a></span></dt>
+                           <dt><span class="sect2"><a href="collections-mapping.html#collections-onetomany">6.2.5.  Association un-vers-plusieurs</a></span></dt>
+                        </dl>
+                     </dd>
+                     <dt><span class="sect1"><a href="collections-advancedmappings.html">6.3.  Mappings de collection avanc&eacute;s</a></span></dt>
+                     <dd>
+                        <dl>
+                           <dt><span class="sect2"><a href="collections-advancedmappings.html#collections-sorted">6.3.1.  Collections tri&eacute;es</a></span></dt>
+                           <dt><span class="sect2"><a href="collections-advancedmappings.html#collections-bidirectional">6.3.2.  Associations bidirectionnelles</a></span></dt>
+                           <dt><span class="sect2"><a href="collections-advancedmappings.html#collections-indexedbidirectional">6.3.3.  Associations bidirectionnelles avec des collections index&eacute;es</a></span></dt>
+                           <dt><span class="sect2"><a href="collections-advancedmappings.html#collections-ternary">6.3.4.  Associations ternaires</a></span></dt>
+                           <dt><span class="sect2"><a href="collections-advancedmappings.html#collections-idbag">6.3.5.  <code class="literal">Utiliser un <code class="literal">&lt;idbag&gt;</code></code></a></span></dt>
+                        </dl>
+                     </dd>
+                     <dt><span class="sect1"><a href="collections-example.html">6.4.  Exemples de collections</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="chapter"><a href="associations.html">7.  Mapper les associations</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="sect1"><a href="associations.html#assoc-intro">7.1.  Introduction</a></span></dt>
+                     <dt><span class="sect1"><a href="assoc-unidirectional.html">7.2.  Association unidirectionnelle</a></span></dt>
+                     <dd>
+                        <dl>
+                           <dt><span class="sect2"><a href="assoc-unidirectional.html#assoc-unidirectional-m21">7.2.1.  plusieurs &agrave; un</a></span></dt>
+                           <dt><span class="sect2"><a href="assoc-unidirectional.html#assoc-unidirectional-121">7.2.2.  one to one</a></span></dt>
+                           <dt><span class="sect2"><a href="assoc-unidirectional.html#assoc-unidirectional-12m">7.2.3.  un &agrave; plusieurs</a></span></dt>
+                        </dl>
+                     </dd>
+                     <dt><span class="sect1"><a href="assoc-unidirectional-join.html">7.3.  Associations unidirectionnelles avec tables de jointure</a></span></dt>
+                     <dd>
+                        <dl>
+                           <dt><span class="sect2"><a href="assoc-unidirectional-join.html#assoc-unidirectional-join-12m">7.3.1.  un &agrave; plusieurs</a></span></dt>
+                           <dt><span class="sect2"><a href="assoc-unidirectional-join.html#assoc-unidirectional-join-m21">7.3.2.  plusieurs &agrave; un</a></span></dt>
+                           <dt><span class="sect2"><a href="assoc-unidirectional-join.html#assoc-unidirectional-join-121">7.3.3.  one to one</a></span></dt>
+                           <dt><span class="sect2"><a href="assoc-unidirectional-join.html#assoc-unidirectional-join-m2m">7.3.4.  plusieurs &agrave; plusieurs</a></span></dt>
+                        </dl>
+                     </dd>
+                     <dt><span class="sect1"><a href="assoc-bidirectional.html">7.4.  Associations bidirectionnelles</a></span></dt>
+                     <dd>
+                        <dl>
+                           <dt><span class="sect2"><a href="assoc-bidirectional.html#assoc-bidirectional-m21">7.4.1.  un &agrave; plusieurs / plusieurs &agrave; un</a></span></dt>
+                           <dt><span class="sect2"><a href="assoc-bidirectional.html#assoc-bidirectional-121">7.4.2.  one to one</a></span></dt>
+                        </dl>
+                     </dd>
+                     <dt><span class="sect1"><a href="assoc-bidirectional-join.html">7.5.  Associations bidirectionnelles avec table de jointure</a></span></dt>
+                     <dd>
+                        <dl>
+                           <dt><span class="sect2"><a href="assoc-bidirectional-join.html#assoc-bidirectional-join-12m">7.5.1.  un &agrave; plusieurs / plusieurs &agrave; un</a></span></dt>
+                           <dt><span class="sect2"><a href="assoc-bidirectional-join.html#assoc-bidirectional-join-121">7.5.2.  one to one</a></span></dt>
+                           <dt><span class="sect2"><a href="assoc-bidirectional-join.html#assoc-bidirectional-join-m2m">7.5.3.  plusieurs &agrave; plusieurs</a></span></dt>
+                        </dl>
+                     </dd>
+                     <dt><span class="sect1"><a href="assoc-complex.html">7.6.  Des mappings plus complexes</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="chapter"><a href="components.html">8.  Mapping de composants</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="sect1"><a href="components.html#components-dependentobjects">8.1.  Objects d&eacute;pendants</a></span></dt>
+                     <dt><span class="sect1"><a href="components-incollections.html">8.2.  Collection d'objets d&eacute;pendants</a></span></dt>
+                     <dt><span class="sect1"><a href="components-asmapindex.html">8.3.  Utiliser les composants comme index de map</a></span></dt>
+                     <dt><span class="sect1"><a href="components-compositeid.html">8.4.  Utiliser un composant comme identifiant</a></span></dt>
+                     <dt><span class="sect1"><a href="components-dynamic.html">8.5.  Composant Dynamique</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="chapter"><a href="inheritance.html">9.  Mapping d'h&eacute;ritage de classe</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="sect1"><a href="inheritance.html#inheritance-strategies">9.1.  Les trois strat&eacute;gies</a></span></dt>
+                     <dd>
+                        <dl>
+                           <dt><span class="sect2"><a href="inheritance.html#inheritance-tableperclass">9.1.1.  Une table par hi&eacute;rarchie de classe</a></span></dt>
+                           <dt><span class="sect2"><a href="inheritance.html#inheritance-tablepersubclass">9.1.2.  Une table par classe fille</a></span></dt>
+                           <dt><span class="sect2"><a href="inheritance.html#inheritance-tablepersubclass-discriminator">9.1.3.  Une table par classe fille, en utilisant un discriminant</a></span></dt>
+                           <dt><span class="sect2"><a href="inheritance.html#inheritance-mixing-tableperclass-tablepersubclass">9.1.4.  M&eacute;lange d'une table par hi&eacute;rarchie de classe avec une table par classe fille</a></span></dt>
+                           <dt><span class="sect2"><a href="inheritance.html#inheritance-tableperconcrete">9.1.5.  Une table par classe concr&egrave;te</a></span></dt>
+                           <dt><span class="sect2"><a href="inheritance.html#inheritance-tableperconcreate-polymorphism">9.1.6.  Une table par classe concr&egrave;te, en utilisant le polymorphisme implicite</a></span></dt>
+                           <dt><span class="sect2"><a href="inheritance.html#inheritace-mixingpolymorphism">9.1.7.  M&eacute;lange du polymorphisme implicite avec d'autres mappings d'h&eacute;ritage</a></span></dt>
+                        </dl>
+                     </dd>
+                     <dt><span class="sect1"><a href="inheritance-limitations.html">9.2.  Limitations</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="chapter"><a href="objectstate.html">10.  Travailler avec des objets</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="sect1"><a href="objectstate.html#objectstate-overview">10.1.  &Eacute;tats des objets Hibernate</a></span></dt>
+                     <dt><span class="sect1"><a href="objectstate-makingpersistent.html">10.2.  Rendre des objets persistants</a></span></dt>
+                     <dt><span class="sect1"><a href="objectstate-loading.html">10.3.  Chargement d'un objet</a></span></dt>
+                     <dt><span class="sect1"><a href="objectstate-querying.html">10.4.  Requ&ecirc;tage</a></span></dt>
+                     <dd>
+                        <dl>
+                           <dt><span class="sect2"><a href="objectstate-querying.html#objectstate-querying-executing">10.4.1.  Ex&eacute;cution de requ&ecirc;tes</a></span></dt>
+                           <dd>
+                              <dl>
+                                 <dt><span class="sect3"><a href="objectstate-querying.html#objectstate-querying-executing-iterate">10.4.1.1.  It&eacute;ration de r&eacute;sultats</a></span></dt>
+                                 <dt><span class="sect3"><a href="objectstate-querying.html#objectstate-querying-executing-tuples">10.4.1.2.  Requ&ecirc;tes qui retournent des tuples</a></span></dt>
+                                 <dt><span class="sect3"><a href="objectstate-querying.html#objectstate-querying-executing-scalar">10.4.1.3.  R&eacute;sultats scalaires</a></span></dt>
+                                 <dt><span class="sect3"><a href="objectstate-querying.html#objectstate-querying-executing-parameters">10.4.1.4.  Lier des param&egrave;tres</a></span></dt>
+                                 <dt><span class="sect3"><a href="objectstate-querying.html#objectstate-querying-executing-pagination">10.4.1.5.  Pagination</a></span></dt>
+                                 <dt><span class="sect3"><a href="objectstate-querying.html#objectstate-querying-executing-scrolling">10.4.1.6.  It&eacute;ration "scrollable"</a></span></dt>
+                                 <dt><span class="sect3"><a href="objectstate-querying.html#objectstate-querying-executing-named">10.4.1.7.  Externaliser des requ&ecirc;tes nomm&eacute;es</a></span></dt>
+                              </dl>
+                           </dd>
+                           <dt><span class="sect2"><a href="objectstate-querying.html#objectstate-filtering">10.4.2.  Filtrer des collections</a></span></dt>
+                           <dt><span class="sect2"><a href="objectstate-querying.html#objecstate-querying-criteria">10.4.3.  Requ&ecirc;tes Criteria</a></span></dt>
+                           <dt><span class="sect2"><a href="objectstate-querying.html#objectstate-querying-nativesql">10.4.4.  Requ&ecirc;tes en SQL natif</a></span></dt>
+                        </dl>
+                     </dd>
+                     <dt><span class="sect1"><a href="objectstate-modifying.html">10.5.  Modifier des objets persistants</a></span></dt>
+                     <dt><span class="sect1"><a href="objectstate-detached.html">10.6.  Modifier des objets d&eacute;tach&eacute;s</a></span></dt>
+                     <dt><span class="sect1"><a href="objectstate-saveorupdate.html">10.7.  D&eacute;tection automatique d'un &eacute;tat</a></span></dt>
+                     <dt><span class="sect1"><a href="objectstate-deleting.html">10.8.  Suppression d'objets persistants</a></span></dt>
+                     <dt><span class="sect1"><a href="objectstate-replicating.html">10.9.  R&eacute;plication d'objets entre deux entrep&ocirc;ts de donn&eacute;es</a></span></dt>
+                     <dt><span class="sect1"><a href="objectstate-flushing.html">10.10.  Flush de la session</a></span></dt>
+                     <dt><span class="sect1"><a href="objectstate-transitive.html">10.11.  Persistance transitive</a></span></dt>
+                     <dt><span class="sect1"><a href="objectstate-metadata.html">10.12.  Utilisation des m&eacute;ta-donn&eacute;es</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="chapter"><a href="transactions.html">11.  Transactions et acc&egrave;s concurrents</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="sect1"><a href="transactions.html#transactions-basics">11.1.  Gestion de session et d&eacute;limitation de transactions</a></span></dt>
+                     <dd>
+                        <dl>
+                           <dt><span class="sect2"><a href="transactions.html#transactions-basics-uow">11.1.1.  Unit&eacute; de travail</a></span></dt>
+                           <dt><span class="sect2"><a href="transactions.html#transactions-basics-apptx">11.1.2.  Longue conversation</a></span></dt>
+                           <dt><span class="sect2"><a href="transactions.html#transactions-basics-identity">11.1.3.  L'identit&eacute; des objets</a></span></dt>
+                           <dt><span class="sect2"><a href="transactions.html#transactions-basics-issues">11.1.4.  Probl&egrave;mes communs</a></span></dt>
+                        </dl>
+                     </dd>
+                     <dt><span class="sect1"><a href="transactions-demarcation.html">11.2.  D&eacute;marcation des transactions</a></span></dt>
+                     <dd>
+                        <dl>
+                           <dt><span class="sect2"><a href="transactions-demarcation.html#transactions-demarcation-nonmanaged">11.2.1.  Environnement non manag&eacute;</a></span></dt>
+                           <dt><span class="sect2"><a href="transactions-demarcation.html#transactions-demarcation-jta">11.2.2.  Utilisation de JTA</a></span></dt>
+                           <dt><span class="sect2"><a href="transactions-demarcation.html#transactions-demarcation-exceptions">11.2.3.  Gestion des exceptions</a></span></dt>
+                           <dt><span class="sect2"><a href="transactions-demarcation.html#transactions-demarcation-timeout">11.2.4.  Timeout de transaction</a></span></dt>
+                        </dl>
+                     </dd>
+                     <dt><span class="sect1"><a href="transactions-optimistic.html">11.3.  Contr&ocirc;le de consurrence optimiste</a></span></dt>
+                     <dd>
+                        <dl>
+                           <dt><span class="sect2"><a href="transactions-optimistic.html#transactions-optimistic-manual">11.3.1.  Gestion du versionnage au niveau applicatif</a></span></dt>
+                           <dt><span class="sect2"><a href="transactions-optimistic.html#transactions-optimistic-longsession">11.3.2.  Les sessions longues et le versionnage automatique.</a></span></dt>
+                           <dt><span class="sect2"><a href="transactions-optimistic.html#transactions-optimistic-detached">11.3.3.  Les objets d&eacute;tach&eacute;s et le versionnage automatique</a></span></dt>
+                           <dt><span class="sect2"><a href="transactions-optimistic.html#transactions-optimistic-customizing">11.3.4.  Personnaliser le versionnage automatique</a></span></dt>
+                        </dl>
+                     </dd>
+                     <dt><span class="sect1"><a href="transactions-locking.html">11.4.  Verouillage pessimiste</a></span></dt>
+                     <dt><span class="sect1"><a href="transactions-connection-release.html">11.5.  Mode de lib&eacute;ration de Connection</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="chapter"><a href="events.html">12.  Les intercepteurs et les &eacute;v&eacute;nements</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="sect1"><a href="events.html#objectstate-interceptors">12.1.  Intercepteurs</a></span></dt>
+                     <dt><span class="sect1"><a href="objectstate-events.html">12.2.  Syst&egrave;me d'&eacute;v&eacute;nements</a></span></dt>
+                     <dt><span class="sect1"><a href="objectstate-decl-security.html">12.3.  S&eacute;curit&eacute; d&eacute;clarative d'Hibernate</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="chapter"><a href="batch.html">13.  Traitement par paquet</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="sect1"><a href="batch.html#batch-inserts">13.1.  Paquet de mises &Atilde;&nbsp; jour</a></span></dt>
+                     <dt><span class="sect1"><a href="batch-update.html">13.2.  L'interface StatelessSession</a></span></dt>
+                     <dt><span class="sect1"><a href="batch-statelesssession.html">13.3.  Notez que dans le code de l'exemple, les intances de <code class="literal">Customer</code> retourn&Atilde;&copy;es par la requ&Atilde;&ordf;te sont imm&Atilde;&copy;diatement d&Atilde;&copy;tach&Atilde;&copy;es. Elles ne sont jamais associ&Atilde;&copy;es &Atilde;&nbsp; un contexte de persistance.</a></span></dt>
+                     <dt><span class="sect1"><a href="batch-direct.html">13.4.  La pseudo-syntaxe pour les expressions <code class="literal">UPDATE</code> et <code class="literal">DELETE</code> est : <code class="literal">( UPDATE | DELETE ) FROM? EntityName (WHERE where_conditions)?</code>. Certains points sont &Atilde;&nbsp; noter :</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="chapter"><a href="queryhql.html">14.  HQL: Langage de requ&ecirc;tage d'Hibernate</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="sect1"><a href="queryhql.html#queryhql-casesensitivity">14.1.  Sensibilit&eacute; &agrave; la casse</a></span></dt>
+                     <dt><span class="sect1"><a href="queryhql-from.html">14.2.  La clause from</a></span></dt>
+                     <dt><span class="sect1"><a href="queryhql-joins.html">14.3.  Associations et jointures</a></span></dt>
+                     <dt><span class="sect1"><a href="queryhql-joins-forms.html">14.4.  Formes de syntaxes pour les jointures</a></span></dt>
+                     <dt><span class="sect1"><a href="queryhql-identifier-property.html">14.5.  Refering to identifier property</a></span></dt>
+                     <dt><span class="sect1"><a href="queryhql-select.html">14.6.  La clause select</a></span></dt>
+                     <dt><span class="sect1"><a href="queryhql-aggregation.html">14.7.  Fonctions d'aggr&eacute;gation</a></span></dt>
+                     <dt><span class="sect1"><a href="queryhql-polymorphism.html">14.8.  Requ&ecirc;tes polymorphiques</a></span></dt>
+                     <dt><span class="sect1"><a href="queryhql-where.html">14.9.  La clause where</a></span></dt>
+                     <dt><span class="sect1"><a href="queryhql-expressions.html">14.10.  Expressions</a></span></dt>
+                     <dt><span class="sect1"><a href="queryhql-ordering.html">14.11.  La clause order by</a></span></dt>
+                     <dt><span class="sect1"><a href="queryhql-grouping.html">14.12.  La clause group by</a></span></dt>
+                     <dt><span class="sect1"><a href="queryhql-subqueries.html">14.13.  Sous-requ&ecirc;tes</a></span></dt>
+                     <dt><span class="sect1"><a href="queryhql-examples.html">14.14.  Exemples HQL</a></span></dt>
+                     <dt><span class="sect1"><a href="queryhql-bulk.html">14.15.  Mise &agrave; jour et suppression</a></span></dt>
+                     <dt><span class="sect1"><a href="queryhql-tipstricks.html">14.16.  Trucs &amp; Astuces</a></span></dt>
+                     <dt><span class="sect1"><a href="queryhql-components.html">14.17.  translator-credits</a></span></dt>
+                     <dt><span class="sect1"><a href="queryhql-tuple.html">14.18.  Row value constructor syntax</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="chapter"><a href="querycriteria.html">15.  Requ&ecirc;tes par crit&egrave;res</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="sect1"><a href="querycriteria.html#querycriteria-creating">15.1.  Cr&eacute;er une instance de <code class="literal">Criteria</code></a></span></dt>
+                     <dt><span class="sect1"><a href="querycriteria-narrowing.html">15.2.  Restriction du r&eacute;sultat</a></span></dt>
+                     <dt><span class="sect1"><a href="querycriteria-ordering.html">15.3.  Trier les r&eacute;sultats</a></span></dt>
+                     <dt><span class="sect1"><a href="querycriteria-associations.html">15.4.  Associations</a></span></dt>
+                     <dt><span class="sect1"><a href="querycriteria-dynamicfetching.html">15.5.  Peuplement d'associations de mani&egrave;re dynamique</a></span></dt>
+                     <dt><span class="sect1"><a href="querycriteria-examples.html">15.6.  Requ&ecirc;tes par l'exemple</a></span></dt>
+                     <dt><span class="sect1"><a href="querycriteria-projection.html">15.7.  Projections, agr&eacute;gation et regroupement</a></span></dt>
+                     <dt><span class="sect1"><a href="querycriteria-detachedqueries.html">15.8.  Requ&ecirc;tes et sous-requ&ecirc;tes d&eacute;tach&eacute;es</a></span></dt>
+                     <dt><span class="sect1"><a href="query-criteria-naturalid.html">15.9.  Requ&ecirc;tes par identifiant naturel</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="chapter"><a href="querysql.html">16.  SQL natif</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="sect1"><a href="querysql.html#querysql-creating">16.1.  Utiliser une <code class="literal">SQLQuery</code></a></span></dt>
+                     <dd>
+                        <dl>
+                           <dt><span class="sect2"><a href="querysql.html#d0e13156">16.1.1.  Scalar queries</a></span></dt>
+                           <dt><span class="sect2"><a href="querysql.html#d0e13206">16.1.2.  Entity queries</a></span></dt>
+                           <dt><span class="sect2"><a href="querysql.html#d0e13242">16.1.3.  Handling associations and collections</a></span></dt>
+                           <dt><span class="sect2"><a href="querysql.html#d0e13273">16.1.4.  Returning multiple entities</a></span></dt>
+                           <dd>
+                              <dl>
+                                 <dt><span class="sect3"><a href="querysql.html#querysql-aliasreferences">16.1.4.1.  Alias and property references</a></span></dt>
+                              </dl>
+                           </dd>
+                           <dt><span class="sect2"><a href="querysql.html#d0e13414">16.1.5.  Returning non-managed entities</a></span></dt>
+                           <dt><span class="sect2"><a href="querysql.html#d0e13435">16.1.6.  Handling inheritance</a></span></dt>
+                           <dt><span class="sect2"><a href="querysql.html#d0e13440">16.1.7.  Parameters</a></span></dt>
+                        </dl>
+                     </dd>
+                     <dt><span class="sect1"><a href="querysql-namedqueries.html">16.2.  Requ&ecirc;tes SQL nomm&eacute;es</a></span></dt>
+                     <dd>
+                        <dl>
+                           <dt><span class="sect2"><a href="querysql-namedqueries.html#propertyresults">16.2.1.  Utilisation de return-property pour sp&eacute;cifier explicitement les noms des colonnes/alias</a></span></dt>
+                           <dt><span class="sect2"><a href="querysql-namedqueries.html#sp_query">16.2.2.  Utilisation de proc&eacute;dures stock&eacute;es pour les requ&ecirc;tes</a></span></dt>
+                           <dd>
+                              <dl>
+                                 <dt><span class="sect3"><a href="querysql-namedqueries.html#querysql-limits-storedprocedures">16.2.2.1.  R&egrave;gles/limitations lors de l'utilisation des proc&eacute;dures stock&eacute;es</a></span></dt>
+                              </dl>
+                           </dd>
+                        </dl>
+                     </dd>
+                     <dt><span class="sect1"><a href="querysql-cud.html">16.3.  SQL personnalis&eacute; pour cr&eacute;er, mettre &agrave; jour et effacer</a></span></dt>
+                     <dt><span class="sect1"><a href="querysql-load.html">16.4.  SQL personnalis&eacute; pour le chargement</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="chapter"><a href="filters.html">17.  Filtrer les donn&eacute;es</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="sect1"><a href="filters.html#objectstate-filters">17.1.  Filtres Hibernate</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="chapter"><a href="xml.html">18.  Mapping XML</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="sect1"><a href="xml.html#xml-intro">18.1.  Travailler avec des donn&eacute;es XML</a></span></dt>
+                     <dd>
+                        <dl>
+                           <dt><span class="sect2"><a href="xml.html#xml-intro-mapping">18.1.1.  Sp&eacute;cifier le mapping XML et le mapping d'une classe ensemble</a></span></dt>
+                           <dt><span class="sect2"><a href="xml.html#xml-onlyxml">18.1.2.  Sp&eacute;cifier seulement un mapping XML</a></span></dt>
+                        </dl>
+                     </dd>
+                     <dt><span class="sect1"><a href="xml-mapping.html">18.2.  M&eacute;tadonn&eacute;es du mapping XML</a></span></dt>
+                     <dt><span class="sect1"><a href="xml-manipulation.html">18.3.  Manipuler des donn&eacute;es XML</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="chapter"><a href="performance.html">19.  Am&eacute;liorer les performances</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="sect1"><a href="performance.html#performance-fetching">19.1.  Strat&eacute;gies de chargement</a></span></dt>
+                     <dd>
+                        <dl>
+                           <dt><span class="sect2"><a href="performance.html#performance-fetching-lazy">19.1.1.  Travailler avec des associations charg&eacute;es tardivement</a></span></dt>
+                           <dt><span class="sect2"><a href="performance.html#performance-fetching-custom">19.1.2.  Personnalisation des strat&eacute;gies de chargement</a></span></dt>
+                           <dt><span class="sect2"><a href="performance.html#performance-fetching-proxies">19.1.3.  Proxys pour des associations vers un seul objet</a></span></dt>
+                           <dt><span class="sect2"><a href="performance.html#performance-fetching-initialization">19.1.4.  Initialisation des collections et des proxys</a></span></dt>
+                           <dt><span class="sect2"><a href="performance.html#performance-fetching-batch">19.1.5.  Utiliser le chargement par lot</a></span></dt>
+                           <dt><span class="sect2"><a href="performance.html#performance-fetching-subselect">19.1.6.  Utilisation du chargement par sous select</a></span></dt>
+                           <dt><span class="sect2"><a href="performance.html#performance-fetching-lazyproperties">19.1.7.  Utiliser le chargement tardif des propri&eacute;t&eacute;s</a></span></dt>
+                        </dl>
+                     </dd>
+                     <dt><span class="sect1"><a href="performance-cache.html">19.2.  Le cache de second niveau</a></span></dt>
+                     <dd>
+                        <dl>
+                           <dt><span class="sect2"><a href="performance-cache.html#performance-cache-mapping">19.2.1.  Mapping de Cache</a></span></dt>
+                           <dt><span class="sect2"><a href="performance-cache.html#performance-cache-readonly">19.2.2.  Strategie : lecture seule</a></span></dt>
+                           <dt><span class="sect2"><a href="performance-cache.html#performance-cache-readwrite">19.2.3.  Strat&eacute;gie : lecture/&eacute;criture</a></span></dt>
+                           <dt><span class="sect2"><a href="performance-cache.html#performance-cache-nonstrict">19.2.4.  Strat&eacute;gie : lecture/&eacute;criture non stricte</a></span></dt>
+                           <dt><span class="sect2"><a href="performance-cache.html#performance-cache-transactional">19.2.5.  Strat&eacute;gie : transactionelle</a></span></dt>
+                           <dt><span class="sect2"><a href="performance-cache.html#performance-cache-compat-matrix">19.2.6.  Cache-provider/concurrency-strategy compatibility</a></span></dt>
+                        </dl>
+                     </dd>
+                     <dt><span class="sect1"><a href="performance-sessioncache.html">19.3.  G&eacute;rer les caches</a></span></dt>
+                     <dt><span class="sect1"><a href="performance-querycache.html">19.4.  Le cache de requ&ecirc;tes</a></span></dt>
+                     <dt><span class="sect1"><a href="performance-collections.html">19.5.  Comprendre les performances des Collections</a></span></dt>
+                     <dd>
+                        <dl>
+                           <dt><span class="sect2"><a href="performance-collections.html#performance-collections-taxonomy">19.5.1.  Classification</a></span></dt>
+                           <dt><span class="sect2"><a href="performance-collections.html#performance-collections-mostefficientupdate">19.5.2.  Les lists, les maps, les idbags et les sets sont les collections les plus efficaces pour la mise &agrave; jour</a></span></dt>
+                           <dt><span class="sect2"><a href="performance-collections.html#performance-collections-mostefficentinverse">19.5.3.  Les Bags et les lists sont les plus efficaces pour les collections inverse</a></span></dt>
+                           <dt><span class="sect2"><a href="performance-collections.html#performance-collections-oneshotdelete">19.5.4.  Suppression en un coup</a></span></dt>
+                        </dl>
+                     </dd>
+                     <dt><span class="sect1"><a href="performance-monitoring.html">19.6.  Moniteur de performance</a></span></dt>
+                     <dd>
+                        <dl>
+                           <dt><span class="sect2"><a href="performance-monitoring.html#performance-monitoring-sf">19.6.1.  Suivi d'une SessionFactory</a></span></dt>
+                           <dt><span class="sect2"><a href="performance-monitoring.html#performance-monitoring-metrics">19.6.2.  M&eacute;triques</a></span></dt>
+                        </dl>
+                     </dd>
+                  </dl>
+               </dd>
+               <dt><span class="chapter"><a href="toolsetguide.html">20.  Guide des outils</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="sect1"><a href="toolsetguide.html#toolsetguide-s1">20.1.  G&eacute;n&eacute;ration automatique du sch&eacute;ma</a></span></dt>
+                     <dd>
+                        <dl>
+                           <dt><span class="sect2"><a href="toolsetguide.html#toolsetguide-s1-2">20.1.1.  Personnaliser le sch&eacute;ma</a></span></dt>
+                           <dt><span class="sect2"><a href="toolsetguide.html#toolsetguide-s1-3">20.1.2.  Ex&eacute;cuter l'outil</a></span></dt>
+                           <dt><span class="sect2"><a href="toolsetguide.html#toolsetguide-s1-4">20.1.3.  Propri&eacute;t&eacute;s</a></span></dt>
+                           <dt><span class="sect2"><a href="toolsetguide.html#toolsetguide-s1-5">20.1.4.  Utiliser Ant</a></span></dt>
+                           <dt><span class="sect2"><a href="toolsetguide.html#toolsetguide-s1-6">20.1.5.  Mises &agrave; jour incr&eacute;mentales du sch&eacute;ma</a></span></dt>
+                           <dt><span class="sect2"><a href="toolsetguide.html#toolsetguide-s1-7">20.1.6.  Utiliser Ant pour des mises &agrave; jour de sch&eacute;ma par incr&eacute;ment</a></span></dt>
+                           <dt><span class="sect2"><a href="toolsetguide.html#toolsetguide-s1-8">20.1.7.  Validation du sch&eacute;ma</a></span></dt>
+                           <dt><span class="sect2"><a href="toolsetguide.html#toolsetguide-s1-9">20.1.8.  Utiliser Ant pour la validation du Sch&eacute;ma</a></span></dt>
+                        </dl>
+                     </dd>
+                  </dl>
+               </dd>
+               <dt><span class="chapter"><a href="example-parentchild.html">21.  Exemple : P&egrave;re/Fils</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="sect1"><a href="example-parentchild.html#example-parentchild-collections">21.1.  Une note &agrave; propos des collections</a></span></dt>
+                     <dt><span class="sect1"><a href="example-parentchild-bidir.html">21.2.  un-vers-plusieurs bidirectionnel</a></span></dt>
+                     <dt><span class="sect1"><a href="example-parentchild-cascades.html">21.3.  Cycle de vie en cascade</a></span></dt>
+                     <dt><span class="sect1"><a href="example-parentchild-update.html">21.4.  Cascades et <code class="literal">unsaved-value</code></a></span></dt>
+                     <dt><span class="sect1"><a href="example-parentchild-conclusion.html">21.5.  Conclusion</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="chapter"><a href="example-weblog.html">22.  Exemple : application Weblog</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="sect1"><a href="example-weblog.html#example-weblog-classes">22.1.  Classes persistantes</a></span></dt>
+                     <dt><span class="sect1"><a href="example-weblog-mappings.html">22.2.  Mappings Hibernate</a></span></dt>
+                     <dt><span class="sect1"><a href="example-weblog-code.html">22.3.  Code Hibernate</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="chapter"><a href="example-mappings.html">23.  Exemple : quelques mappings</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="sect1"><a href="example-mappings.html#example-mappings-emp">23.1.  Employeur/Employ&eacute; (Employer/Employee)</a></span></dt>
+                     <dt><span class="sect1"><a href="example-mappings-authorwork.html">23.2.  Auteur/Travail (Author/Work)</a></span></dt>
+                     <dt><span class="sect1"><a href="example-mappings-customerorderproduct.html">23.3.  Client/Commande/Produit (Customer/Order/Product)</a></span></dt>
+                     <dt><span class="sect1"><a href="misc.html">23.4.  Divers mappings d'exemple</a></span></dt>
+                     <dd>
+                        <dl>
+                           <dt><span class="sect2"><a href="misc.html#example-mappings-typed-onetone">23.4.1.  "Typed" one-to-one association</a></span></dt>
+                           <dt><span class="sect2"><a href="misc.html#example-mappings-composite-key">23.4.2.  Exemple de clef compos&eacute;e</a></span></dt>
+                           <dt><span class="sect2"><a href="misc.html#example-mappings-composite-key-manytomany">23.4.3.  Many-to-many avec une clef compos&eacute;e partag&eacute;e</a></span></dt>
+                           <dt><span class="sect2"><a href="misc.html#example-mappings-content-discrimination">23.4.4.  Contenu bas&eacute; sur une discrimination</a></span></dt>
+                           <dt><span class="sect2"><a href="misc.html#example-mappings-association-alternatekeys">23.4.5.  Associations sur des clefs altern&eacute;es</a></span></dt>
+                        </dl>
+                     </dd>
+                  </dl>
+               </dd>
+               <dt><span class="chapter"><a href="best-practices.html">24.  Meilleures pratiques</a></span></dt>
+            </dl>
+         </div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left">&nbsp;</td>
+               <td width="20%" align="center">&nbsp;</td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="preface.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">&nbsp;</td>
+               <td width="20%" align="center">&nbsp;</td>
+               <td width="40%" align="right" valign="top">&nbsp;Pr&eacute;face</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

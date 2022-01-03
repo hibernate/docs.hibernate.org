@@ -1,0 +1,849 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>6.2.&nbsp;Collection mappings</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="collections.html" title="Chapter&nbsp;6.&nbsp;Collection Mapping">
+      <link rel="prev" href="collections.html" title="Chapter&nbsp;6.&nbsp;Collection Mapping">
+      <link rel="next" href="collections-advancedmappings.html" title="6.3.&nbsp;Advanced collection mappings">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">6.2.&nbsp;Collection mappings</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="collections.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;6.&nbsp;Collection Mapping</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="collections-advancedmappings.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="collections-mapping"></a>6.2.&nbsp;Collection mappings
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <div class="tip" style="margin-left: 0.5in; margin-right: 0.5in;">
+            <h3 class="title">Tip</h3>
+            <p>
+               There are quite a range of mappings that can be generated for collections, covering
+               many common relational models. We suggest you experiment with the schema generation tool
+                               to get a feeling for how various mapping declarations translate to database tables.
+                           
+            </p>
+         </div>
+         <p>
+                        The Hibernate mapping element used for mapping a collection depends upon
+                        the type of the interface. For example, a <code class="literal">&lt;set&gt;</code> 
+                        element is used for mapping properties of type <code class="literal">Set</code>.
+                    
+         </p><pre class="programlisting">&lt;class name="Product"&gt;
+    &lt;id name="serialNumber" column="productSerialNumber"/&gt;
+    &lt;set name="parts"&gt;
+        &lt;key column="productSerialNumber" not-null="true"/&gt;
+        &lt;one-to-many class="Part"/&gt;
+    &lt;/set&gt;
+&lt;/class&gt;</pre><p>
+                        Apart from <code class="literal">&lt;set&gt;</code>, there is also 
+                        <code class="literal">&lt;list&gt;</code>, <code class="literal">&lt;map&gt;</code>,
+                        <code class="literal">&lt;bag&gt;</code>, <code class="literal">&lt;array&gt;</code> and
+                        <code class="literal">&lt;primitive-array&gt;</code> mapping elements. The
+                        <code class="literal">&lt;map&gt;</code> element is representative:
+                    
+         </p>
+         <div class="programlistingco"><pre class="programlisting">&lt;map
+    name="propertyName"                                         <span class="co">(1)</span>
+    table="table_name"                                          <span class="co">(2)</span>
+    schema="schema_name"                                        <span class="co">(3)</span>
+    lazy="true|extra|false"                                     <span class="co">(4)</span>
+    inverse="true|false"                                        <span class="co">(5)</span>
+    cascade="all|none|save-update|delete|all-delete-orphan|delet<span class="co">(6)</span>e-orphan"
+    sort="unsorted|natural|comparatorClass"                     <span class="co">(7)</span>
+    order-by="column_name asc|desc"                             <span class="co">(8)</span>
+    where="arbitrary sql where condition"                       <span class="co">(9)</span>
+    fetch="join|select|subselect"                               <span class="co">(10)</span>
+    batch-size="N"                                              <span class="co">(11)</span>
+    access="field|property|ClassName"                           <span class="co">(12)</span>
+    optimistic-lock="true|false"                                <span class="co">(13)</span>
+    mutable="true|false"                                        <span class="co">(14)</span>
+    node="element-name|."
+    embed-xml="true|false"
+&gt;
+
+    &lt;key .... /&gt;
+    &lt;map-key .... /&gt;
+    &lt;element .... /&gt;
+&lt;/map&gt;</pre><div class="calloutlist">
+               <table border="0" summary="Callout list">
+                  <tr>
+                     <td width="5%" valign="top" align="left">
+                        <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(1)</fo:inline>
+                     </td>
+                     <td valign="top" align="left">
+                        <p>
+                                                   <code class="literal">name</code> the collection property name
+                                               
+                        </p>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td width="5%" valign="top" align="left">
+                        <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(2)</fo:inline>
+                     </td>
+                     <td valign="top" align="left">
+                        <p>
+                                                   <code class="literal">table</code> (optional - defaults to property name) the
+                                                   name of the collection table (not used for one-to-many associations)
+                                               
+                        </p>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td width="5%" valign="top" align="left">
+                        <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(3)</fo:inline>
+                     </td>
+                     <td valign="top" align="left">
+                        <p>
+                                                   <code class="literal">schema</code> (optional) the name of a table schema to
+                                                   override the schema declared on the root element
+                                               
+                        </p>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td width="5%" valign="top" align="left">
+                        <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(4)</fo:inline>
+                     </td>
+                     <td valign="top" align="left">
+                        <p>
+                                                   <code class="literal">lazy</code> (optional - defaults to <code class="literal">true</code>)
+                                                   may be used to disable lazy fetching and specify that the association is 
+                                                   always eagerly fetched, or to enable "extra-lazy" fetching where most 
+                                                   operations do not initialize the collection (suitable for very large 
+                                                   collections)
+                                               
+                        </p>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td width="5%" valign="top" align="left">
+                        <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(5)</fo:inline>
+                     </td>
+                     <td valign="top" align="left">
+                        <p>
+                                                   <code class="literal">inverse</code> (optional - defaults to <code class="literal">false</code>)
+                                                   mark this collection as the "inverse" end of a bidirectional association
+                                               
+                        </p>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td width="5%" valign="top" align="left">
+                        <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(6)</fo:inline>
+                     </td>
+                     <td valign="top" align="left">
+                        <p>
+                                                   <code class="literal">cascade</code> (optional - defaults to <code class="literal">none</code>)
+                                                   enable operations to cascade to child entities
+                                               
+                        </p>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td width="5%" valign="top" align="left">
+                        <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(7)</fo:inline>
+                     </td>
+                     <td valign="top" align="left">
+                        <p>
+                                                   <code class="literal">sort</code> (optional) specify a sorted collection with
+                                                   <code class="literal">natural</code> sort order, or a given comparator class
+                                               
+                        </p>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td width="5%" valign="top" align="left">
+                        <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(8)</fo:inline>
+                     </td>
+                     <td valign="top" align="left">
+                        <p>
+                                                   <code class="literal">order-by</code> (optional, JDK1.4 only) specify a table column (or columns)
+                                                   that define the iteration order of the <code class="literal">Map</code>, <code class="literal">Set</code>
+                                                   or bag, together with an optional <code class="literal">asc</code> or <code class="literal">desc</code>
+                                               
+                        </p>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td width="5%" valign="top" align="left">
+                        <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(9)</fo:inline>
+                     </td>
+                     <td valign="top" align="left">
+                        <p>
+                                                   <code class="literal">where</code> (optional) specify an arbitrary SQL <code class="literal">WHERE</code>
+                                                   condition to be used when retrieving or removing the collection (useful if the
+                                                   collection should contain only a subset of the available data)
+                                               
+                        </p>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td width="5%" valign="top" align="left">
+                        <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(10)</fo:inline>
+                     </td>
+                     <td valign="top" align="left">
+                        <p>
+                                                   <code class="literal">fetch</code> (optional, defaults to <code class="literal">select</code>) Choose
+                                                   between outer-join fetching, fetching by sequential select, and fetching by sequential
+                                                   subselect.
+                                               
+                        </p>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td width="5%" valign="top" align="left">
+                        <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(11)</fo:inline>
+                     </td>
+                     <td valign="top" align="left">
+                        <p>
+                                                   <code class="literal">batch-size</code> (optional, defaults to <code class="literal">1</code>) specify a
+                                                   "batch size" for lazily fetching instances of this collection.
+                                               
+                        </p>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td width="5%" valign="top" align="left">
+                        <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(12)</fo:inline>
+                     </td>
+                     <td valign="top" align="left">
+                        <p>
+                                                   <code class="literal">access</code> (optional - defaults to <code class="literal">property</code>): The
+                                                   strategy Hibernate should use for accessing the collection property value.
+                                               
+                        </p>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td width="5%" valign="top" align="left">
+                        <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(13)</fo:inline>
+                     </td>
+                     <td valign="top" align="left">
+                        <p>
+                                                   <code class="literal">optimistic-lock</code> (optional - defaults to <code class="literal">true</code>): 
+                                                   Species that changes to the state of the collection results in increment of the
+                                                   owning entity's version. (For one to many associations, it is often reasonable to
+                                                   disable this setting.)
+                                               
+                        </p>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td width="5%" valign="top" align="left">
+                        <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(14)</fo:inline>
+                     </td>
+                     <td valign="top" align="left">
+                        <p>
+                                                   <code class="literal">mutable</code> (optional - defaults to <code class="literal">true</code>): 
+                                                   A value of <code class="literal">false</code> specifies that the elements of the 
+                                                   collection never change (a minor performance optimization in some cases).
+                                               
+                        </p>
+                     </td>
+                  </tr>
+               </table>
+            </div>
+         </div>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="collections-foreignkeys"></a>6.2.1.&nbsp;Collection foreign keys
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                               Collection instances are distinguished in the database by the foreign key of
+                               the entity that owns the collection. This foreign key is referred to as the
+                               <span class="emphasis"><em>collection key column</em></span> (or columns) of the collection 
+                               table. The collection key column is mapped by the <code class="literal">&lt;key&gt;</code> 
+                               element. 
+                           
+            </p>
+            <p>
+                               There may be a nullability constraint on the foreign key column. For most
+                               collections, this is implied. For unidirectional one to many associations,
+                               the foreign key column is nullable by default, so you might need to specify
+                               <code class="literal">not-null="true"</code>.
+                           
+            </p><pre class="programlisting">&lt;key column="productSerialNumber" not-null="true"/&gt;</pre><p>
+                               The foreign key constraint may use <code class="literal">ON DELETE CASCADE</code>.
+                           
+            </p><pre class="programlisting">&lt;key column="productSerialNumber" on-delete="cascade"/&gt;</pre><p>
+                               See the previous chapter for a full definition of the <code class="literal">&lt;key&gt;</code> 
+                               element.
+                           
+            </p>
+         </div>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="collections-elements"></a>6.2.2.&nbsp;Collection elements
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                               Collections may contain almost any other Hibernate type, including all basic types,
+                               custom types, components, and of course, references to other entities. This is an
+                               important distinction: an object in a collection might be handled with "value" 
+                               semantics (its life cycle fully depends on the collection owner) or it might be a
+                               reference to another entity, with its own life cycle. In the latter case, only the 
+                               "link" between the two objects is considered to be state held by the collection. 
+                           
+            </p>
+            <p>
+                               The contained type is referred to as the <span class="emphasis"><em>collection element type</em></span>. 
+                               Collection elements are mapped by <code class="literal">&lt;element&gt;</code> or
+                               <code class="literal">&lt;composite-element&gt;</code>, or in the case of entity references, 
+                               with <code class="literal">&lt;one-to-many&gt;</code> or <code class="literal">&lt;many-to-many&gt;</code>. 
+                               The first two map elements with value semantics, the next two are used to map entity 
+                               associations.
+                           
+            </p>
+         </div>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="collections-indexed"></a>6.2.3.&nbsp;Indexed collections
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                               All collection mappings, except those with set and bag semantics, need an
+                               <span class="emphasis"><em>index column</em></span> in the collection table - a column that maps to an
+                               array index, or <code class="literal">List</code> index, or <code class="literal">Map</code> key. The
+                               index of a <code class="literal">Map</code> may be of any basic type, mapped with 
+                               <code class="literal">&lt;map-key&gt;</code>, it may be an entity reference mapped with 
+                               <code class="literal">&lt;map-key-many-to-many&gt;</code>, or it may be a composite type,
+                               mapped with <code class="literal">&lt;composite-map-key&gt;</code>. The index of an array or 
+                               list is always of type <code class="literal">integer</code> and is mapped using the 
+                               <code class="literal">&lt;list-index&gt;</code> element. The mapped column contains 
+                               sequential integers (numbered from zero, by default).
+                           
+            </p>
+            <div class="programlistingco"><pre class="programlisting">&lt;list-index 
+        column="column_name"                <span class="co">(1)</span>
+        base="0|1|..."/&gt;</pre><div class="calloutlist">
+                  <table border="0" summary="Callout list">
+                     <tr>
+                        <td width="5%" valign="top" align="left">
+                           <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(1)</fo:inline>
+                        </td>
+                        <td valign="top" align="left">
+                           <p>
+                                                      <code class="literal">column_name</code> (required): The name of the column holding the
+                                                      collection index values.
+                                                  
+                           </p>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td width="5%" valign="top" align="left">
+                           <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(1)</fo:inline>
+                        </td>
+                        <td valign="top" align="left">
+                           <p>
+                                                      <code class="literal">base</code> (optional, defaults to <code class="literal">0</code>): The value
+                                                      of the index column that corresponds to the first element of the list or array.
+                                                  
+                           </p>
+                        </td>
+                     </tr>
+                  </table>
+               </div>
+            </div>
+            <div class="programlistingco"><pre class="programlisting">&lt;map-key 
+        column="column_name"                <span class="co">(1)</span>
+        formula="any SQL expression"        <span class="co">(2)</span>
+        type="type_name"                    <span class="co">(3)</span>
+        node="@attribute-name"
+        length="N"/&gt;</pre><div class="calloutlist">
+                  <table border="0" summary="Callout list">
+                     <tr>
+                        <td width="5%" valign="top" align="left">
+                           <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(1)</fo:inline>
+                        </td>
+                        <td valign="top" align="left">
+                           <p>
+                                                      <code class="literal">column</code> (optional): The name of the column holding the
+                                                      collection index values.
+                                                  
+                           </p>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td width="5%" valign="top" align="left">
+                           <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(2)</fo:inline>
+                        </td>
+                        <td valign="top" align="left">
+                           <p>
+                                                      <code class="literal">formula</code> (optional): A SQL formula used to evaluate the
+                                                      key of the map.
+                                                  
+                           </p>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td width="5%" valign="top" align="left">
+                           <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(3)</fo:inline>
+                        </td>
+                        <td valign="top" align="left">
+                           <p>
+                                                      <code class="literal">type</code> (reguired): The type of the map keys.
+                                                  
+                           </p>
+                        </td>
+                     </tr>
+                  </table>
+               </div>
+            </div>
+            <div class="programlistingco"><pre class="programlisting">&lt;map-key-many-to-many
+        column="column_name"                <span class="co">(1)</span>
+        formula="any SQL expression"        <span class="co">(2)</span><span class="co">(3)</span>
+        class="ClassName"
+/&gt;</pre><div class="calloutlist">
+                  <table border="0" summary="Callout list">
+                     <tr>
+                        <td width="5%" valign="top" align="left">
+                           <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(1)</fo:inline>
+                        </td>
+                        <td valign="top" align="left">
+                           <p>
+                                                      <code class="literal">column</code> (optional): The name of the foreign key
+                                                      column for the collection index values.
+                                                  
+                           </p>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td width="5%" valign="top" align="left">
+                           <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(2)</fo:inline>
+                        </td>
+                        <td valign="top" align="left">
+                           <p>
+                                                      <code class="literal">formula</code> (optional): A SQL formula used to evaluate the
+                                                      foreign key of the map key.
+                                                  
+                           </p>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td width="5%" valign="top" align="left">
+                           <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(3)</fo:inline>
+                        </td>
+                        <td valign="top" align="left">
+                           <p>
+                                                      <code class="literal">class</code> (required): The entity class used as the map key.
+                                                  
+                           </p>
+                        </td>
+                     </tr>
+                  </table>
+               </div>
+            </div>
+            <p>
+                               If your table doesn't have an index column, and you still wish to use <code class="literal">List</code> 
+                               as the property type, you should map the property as a Hibernate <span class="emphasis"><em>&lt;bag&gt;</em></span>.
+                               A bag does not retain its order when it is retrieved from the database, but it may be 
+                               optionally sorted or ordered.
+                           
+            </p>
+         </div>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="collections-ofvalues"></a>6.2.4.&nbsp;Collections of values and many-to-many associations
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                           Any collection of values or many-to-many association requires a dedicated 
+                           <span class="emphasis"><em>collection table</em></span> with a foreign key column or columns, 
+                           <span class="emphasis"><em>collection element column</em></span> or columns and possibly 
+                           an index column or columns.
+                       
+            </p>
+            <p>
+                           For a collection of values, we use the <code class="literal">&lt;element&gt;</code> tag.
+                       
+            </p>
+            <div class="programlistingco"><pre class="programlisting">&lt;element
+        column="column_name"                     <span class="co">(1)</span>
+        formula="any SQL expression"             <span class="co">(2)</span>
+        type="typename"                          <span class="co">(3)</span>
+        length="L"
+        precision="P"
+        scale="S"
+        not-null="true|false"
+        unique="true|false"
+        node="element-name"
+/&gt;</pre><div class="calloutlist">
+                  <table border="0" summary="Callout list">
+                     <tr>
+                        <td width="5%" valign="top" align="left">
+                           <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(1)</fo:inline>
+                        </td>
+                        <td valign="top" align="left">
+                           <p>
+                                                      <code class="literal">column</code> (optional): The name of the column holding the
+                                                      collection element values.
+                                                  
+                           </p>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td width="5%" valign="top" align="left">
+                           <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(2)</fo:inline>
+                        </td>
+                        <td valign="top" align="left">
+                           <p>
+                                                      <code class="literal">formula</code> (optional): An SQL formula used to evaluate the
+                                                      element.
+                                                  
+                           </p>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td width="5%" valign="top" align="left">
+                           <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(3)</fo:inline>
+                        </td>
+                        <td valign="top" align="left">
+                           <p>
+                                                      <code class="literal">type</code> (required): The type of the collection element.
+                                                  
+                           </p>
+                        </td>
+                     </tr>
+                  </table>
+               </div>
+            </div>
+            <p>
+                           A <span class="emphasis"><em>many-to-many association</em></span> is specified using the 
+                           <code class="literal">&lt;many-to-many&gt;</code> element.
+                       
+            </p>
+            <div class="programlistingco"><pre class="programlisting">&lt;many-to-many
+        column="column_name"                               <span class="co">(1)</span>
+        formula="any SQL expression"                       <span class="co">(2)</span>
+        class="ClassName"                                  <span class="co">(3)</span>
+        fetch="select|join"                                <span class="co">(4)</span>
+        unique="true|false"                                <span class="co">(5)</span>
+        not-found="ignore|exception"                       <span class="co">(6)</span>
+        entity-name="EntityName"                           <span class="co">(7)</span>
+        property-ref="propertyNameFromAssociatedClass"     <span class="co">(8)</span>
+        node="element-name"
+        embed-xml="true|false"
+    /&gt;</pre><div class="calloutlist">
+                  <table border="0" summary="Callout list">
+                     <tr>
+                        <td width="5%" valign="top" align="left">
+                           <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(1)</fo:inline>
+                        </td>
+                        <td valign="top" align="left">
+                           <p>
+                                                      <code class="literal">column</code> (optional): The name of the element foreign key column.
+                                                  
+                           </p>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td width="5%" valign="top" align="left">
+                           <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(2)</fo:inline>
+                        </td>
+                        <td valign="top" align="left">
+                           <p>
+                                                      <code class="literal">formula</code> (optional): An SQL formula used to evaluate the element
+                                                      foreign key value.
+                                                  
+                           </p>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td width="5%" valign="top" align="left">
+                           <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(3)</fo:inline>
+                        </td>
+                        <td valign="top" align="left">
+                           <p>
+                                                      <code class="literal">class</code> (required): The name of the associated class.
+                                                  
+                           </p>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td width="5%" valign="top" align="left">
+                           <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(4)</fo:inline>
+                        </td>
+                        <td valign="top" align="left">
+                           <p>
+                                                      <code class="literal">fetch</code> (optional - defaults to <code class="literal">join</code>):
+                                                      enables outer-join or sequential select fetching for this association. This
+                                                      is a special case; for full eager fetching (in a single <code class="literal">SELECT</code>)
+                                                      of an entity and its many-to-many relationships to other entities, you would
+                                                      enable <code class="literal">join</code> fetching not only of the collection itself,
+                                                      but also with this attribute on the <code class="literal">&lt;many-to-many&gt;</code>
+                                                      nested element.
+                                                  
+                           </p>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td width="5%" valign="top" align="left">
+                           <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(5)</fo:inline>
+                        </td>
+                        <td valign="top" align="left">
+                           <p>
+                                                      <code class="literal">unique</code> (optional): Enable the DDL generation of a unique
+                                                      constraint for the foreign-key column. This makes the association multiplicity
+                                                      effectively one to many.
+                                                  
+                           </p>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td width="5%" valign="top" align="left">
+                           <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(6)</fo:inline>
+                        </td>
+                        <td valign="top" align="left">
+                           <p>
+                              	                    <code class="literal">not-found</code> (optional - defaults to <code class="literal">exception</code>): 
+                              	                    Specifies how foreign keys that reference missing rows will be handled: 
+                              	                    <code class="literal">ignore</code> will treat a missing row as a null association.
+                              	                
+                           </p>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td width="5%" valign="top" align="left">
+                           <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(7)</fo:inline>
+                        </td>
+                        <td valign="top" align="left">
+                           <p>
+                                                      <code class="literal">entity-name</code> (optional): The entity name of the associated class,
+                                                      as an alternative to <code class="literal">class</code>.
+                                                  
+                           </p>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td width="5%" valign="top" align="left">
+                           <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(8)</fo:inline>
+                        </td>
+                        <td valign="top" align="left">
+                           <p>
+                                                      <code class="literal">property-ref</code>: (optional) The name of a property of the associated 
+                                                      class that is joined to this foreign key. If not specified, the primary key of
+                                                      the associated class is used.
+                                                  
+                           </p>
+                        </td>
+                     </tr>
+                  </table>
+               </div>
+            </div>
+            <p>
+                           Some examples, first, a set of strings:
+                       
+            </p><pre class="programlisting">&lt;set name="names" table="person_names"&gt;
+    &lt;key column="person_id"/&gt;
+    &lt;element column="person_name" type="string"/&gt;
+&lt;/set&gt;</pre><p>
+                           A bag containing integers (with an iteration order determined by the
+                           <code class="literal">order-by</code> attribute):
+                       
+            </p><pre class="programlisting">&lt;bag name="sizes" 
+        table="item_sizes" 
+        order-by="size asc"&gt;
+    &lt;key column="item_id"/&gt;
+    &lt;element column="size" type="integer"/&gt;
+&lt;/bag&gt;</pre><p>
+                           An array of entities - in this case, a many to many association:
+                       
+            </p><pre class="programlisting">&lt;array name="addresses" 
+        table="PersonAddress" 
+        cascade="persist"&gt;
+    &lt;key column="personId"/&gt;
+    &lt;list-index column="sortOrder"/&gt;
+    &lt;many-to-many column="addressId" class="Address"/&gt;
+&lt;/array&gt;</pre><p>
+                           A map from string indices to dates:
+                       
+            </p><pre class="programlisting">&lt;map name="holidays" 
+        table="holidays" 
+        schema="dbo" 
+        order-by="hol_name asc"&gt;
+    &lt;key column="id"/&gt;
+    &lt;map-key column="hol_name" type="string"/&gt;
+    &lt;element column="hol_date" type="date"/&gt;
+&lt;/map&gt;</pre><p>
+                           A list of components (discussed in the next chapter):
+                       
+            </p><pre class="programlisting">&lt;list name="carComponents" 
+        table="CarComponents"&gt;
+    &lt;key column="carId"/&gt;
+    &lt;list-index column="sortOrder"/&gt;
+    &lt;composite-element class="CarComponent"&gt;
+        &lt;property name="price"/&gt;
+        &lt;property name="type"/&gt;
+        &lt;property name="serialNumber" column="serialNum"/&gt;
+    &lt;/composite-element&gt;
+&lt;/list&gt;</pre></div>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="collections-onetomany"></a>6.2.5.&nbsp;One-to-many associations
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                           A <span class="emphasis"><em>one to many association</em></span> links the tables of two classes
+                           via a foreign key, with no intervening collection table. This mapping loses 
+                           certain semantics of normal Java collections:
+                       
+            </p>
+            <div class="itemizedlist">
+               <ul type="disc" compact>
+                  <li>
+                     <p>
+                                            An instance of the contained entity class may not belong to more than
+                                            one instance of the collection
+                                        
+                     </p>
+                  </li>
+                  <li>
+                     <p>
+                                            An instance of the contained entity class may not appear at more than
+                                            one value of the collection index
+                                        
+                     </p>
+                  </li>
+               </ul>
+            </div>
+            <p>
+                           An association from <code class="literal">Product</code> to <code class="literal">Part</code> requires 
+                           existence of a foreign key column and possibly an index column to the <code class="literal">Part</code> 
+                           table. A <code class="literal">&lt;one-to-many&gt;</code> tag indicates that this is a one to many 
+                           association.
+                       
+            </p>
+            <div class="programlistingco"><pre class="programlisting">&lt;one-to-many 
+        class="ClassName"                                  <span class="co">(1)</span>
+        not-found="ignore|exception"                       <span class="co">(2)</span>
+        entity-name="EntityName"                           <span class="co">(3)</span>
+        node="element-name"
+        embed-xml="true|false"
+    /&gt;</pre><div class="calloutlist">
+                  <table border="0" summary="Callout list">
+                     <tr>
+                        <td width="5%" valign="top" align="left">
+                           <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(1)</fo:inline>
+                        </td>
+                        <td valign="top" align="left">
+                           <p>
+                                                      <code class="literal">class</code> (required): The name of the associated class.
+                                                  
+                           </p>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td width="5%" valign="top" align="left">
+                           <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(2)</fo:inline>
+                        </td>
+                        <td valign="top" align="left">
+                           <p>
+                              		                <code class="literal">not-found</code> (optional - defaults to <code class="literal">exception</code>): 
+                              		                Specifies how cached identifiers that reference missing rows will be handled: 
+                              		                <code class="literal">ignore</code> will treat a missing row as a null association.
+                              		            
+                           </p>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td width="5%" valign="top" align="left">
+                           <fo:inline xmlns:fo="http://www.w3.org/1999/XSL/Format" color="black" padding-top="0.1em" padding-bottom="0.1em" padding-start="0.2em" padding-end="0.2em" baseline-shift="0.1em" font-weight="bold" font-size="75%">(3)</fo:inline>
+                        </td>
+                        <td valign="top" align="left">
+                           <p>
+                                                      <code class="literal">entity-name</code> (optional): The entity name of the associated class,
+                                                      as an alternative to <code class="literal">class</code>.
+                                                  
+                           </p>
+                        </td>
+                     </tr>
+                  </table>
+               </div>
+            </div>
+            <p>
+                           Notice that the <code class="literal">&lt;one-to-many&gt;</code> element does not need to
+                           declare any columns. Nor is it necessary to specify the <code class="literal">table</code>
+                           name anywhere.
+                       
+            </p>
+            <p>
+                           <span class="emphasis"><em>Very important note:</em></span> If the foreign key column of a 
+                           <code class="literal">&lt;one-to-many&gt;</code> association is declared <code class="literal">NOT NULL</code>, 
+                           you must declare the <code class="literal">&lt;key&gt;</code> mapping 
+                           <code class="literal">not-null="true"</code> or <span class="emphasis"><em>use a bidirectional association</em></span> 
+                           with the collection mapping marked <code class="literal">inverse="true"</code>. See the discussion 
+                           of bidirectional associations later in this chapter.
+                       
+            </p>
+            <p>
+                           This example shows a map of <code class="literal">Part</code> entities by name (where
+                           <code class="literal">partName</code> is a persistent property of <code class="literal">Part</code>).
+                           Notice the use of a formula-based index.
+                       
+            </p><pre class="programlisting">&lt;map name="parts"
+        cascade="all"&gt;
+    &lt;key column="productId" not-null="true"/&gt;
+    &lt;map-key formula="partName"/&gt;
+    &lt;one-to-many class="Part"/&gt;
+&lt;/map&gt;</pre></div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="collections.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="collections.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="collections-advancedmappings.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">Chapter&nbsp;6.&nbsp;Collection Mapping&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;6.3.&nbsp;Advanced collection mappings</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

@@ -1,0 +1,89 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>15.2.&nbsp;Restriction du r&eacute;sultat</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="querycriteria.html" title="Chapitre&nbsp;15.&nbsp;Requ&ecirc;tes par crit&egrave;res">
+      <link rel="prev" href="querycriteria.html" title="Chapitre&nbsp;15.&nbsp;Requ&ecirc;tes par crit&egrave;res">
+      <link rel="next" href="querycriteria-ordering.html" title="15.3.&nbsp;Trier les r&eacute;sultats">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">15.2.&nbsp;Restriction du r&eacute;sultat</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="querycriteria.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;15.&nbsp;Requ&ecirc;tes par crit&egrave;res</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="querycriteria-ordering.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="querycriteria-narrowing"></a>15.2.&nbsp;Restriction du r&eacute;sultat
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Un criterion (crit&egrave;re de recherche) est une instance de l'interface <code class="literal">org.hibernate.criterion.Criterion</code>. La classe <code class="literal">org.hibernate.criterion.Restrictions</code> d&eacute;finit des m&eacute;thodes pour obtenir des types de <code class="literal">Criterion</code> pr&eacute;-d&eacute;finis. 
+         </p><pre class="programlisting">List cats = sess.createCriteria(Cat.class)
+    .add( Restrictions.like("name", "Fritz%") )
+    .add( Restrictions.between("weight", minWeight, maxWeight) )
+    .list();</pre><p>Les restrictions peuvent &ecirc;tre goup&eacute;es de mani&egrave;re logique. </p><pre class="programlisting">List cats = sess.createCriteria(Cat.class)
+    .add( Restrictions.like("name", "Fritz%") )
+    .add( Restrictions.or(
+        Restrictions.eq( "age", new Integer(0) ),
+        Restrictions.isNull("age")
+    ) )
+    .list();</pre><pre class="programlisting">List cats = sess.createCriteria(Cat.class)
+    .add( Restrictions.in( "name", new String[] { "Fritz", "Izi", "Pk" } ) )
+    .add( Restrictions.disjunction()
+        .add( Restrictions.isNull("age") )
+        .add( Restrictions.eq("age", new Integer(0) ) )
+        .add( Restrictions.eq("age", new Integer(1) ) )
+        .add( Restrictions.eq("age", new Integer(2) ) )
+    ) )
+    .list();</pre><p>Il y a plusieurs types de criterion pr&eacute;-d&eacute;finis (sous classes de <code class="literal">Restriction</code>), mais l'une d'entre elle particuli&egrave;rement utile vous permet de sp&eacute;cifier directement du SQL. 
+         </p><pre class="programlisting">List cats = sess.createCriteria(Cat.class)
+    .add( Restrictions.sqlRestriction("lower({alias}.name) like lower(?)", "Fritz%", Hibernate.STRING) )
+    .list();</pre><p>La zone <code class="literal">{alias}</code> sera remplac&eacute;e par l'alias de colonne de l'entit&eacute; que l'on souhaite int&eacute;rroger. 
+         </p>
+         <p>Une autre approche pour obtenir un criterion est de le r&eacute;cup&eacute;rer d'une instance de <code class="literal">Property</code>. Vous pouvez cr&eacute;er une <code class="literal">Property</code> en appelant <code class="literal">Property.forName()</code>. 
+         </p><pre class="programlisting">
+Property age = Property.forName("age");
+List cats = sess.createCriteria(Cat.class)
+    .add( Restrictions.disjunction()
+        .add( age.isNull() )
+        .add( age.eq( new Integer(0) ) )
+        .add( age.eq( new Integer(1) ) )
+        .add( age.eq( new Integer(2) ) )
+    ) )
+    .add( Property.forName("name").in( new String[] { "Fritz", "Izi", "Pk" } ) )
+    .list();</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="querycriteria.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="querycriteria.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="querycriteria-ordering.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">Chapitre&nbsp;15.&nbsp;Requ&ecirc;tes par crit&egrave;res&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;15.3.&nbsp;Trier les r&eacute;sultats</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

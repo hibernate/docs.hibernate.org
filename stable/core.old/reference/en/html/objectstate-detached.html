@@ -1,0 +1,119 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>10.6.&nbsp;Modifying detached objects</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="objectstate.html" title="Chapter&nbsp;10.&nbsp;Working with objects">
+      <link rel="prev" href="objectstate-modifying.html" title="10.5.&nbsp;Modifying persistent objects">
+      <link rel="next" href="objectstate-saveorupdate.html" title="10.7.&nbsp;Automatic state detection">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">10.6.&nbsp;Modifying detached objects</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="objectstate-modifying.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;10.&nbsp;Working with objects</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="objectstate-saveorupdate.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="objectstate-detached"></a>10.6.&nbsp;Modifying detached objects
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+            Many applications need to retrieve an object in one transaction, send it to the
+            UI layer for manipulation, then save the changes in a new transaction.
+            Applications that use this kind of approach in a high-concurrency environment
+                        usually use versioned  data to ensure isolation for the "long" unit of work.
+                    
+         </p>
+         <p>
+                        Hibernate supports this model by providing for reattachment of detached instances
+                        using the <code class="literal">Session.update()</code> or <code class="literal">Session.merge()</code>
+                        methods:
+                    
+         </p><pre class="programlisting">// in the first session
+Cat cat = (Cat) firstSession.load(Cat.class, catId);
+Cat potentialMate = new Cat();
+firstSession.save(potentialMate);
+
+// in a higher layer of the application
+cat.setMate(potentialMate);
+
+// later, in a new session
+secondSession.update(cat);  // update cat
+secondSession.update(mate); // update mate</pre><p>
+                        If the <code class="literal">Cat</code> with identifier <code class="literal">catId</code> had already
+                        been loaded  by <code class="literal">secondSession</code> when the application tried to
+                        reattach it, an exception would have been thrown.
+                    
+         </p>
+         <p>
+                        Use <code class="literal">update()</code> if you are sure that the session does
+                        not contain an already persistent instance with the same identifier, and
+                        <code class="literal">merge()</code> if you want to merge your modifications at any time
+                        without consideration of the state of the session. In other words, <code class="literal">update()</code>
+                        is usually the first method you would call in a fresh session, ensuring that
+                        reattachment of your detached instances is the first operation that is executed.
+                    
+         </p>
+         <p>
+                        The application should individually <code class="literal">update()</code> detached instances
+                        reachable from the given detached instance if and <span class="emphasis"><em>only</em></span> if it wants
+                        their state also updated. This can be automated of course, using <span class="emphasis"><em>transitive
+                              persistence</em></span>, see <a href="objectstate-transitive.html" title="10.11.&nbsp;Transitive persistence">Section&nbsp;10.11, &#8220;Transitive persistence&#8221;</a>.
+                    
+         </p>
+         <p>
+                        The <code class="literal">lock()</code> method also allows an application to reassociate
+                        an object with a new session. However, the detached instance has to be unmodified!
+                    
+         </p><pre class="programlisting">//just reassociate:
+sess.lock(fritz, LockMode.NONE);
+//do a version check, then reassociate:
+sess.lock(izi, LockMode.READ);
+//do a version check, using SELECT ... FOR UPDATE, then reassociate:
+sess.lock(pk, LockMode.UPGRADE);</pre><p>
+                        Note that <code class="literal">lock()</code> can be used with various
+                        <code class="literal">LockMode</code>s, see the API documentation and the
+                        chapter on transaction handling for more information. Reattachment is not
+                        the only usecase for <code class="literal">lock()</code>.
+                    
+         </p>
+         <p>
+                        Other models for long units of work are discussed in <a href="transactions-optimistic.html" title="11.3.&nbsp;Optimistic concurrency control">Section&nbsp;11.3, &#8220;Optimistic concurrency control&#8221;</a>.
+                    
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="objectstate-modifying.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="objectstate.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="objectstate-saveorupdate.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">10.5.&nbsp;Modifying persistent objects&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;10.7.&nbsp;Automatic state detection</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

@@ -1,0 +1,1615 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>Hibernate Search</title><!-- HibernateDoc.Meta --><meta name="description" content="Hibernate Search, full text search for your entities - Reference Documentation" /><meta name="keywords" content="hibernate, search, hibernate search, full text, lucene" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://docs.jboss.org/hibernate/stable/search/reference/en-US/html_single/" /><!-- /HibernateDoc.Meta --><link rel="stylesheet" href="../shared/css/html.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.65.1"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="book" lang="en"><div class="titlepage"><div><div><h1 class="title"><a name="d0e2"></a>Hibernate Search</h1></div><div><h2 class="subtitle">Apache <span class="trademark">Lucene</span>&#8482; Integration</h2></div><div><h2 class="subtitle">Reference Guide</h2></div><div><p class="releaseinfo">3.0.1.GA</p></div></div><div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="preface"><a href="#preface">Preface</a></span></dt><dt><span class="chapter"><a href="#getting-started">1. Getting started</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e44">1.1. System Requirements</a></span></dt><dt><span class="section"><a href="#d0e103">1.2. Maven</a></span></dt><dt><span class="section"><a href="#d0e137">1.3. Configuration</a></span></dt><dt><span class="section"><a href="#d0e247">1.4. Indexing</a></span></dt><dt><span class="section"><a href="#d0e267">1.5. Searching</a></span></dt><dt><span class="section"><a href="#d0e289">1.6. Analyzer</a></span></dt><dt><span class="section"><a href="#d0e328">1.7. What's next</a></span></dt></dl></dd><dt><span class="chapter"><a href="#search-architecture">2. Architecture</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e351">2.1. Overview</a></span></dt><dt><span class="section"><a href="#d0e403">2.2. Back end</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e408">2.2.1. Lucene</a></span></dt><dt><span class="section"><a href="#d0e422">2.2.2. JMS</a></span></dt></dl></dd><dt><span class="section"><a href="#d0e439">2.3. Work execution</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e444">2.3.1. Synchronous</a></span></dt><dt><span class="section"><a href="#d0e449">2.3.2. Asynchronous</a></span></dt></dl></dd><dt><span class="section"><a href="#search-architecture-readerstrategy">2.4. Reader strategy</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e462">2.4.1. Shared</a></span></dt><dt><span class="section"><a href="#d0e470">2.4.2. Not-shared</a></span></dt><dt><span class="section"><a href="#d0e475">2.4.3. Custom</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="#search-configuration">3. Configuration</a></span></dt><dd><dl><dt><span class="section"><a href="#search-configuration-directory">3.1. Directory configuration</a></span></dt><dt><span class="section"><a href="#search-configuration-directory-sharding">3.2. Index sharding</a></span></dt><dt><span class="section"><a href="#d0e718">3.3. Worker configuration</a></span></dt><dt><span class="section"><a href="#jms-backend">3.4. JMS Master/Slave configuration</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e807">3.4.1. Slave nodes</a></span></dt><dt><span class="section"><a href="#d0e818">3.4.2. Master node</a></span></dt></dl></dd><dt><span class="section"><a href="#configuration-reader-strategy">3.5. Reader strategy configuration</a></span></dt><dt><span class="section"><a href="#search-configuration-event">3.6. Enabling Hibernate Search and automatic indexing</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e874">3.6.1. Enabling Hibernate Search</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e905">3.6.1.1. Hibernate Core 3.2.6 and beyond</a></span></dt></dl></dd><dt><span class="section"><a href="#d0e917">3.6.2. Automatic indexing</a></span></dt></dl></dd><dt><span class="section"><a href="#lucene-indexing-performance">3.7. Tuning Lucene indexing performance</a></span></dt></dl></dd><dt><span class="chapter"><a href="#search-mapping">4. Mapping entities to the index structure</a></span></dt><dd><dl><dt><span class="section"><a href="#search-mapping-entity">4.1. Mapping an entity</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e1090">4.1.1. Basic mapping</a></span></dt><dt><span class="section"><a href="#d0e1209">4.1.2. Mapping properties multiple times</a></span></dt><dt><span class="section"><a href="#d0e1236">4.1.3. Embedded and associated objects</a></span></dt><dt><span class="section"><a href="#d0e1399">4.1.4. Boost factor</a></span></dt><dt><span class="section"><a href="#analyzer">4.1.5. Analyzer</a></span></dt></dl></dd><dt><span class="section"><a href="#search-mapping-bridge">4.2. Property/Field Bridge</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e1469">4.2.1. Built-in bridges</a></span></dt><dt><span class="section"><a href="#d0e1531">4.2.2. Custom Bridge</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e1536">4.2.2.1. StringBridge</a></span></dt><dt><span class="section"><a href="#d0e1624">4.2.2.2. FieldBridge</a></span></dt><dt><span class="section"><a href="#d0e1652">4.2.2.3. @ClassBridge</a></span></dt></dl></dd></dl></dd></dl></dd><dt><span class="chapter"><a href="#search-query">5. Querying</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e1731">5.1. Building queries</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e1736">5.1.1. Building a Lucene query</a></span></dt><dt><span class="section"><a href="#d0e1741">5.1.2. Building a Hibernate Search query</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e1744">5.1.2.1. Generality</a></span></dt><dt><span class="section"><a href="#d0e1757">5.1.2.2. Pagination</a></span></dt><dt><span class="section"><a href="#d0e1770">5.1.2.3. Sorting</a></span></dt><dt><span class="section"><a href="#d0e1792">5.1.2.4. Fetching strategy</a></span></dt><dt><span class="section"><a href="#projections">5.1.2.5. Projection</a></span></dt></dl></dd></dl></dd><dt><span class="section"><a href="#d0e1872">5.2. Retrieving the results</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e1889">5.2.1. Performance considerations</a></span></dt><dt><span class="section"><a href="#d0e1934">5.2.2. Result size</a></span></dt><dt><span class="section"><a href="#d0e1964">5.2.3. ResultTransformer</a></span></dt></dl></dd><dt><span class="section"><a href="#d0e1982">5.3. Filters</a></span></dt><dt><span class="section"><a href="#d0e2128">5.4. Optimizing the query process</a></span></dt><dt><span class="section"><a href="#d0e2145">5.5. Native Lucene Queries</a></span></dt></dl></dd><dt><span class="chapter"><a href="#search-batchindex">6. Manual indexing</a></span></dt><dd><dl><dt><span class="section"><a href="#search-batchindex-indexing">6.1. Indexing</a></span></dt><dt><span class="section"><a href="#d0e2224">6.2. Purging</a></span></dt></dl></dd><dt><span class="chapter"><a href="#search-optimize">7. Index Optimization</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e2281">7.1. Automatic optimization</a></span></dt><dt><span class="section"><a href="#d0e2317">7.2. Manual optimization</a></span></dt><dt><span class="section"><a href="#d0e2346">7.3. Adjusting optimization</a></span></dt></dl></dd><dt><span class="chapter"><a href="#search-lucene-native">8. Accessing Lucene natively</a></span></dt><dd><dl><dt><span class="section"><a href="#d0e2368">8.1. SearchFactory</a></span></dt><dt><span class="section"><a href="#d0e2384">8.2. Accessing a Lucene Directory</a></span></dt><dt><span class="section"><a href="#d0e2407">8.3. Using an IndexReader</a></span></dt></dl></dd></dl></div><div class="preface" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="preface"></a>Preface</h2></div></div><div></div></div><p>Full text search engines like <span class="productname">Apache
+    Lucene</span>&#8482; are very powerful technologies to add efficient free
+    text search capabilities to applications. However, they suffer several mismatches when
+    dealing with object domain models. Amongst other things indexes have to be kept up to date and
+    mismatches between index structure and domain model as well as query mismatches 
+    have to be avoided.
+    </p><p>
+    Hibernate Search indexes your domain model with the help of a few annotations,
+    takes care of database/index synchronization and brings back
+    regular managed objects from free text queries. To achieve this Hibernate Search
+    is combining the power of <a href="http://www.hibernate.org" target="_top">Hibernate</a> and  
+    <a href="http://lucene.apache.org" target="_top">Apache Lucene</a>.
+    </p></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="getting-started"></a>Chapter&nbsp;1.&nbsp;Getting started</h2></div></div><div></div></div><p>Welcome to Hibernate Search! The following chapter will guide you
+  through the initial steps required to integrate Hibernate Search into an
+  existing Hibernate enabled application. In case you are a Hibernate new
+  timer we recommend you start <a href="http://hibernate.org/152.html" target="_top">here</a>.</p><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e44"></a>1.1.&nbsp;System Requirements</h2></div></div><div></div></div><div class="table"><a name="d0e47"></a><p class="title"><b>Table&nbsp;1.1.&nbsp;System requirements</b></p><table summary="System requirements" border="1"><colgroup><col><col></colgroup><tbody><tr><td>Java Runtime</td><td>A JDK or JRE version <span class="emphasis"><em>5</em></span> or greater. You
+            can download a Java Runtime for Windows/Linux/Solaris <a href="http://java.sun.com/javase/downloads/" target="_top"> here
+            </a>.</td></tr><tr><td>Hibernate Search</td><td><tt class="literal">hibernate-search.jar</tt> and all the
+            dependencies from the <tt class="literal">lib</tt> directory of the
+            Hibernate Search distribution, especially lucene :)</td></tr><tr><td>Hibernate Core</td><td>This instructions have been tested against Hibernate 3.2.x.
+            Next to the main <tt class="literal">hibernate3.jar</tt> you will need
+            all required libaries from the <tt class="literal">lib</tt> directory of
+            the distribution. Refer to <tt class="literal">README.txt</tt> in the
+            <tt class="literal">lib</tt> directory of the distibution to determine
+            the minimum runtime requirements.</td></tr><tr><td>Hibernate Annotations</td><td>Even though Hibernate Search can be used without Hibernate
+            Annotations the following instructions will use them for ease of
+            use. The tutorial is tested against version 3.3.x of Hibernate
+            Annotations.</td></tr></tbody></table></div><p>You can download all dependencies from the Hibernate <a href="http://www.hibernate.org/6.html" target="_top">download site</a>. You can also
+    verify the dependency versions against the <a href="http://www.hibernate.org/6.html#A3" target="_top">Hibernate Compatibility
+    Matrix</a>.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e103"></a>1.2.&nbsp;Maven</h2></div></div><div></div></div><p>Instead of managing all dependencies yourself maven users have the
+    possibility to use the <a href="http://repository.jboss.com/maven2" target="_top">JBoss maven repository</a>.
+    Just add the JBoss repository url to the <span class="emphasis"><em>repositories</em></span>
+    section of your <tt class="filename">pom.xml</tt> or
+    <tt class="filename">settings.xml</tt>:</p><pre class="programlisting">
+&lt;repository&gt;
+  &lt;id&gt;repository.jboss.org&lt;/id&gt;
+  &lt;name&gt;JBoss Maven Repository&lt;/name&gt;
+  &lt;url&gt;http://repository.jboss.org/maven2&lt;/url&gt;
+  &lt;layout&gt;default&lt;/layout&gt;
+&lt;/repository&gt;
+      </pre><p>Then add the following dependencies to your pom.xml:</p><pre class="programlisting">
+&lt;dependency&gt;
+   &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
+   &lt;artifactId&gt;hibernate-search&lt;/artifactId&gt;
+   &lt;version&gt;3.0.0.ga&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+   &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
+   &lt;artifactId&gt;hibernate-annotations&lt;/artifactId&gt;
+   &lt;version&gt;3.3.0.ga&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+   &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
+   &lt;artifactId&gt;hibernate-entitymanager&lt;/artifactId&gt;
+   &lt;version&gt;3.3.1.ga&lt;/version&gt;
+&lt;/dependency&gt;
+      </pre><p>Not all three dependencies are required.
+    <span class="emphasis"><em>hibernate-search</em></span> alone contains everything needed to
+    use Hibernate Search. <span class="emphasis"><em>hibernate-annotations</em></span> is only
+    needed if you use non Hibernate Search annotations like we do in the
+    examples of this tutorial. Last but not least,
+    <span class="emphasis"><em>hibernate-entitymanager</em></span> is only required if you use
+    Hibernate Search in conjunction with JPA.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e137"></a>1.3.&nbsp;Configuration</h2></div></div><div></div></div><p>Once you have downloaded and added all required dependencies to your
+    application you have to add a few properties to your hibernate
+    configuration file. If you are using Hibernate directly this can be done
+    in <tt class="literal">hibernate.properties</tt> or
+    <tt class="literal">hibernate.cfg.xml</tt>. If you are using Hibernate via JPA
+    you can also add the properties to <tt class="literal">persistence.xml</tt>. The
+    good news is that for standard use most properties offer a sensible
+    default.</p><p>Apache Lucene has a notion of <tt class="literal">Directory</tt> to store
+    the index files. Hibernate Search handles the initialization and
+    configuration of a Lucene <tt class="literal">Directory</tt> instance via a
+    <tt class="literal">DirectoryProvider</tt>. In this tutorial we will use a
+    subclass of <tt class="literal">DirectoryProvider</tt> called
+    <tt class="classname">FSDirectoryProvider</tt>. This will give us the ability
+    to physically inspect the Lucene indexes created by Hibernate Search (eg
+    via <a href="http://www.getopt.org/luke/" target="_top">Luke</a>). Once you have
+    a working configuration you can start experimenting with other directory
+    providers (see <a href="#search-configuration-directory" title="3.1.&nbsp;Directory configuration">Section&nbsp;3.1, &#8220;Directory configuration&#8221;</a>).</p><p>Lets assume that your application contains the Hibernate managed
+    class <tt class="classname">example.Book</tt> and you now want to add free
+    text search capabilities to your application in order to search body and
+    summary of the books contained in your database.</p><pre class="programlisting">
+package exmaple.Book
+...
+@Entity
+public class Book {
+
+  @Id
+  private Integer id; 
+  private String body;  
+  private String summary; 
+  @ManyToMany private Set&lt;Author&gt; authors = new HashSet&lt;Author&gt;();
+  @ManyToOne private Author mainAuthor;
+  private Date publicationDate;
+  
+  public Book() {
+  } 
+  
+  // standard getters/setters follow here
+... 
+    </pre><p>First you have to tell Hibernate Search which
+    <tt class="classname">DirectoryProvider</tt> to use. This can be achieved by
+    setting the <tt class="literal">hibernate.search.default.directory_provider</tt>
+    property. You also have to specify the default root directory for all
+    indexes via <tt class="literal">hibernate.search.default.indexBase</tt>.</p><pre class="programlisting">
+...
+# the default directory provider
+hibernate.search.default.directory_provider = org.hibernate.search.store.FSDirectoryProvider
+
+# the default base directory for the indecies
+hibernate.search.default.indexBase = /var/lucene/indexes    
+...
+    </pre><p>Next you have to add three annotations to the
+    <tt class="classname">Book</tt> class. The first annotation
+    <tt class="literal">@Indexed</tt> marks <tt class="classname">Book</tt> as
+    indexable. By design Hibernate Search needs to store an untokenized id in
+    the index to ensure index unicity for a given entity.
+    <tt class="literal">@DocumentId</tt> marks the property to use for this purpose.
+    Most if not all the time, the property is the database primary key. Last
+    but not least you have to index the fields you want to make searchable. In
+    our example these fields are <tt class="literal">body</tt> and
+    <tt class="literal">summary</tt>. Both properties get annotated with
+    <tt class="literal">@Field</tt>. The property
+    <tt class="literal">index=Index.TOKENIZED</tt> will ensure that the text will be
+    tokenized using the default Lucene analyzer whereas
+    <tt class="literal">store=Store.NO</tt> ensures that the actual data will not be
+    stored in the index. Usually, tokenizing means chunking a sentence into
+    individual words (and potentially excluding common words like
+    <tt class="literal">a</tt>, <tt class="literal">the </tt>etc).</p><p>These settings are sufficient for an initial test. For more details
+    on entity mapping refer to <a href="#search-mapping-entity" title="4.1.&nbsp;Mapping an entity">Section&nbsp;4.1, &#8220;Mapping an entity&#8221;</a>. In
+    case you want to store and retrieve the indexed data in order to avoid
+    database roundtrips, refer to projections in <a href="#projections" title="5.1.2.5.&nbsp;Projection">Section&nbsp;5.1.2.5, &#8220;Projection&#8221;</a></p><pre class="programlisting">
+package exmaple.Book
+...
+@Entity
+<span class="bold"><b>@Indexed</b></span>
+public class Book {
+
+  @Id
+  <span class="bold"><b>@DocumentId</b></span>
+  private Integer id;
+  
+  <span class="bold"><b>@Field(index=Index.TOKENIZED, store=Store.NO)</b></span>
+  private String body;
+  
+  <span class="bold"><b>@Field(index=Index.TOKENIZED, store=Store.NO)</b></span>
+  private String summary; 
+  @ManyToMany private Set&lt;Author&gt; authors = new HashSet&lt;Author&gt;();
+  @ManyToOne private Author mainAuthor;
+  private Date publicationDate;
+  
+  public Book() {
+  } 
+  
+  // standard getters/setters follow here
+... 
+  </pre></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e247"></a>1.4.&nbsp;Indexing</h2></div></div><div></div></div><p>Hibernate Search will index every entity persisted, updated or
+    removed through Hibernate core transparently for the application. However,
+    the data already present in your database needs to be indexed once to
+    populate the Lucene index. Once you have added the above properties and
+    annotations it is time to trigger an initial batch index of your books.
+    You can achieve this by adding one of the following code examples to your
+    code (see also <a href="#search-batchindex" title="Chapter&nbsp;6.&nbsp;Manual indexing">Chapter&nbsp;6, <i>Manual indexing</i></a>):</p><p>Example using Hibernate Session:</p><pre class="programlisting">
+FullTextSession fullTextSession = Search.createFullTextSession(session);
+Transaction tx = fullTextSession.beginTransaction();
+List books = session.createQuery("from Book as book").list();
+for (Book book : books) {
+    fullTextSession.index(book);
+}
+tx.commit(); //index are written at commit time       
+    </pre><p>Example using JPA:</p><pre class="programlisting">
+EntityManager em = entityManagerFactory.createEntityManager();
+FullTextEntityManager fullTextEntityManager = Search.createFullTextEntityManager(em);
+List books = em.createQuery("select book from Book as book").getResultList();
+for (Book book : books) {
+    fullTextEntityManager.index(book);
+} 
+    </pre><p>After executing the above code, you should be able to see a Lucene
+    index under <tt class="literal">/var/lucene/indexes/example.Book</tt>. Go ahead
+    an inspect this index. It will help you to understand how Hibernate Search
+    works.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e267"></a>1.5.&nbsp;Searching</h2></div></div><div></div></div><p>Now it is time to execute a first search. The following code will
+    prepare a query against the fields <tt class="literal">summary</tt> and
+    <tt class="literal">body</tt>, execute it and return a list of
+    <tt class="classname">Book</tt>s:</p><p>Example using Hibernate Session:</p><pre class="programlisting">
+FullTextSession fullTextSession = Search.createFullTextSession(session);
+
+Transaction tx = fullTextSession.beginTransaction();
+
+MultiFieldQueryParser parser = new MultiFieldQueryParser( new String[]{"summary", "body"}, 
+  new StandardAnalyzer());
+Query query = parser.parse( "Java rocks!" );
+org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( query, Book.class );
+List result = hibQuery.list();
+  
+tx.commit();
+session.close();  
+    </pre><p>Example using JPA:</p><pre class="programlisting">
+EntityManager em = entityManagerFactory.createEntityManager();
+
+FullTextEntityManager fullTextEntityManager = 
+    org.hibernate.hibernate.search.jpa.Search.createFullTextEntityManager(em);
+MultiFieldQueryParser parser = new MultiFieldQueryParser( new String[]{"summary", "body"}, 
+  new StandardAnalyzer());
+Query query = parser.parse( "Java rocks!" );
+org.hibernate.Query hibQuery = fullTextEntityManager.createFullTextQuery( query, Book.class );
+List result = hibQuery.list();
+    </pre></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e289"></a>1.6.&nbsp;Analyzer</h2></div></div><div></div></div><p>Assume that one of your indexed book entities contains the text
+    "Java rocks" and you want to get hits for all of the following queries:
+    "rock", "rocks", "rocked" and "rocking". In Lucene this can be achieved by
+    choosing an analyzer class which applies word stemming during the indexing
+    process. Hibernate Search offers several ways to configure the analyzer to
+    use (see <a href="#analyzer" title="4.1.5.&nbsp;Analyzer">Section&nbsp;4.1.5, &#8220;Analyzer&#8221;</a>):</p><div class="itemizedlist"><ul type="disc"><li><p>Setting the <tt class="literal">hibernate.search.analyzer</tt>
+        property in the configuration file. The specified class will then be
+        the default analyzer.</p></li><li><p>Setting the <tt class="literal">Analyzer</tt> annotation at the entity
+        level.</p></li><li><p>Setting the <tt class="literal">Analyzer</tt> annotation at the field
+        level.</p></li></ul></div><p>The following example uses the entity level annotation to apply a
+    English language analyzer which would help you to achieve your goal. The
+    class <tt class="classname">EnglishAnalyzer</tt> is a custom class using the
+    Snowball English Stemmer from the <a href="http://lucene.apache.org/java/docs/lucene-sandbox/" target="_top">Lucene
+    Sandbox</a>.</p><pre class="programlisting">
+package example.Book
+...
+@Entity
+@Indexed
+<span class="bold"><b>@Analyzer(impl = example.EnglishAnalyzer.class)</b></span>
+public class Book {
+
+  @Id
+  @DocumentId
+  private Integer id;
+  
+  @Field(index=Index.TOKENIZED, store=Store.NO)
+  private String body;
+  
+  @Field(index=Index.TOKENIZED, store=Store.NO)
+  private String summary; 
+  @ManyToMany private Set&lt;Author&gt; authors = new HashSet&lt;Author&gt;();
+  @ManyToOne private Author mainAuthor;
+  private Date publicationDate;
+  
+  public Book() {
+  } 
+  
+  // standard getters/setters follow here
+... 
+}
+
+public class EnglishAnalyzer extends Analyzer {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public TokenStream tokenStream(String fieldName, Reader reader) {
+        TokenStream result = new StandardTokenizer(reader);
+        result = new StandardFilter(result);
+        result = new LowerCaseFilter(result);
+        result = new SnowballFilter(result, name);
+        return result;
+    }
+}
+  </pre></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e328"></a>1.7.&nbsp;What's next</h2></div></div><div></div></div><p>The above paragraphs hopefully helped you getting started with
+    Hibernate Search. You should by now have a file system based index and be
+    able to search and retrieve a list of managed objects via Hibernate
+    Search. The next step is to get more familiar with the overall
+    architecture ((<a href="#search-architecture" title="Chapter&nbsp;2.&nbsp;Architecture">Chapter&nbsp;2, <i>Architecture</i></a>)) and explore the
+    basic features in more detail.</p><p>Two topics which where only briefly touched in this tutorial were
+    analyzer configuration (<a href="#analyzer" title="4.1.5.&nbsp;Analyzer">Section&nbsp;4.1.5, &#8220;Analyzer&#8221;</a>) and field bridges
+    (<a href="#search-mapping-bridge" title="4.2.&nbsp;Property/Field Bridge">Section&nbsp;4.2, &#8220;Property/Field Bridge&#8221;</a>), both important features
+    required for more fine-grained indexing.</p><p>More advanced topics cover clustering (<a href="#jms-backend" title="3.4.&nbsp;JMS Master/Slave configuration">Section&nbsp;3.4, &#8220;JMS Master/Slave configuration&#8221;</a>) and large indexes handling (<a href="#search-configuration-directory-sharding" title="3.2.&nbsp;Index sharding">Section&nbsp;3.2, &#8220;Index sharding&#8221;</a>).</p></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="search-architecture"></a>Chapter&nbsp;2.&nbsp;Architecture</h2></div></div><div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e351"></a>2.1.&nbsp;Overview</h2></div></div><div></div></div><p>Hibernate Search consists of an indexing and an index search engine.
+    Both are backed by Apache Lucene.</p><p>When an entity is inserted, updated or removed in/from the database,
+    Hibernate Search keeps track of this event (through the Hibernate event
+    system) and schedules an index update. All the index updates are handled
+    for you without you having to use the Apache Lucene APIs (see <a href="#search-configuration-event" title="3.6.&nbsp;Enabling Hibernate Search and automatic indexing">Section&nbsp;3.6, &#8220;Enabling Hibernate Search and automatic indexing&#8221;</a>).</p><p>To interact with Apache Lucene indexes, Hibernate Search has the
+    notion of <tt class="classname">DirectoryProvider</tt>s. A directory provider
+    will manage a given Lucene <tt class="classname">Directory</tt> type. You can
+    configure directory providers to adjust the directory target (see <a href="#search-configuration-directory" title="3.1.&nbsp;Directory configuration">Section&nbsp;3.1, &#8220;Directory configuration&#8221;</a>).</p><p>Hibernate Search can also use the Lucene index to search an entity
+    and return a list of managed entities saving you the tedious object to
+    Lucene document mapping. The same persistence context is shared between
+    Hibernate and Hibernate Search; as a matter of fact, the Search Session is
+    built on top of the Hibernate Session. The application code use the
+    unified <tt class="classname">org.hibernate.Query</tt> or
+    <tt class="classname">javax.persistence.Query</tt> APIs exactly the way a HQL,
+    JPA-QL or native queries would do.</p><p>To be more efficient, Hibernate Search batches the write
+    interactions with the Lucene index. There is currently two types of
+    batching depending on the expected scope.</p><p>Outside a transaction, the index update operation is executed right
+    after the actual database operation. This scope is really a no scoping
+    setup and no batching is performed.</p><p>It is however recommended, for both your database and Hibernate
+    Search, to execute your operation in a transaction be it JDBC or JTA. When
+    in a transaction, the index update operation is scheduled for the
+    transaction commit and discarded in case of transaction rollback. The
+    batching scope is the transaction. There are two immediate
+    benefits:</p><div class="itemizedlist"><ul type="disc"><li><p>Performance: Lucene indexing works better when operation are
+        executed in batch.</p></li><li><p>ACIDity: The work executed has the same scoping as the one
+        executed by the database transaction and is executed if and only if
+        the transaction is committed.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>Disclaimer, the work in not ACID in the strict sense of it,
+          but ACID behavior is rarely useful for full text search indexes
+          since they can be rebuilt from the source at any time.</p></div></li></ul></div><p>You can think of those two scopes (no scope vs transactional) as the
+    equivalent of the (infamous) autocommit vs transactional behavior. From a
+    performance perspective, the <span class="emphasis"><em>in transaction</em></span> mode is
+    recommended. The scoping choice is made transparently: Hibernate Search
+    detects the presence of a transaction and adjust the scoping.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3>
+      Hibernate Search works perfectly fine in the Hibernate / EntityManager long conversation pattern aka. atomic conversation.
+    </div><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3>
+      Depending on user demand, additional scoping will be considered, the pluggability mechanism being already in place.
+    </div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e403"></a>2.2.&nbsp;Back end</h2></div></div><div></div></div><p>Hibernate Search offers the ability to let the scoped work being
+    processed by different back ends. Two back ends are provided out of the
+    box for two different scenarios.</p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e408"></a>2.2.1.&nbsp;Lucene</h3></div></div><div></div></div><p>In this mode, all index update operations applied on a given node
+      (JVM) will be executed to the Lucene directories (through the directory
+      providers) by the same node. This mode is typically used in non
+      clustered environment or in clustered environments where the directory
+      store is shared.</p><div class="mediaobject" align="center"><img src="../shared/images/lucene-backend.png" align="middle"></div><p>This mode targets non clustered applications, or clustered
+      applications where the Directory is taking care of the locking
+      strategy.</p><p>The main advantage is simplicity and immediate visibility of the
+      changes in Lucene queries (a requirement is some applications).</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e422"></a>2.2.2.&nbsp;JMS</h3></div></div><div></div></div><p>All index update operations applied on a given node are sent to a
+      JMS queue. A unique reader will then process the queue and update the
+      master Lucene index. The master index is then replicated on a regular
+      basis to the slave copies. This is known as the master / slaves pattern.
+      The master is the sole responsible for updating the Lucene index. The
+      slaves can accept read as well as write operations. However, they only
+      process the read operation on their local index copy and delegate the
+      update operations to the master.</p><div class="mediaobject" align="center"><img src="../shared/images/jms-backend.png" align="middle"></div><p>This mode targets clustered environments where throughput is
+      critical, and index update delays are affordable. Reliability is ensured
+      by the JMS provider and by having the slaves working on a local copy of
+      the index.</p></div><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3>Hibernate Search is an extensible architecture. While not yet part
+    of the public API, plugging a third party back end is possible. Feel free
+    to drop ideas to <tt class="literal">hibernate-dev@lists.jboss.org</tt>.</div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e439"></a>2.3.&nbsp;Work execution</h2></div></div><div></div></div><p>The indexing work (done by the back end) can be executed
+    synchronously with the transaction commit (or update operation if out of
+    transaction), or asynchronously.</p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e444"></a>2.3.1.&nbsp;Synchronous</h3></div></div><div></div></div><p>This is the safe mode where the back end work is executed in
+      concert with the transaction commit. Under highly concurrent
+      environment, this can lead to throughput limitations (due to the Apache
+      Lucene lock mechanism) and it can increase the system response time if
+      the backend is significantly slower than the transactional process and
+      if a lot of IO operations are involved.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e449"></a>2.3.2.&nbsp;Asynchronous</h3></div></div><div></div></div><p>This mode delegates the work done by the back end to a different
+      thread. That way, throughput and response time are (to a certain extend)
+      decorrelated from the back end performance. The drawback is that a small
+      delay appears between the transaction commit and the index update and a
+      small overhead is introduced to deal with thread management.</p><p>It is recommended to use synchronous execution first and evaluate
+      asynchronous execution if performance problems occur and after having
+      set up a proper benchmark (ie not a lonely cowboy hitting the system in
+      a completely unrealistic way).</p></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="search-architecture-readerstrategy"></a>2.4.&nbsp;Reader strategy</h2></div></div><div></div></div><p>When executing a query, Hibernate Search interacts with the Apache
+    Lucene indexes through a reader strategy. chosing a reader strategy will
+    depend on the profile of the application (frequent updates, read mostly,
+    asynchronous index update etc). See also <a href="#configuration-reader-strategy" title="3.5.&nbsp;Reader strategy configuration">Section&nbsp;3.5, &#8220;Reader strategy configuration&#8221;</a></p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e462"></a>2.4.1.&nbsp;Shared</h3></div></div><div></div></div><p>With this strategy, Hibernate Search will share the same
+      IndexReader, for a given Lucene index, across multiple queries and
+      threads provided that the IndexReader is still up-to-date. If the
+      IndexReader is not up-to-date, a new one is opened and provided.
+      Generally speaking, this strategy provides much better performances than
+      the <tt class="literal">not-shared</tt> strategy. It is especially true if the
+      number of updates is much lower than the reads. This strategy is the
+      default.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e470"></a>2.4.2.&nbsp;Not-shared</h3></div></div><div></div></div><p>Every time a query is executed, a Lucene IndexReader is opened.
+      This strategy is not the most efficient since opening and warming up an
+      IndexReader can be a relatively expensive operation.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e475"></a>2.4.3.&nbsp;Custom</h3></div></div><div></div></div><p>You can write your own reader strategy that suits your application
+      needs by implementing
+      <tt class="classname">org.hibernate.search.reader.ReaderProvider</tt>. The
+      implementation must be thread safe.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>Some additional strategies are planned in future versions of
+        Hibernate Search</p></div></div></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="search-configuration"></a>Chapter&nbsp;3.&nbsp;Configuration</h2></div></div><div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="search-configuration-directory"></a>3.1.&nbsp;Directory configuration</h2></div></div><div></div></div><p>Apache Lucene has a notion of <tt class="literal">Directory</tt> to store
+    the index files. The Directory implementation can be customized, but
+    Lucene comes bundled with a file system
+    (<tt class="literal">FSDirectoryProvider</tt>) and a in memory
+    (<tt class="literal">RAMDirectoryProvider</tt>) implementation. Hibernate Search
+    has the notion of <tt class="literal">DirectoryProvider</tt> that handles the
+    configuration and the initialization of the Lucene Directory.</p><div class="table"><a name="d0e507"></a><p class="title"><b>Table&nbsp;3.1.&nbsp;List of built-in Directory Providers</b></p><table summary="List of built-in Directory Providers" border="1"><colgroup><col><col><col></colgroup><thead><tr><th align="center">Class</th><th align="center">Description</th><th align="center">Properties</th></tr></thead><tbody><tr><td>org.hibernate.search.store.FSDirectoryProvider</td><td>File system based directory. The directory used will be
+            &lt;indexBase&gt;/&lt; <tt class="literal">@Indexed.name</tt>
+            &gt;</td><td><p><tt class="literal">indexBase</tt> : Base
+            directory</p><p><tt class="literal">indexName</tt>: override
+            @Index.name (useful for sharded indexes)</p></td></tr><tr><td>org.hibernate.search.store.FSMasterDirectoryProvider</td><td><p>File system based directory. Like
+            FSDirectoryProvider. It also copies the index to a source
+            directory (aka copy directory) on a regular basis.
+            </p><p>The recommended value for the refresh period is (at
+            least) 50% higher that the time to copy the information (default
+            3600 seconds - 60 minutes).</p><p>Note that the copy is
+            based on an incremental copy mechanism reducing the average copy
+            time.</p><p>DirectoryProvider typically used on the master
+            node in a JMS back end cluster.</p>DirectoryProvider typically
+            used on slave nodes using a JMS back end.</td><td><p><tt class="literal">indexBase</tt>: Base
+            directory</p><p><tt class="literal">indexName</tt>: override
+            @Index.name (useful for sharded
+            indexes)</p><p><tt class="literal">sourceBase</tt>: Source (copy)
+            base directory.</p><p><tt class="literal">source</tt>: Source
+            directory suffix (default to <tt class="literal">@Indexed.name</tt>).
+            The actual source directory name being
+            <tt class="filename">&lt;sourceBase&gt;/&lt;source&gt;</tt>
+            </p><p>refresh: refresh period in second (the copy will take
+            place every refresh seconds).</p></td></tr><tr><td>org.hibernate.search.store.FSSlaveDirectoryProvider</td><td><p>File system based directory. Like
+            FSDirectoryProvider, but retrieves a master version (source) on a
+            regular basis. To avoid locking and inconsistent search results, 2
+            local copies are kept. </p><p>The recommended value for the
+            refresh period is (at least) 50% higher that the time to copy the
+            information (default 3600 seconds - 60 minutes).</p><p>Note
+            that the copy is based on an incremental copy mechanism reducing
+            the average copy time.</p><p>DirectoryProvider typically
+            used on slave nodes using a JMS back end.</p></td><td><p><tt class="literal">indexBase</tt>: Base
+            directory</p><p><tt class="literal">indexName</tt>: override
+            @Index.name (useful for sharded
+            indexes)</p><p><tt class="literal">sourceBase</tt>: Source (copy)
+            base directory.</p><p><tt class="literal">source</tt>: Source
+            directory suffix (default to <tt class="literal">@Indexed.name</tt>).
+            The actual source directory name being
+            <tt class="filename">&lt;sourceBase&gt;/&lt;source&gt;</tt>
+            </p><p>refresh: refresh period in second (the copy will take
+            place every refresh seconds).</p></td></tr><tr><td>org.hibernate.search.store.RAMDirectoryProvider</td><td>Memory based directory, the directory will be uniquely
+            identified (in the same deployment unit) by the
+            <tt class="literal">@Indexed.name</tt> element</td><td>none</td></tr></tbody></table></div><p>If the built-in directory providers does not fit your needs, you can
+    write your own directory provider by implementing the
+    <tt class="classname">org.hibernate.store.DirectoryProvider</tt>
+    interface</p><p>Each indexed entity is associated to a Lucene index (an index can be
+    shared by several entities but this is not usually the case). You can
+    configure the index through properties prefixed by
+    <tt class="constant">hibernate.search.</tt><i class="replaceable"><tt>indexname</tt></i>
+    . Default properties inherited to all indexes can be defined using the
+    prefix <tt class="constant">hibernate.search.default.</tt></p><p>To define the directory provider of a given index, you use the
+    <tt class="constant">hibernate.search.<i class="replaceable"><tt>indexname</tt></i>.directory_provider
+    </tt></p><pre class="programlisting">hibernate.search.default.directory_provider org.hibernate.search.store.FSDirectoryProvider
+hibernate.search.default.indexBase=/usr/lucene/indexes
+
+hibernate.search.Rules.directory_provider org.hibernate.search.store.RAMDirectoryProvider        </pre><p>applied on</p><pre class="programlisting">@Indexed(name="Status")
+public class Status { ... }
+
+@Indexed(name="Rules")
+public class Rule { ... }</pre><p>will create a file system directory in
+    <tt class="filename">/usr/lucene/indexes/Status</tt> where the Status entities
+    will be indexed, and use an in memory directory named
+    <tt class="literal">Rules</tt> where Rule entities will be indexed.</p><p>You can easily define common rules like the directory provider and
+    base directory, and overide those default later on on a per index
+    basis.</p><p>Writing your own <tt class="classname">DirectoryProvider</tt>, you can
+    utilize this configuration mechanism as well.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="search-configuration-directory-sharding"></a>3.2.&nbsp;Index sharding</h2></div></div><div></div></div><p>In some extreme cases involving huge indexes (in size), it is
+    necessary to split (shard) the indexing data of a given entity type into
+    several Lucene indexes. This solution is not recommended until you reach
+    significant index sizes and index update time are slowing down. The main
+    drawback of index sharding is that searches will end up being slower since
+    more files have to be opend for a single search. In other words don't do
+    it until you have problems :)</p><p>Despite this strong warning, Hibernate Search allows you to index a
+    given entity type into several sub indexes. Data is sharded into the
+    different sub indexes thanks to an
+    <tt class="classname">IndexShardingStrategy</tt>. By default, no sharding
+    strategy is enabled, unless the number of shards is configured. To
+    configure the number of shards use the following property</p><pre class="programlisting">hibernate.search.&lt;indexName&gt;.sharding_strategy.nbr_of_shards 5</pre><p>This will use 5 different shards.</p><p>The default sharding strategy, when shards are set up, splits the
+    data according to the hash value of the id string representation
+    (generated by the Field Bridge). This ensures a fairly balanced sharding.
+    You can replace the strategy by implementing
+    <tt class="literal">IndexShardingStrategy</tt> and by setting the following
+    property</p><pre class="programlisting">hibernate.search.&lt;indexName&gt;.sharding_strategy my.shardingstrategy.Implementation</pre><p>Each shard has an independent directory provider configuration as
+    described in <a href="#search-configuration-directory" title="3.1.&nbsp;Directory configuration">Section&nbsp;3.1, &#8220;Directory configuration&#8221;</a>. The
+    DirectoryProvider default name for the previous example are
+    <tt class="literal">&lt;indexName&gt;.0</tt> to
+    <tt class="literal">&lt;indexName&gt;.4</tt>. In other words, each shard has the
+    name of it's owning index followed by <tt class="constant">.</tt> (dot) and its
+    index number.</p><pre class="programlisting">hibernate.search.default.indexBase /usr/lucene/indexes
+
+hibernate.search.Animal.sharding_strategy.nbr_of_shards 5
+hibernate.search.Animal.directory_provider org.hibernate.search.store.FSDirectoryProvider
+hibernate.search.Animal.0.indexName Animal00
+hibernate.search.Animal.3.indexBase /usr/lucene/sharded
+hibernate.search.Animal.3.indexName Animal03</pre><p>This configuration uses the default id string hashing strategy and
+    shards the Animal index into 5 subindexes. All subindexes are
+    FSDirectoryProvider instances and the directory where each subindex is
+    stored is as followed:</p><div class="itemizedlist"><ul type="disc"><li><p>for subindex 0: /usr/lucene/indexes/Animal00 (shared indexBase
+        but overridden indexName)</p></li><li><p>for subindex 1: /usr/lucene/indexes/Animal.1 (shared indexBase,
+        default indexName)</p></li><li><p>for subindex 2: /usr/lucene/indexes/Animal.2 (shared indexBase,
+        default indexName)</p></li><li><p>for subindex 3: /usr/lucene/shared/Animal03 (overridden
+        indexBase, overridden indexName)</p></li><li><p>for subindex 4: /usr/lucene/indexes/Animal.4 (shared indexBase,
+        default indexName)</p></li></ul></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e718"></a>3.3.&nbsp;Worker configuration</h2></div></div><div></div></div><p>It is possible to refine how Hibernate Search interacts with Lucene
+    through the worker configuration. The work can be exected to the Lucene
+    directory or sent to a JMS queue for later processing. When processed to
+    the Lucene directory, the work can be processed synchronously or
+    asynchronously to the transaction commit.</p><p>You can define the worker configuration using the following
+    properties</p><div class="table"><a name="d0e725"></a><p class="title"><b>Table&nbsp;3.2.&nbsp;worker configuration</b></p><table summary="worker configuration" border="1"><colgroup><col align="center"><col></colgroup><tbody><tr><td align="center">Property</td><td>Description</td></tr><tr><td align="center"><tt class="literal">hibernate.worker.backend</tt></td><td>Out of the box support for the Apache Lucene back end and
+            the JMS back end. Default to <tt class="literal">lucene</tt>. Supports
+            also <tt class="literal">jms</tt>.</td></tr><tr><td align="center"><tt class="literal">hibernate.worker.execution</tt></td><td>Supports synchronous and asynchrounous execution. Default
+            to <tt class="literal"><tt class="literal">sync</tt></tt>. Supports also
+            <tt class="literal">async</tt>.</td></tr><tr><td align="center"><tt class="literal">hibernate.worker.thread_pool.size</tt></td><td>Defines the number of threads in the pool. useful only for
+            asynchrounous execution. Default to 1.</td></tr><tr><td align="center"><tt class="literal">hibernate.worker.buffer_queue.max</tt></td><td>Defines the maximal number of work queue if the thread poll
+            is starved. Useful only for asynchrounous execution. Default to
+            infinite. If the limit is reached, the work is done by the main
+            thread.</td></tr><tr><td align="center"><tt class="literal">hibernate.worker.jndi.*</tt></td><td>Defines the JNDI properties to initiate the InitialContext
+            (if needed). JNDI is only used by the JMS back end.</td></tr><tr><td align="center"><tt class="literal">
+            hibernate.worker.jms.connection_factory</tt></td><td>Mandatory for the JMS back end. Defines the JNDI name to
+            lookup the JMS connection factory from
+            (<tt class="literal">java:/ConnectionFactory</tt> by default in JBoss
+            AS)</td></tr><tr><td align="center"><tt class="literal">hibernate.worker.jms.queue</tt></td><td>Mandatory for the JMS back end. Defines the JNDI name to
+            lookup the JMS queue from. The queue will be used to post work
+            messages.</td></tr><tr><td align="center"><tt class="literal">hibernate.worker.batch_size</tt></td><td>Defines the maximum number of elements indexed before
+            flushing the transaction-bound queue. Default to 0 (ie no limit).
+            See <a href="#search-batchindex" title="Chapter&nbsp;6.&nbsp;Manual indexing">Chapter&nbsp;6, <i>Manual indexing</i></a> for more
+            information.</td></tr></tbody></table></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="jms-backend"></a>3.4.&nbsp;JMS Master/Slave configuration</h2></div></div><div></div></div><p>This section describes in greater detail how to configure the Master
+    / Slaves Hibernate Search architecture.</p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e807"></a>3.4.1.&nbsp;Slave nodes</h3></div></div><div></div></div><p>Every index update operation is sent to a JMS queue. Index quering
+      operations are executed on a local index copy.</p><pre class="programlisting">### slave configuration
+
+## DirectoryProvider
+# (remote) master location
+hibernate.search.default.sourceBase = /mnt/mastervolume/lucenedirs/mastercopy
+
+# local copy location
+hibernate.search.default.indexBase = /Users/prod/lucenedirs
+
+# refresh every half hour
+hibernate.search.default.refresh = 1800
+
+# appropriate directory provider
+hibernate.search.default.directory_provider = org.hibernate.search.store.FSSlaveDirectoryProvider
+
+## Backend configuration
+hibernate.search.worker.backend = jms
+hibernate.search.worker.jms.connection_factory = java:/ConnectionFactory
+hibernate.search.worker.jms.queue = queue/hibernatesearch
+#optional jndi configuration (check your JMS provider for more information)
+
+## Optional asynchronous execution strategy
+# org.hibernate.worker.execution = async
+# org.hibernate.worker.thread_pool.size = 2
+# org.hibernate.worker.buffer_queue.max = 50</pre><p>A file system local copy is recommended for faster search
+      results.</p><p>The refresh period should be higher that the expected time
+      copy.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e818"></a>3.4.2.&nbsp;Master node</h3></div></div><div></div></div><p>Every index update operation is taken from a JMS queue and
+      executed. The master index(es) is(are) copied on a regular basis.</p><pre class="programlisting">### master configuration
+
+## DirectoryProvider
+# (remote) master location where information is copied to
+hibernate.search.default.sourceBase = /mnt/mastervolume/lucenedirs/mastercopy
+
+# local master location
+hibernate.search.default.indexBase = /Users/prod/lucenedirs
+
+# refresh every half hour
+hibernate.search.default.refresh = 1800
+
+# appropriate directory provider
+hibernate.search.default.directory_provider = org.hibernate.search.store.FSMasterDirectoryProvider
+
+## Backend configuration
+#Backend is the default lucene one</pre><p>The refresh period should be higher that the expected time
+      copy.</p><p>In addition to the Hibernate Search framework configuration, a
+      Message Driven Bean should be written and set up to process index works
+      queue through JMS.</p><pre class="programlisting">@MessageDriven(activationConfig = {
+      @ActivationConfigProperty(propertyName="destinationType", propertyValue="javax.jms.Queue"),
+      @ActivationConfigProperty(propertyName="destination", propertyValue="queue/hiebrnatesearch"),
+      @ActivationConfigProperty(propertyName="DLQMaxResent", propertyValue="1")
+   } )
+public class MDBSearchController extends AbstractJMSHibernateSearchController implements MessageListener {
+    @PersistenceContext EntityManager em;
+    
+    //method retrieving the appropriate session
+    protected Session getSession() {
+        return (Session) em.getDelegate();
+    }
+
+    //potentially close the session opened in #getSession(), not needed here
+    protected void cleanSessionIfNeeded(Session session) 
+    }
+}</pre><p>This example inherit the abstract JMS controller class available
+      and implements a JavaEE 5 MDB. This implementation is given as an
+      example and, while most likely more complex, can be adjusted to make use
+      of non Java EE Message Driven Beans. For more information about the
+      <tt class="methodname">getSession()</tt> and
+      <tt class="methodname">cleanSessionIfNeeded()</tt>, please check
+      <tt class="classname">AbstractJMSHibernateSearchController</tt>'s
+      javadoc.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>Hibernate Search test suite makes use of JBoss Embedded to test
+        the JMS integration. It allows the unit test to run both the MDB
+        container and JBoss Messaging (JMS provider) in a standalone way
+        (marketed by some as "lightweight").</p></div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="configuration-reader-strategy"></a>3.5.&nbsp;Reader strategy configuration</h2></div></div><div></div></div><p>The different reader strategies are described in <a href="#search-architecture-readerstrategy">Reader strategy</a>. The default reader
+    strategy is <tt class="literal">shared</tt>. This can be adjusted:</p><pre class="programlisting">hibernate.search.reader.strategy = not-shared</pre><p>Adding this property switch to the <tt class="literal">non shared</tt>
+    strategy.</p><p>Or if you have a custom reader strategy:</p><pre class="programlisting">hibernate.search.reader.strategy = my.corp.myapp.CustomReaderProvider</pre><p>where <tt class="classname">my.corp.myapp.CustomReaderProvider</tt> is
+    the custom strategy implementation</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="search-configuration-event"></a>3.6.&nbsp;Enabling Hibernate Search and automatic indexing</h2></div></div><div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e874"></a>3.6.1.&nbsp;Enabling Hibernate Search</h3></div></div><div></div></div><p>Hibernate Search is enabled out of the box when using Hibernate
+      Annotations or Hibernate EntityManager. If, for some reason you need to
+      disable it, set
+      <tt class="literal">hibernate.search.autoregister_listeners</tt> to false.
+      Note that there is no performance runtime when the listeners are enabled
+      while no entity is indexable.</p><p>To enable Hibernate Search in Hibernate Core, add the
+      <tt class="literal">FullTextIndexEventListener</tt> for the three Hibernate
+      events that occur after changes are executed to the database. Once
+      again, such a configuration is not useful with Hibernate Annotations or
+      Hibernate EntityManager.</p><pre class="programlisting">&lt;hibernate-configuration&gt;
+     &lt;session-factory&gt;
+        ...
+        &lt;event type="post-update"/&gt;
+            &lt;listener class="org.hibernate.search.event.FullTextIndexEventListener"/&gt;
+        &lt;/event&gt;
+        &lt;event type="post-insert"/&gt;
+            &lt;listener class="org.hibernate.search.event.FullTextIndexEventListener"/&gt;
+        &lt;/event&gt;
+        &lt;event type="post-delete"/&gt;
+            &lt;listener class="org.hibernate.search.event.FullTextIndexEventListener"/&gt;
+        &lt;/event&gt;
+    &lt;/session-factory&gt;
+&lt;/hibernate-configuration&gt;</pre><p>Be sure to add the appropriate jar files in your classpath. Check
+      <tt class="literal">lib/README.TXT</tt> for the list of third party libraries.
+      A typical installation on top of Hibernate Annotations will add:</p><div class="itemizedlist"><ul type="disc"><li><p><tt class="filename">hibernate-search.jar</tt>: the core
+          engine</p></li><li><p><tt class="filename">lucene-core-*.jar</tt>: Lucene core
+          engine</p></li></ul></div><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="d0e905"></a>3.6.1.1.&nbsp;Hibernate Core 3.2.6 and beyond</h4></div></div><div></div></div><p>If you use Hibernate Core 3.2.6 and beyond, make sure to add
+        three additional event listeners that cope with collection
+        events</p><pre class="programlisting">&lt;hibernate-configuration&gt;
+     &lt;session-factory&gt;
+        ...
+        &lt;event type="post-collection-recreate"/&gt;
+            &lt;listener class="org.hibernate.search.event.FullTextIndexCollectionEventListener"/&gt;
+        &lt;/event&gt;
+        &lt;event type="post-collection-remove"/&gt;
+            &lt;listener class="org.hibernate.search.event.FullTextIndexCollectionEventListener"/&gt;
+        &lt;/event&gt;
+        &lt;event type="post-collection-update"/&gt;
+            &lt;listener class="org.hibernate.search.event.FullTextIndexCollectionEventListener"/&gt;
+        &lt;/event&gt;
+    &lt;/session-factory&gt;
+&lt;/hibernate-configuration&gt;</pre><p>Those additional event listeners have been introduced in
+        Hibernate 3.2.6. note the
+        <tt class="classname">FullTextIndexCollectionEventListener</tt> usage. You
+        need to explicitly reference those event listeners unless you use
+        Hibernate Annotations 3.3.1 and above.</p></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e917"></a>3.6.2.&nbsp;Automatic indexing</h3></div></div><div></div></div><p>By default, every time an object is inserted, updated or deleted
+      through Hibernate, Hibernate Search updates the according Lucene index.
+      It is sometimes desirable to disable that features if either your index
+      is read-only or if index updates are done in a batch way (see <a href="#search-batchindex" title="Chapter&nbsp;6.&nbsp;Manual indexing">Chapter&nbsp;6, <i>Manual indexing</i></a>).</p><p>To disable event based indexing, set</p><pre class="programlisting">hibernate.search.indexing_strategy manual</pre><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>In most case, the JMS backend provides the best of both world, a
+        lightweight event based system keeps track of all changes in the
+        system, and the heavyweight indexing process is done by a separate
+        process or machine.</p></div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="lucene-indexing-performance"></a>3.7.&nbsp;Tuning Lucene indexing performance</h2></div></div><div></div></div><p>Hibernate Search allows you to tune the Lucene indexing performance
+    by specifying a set of parameters which are passed through to underlying
+    Lucene <tt class="literal">IndexWriter</tt> such as
+    <tt class="literal">mergeFactor</tt>, <tt class="literal">maxMergeDocs</tt> and
+    <tt class="literal">maxBufferedDocs</tt>. You can specify these parameters
+    either as default values applying for all indexes or on a per index
+    basis.</p><p>There are two sets of parameters allowing for different performance
+    settings depending on the use case. During indexing operations triggered
+    by database modifications, the following ones are used: </p><div class="itemizedlist"><ul type="disc"><li><p><tt class="literal">hibernate.search.[default|&lt;indexname&gt;].transaction.merge_factor</tt></p></li><li><p><tt class="literal">hibernate.search.[default|&lt;indexname&gt;].transaction.max_merge_docs</tt></p></li><li><p><tt class="literal">hibernate.search.[default|&lt;indexname&gt;].transaction.max_buffered_docs</tt></p></li></ul></div><p>When indexing occurs via
+    <tt class="literal">FullTextSession.index()</tt> (see <a href="#search-batchindex" title="Chapter&nbsp;6.&nbsp;Manual indexing">Chapter&nbsp;6, <i>Manual indexing</i></a>), the following properties are used:
+    </p><div class="itemizedlist"><ul type="disc"><li><p><tt class="literal">hibernate.search.[default|&lt;indexname&gt;].batch.merge_factor</tt></p></li><li><p><tt class="literal">hibernate.search.[default|&lt;indexname&gt;].batch.max_merge_docs</tt></p></li><li><p><tt class="literal">hibernate.search.[default|&lt;indexname&gt;].batch.max_buffered_docs</tt></p></li></ul></div><p>Unless the corresponding <tt class="literal">.batch</tt> property is
+    explicitly set, the value will default to the
+    <tt class="literal">.transaction</tt> property.</p><p>For more information about Lucene indexing performances, please
+    refer to the Lucene documentation.</p><div class="table"><a name="d0e992"></a><p class="title"><b>Table&nbsp;3.3.&nbsp;List of indexing performance properties</b></p><table summary="List of indexing performance properties" border="1"><colgroup><col><col><col></colgroup><thead><tr><th align="center">Property</th><th align="center">Description</th><th align="center">Default Value</th></tr></thead><tbody><tr><td><tt class="literal">hibernate.search.[default|&lt;indexname&gt;].transaction.merge_factor</tt></td><td><p>Controls segment merge frequency and size. </p><p>Determines how often segment indices are merged when
+            insertion occurs. With smaller values, less RAM is used while
+            indexing, and searches on unoptimized indices are faster, but
+            indexing speed is slower. With larger values, more RAM is used
+            during indexing, and while searches on unoptimized indices are
+            slower, indexing is faster. Thus larger values (&gt; 10) are best
+            for batch index creation, and smaller values (&lt; 10) for indices
+            that are interactively maintained. The value must no be lower than
+            2.</p><p>Used by Hibernate Search during index update
+            operations as part of database modifications.</p></td><td>10</td></tr><tr><td><tt class="literal">hibernate.search.[default|&lt;indexname&gt;].transaction.max_merge_docs</tt></td><td><p>Defines the largest number of documents allowed in a
+            segment.</p><p>Used by Hibernate Search during index update
+            operations as part of database modifications.</p></td><td>Unlimited (Integer.MAX_VALUE)</td></tr><tr><td><tt class="literal">hibernate.search.[default|&lt;indexname&gt;].transaction.max_buffered_docs</tt></td><td><p>Controls the amount of documents buffered in memory
+            during indexing. The bigger the more RAM is consumed.</p><p>Used by Hibernate Search during index update operations as
+            part of database modifications.</p></td><td>10</td></tr><tr><td><tt class="literal">hibernate.search.[default|&lt;indexname&gt;].batch.merge_factor</tt></td><td><p>Controls segment merge frequency and size.</p><p>Determines how often segment indices are merged when
+            insertion occurs. With smaller values, less RAM is used while
+            indexing, and searches on unoptimized indices are faster, but
+            indexing speed is slower. With larger values, more RAM is used
+            during indexing, and while searches on unoptimized indices are
+            slower, indexing is faster. Thus larger values (&gt; 10) are best
+            for batch index creation, and smaller values (&lt; 10) for indices
+            that are interactively maintained. The value must no be lower than
+            2.</p><p>Used during indexing via
+            <tt class="literal">FullTextSession.index()</tt></p></td><td>10</td></tr><tr><td><tt class="literal">hibernate.search.[default|&lt;indexname&gt;].batch.max_merge_docs</tt></td><td><p>Defines the largest number of documents allowed in a
+            segment.</p><p>Used during indexing via
+            <tt class="literal">FullTextSession.index()</tt></p></td><td>Unlimited (Integer.MAX_VALUE)</td></tr><tr><td><tt class="literal">hibernate.search.[default|&lt;indexname&gt;].batch.max_buffered_docs</tt></td><td><p>Controls the amount of documents buffered in memory
+            during indexing. The bigger the more RAM is consumed.</p><p>Used during indexing via
+            <tt class="literal">FullTextSession.index()</tt></p></td><td>10</td></tr></tbody></table></div></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="search-mapping"></a>Chapter&nbsp;4.&nbsp;Mapping entities to the index structure</h2></div></div><div></div></div><p>All the metadata information needed to index entities is described
+  through some Java annotations. There is no need for xml mapping files nor a
+  list of indexed entities. The list is discovered at startup time scanning
+  the Hibernate mapped entities.</p><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="search-mapping-entity"></a>4.1.&nbsp;Mapping an entity</h2></div></div><div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e1090"></a>4.1.1.&nbsp;Basic mapping</h3></div></div><div></div></div><p>First, we must declare a persistent class as indexable. This is
+      done by annotating the class with <tt class="literal">@Indexed</tt> (all
+      entities not annotated with <tt class="literal">@Indexed</tt> will be ignored
+      by the indexing process):</p><pre class="programlisting">@Entity
+<span class="bold"><b>@Indexed(index="indexes/essays")</b></span>
+public class Essay {
+    ...
+}</pre><p>The <tt class="literal">index</tt> attribute tells Hibernate what the
+      Lucene directory name is (usually a directory on your file system). If
+      you wish to define a base directory for all Lucene indexes, you can use
+      the <tt class="literal">hibernate.search.default.indexBase</tt> property in
+      your configuration file. Each entity instance will be represented by a
+      Lucene <tt class="classname">Document</tt> inside the given index (aka
+      Directory).</p><p>For each property (or attribute) of your entity, you have the
+      ability to describe how it will be indexed. The default (ie no
+      annotation) means that the property is completly ignored by the indexing
+      process. <tt class="literal">@Field</tt> does declare a property as indexed.
+      When indexing an element to a Lucene document you can specify how it is
+      indexed:</p><div class="itemizedlist"><ul type="disc"><li><p><tt class="literal">name</tt> : describe under which name, the
+          property should be stored in the Lucene Document. The default value
+          is the property name (following the JavaBeans convention)</p></li><li><p><tt class="literal">store</tt> : describe whether or not the
+          property is stored in the Lucene index. You can store the value
+          <tt class="literal">Store.YES</tt> (comsuming more space in the index but
+          allowing projection, see <a href="#projections" title="5.1.2.5.&nbsp;Projection">Section&nbsp;5.1.2.5, &#8220;Projection&#8221;</a> for more
+          information), store it in a compressed way
+          <tt class="literal">Store.COMPRESS</tt> (this does consume more CPU), or
+          avoid any storage <tt class="literal">Store.NO</tt> (this is the default
+          value). When a property is stored, you can retrieve it from the
+          Lucene Document (note that this is not related to whether the
+          element is indexed or not).</p></li><li><p>index: describe how the element is indexed (ie the process
+          used to index the property and the type of information store). The
+          different values are <tt class="literal">Index.NO</tt> (no indexing, ie
+          cannot be found by a query), <tt class="literal">Index.TOKENIZED</tt> (use
+          an analyzer to process the property),
+          <tt class="literal">Index.UN_TOKENISED</tt> (no analyzer pre processing),
+          <tt class="literal">Index.NO_NORM</tt> (do not store the normalization
+          data). The default value is <tt class="literal">TOKENIZED</tt>.</p></li></ul></div><p>These attributes are part of the <tt class="literal">@Field</tt>
+      annotation.</p><p>Whether or not you want to store the data depends on how you wish
+      to use the index query result. For a regular Hibernate Search usage,
+      storing is not necessary. However you might want to store some fields to
+      subsequently project them (see <a href="#projections" title="5.1.2.5.&nbsp;Projection">Section&nbsp;5.1.2.5, &#8220;Projection&#8221;</a> for more
+      information).</p><p>Whether or not you want to tokenize a property depends on whether
+      you wish to search the element as is, or by the words it contains. It
+      make sense to tokenize a text field, but it does not to do it for a date
+      field (or an id field). Note that fields used for sorting must not be
+      tokenized.</p><p>Finally, the id property of an entity is a special property used
+      by Hibernate Search to ensure index unicity of a given entity. By
+      design, an id has to be stored and must not be tokenized. To mark a
+      property as index id, use the <tt class="literal">@DocumentId</tt>
+      annotation.</p><pre class="programlisting">@Entity
+@Indexed(index="indexes/essays")
+public class Essay {
+    ...
+
+    @Id
+    <span class="bold"><b>@DocumentId</b></span>
+    public Long getId() { return id; }
+
+    <span class="bold"><b>@Field(name="Abstract", index=Index.TOKENIZED, store=Store.YES)</b></span>
+    public String getSummary() { return summary; }
+
+    @Lob
+    <span class="bold"><b>@Field(index=Index.TOKENIZED)</b></span>
+    public String getText() { return text; }
+}</pre><p>These annotations define an index with three fields:
+      <tt class="literal">id</tt> , <tt class="literal">Abstract</tt> and
+      <tt class="literal">text</tt> . Note that by default the field name is
+      decapitalized, following the JavaBean specification.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>You <span class="emphasis"><em>must</em></span> specify
+        <tt class="literal">@DocumentId</tt> on the identifier property of your
+        entity class.</p></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e1209"></a>4.1.2.&nbsp;Mapping properties multiple times</h3></div></div><div></div></div><p>It is sometimes needed to map a property multiple times per index,
+      with slightly different indexing strategies. Especially, sorting a query
+      by field requires the field to be <tt class="literal">UN_TOKENIZED</tt>. If
+      one want to search by words in this property and still sort it, one need
+      to index it twice, once tokenized, once untokenized. @Fields allows to
+      achieve this goal.</p><pre class="programlisting">@Entity
+@Indexed(index = "Book" )
+public class Book {
+    @Fields( {
+            @Field(index = Index.TOKENIZED),
+            @Field(name = "summary_forSort", index = Index.UN_TOKENIZED, store = Store.YES)
+            } )
+    public String getSummary() {
+        return summary;
+    }
+
+    ...
+}</pre><p>The field summary is indexed twice, once as
+      <tt class="literal">summary</tt> in a tokenized way, and once as
+      <tt class="literal">summary_forSort</tt> in an untokenized way. @Field
+      supports 2 attributes useful when @Fields is used:</p><div class="itemizedlist"><ul type="disc"><li><p>analyzer: defines a @Analyzer annotation per field rather than
+          per property</p></li><li><p>bridge: defines a @FieldBridge annotation per field rather
+          than per property</p></li></ul></div><p>See below for more information about analyzers and field
+      bridges.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e1236"></a>4.1.3.&nbsp;Embedded and associated objects</h3></div></div><div></div></div><p>Associated objects as well as embedded objects can be indexed as
+      part of the root entity index. It is necessary if you expect to search a
+      given entity based on properties of the associated object(s). In the
+      following example, the use case is to return the places whose city is
+      Atlanta (In the Lucene query parser language, it would translate into
+      <tt class="code">address.city:Atlanta</tt>).</p><pre class="programlisting">@Entity
+@Indexed
+public class Place {
+    @Id
+    @GeneratedValue
+    @DocumentId
+    private Long id;
+
+    @Field( index = Index.TOKENIZED )
+    private String name;
+
+    @OneToOne( cascade = { CascadeType.PERSIST, CascadeType.REMOVE } )
+    <span class="bold"><b>@IndexedEmbedded</b></span>
+    private Address address;
+    ....
+}
+
+@Entity
+@Indexed
+public class Address {
+    @Id
+    @GeneratedValue
+    @DocumentId
+    private Long id;
+
+    @Field(index=Index.TOKENIZED)
+    private String street;
+
+    @Field(index=Index.TOKENIZED)
+    private String city;
+
+    <span class="bold"><b>@ContainedIn</b></span>
+    @OneToMany(mappedBy="address")
+    private Set&lt;Place&gt; places;
+    ...
+}</pre><p>In this example, the place fields will be indexed in the
+      <tt class="literal">Place</tt> index. The <tt class="literal">Place</tt> index
+      documents will also contain the fields <tt class="literal">address.id</tt>,
+      <tt class="literal">address.street</tt>, and <tt class="literal">address.city</tt>
+      which you will be able to query. This is enabled by the
+      <tt class="literal">@IndexedEmbedded</tt> annotation.</p><p>Be careful. Because the data is denormalized in the Lucene index
+      when using the <tt class="classname">@IndexedEmbedded</tt> technique,
+      Hibernate Search needs to be aware of any change in the Place object and
+      any change in the Address object to keep the index up to date. To make
+      sure the Place Lucene document is updated when it's Address changes, you
+      need to mark the other side of the birirectional relationship with
+      <tt class="classname">@ContainedIn</tt>.</p><p><tt class="literal">@ContainedIn</tt> is only useful on associations
+      pointing to entities as opposed to embedded (collection of)
+      objects.</p><p>Let's make our example a bit more complex:</p><pre class="programlisting">@Entity
+@Indexed
+public class Place {
+    @Id
+    @GeneratedValue
+    @DocumentId
+    private Long id;
+
+    @Field( index = Index.TOKENIZED )
+    private String name;
+
+    @OneToOne( cascade = { CascadeType.PERSIST, CascadeType.REMOVE } )
+    <span class="bold"><b>@IndexedEmbedded</b></span>
+    private Address address;
+    ....
+}
+
+@Entity
+@Indexed
+public class Address {
+    @Id
+    @GeneratedValue
+    @DocumentId
+    private Long id;
+
+    @Field(index=Index.TOKENIZED)
+    private String street;
+
+    @Field(index=Index.TOKENIZED)
+    private String city;
+
+    <span class="bold"><b>@IndexedEmbedded(depth = 1, prefix = "ownedBy_")</b></span>
+    private Owner ownedBy;
+
+    <span class="bold"><b>@ContainedIn</b></span>
+    @OneToMany(mappedBy="address")
+    private Set&lt;Place&gt; places;
+    ...
+}
+
+@Embeddable
+public class Owner {
+    @Field(index = Index.TOKENIZED)
+    private String name;
+   ...
+}</pre><p>Any <tt class="literal">@*ToOne</tt> and <tt class="literal">@Embedded</tt>
+      attribute can be annotated with <tt class="literal">@IndexedEmbedded</tt>. The
+      attributes of the associated class will then be added to the main entity
+      index. In the previous example, the index will contain the following
+      fields</p><div class="itemizedlist"><ul type="disc"><li><p>id</p></li><li><p>name</p></li><li><p>address.street</p></li><li><p>address.city</p></li><li><p>addess.ownedBy_name</p></li></ul></div><p>The default prefix is <tt class="literal">propertyName.</tt>, following
+      the traditional object navigation convention. You can override it using
+      the <tt class="literal">prefix</tt> attribute as it is shown on the
+      <tt class="literal">ownedBy</tt> property.</p><p><tt class="literal">depth</tt> is necessary when the object graph
+      contains a cyclic dependency of classes (not instances). For example, if
+      <tt class="classname">Owner</tt> points to <tt class="classname">Place</tt>.
+      Hibernate Search will stop including Indexed embedded atttributes after
+      reaching the expected depth (or the object graph boundaries are
+      reached). A class having a self reference is an example of cyclic
+      dependency. In our example, because <tt class="literal">depth</tt> is set to
+      1, any <tt class="literal">@IndexedEmbedded</tt> attribute in Owner (if any)
+      will be ignored.</p><p>Such a feature (<tt class="literal">@IndexedEmbedded</tt>) is very
+      useful to express queries refering to associated objects, such
+      as:</p><div class="itemizedlist"><ul type="disc"><li><p>Return places where name contains JBoss and where address city
+          is Atlanta. In Lucene query this would be</p><pre class="programlisting">+name:jboss +address.city:atlanta  </pre></li><li><p>Return places where name contains JBoss and where owner's name
+          contain Joe. In Lucene query this would be</p><pre class="programlisting">+name:jboss +address.orderBy_name:joe  </pre></li></ul></div><p>In a way it mimics the relational join operation in a more
+      efficient way (at the cost of data duplication). Remember that, out of
+      the box, Lucene indexes have no notion of association, the join
+      operation is simply non-existent. It might help to keep the relational
+      model normalzed while benefiting from the full text index speed and
+      feature richness.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>An associated object can itself be (but don't have to)
+          <tt class="literal">@Indexed</tt></p></div><p>When @IndexedEmbedded points to an entity, the association has to
+      be directional and the other side has to be annotated
+      <tt class="literal">@ContainedIn</tt> (as see in the previous example). If
+      not, Hibernate Search has no way to update the root index when the
+      associated entity is updated (in ou example, a <tt class="literal">Place</tt>
+      index document has to be updated when the associated
+      <tt class="classname">Address</tt> instance is updated.</p><p>Sometimes, the object type annotated by
+      <tt class="classname">@IndexedEmbedded</tt> is not the object type targeted
+      by Hibernate and Hibernate Search especially when interface are used in
+      lieu of their implementation. You can override the object type targeted
+      by Hibernate Search using the <tt class="methodname">targetElement</tt>
+      parameter.</p><pre class="programlisting">@Entity
+@Indexed
+public class Address {
+    @Id
+    @GeneratedValue
+    @DocumentId
+    private Long id;
+
+    @Field(index= Index.TOKENIZED)
+    private String street;
+
+    @IndexedEmbedded(depth = 1, prefix = "ownedBy_", <span class="bold"><b>targetElement = Owner.class</b></span>)
+    @Target(Owner.class)
+    private Person ownedBy;
+
+
+    ...
+}
+
+@Embeddable
+public class Owner implements Person { ... }</pre></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e1399"></a>4.1.4.&nbsp;Boost factor</h3></div></div><div></div></div><p>Lucene has the notion of <span class="emphasis"><em>boost factor</em></span> . It's
+      a way to give more weigth to a field or to an indexed element over an
+      other during the indexation process. You can use
+      <tt class="literal">@Boost</tt> at the field or the class level.</p><pre class="programlisting">@Entity
+@Indexed(index="indexes/essays")
+<span class="bold"><b>@Boost(2)</b></span>
+public class Essay {
+    ...
+
+    @Id
+    @DocumentId
+    public Long getId() { return id; }
+
+    @Field(name="Abstract", index=Index.TOKENIZED, store=Store.YES)
+    <span class="bold"><b>@Boost(2.5f)</b></span>
+    public String getSummary() { return summary; }
+
+    @Lob
+    @Field(index=Index.TOKENIZED)
+    public String getText() { return text; }
+}        </pre><p>In our example, Essay's probability to reach the top of the search
+      list will be multiplied by 2 and the summary field will be 2.5 more
+      important than the test field. Note that this explaination is actually
+      wrong, but it is simple and close enought to the reality. Please check
+      the Lucene documentation or the excellent <i class="citetitle">Lucene In Action
+      </i> from Otis Gospodnetic and Erik Hatcher.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="analyzer"></a>4.1.5.&nbsp;Analyzer</h3></div></div><div></div></div><p>The default analyzer class used to index the elements is
+      configurable through the <tt class="literal">hibernate.search.analyzer</tt>
+      property. If none is defined,
+      <tt class="classname">org.apache.lucene.analysis.standard.StandardAnalyzer</tt>
+      is used as the default.</p><p>You can also define the analyzer class per entity, per property
+      and even per @Field (useful when multiple fields are indexed from a
+      single property).</p><pre class="programlisting">@Entity
+@Indexed
+@Analyzer(impl = EntityAnalyzer.class)
+public class MyEntity {
+    @Id
+    @GeneratedValue
+    @DocumentId
+    private Integer id;
+
+    @Field(index = Index.TOKENIZED)
+    private String name;
+
+    @Field(index = Index.TOKENIZED)
+    @Analyzer(impl = PropertyAnalyzer.class)
+    private String summary;
+
+    @Field(index = Index.TOKENIZED, analyzer = @Analyzer(impl = FieldAnalyzer.class)
+    private String body;
+
+    ...
+}</pre><p>In this example, <tt class="classname">EntityAnalyzer</tt> is used
+      index all tokenized properties (eg. <tt class="literal">name</tt>), except for
+      <tt class="literal">summary</tt> and <tt class="literal">body</tt> which are indexed
+      with <tt class="classname">PropertyAnalyzer</tt> and
+      <tt class="classname">FieldAnalyzer</tt> respectively.</p><div class="caution" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Caution</h3><p>Mixing different analyzers in the same entity is most of the
+        time a bad practice. It makes query building more complex and results
+        less predictable (for the novice), especially if you are using a
+        QueryParser (which uses the same analyzer for the whole query). As a
+        thumb rule, the same analyzer should be used for both the indexing and
+        the query for a given field.</p></div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="search-mapping-bridge"></a>4.2.&nbsp;Property/Field Bridge</h2></div></div><div></div></div><p>In Lucene all index fields have to be represented as Strings. For
+    this reason all entity properties annotated with <tt class="literal">@Field</tt>
+    have to be indexed in a String form. For most of your properties,
+    Hibernate Search does the translation job for you thanks to a built-in set
+    of bridges. In some cases, though you need a more fine grain control over
+    the translation process.</p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e1469"></a>4.2.1.&nbsp;Built-in bridges</h3></div></div><div></div></div><p><tt class="literal">Hibernate Search</tt> comes bundled with a set of
+      built-in bridges between a Java property type and its full text
+      representation.</p><div class="variablelist"><dl><dt><span class="term">null</span></dt><dd><p>null elements are not indexed. Lucene does not support null
+            elements and this does not make much sense either.</p></dd><dt><span class="term">java.lang.String</span></dt><dd><p>String are indexed as is</p></dd><dt><span class="term">short, Short, integer, Integer, long, Long, float, Float,
+          double, Double, BigInteger, BigDecimal</span></dt><dd><p>Numbers are converted in their String representation. Note
+            that numbers cannot be compared by Lucene (ie used in ranged
+            queries) out of the box: they have to be padded <sup>[<a name="d0e1495" href="#ftn.d0e1495">1</a>]</sup></p></dd><dt><span class="term">java.util.Date</span></dt><dd><p>Dates are stored as yyyyMMddHHmmssSSS in GMT time
+            (200611072203012 for Nov 7th of 2006 4:03PM and 12ms EST). You
+            shouldn't really bother with the internal format. What is
+            important is that when using a DateRange Query, you should know
+            that the dates have to be expressed in GMT time.</p><p>Usually, storing the date up to the milisecond is not
+            necessary. <tt class="literal">@DateBridge</tt> defines the appropriate
+            resolution you are willing to store in the index ( <tt class="literal">
+            <tt class="literal">@DateBridge(resolution=Resolution.DAY)</tt>
+            </tt> ). The date pattern will then be truncated
+            accordingly.</p><pre class="programlisting">@Entity 
+@Indexed
+public class Meeting {
+    @Field(index=Index.UN_TOKENIZED)
+    <span class="bold"><b>@DateBridge(resolution=Resolution.MINUTE)</b></span>
+    private Date date;
+    ...                 </pre><div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Warning</h3><p>A Date whose resolution is lower than
+              <tt class="literal">MILLISECOND</tt> cannot be a
+              <tt class="literal">@DocumentId</tt></p></div></dd></dl></div><p></p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e1531"></a>4.2.2.&nbsp;Custom Bridge</h3></div></div><div></div></div><p>It can happen that the built-in bridges of Hibernate Search do not
+      cover some of your property types, or that the String representation
+      used is not what you expect. The following paragraphs sveral solutions
+      for this problem.</p><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="d0e1536"></a>4.2.2.1.&nbsp;StringBridge</h4></div></div><div></div></div><p>The simpliest custom solution is to give <span class="productname">Hibernate
+        Search </span>&#8482; an implementation of your expected
+        <span class="emphasis"><em>object to String</em></span> bridge. To do so you need to
+        implements the
+        <tt class="literal">org.hibernate.search.bridge.StringBridge</tt>
+        interface</p><pre class="programlisting">/**
+ * Padding Integer bridge.
+ * All numbers will be padded with 0 to match 5 digits
+ *
+ * @author Emmanuel Bernard
+ */
+public class PaddedIntegerBridge implements <span class="bold"><b>StringBridge</b></span> {
+
+    private int PADDING = 5;
+
+    <span class="bold"><b>public String objectToString(Object object)</b></span> {
+        String rawInteger = ( (Integer) object ).toString();
+        if (rawInteger.length() &gt; PADDING) 
+            throw new IllegalArgumentException( "Try to pad on a number too big" );
+        StringBuilder paddedInteger = new StringBuilder( );
+        for ( int padIndex = rawInteger.length() ; padIndex &lt; PADDING ; padIndex++ ) {
+            paddedInteger.append('0');
+        }
+        return paddedInteger.append( rawInteger ).toString();
+    }
+}                </pre><p>Then any property or field can use this bridge thanks to the
+        <tt class="literal">@FieldBridge</tt> annotation</p><pre class="programlisting"><span class="bold"><b>@FieldBridge(impl = PaddedIntegerBridge.class)</b></span>
+private Integer length;                </pre><p>Parameters can be passed to the Bridge implementation making it
+        more flexible. The Bridge implementation implements a
+        <tt class="classname">ParameterizedBridge</tt> interface, and the
+        parameters are passed through the <tt class="literal">@FieldBridge</tt>
+        annotation.</p><pre class="programlisting">public class PaddedIntegerBridge implements StringBridge, <span class="bold"><b>ParameterizedBridge</b></span> {
+
+    public static String PADDING_PROPERTY = "padding";
+    private int padding = 5; //default
+
+    <span class="bold"><b>public void setParameterValues(Map parameters)</b></span> {
+        Object padding = parameters.get( PADDING_PROPERTY );
+        if (padding != null) this.padding = (Integer) padding;
+    }
+
+    public String objectToString(Object object) {
+        String rawInteger = ( (Integer) object ).toString();
+        if (rawInteger.length() &gt; padding) 
+            throw new IllegalArgumentException( "Try to pad on a number too big" );
+        StringBuilder paddedInteger = new StringBuilder( );
+        for ( int padIndex = rawInteger.length() ; padIndex &lt; padding ; padIndex++ ) {
+            paddedInteger.append('0');
+        }
+        return paddedInteger.append( rawInteger ).toString();
+    }
+}
+
+
+//property
+@FieldBridge(impl = PaddedIntegerBridge.class,
+             <span class="bold"><b>params = @Parameter(name="padding", value="10")</b></span>
+            )
+private Integer length;                </pre><p>The <tt class="classname">ParameterizedBridge</tt> interface can be
+        implemented by <tt class="classname">StringBridge</tt> ,
+        <tt class="classname">TwoWayStringBridge</tt> ,
+        <tt class="classname">FieldBridge</tt> implementations (see
+        bellow).</p><p>If you expect to use your bridge implementation on for an id
+        property (ie annotated with <tt class="literal">@DocumentId</tt> ), you need
+        to use a slightly extended version of <tt class="literal">StringBridge</tt>
+        named <tt class="classname">TwoWayStringBridge</tt> . <tt class="literal">Hibernate
+        Search </tt> needs to read the string representation of the
+        identifier and generate the object out of it. There is not difference
+        in the way the <tt class="literal">@FieldBridge</tt> annotation is
+        used.</p><pre class="programlisting">public class PaddedIntegerBridge implements TwoWayStringBridge, ParameterizedBridge {
+
+    public static String PADDING_PROPERTY = "padding";
+    private int padding = 5; //default
+
+    public void setParameterValues(Map parameters) {
+        Object padding = parameters.get( PADDING_PROPERTY );
+        if (padding != null) this.padding = (Integer) padding;
+    }
+
+    public String objectToString(Object object) {
+        String rawInteger = ( (Integer) object ).toString();
+        if (rawInteger.length() &gt; padding) 
+            throw new IllegalArgumentException( "Try to pad on a number too big" );
+        StringBuilder paddedInteger = new StringBuilder( );
+        for ( int padIndex = rawInteger.length() ; padIndex &lt; padding ; padIndex++ ) {
+            paddedInteger.append('0');
+        }
+        return paddedInteger.append( rawInteger ).toString();
+    }
+
+    <span class="bold"><b>public Object stringToObject(String stringValue)</b></span> {
+        return new Integer(stringValue);
+    }
+}
+
+
+//id property
+@DocumentId
+@FieldBridge(impl = PaddedIntegerBridge.class,
+             params = @Parameter(name="padding", value="10") 
+private Integer id;
+                </pre><p>It is critically important for the two-way process to be
+        idempotent (ie object = stringToObject( objectToString( object ) )
+        ).</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="d0e1624"></a>4.2.2.2.&nbsp;FieldBridge</h4></div></div><div></div></div><p>Some usecase requires more than a simple object to string
+        translation when mapping a property to a Lucene index. To give you
+        most of the flexibility you can also implement a bridge as a
+        <tt class="classname">FieldBridge</tt> . This interface give you a
+        property value and let you map it the way you want in your Lucene
+        <tt class="classname">Document</tt> .This interface is very similar in its
+        concept to the <span class="productname">Hibernate</span>&#8482;
+        <tt class="classname">UserType</tt> .</p><p>You can for example store a given property in two different
+        document fields</p><pre class="programlisting">/**
+ * Store the date in 3 different field year, month, day
+ * to ease Range Query per year, month or day
+ * (eg get all the elements of december for the last 5 years)
+ *
+ * @author Emmanuel Bernard
+ */
+public class DateSplitBridge implements FieldBridge {
+    private final static TimeZone GMT = TimeZone.getTimeZone("GMT");
+
+    <span class="bold"><b>public void set(String name, Object value, Document document, Field.Store
+            store, Field.Index index, Float boost) {
+                    </b></span>
+        Date date = (Date) value;
+        Calendar cal = GregorianCalendar.getInstance( GMT );
+        cal.setTime( date );
+        int year = cal.get( Calendar.YEAR );
+        int month = cal.get( Calendar.MONTH ) + 1;
+        int day = cal.get( Calendar.DAY_OF_MONTH );
+        //set year
+        Field field = new Field( name + ".year", String.valueOf(year), store, index );
+        if ( boost != null ) field.setBoost( boost );
+        document.add( field );
+        //set month and pad it if needed
+        field = new Field( name + ".month", month &lt; 10 ? "0" : "" + String.valueOf(month), store, index);
+        if ( boost != null ) field.setBoost( boost );
+        document.add( field );
+        //set day and pad it if needed
+        field = new Field( name + ".day", day &lt; 10 ? "0" : "" + String.valueOf(day), store, index );
+        if ( boost != null ) field.setBoost( boost );
+        document.add( field );
+    }
+}
+
+
+//property
+<span class="bold"><b>@FieldBridge(impl = DateSplitBridge.class)</b></span>
+private Integer length;                </pre><p></p></div><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="d0e1652"></a>4.2.2.3.&nbsp;@ClassBridge</h4></div></div><div></div></div><p>It is sometimes useful to combine more than one property of a
+        given entity and index this combination in a specific way into the
+        Lucene index. The <tt class="classname">@ClassBridge</tt> and
+        <tt class="classname">@ClassBridges</tt> annotations can be defined at the
+        class level (as opposed to the property level). In this case the
+        custom field bridge implementation receives the entity instance as the
+        value parameter instead of a particular property.</p><pre class="programlisting">@Entity
+@Indexed
+<span class="bold"><b>@ClassBridge</b></span>(name="branchnetwork",
+             index=Index.TOKENIZED,
+             store=Store.YES,
+             impl = <span class="bold"><b>CatFieldsClassBridge.class</b></span>,
+             params = @Parameter( name="sepChar", value=" " ) )
+public class Department {
+    private int id;
+    private String network;
+    private String branchHead;
+    private String branch;
+    private Integer maxEmployees;
+    ...
+}
+
+public class CatFieldsClassBridge implements FieldBridge, ParameterizedBridge {
+
+    private String sepChar;
+
+    public void setParameterValues(Map parameters) {
+        this.sepChar = (String) parameters.get( "sepChar" );
+    }
+
+    public void set(String name, 
+                Object value, //the department instance (entity) in this case
+                Document document, //the Lucene document 
+                Field.Store store, Field.Index index, Float boost) {
+        // In this particular class the name of the new field was passed
+        // from the name field of the ClassBridge Annotation. This is not
+        // a requirement. It just works that way in this instance. The
+        // actual name could be supplied by hard coding it below.
+        Department dep = (Department) value;
+        String fieldValue1 = dep.getBranch();
+        if ( fieldValue1 == null ) {
+            fieldValue1 = "";
+        }
+        String fieldValue2 = dep.getNetwork();
+        if ( fieldValue2 == null ) {
+            fieldValue2 = "";
+        }
+        String fieldValue = fieldValue1 + sepChar + fieldValue2;
+        Field field = new Field( name, fieldValue, store, index );
+        if ( boost != null ) field.setBoost( boost );
+        document.add( field );
+    }
+}</pre><p>In this example, the particular
+        <tt class="classname">CatFieldsClassBridge</tt> is applied to the
+        <tt class="literal">department</tt> instance, the field bridge then
+        concatenate both branch and network and index the
+        concatenation.</p></div></div></div><div class="footnotes"><br><hr width="100" align="left"><div class="footnote"><p><sup>[<a name="ftn.d0e1495" href="#d0e1495">1</a>] </sup>Using a Range query is debatable and has drawbacks, an
+                alternative approach is to use a Filter query which will
+                filter the result query to the appropriate range.</p><p>Hibernate Search will support a padding mechanism</p></div></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="search-query"></a>Chapter&nbsp;5.&nbsp;Querying</h2></div></div><div></div></div><p>The second most important capability of Hibernate Search is the
+  ability to execute a Lucene query and retrieve entities managed by an
+  Hibernate session, providing the power of Lucene without living the
+  Hibernate paradigm, and giving another dimension to the Hibernate classic
+  search mechanisms (HQL, Criteria query, native SQL query).</p><p>To access the <span class="productname">Hibernate Search</span>&#8482; querying
+  facilities, you have to use an Hibernate
+  <tt class="classname">FullTextSession</tt> . A Search Session wraps a regular
+  <tt class="classname">org.hibernate.Session</tt> to provide query and indexing
+  capabilities.</p><pre class="programlisting">Session session = sessionFactory.openSession();
+...
+FullTextSession fullTextSession = Search.createFullTextSession(session);    </pre><p>The search facility is built on native Lucene queries.</p><pre class="programlisting">org.apache.lucene.queryParser.QueryParser parser = new QueryParser("title", new StopAnalyzer() );
+
+org.apache.lucene.search.Query luceneQuery = parser.parse( "summary:Festina Or brand:Seiko" );
+<span class="bold"><b>org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery );
+        </b></span>
+
+List result = fullTextQuery.list(); //return a list of managed objects    </pre><p>The Hibernate query built on top of the Lucene query is a regular
+  <tt class="literal">org.hibernate.Query</tt> , you are in the same paradigm as the
+  other Hibernate query facilities (HQL, Native or Criteria). The regular
+  <tt class="literal">list()</tt> , <tt class="literal">uniqueResult()</tt> ,
+  <tt class="literal">iterate()</tt> and <tt class="literal">scroll()</tt> can be
+  used.</p><p>For people using Java Persistence (aka EJB 3.0 Persistence) APIs of
+  Hibernate, the same extensions exist:</p><pre class="programlisting">EntityManager em = entityManagerFactory.createEntityManager();
+
+FullTextEntityManager fullTextEntityManager = 
+    org.hibernate.hibernate.search.jpa.Search.createFullTextEntityManager(em);
+
+...
+org.apache.lucene.queryParser.QueryParser parser = new QueryParser("title", new StopAnalyzer() );
+
+org.apache.lucene.search.Query luceneQuery = parser.parse( "summary:Festina Or brand:Seiko" );
+<span class="bold"><b>javax.persistence.Query fullTextQuery = fullTextEntityManager.createFullTextQuery( luceneQuery );</b></span>
+
+List result = fullTextQuery.getResultList(); //return a list of managed objects  </pre><p>The following examples show the Hibernate APIs but the same example
+  can be easily rewritten with the Java Persistence API by just adjusting the
+  way the FullTextQuery is retrieved.</p><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e1731"></a>5.1.&nbsp;Building queries</h2></div></div><div></div></div><p>Hibernate Search queries are built on top of Lucene queries. It
+    gives you a total freedom on the kind of Lucene queries you are willing to
+    execute. However, once built, Hibernate Search abstract the query
+    processing from your application using org.hibernate.Query as your primary
+    query manipulation API.</p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e1736"></a>5.1.1.&nbsp;Building a Lucene query</h3></div></div><div></div></div><p>This subject is generally speaking out of the scope of this
+      documentation. Please refer to the Lucene documentation or Lucene In
+      Action.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e1741"></a>5.1.2.&nbsp;Building a Hibernate Search query</h3></div></div><div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="d0e1744"></a>5.1.2.1.&nbsp;Generality</h4></div></div><div></div></div><p>Once the Lucene query is built, it needs to be wrapped into an
+        Hibernate Query.</p><pre class="programlisting">FullTextSession fullTextSession = Search.createFullTextSession( session );
+org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery );</pre><p>If not specified otherwise, the query will be executed against
+        all indexed entities, potentially returning all types of indexed
+        classes. It is advised, from a performance point of view, to restrict
+        the returned types:</p><pre class="programlisting">org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Customer.class );
+//or
+fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Item.class, Actor.class );</pre><p>The first example returns only matching customers, the second
+        returns matching actors and items.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="d0e1757"></a>5.1.2.2.&nbsp;Pagination</h4></div></div><div></div></div><p>It is recommended to restrict the number of returned objects per
+        query. It is a very common use case as well, the user usually navigate
+        from one page to an other. The way to define pagination is exactly the
+        way you would define pagination in a plain HQL or Criteria
+        query.</p><pre class="programlisting">org.hibernate.Query fullTextQuery = fullTextSession.createFullTextQuery( luceneQuery, Customer.class );
+fullTextQuery.setFirstResult(15); //start from the 15th element
+fullTextQuery.setMaxResults(10); //return 10 elements</pre><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>It is still possible to get the total number of matching
+          elements regardless of the pagination. See
+          <tt class="methodname">getResultSize()</tt> below</p></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="d0e1770"></a>5.1.2.3.&nbsp;Sorting</h4></div></div><div></div></div><p>Apache Lucene provides a very flexible and powerful way to sort
+        results. While the default sorting (by relevance) is appropriate most
+        of the time, it can interesting to sort by one or several
+        properties.</p><p>Inject the Lucene Sort object to apply a Lucene sorting strategy
+        to an Hibernate Search.</p><pre class="programlisting">org.hibernate.search.FullTextQuery query = s.createFullTextQuery( query, Book.class );
+org.apache.lucene.search.Sort sort = new Sort(new SortField("title"));
+<span class="bold"><b>query.setSort(sort);</b></span>
+List results = query.list();</pre><p>One can notice the <tt class="classname">FullTextQuery</tt>
+        interface which is a sub interface of
+        <tt class="classname">org.hibernate.Query</tt>.</p><p>Fields used for sorting must not be tokenized.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="d0e1792"></a>5.1.2.4.&nbsp;Fetching strategy</h4></div></div><div></div></div><p>When you restrict the return types to one class, Hibernate
+        Search loads the objects using a single query. It also respects the
+        static fetching strategy defined in your domain model.</p><p>It is often useful, however, to refine the fetching strategy for
+        a specific use case.</p><pre class="programlisting">Criteria criteria = s.createCriteria( Book.class ).setFetchMode( "authors", FetchMode.JOIN );
+s.createFullTextQuery( luceneQuery ).setCriteriaQuery( criteria );</pre><p>In this example, the query will return all Books matching the
+        luceneQuery. The authors collection will be loaded from the same query
+        using an SQL outer join.</p><p>When defining a criteria query, it is not needed to restrict the
+        entity types returned while creating the Hibernate Search query from
+        the full text session: the type is guessed from the criteria query
+        itself. Only fetch mode can be adjusted, refrain from applying any
+        other restriction.</p><p>One cannot use <tt class="methodname">setCriteriaQuery</tt> if more
+        than one entity type is expected to be returned.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="projections"></a>5.1.2.5.&nbsp;Projection</h4></div></div><div></div></div><p>For some use cases, returning the domain object (graph) is
+        overkill. Only a small subset of the properties is necessary.
+        Hibernate Search allows you to return a subset of properties:</p><pre class="programlisting">org.hibernate.search.FullTextQuery query = s.createFullTextQuery( luceneQuery, Book.class );
+query.<span class="bold"><b>setProjection( "id", "summary", "body", "mainAuthor.name" )</b></span>;
+List results = query.list();
+Object[] firstResult = (Object[]) results.get(0);
+Integer id = firstResult[0];
+String summary = firstResult[1];
+String body = firstResult[2];
+String authorName = firstResult[3];</pre><p>Hibernate Search extracts the properties from the Lucene index
+        and convert them back to their object representation, returning a list
+        of <tt class="classname">Object[]</tt>. Projections avoid a potential
+        database round trip (useful if the query response time is critical),
+        but has some constraints:</p><div class="itemizedlist"><ul type="disc"><li><p>the properties projected must be stored in the index
+            (<tt class="literal">@Field(store=Store.YES)</tt>), which increase the
+            index size</p></li><li><p>the properties projected must use a
+            <tt class="literal">FieldBridge</tt> implementing
+            <tt class="classname">org.hibernate.search.bridge.TwoWayFieldBridge</tt>
+            or
+            <tt class="literal">org.hibernate.search.bridge.TwoWayStringBridge</tt>,
+            the latter being the simpler version. All Hibernate Search
+            built-in types are two-way.</p></li></ul></div><p>Projection is useful for another kind of usecases. Lucene
+        provides some metadata informations to the user about the results. By
+        using some special placeholders, the projection mechanism can retrieve
+        them:</p><pre class="programlisting">org.hibernate.search.FullTextQuery query = s.createFullTextQuery( luceneQuery, Book.class );
+query.<span class="bold"><b>setProjection( FullTextQuery.SCORE, FullTextQuery.BOOST, FullTextQuery.THIS, "mainAuthor.name" )</b></span>;
+List results = query.list();
+Object[] firstResult = (Object[]) results.get(0);
+float score = firstResult[0];
+float boost = firstResult[1];
+Book book = firstResult[2];
+String authorName = firstResult[3];</pre><p>You can mix and match regular fields and special placeholders.
+        Here is the list of available placeholders:</p><div class="itemizedlist"><ul type="disc"><li><p>FullTextQuery.THIS: returns the intialized and managed
+            entity (as a non projected query would have done)</p></li><li><p>FullTextQuery.DOCUMENT: returns the Lucene Document related
+            to the object projected</p></li><li><p>FullTextQuery.SCORE: returns the document score in the
+            query. The score is guatanteed to be between 0 and 1 but the
+            highest score is not necessarily equals to 1. Scores are handy to
+            compare one result against an other for a given query but are
+            useless when comparing the result of different queries.</p></li><li><p>FullTextQuery.BOOST: the boost value of the Lucene
+            Document</p></li><li><p>FullTextQuery.ID: the id property value of the projected
+            object</p></li><li><p>FullTextQuery.DOCUMENT_ID: the Lucene document id. Careful,
+            Lucene document id can change overtime between two different
+            IndexReader opening (this feature is experimental)</p></li></ul></div></div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e1872"></a>5.2.&nbsp;Retrieving the results</h2></div></div><div></div></div><p>Once the Hibernate Search query is built, executing it is in no way
+    different than executing a HQL or Criteria query. The same paradigm and
+    object semantic apply. All the common operations are available:
+    <tt class="methodname">list()</tt>, <tt class="methodname">uniqueResult()</tt>,
+    <tt class="methodname">iterate()</tt>,
+    <tt class="methodname">scroll()</tt>.</p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e1889"></a>5.2.1.&nbsp;Performance considerations</h3></div></div><div></div></div><p>If you expect a reasonable number of results (for example using
+      pagination) and expect to work on all of them,
+      <tt class="methodname">list()</tt> or
+      <tt class="methodname">uniqueResult()</tt> are recommended.
+      <tt class="methodname">list()</tt> work best if the entity
+      <tt class="literal">batch-size</tt> is set up properly. Note that Hibernate
+      Search has to process all Lucene Hits elements (within the pagination)
+      when using <tt class="methodname">list()</tt> ,
+      <tt class="methodname">uniqueResult()</tt> and
+      <tt class="methodname">iterate()</tt>.</p><p>If you wish to minimize Lucene document loading,
+      <tt class="methodname">scroll()</tt> is more appropriate. Don't forget to
+      close the <tt class="classname">ScrollableResults</tt> object when you're
+      done, since it keeps Lucene resources. If you expect to use
+      <tt class="methodname">scroll</tt> but wish to load objects in batch, you
+      can use <tt class="methodname">query.setFetchSize()</tt>: When an object is
+      accessed, and if not already loaded, Hibernate Search will load the next
+      <tt class="literal">fetchSize</tt> objects in one pass.</p><p>Pagination is a preferred method over scrolling though.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e1934"></a>5.2.2.&nbsp;Result size</h3></div></div><div></div></div><p>It is sometime useful to know the total number of matching
+      documents:</p><div class="itemizedlist"><ul type="disc"><li><p>for the Google-like feature 1-10 of about 888,000,000</p></li><li><p>to implement a fast pagination navigation</p></li><li><p>to implement a multi step search engine (adding approximation
+          if the restricted query return no or not enough results)</p></li></ul></div><p>But it would be costly to retrieve all the matching
+      documents.</p><p>Hibernate Search allows you to retrieve the total number of
+      matching documents regardless of the pagination parameters. Even more
+      interesting, you can retrieve the number of matching elements without
+      triggering a single object load.</p><pre class="programlisting">org.hibernate.search.FullTextQuery query = s.createFullTextQuery( luceneQuery, Book.class );
+assert 3245 == <span class="bold"><b>query.getResultSize()</b></span>; //return the number of matching books without loading a single one
+
+org.hibernate.search.FullTextQuery query = s.createFullTextQuery( luceneQuery, Book.class );
+query.setMaxResult(10);
+List results = query.list();
+assert 3245 == <span class="bold"><b>query.getResultSize()</b></span>; //return the total number of matching books regardless of pagination</pre><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>Like Google, the number of results is approximative if the index
+        is not fully up-to-date with the database (asynchronous cluster for
+        example).</p></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e1964"></a>5.2.3.&nbsp;ResultTransformer</h3></div></div><div></div></div><p>Especially when using projection, the data structure returned by a
+      query (an object array in this case), is not always matching the
+      application needs. It is possible to apply a
+      <tt class="classname">ResultTransformer</tt> operation post query to match
+      the targeted data structure:</p><pre class="programlisting">org.hibernate.search.FullTextQuery query = s.createFullTextQuery( luceneQuery, Book.class );
+query.setProjection( "title", "mainAuthor.name" );
+
+<span class="bold"><b>query.setResultTransformer( 
+    new StaticAliasToBeanResultTransformer( BookView.class, "title", "author" ) 
+);</b></span>
+List&lt;BookView&gt; results = (List&lt;BookView&gt;) query.list();
+for(BookView view : results) {
+    log.info( "Book: " + view.getTitle() + ", " + view.getAuthor() );
+}</pre><p>Examples of <tt class="classname">ResultTransformer</tt>
+      implementations can be found in the Hibernate Core codebase.</p></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e1982"></a>5.3.&nbsp;Filters</h2></div></div><div></div></div><p>Apache Lucene has a powerful feature that allows to filters results
+    from a query according to a custom filtering process. This is a very
+    powerful way to apply some data restrictions after a query, especially
+    since filters can be cached and reused. Some interesting usecases
+    are:</p><div class="itemizedlist"><ul type="disc"><li><p>security</p></li><li><p>temporal data (eg. view only last month's data)</p></li><li><p>population filter (eg. search limited to a given
+        category)</p></li><li><p>and many more</p></li></ul></div><p>Hibernate Search pushes the concept further by introducing the
+    notion of parameterizable named filters which are transparantly cached.
+    For people familiar with the notion of Hibernate Core filters, the API is
+    very similar.</p><pre class="programlisting">fullTextQuery = s.createFullTextQuery( query, Driver.class );
+fullTextQuery.enableFullTextFilter("bestDriver");
+fullTextQuery.enableFullTextFilter("security").setParameter( "login", "andre" );
+fullTextQuery.list(); //returns only best drivers where andre has credentials</pre><p>In this example we enabled 2 filters on top of this query. You can
+    enable (or disable) as many filters as you want.</p><p>Declaring filters is done through the
+    <tt class="classname">@FullTextFilterDef</tt> annotation. This annotation can
+    be on any <tt class="literal">@Indexed</tt> entity regardless of the filter
+    operation.</p><pre class="programlisting">@Entity
+@Indexed
+@FullTextFilterDefs( {
+    <span class="bold"><b>@FullTextFilterDef(name = "bestDriver", impl = BestDriversFilter.class, cache=false)</b></span>, //actual Filter implementation
+    <span class="bold"><b>@FullTextFilterDef(name = "security", impl = SecurityFilterFactory.class)</b></span> //Filter factory with parameters
+})
+public class Driver { ... }</pre><p>Each named filter points to an actual filter implementation.</p><pre class="programlisting">public class BestDriversFilter extends <span class="bold"><b>org.apache.lucene.search.Filter</b></span> {
+
+    public BitSet bits(IndexReader reader) throws IOException {
+        BitSet bitSet = new BitSet( reader.maxDoc() );
+        TermDocs termDocs = reader.termDocs( new Term("score", "5") );
+        while ( termDocs.next() ) {
+            bitSet.set( termDocs.doc() );
+        }
+        return bitSet;
+    }
+}</pre><p><tt class="classname">BestDriversFilter</tt> is an example of a simple
+    Lucene filter that will filter all results to only return drivers whose
+    score is 5. The filters must have a no-arg constructor when referenced in
+    a <tt class="literal">FulltextFilterDef.impl</tt>.</p><p>The <tt class="literal">cache</tt> flag, defaulted to
+    <tt class="literal">true</tt>, tells Hibernate Search to search the filter in
+    its internal cache and reuses it if found.</p><p>Note that, usually, filter using the
+    <tt class="classname">IndexReader</tt> are wrapped in a Lucene
+    <tt class="classname">CachingWrapperFilter</tt> to benefit from some caching
+    speed improvement. If your Filter creation requires additional steps or if
+    the filter you are willing to use does not have a no-arg constructor, you
+    can use the factory pattern:</p><pre class="programlisting">@Entity
+@Indexed
+@FullTextFilterDef(name = "bestDriver", impl = BestDriversFilterFactory.class) //Filter factory
+public class Driver { ... }
+
+public class BestDriversFilterFactory {
+
+    <span class="bold"><b>@Factory</b></span>
+    public Filter getFilter() {
+        //some additional steps to cache the filter results per IndexReader
+        Filter bestDriversFilter = new BestDriversFilter();
+        return new CachingWrapperFilter(bestDriversFilter);
+    }
+}</pre><p>Hibernate Search will look for a <tt class="literal">@Factory</tt>
+    annotated method and use it to build the filter instance. The factory must
+    have a no-arg constructor. For people familiar with JBoss Seam, this is
+    similar to the component factory pattern, but the annotation is
+    different!</p><p>Named filters comes in handy where the filters have parameters. For
+    example a security filter needs to know which credentials you are willing
+    to filter by:</p><pre class="programlisting">fullTextQuery = s.createFullTextQuery( query, Driver.class );
+fullTextQuery.enableFullTextFilter("security")<span class="bold"><b>.setParameter( "level", 5 )</b></span>;</pre><p>Each parameter name should have an associated setter on either the
+    filter or filter factory of the targeted named filter definition.</p><pre class="programlisting">public class SecurityFilterFactory {
+    private Integer level;
+
+    /**
+     * injected parameter
+     */
+    <span class="bold"><b>public void setLevel(Integer level)</b></span> {
+        this.level = level;
+    }
+
+    <span class="bold"><b>@Key
+    public FilterKey getKey()</b></span> {
+        StandardFilterKey key = new StandardFilterKey();
+        key.addParameter( level );
+        return key;
+    }
+
+    @Factory
+    public Filter getFilter() {
+        Query query = new TermQuery( new Term("level", level.toString() ) );
+        return new CachingWrapperFilter( new QueryWrapperFilter(query) );
+    }
+}</pre><p>Note the method annotated <tt class="classname">@Key</tt> and returning
+    a <tt class="classname">FilterKey</tt> object. The returned object has a
+    special contract: the key object must implement equals / hashcode so that
+    2 keys are equals if and only if the given Filter types are the same and
+    the set of parameters are the same. In other words, 2 filter keys are
+    equal if and only if the filters from which the keys are generated can be
+    interchanged. The key object is used as a key in the cache
+    mechanism.</p><p><tt class="classname">@Key</tt> methods are needed only if:</p><div class="itemizedlist"><ul type="disc"><li><p>you enabled the filter caching system (enabled by
+        default)</p></li><li><p>your filter has parameters</p></li></ul></div><p>In most cases, using the <tt class="literal">StandardFilterKey</tt>
+    implementation will be good enough. It delegates the equals/hashcode
+    implementation to each of the parameters equals and hashcode
+    methods.</p><p>Why should filters be cached? There are two area where filter
+    caching shines:</p><div class="itemizedlist"><ul type="disc"><li><p>the system does not update the targeted entity index often (in
+        other words, the IndexReader is reused a lot)</p></li><li><p>the Filter BitSet is expensive to compute (compared to the time
+        spent to execute the query)</p></li></ul></div><p>Cache is enabled by default and use the notion of SoftReferences to
+    dispose memory when needed. To adjust the size of the hard reference
+    cache, use <tt class="literal">hibernate.search.filter.cache_strategy.size</tt>
+    (defaults to 128). Don't forget to use a
+    <tt class="classname">CachingWrapperFilter</tt> when the filter is cacheable
+    and the Filter's bits methods makes use of IndexReader.</p><p>For advance use of filter caching, you can implement your own
+    <tt class="classname">FilterCachingStrategy</tt>. The classname is defined by
+    <tt class="literal">hibernate.search.filter.cache_strategy</tt>.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e2128"></a>5.4.&nbsp;Optimizing the query process</h2></div></div><div></div></div><p>Query performance depends on several criteria:</p><div class="itemizedlist"><ul type="disc"><li><p>the Lucene query itself: read the literature on this
+        subject</p></li><li><p>the number of object loaded: use pagination (always ;-) ) or
+        index projection (if needed)</p></li><li><p>the way Hibernate Search interacts with the Lucene readers:
+        defines the appropriate <a href="#search-architecture-readerstrategy">Reader strategy</a>.</p></li></ul></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e2145"></a>5.5.&nbsp;Native Lucene Queries</h2></div></div><div></div></div><p>If you wish to use some specific features of Lucene, you can always
+    run Lucene specific queries. Check <a href="#search-lucene-native" title="Chapter&nbsp;8.&nbsp;Accessing Lucene natively">Chapter&nbsp;8, <i>Accessing Lucene natively</i></a>
+    for more informations.</p></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="search-batchindex"></a>Chapter&nbsp;6.&nbsp;Manual indexing</h2></div></div><div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="search-batchindex-indexing"></a>6.1.&nbsp;Indexing</h2></div></div><div></div></div><p>It is sometimes useful to index an object even if this object is not
+    inserted nor updated to the database. This is especially true when you
+    want to build your index for the first time. You can achieve that goal
+    using the <tt class="classname">FullTextSession</tt>.</p><pre class="programlisting">FullTextSession fullTextSession = Search.createFullTextSession(session);
+Transaction tx = fullTextSession.beginTransaction();
+for (Customer customer : customers) {
+    <span class="bold"><b>fullTextSession.index(customer);</b></span>
+}
+tx.commit(); //index are written at commit time    </pre><p>For maximum efficiency, Hibernate Search batches index operations
+    and executse them at commit time (Note: you don't need to use
+    <tt class="classname">org.hibernate.Transaction</tt> in a JTA
+    environment).</p><p>If you expect to index a lot of data, you need to be careful about
+    memory consumption: since all documents are kept in a queue until the
+    transaction commit, you can potentially face an
+    <tt class="classname">OutOfMemoryException</tt>.</p><p>To avoid that, you can set up the
+    <tt class="literal">hibernate.search.worker.batch_size</tt> property to a
+    sensitive value: all index operations are queued until
+    <tt class="literal">batch_size</tt> is reached. Every time
+    <tt class="literal">batch_size</tt> is reached (or if the transaction is
+    committed), the queue is processed (freeing memory) and emptied. Be aware
+    that the changes cannot be rollbacked if the number of index elements goes
+    beyond <tt class="literal">batch_size</tt>. Be also aware that the queue limits
+    are also applied on regular transparent indexing (and not only when
+    <tt class="literal">session.index()</tt> is used). That's why a sensitive
+    <tt class="literal">batch_size</tt> value is expected.</p><p>Other parameters which also can affect indexing time and memory
+    consumption are
+    <tt class="literal">hibernate.search.[default|&lt;indexname&gt;].batch.merge_factor</tt>
+    ,
+    <tt class="literal">hibernate.search.[default|&lt;indexname&gt;].batch.max_merge_docs</tt>
+    and
+    <tt class="literal">hibernate.search.[default|&lt;indexname&gt;].batch.max_buffered_docs</tt>
+    . These parameters are Lucene specific and Hibernate Search is just
+    passing these paramters through - see <a href="#lucene-indexing-performance" title="3.7.&nbsp;Tuning Lucene indexing performance">Section&nbsp;3.7, &#8220;Tuning Lucene indexing performance&#8221;</a> for more details.</p><p>Here is an especially efficient way to index a given class (useful
+    for index (re)initialization):</p><pre class="programlisting">fullTextSession.setFlushMode(FlushMode.MANUAL);
+fullTextSession.setCacheMode(CacheMode.IGNORE);
+transaction = fullTextSession.beginTransaction();
+//Scrollable results will avoid loading too many objects in memory
+ScrollableResults results = fullTextSession.createCriteria( Email.class ).scroll( ScrollMode.FORWARD_ONLY );
+int index = 0;
+while( results.next() ) {
+    index++;
+    fullTextSession.index( results.get(0) ); //index each element
+    if (index % batchSize == 0) s.clear(); //clear every batchSize since the queue is processed
+}
+transaction.commit();</pre><p>It is critical that <tt class="literal">batchSize</tt> in the previous
+    example matches the <tt class="literal">batch_size</tt> value described
+    previously.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e2224"></a>6.2.&nbsp;Purging</h2></div></div><div></div></div><p>It is equally possible to remove an entity or all entities of a
+    given type from a Lucene index without the need to physically remove them
+    from the database. This operation is named purging and is done through the
+    <tt class="classname">FullTextSession</tt>.</p><pre class="programlisting">FullTextSession fullTextSession = Search.createFullTextSession(session);
+Transaction tx = fullTextSession.beginTransaction();
+for (Customer customer : customers) {
+    <span class="bold"><b>fullTextSession.purge( Customer.class, customer.getId() );</b></span>
+}
+tx.commit(); //index are written at commit time    </pre><p>Purging will remove the entity with the given id from the Lucene
+    index but will not touch the database.</p><p>If you need to remove all entities of a given type, you can use the
+    <tt class="methodname">purgeAll</tt> method.</p><pre class="programlisting">FullTextSession fullTextSession = Search.createFullTextSession(session);
+Transaction tx = fullTextSession.beginTransaction();
+<span class="bold"><b>fullTextSession.purgeAll( Customer.class );</b></span>
+//optionally optimize the index
+//fullTextSession.getSearchFactory().optimize( Customer.class );
+tx.commit(); //index are written at commit time    </pre><p>It is recommended to optimize the index after such an
+    operation.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>Methods <tt class="methodname">index</tt>,
+      <tt class="methodname">purge</tt> and <tt class="methodname">purgeAll</tt> are
+      available on <tt class="classname">FullTextEntityManager</tt> as well</p></div></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="search-optimize"></a>Chapter&nbsp;7.&nbsp;Index Optimization</h2></div></div><div></div></div><p>From time to time, the Lucene index needs to be optimized. The process
+  is essentially a defragmentation: until the optimization occurs, deleted
+  documents are just marked as such, no physical deletion is applied, the
+  optimization can also adjust the number of files in the Lucene
+  Directory.</p><p>The optimization speeds up searches but in no way speeds up indexation
+  (update). During an optimization, searches can be performed (but will most
+  likely be slowed down), and all index updates will be stopped. Prefer
+  optimizing:</p><div class="itemizedlist"><ul type="disc"><li><p>on an idle system or when the searches are less frequent</p></li><li><p>after a lot of index modifications (doing so before will not speed
+      up the indexation process)</p></li></ul></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e2281"></a>7.1.&nbsp;Automatic optimization</h2></div></div><div></div></div><p>Hibernate Search can optimize automatically an index after:</p><div class="itemizedlist"><ul type="disc"><li><p>a certain amount of operations have been applied (insertion,
+        deletion)</p></li><li><p>or a certain amout of transactions have been applied</p></li></ul></div><p>The configuration can be global or defined at the index
+    level:</p><pre class="programlisting">hibernate.search.default.optimizer.operation_limit.max = 1000
+hibernate.search.default.optimizer.transaction_limit.max = 100
+
+hibernate.search.Animal.optimizer.transaction_limit.max = 50</pre><p>An optimization will be triggered to the <tt class="literal">Animal</tt>
+    index as soon as either:</p><div class="itemizedlist"><ul type="disc"><li><p>the number of addition and deletion reaches 1000</p></li><li><p>the number of transactions reaches 50
+        (<tt class="constant">hibernate.search.Animal.optimizer.transaction_limit.max</tt>
+        having priority over
+        <tt class="constant">hibernate.search.default.optimizer.transaction_limit.max</tt>)</p></li></ul></div><p>If none of these parameters are defined, not optimization is
+    processed automatically.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e2317"></a>7.2.&nbsp;Manual optimization</h2></div></div><div></div></div><p>You can programmatically optimize (defragment) a Lucene index from
+    Hibernate Search through the <tt class="classname">SearchFactory</tt></p><pre class="programlisting">searchFactory.optimize(Order.class);
+
+searchFactory.optimize();</pre><p>The first example reindex the Lucene index holding
+    <tt class="classname">Order</tt>s, the second, optimize all indexes.</p><p>The <tt class="classname">SearchFactory</tt> can be accessed from a
+    <tt class="classname">FullTextSession</tt>:</p><pre class="programlisting">FullTextSession fullTextSession = Search.createFullTextSession(regularSession);
+SearchFactory searchFactory = fullTextSession.getSearchFactory();</pre><p>Note that <tt class="literal">searchFactory.optimize()</tt> has no effect
+    on a JMS backend. You must apply the optimize operation on the Master
+    node.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e2346"></a>7.3.&nbsp;Adjusting optimization</h2></div></div><div></div></div><p>Apache Lucene has a few parameters to influence how optimization is
+    performed. Hibernate Search expose those parameters.</p><p>Further index optimisation parameters include
+    <tt class="literal">hibernate.search.[default|&lt;indexname&gt;].merge_factor</tt>,
+    <tt class="literal">hibernate.search.[default|&lt;indexname&gt;].max_merge_docs</tt>
+    and
+    <tt class="literal">hibernate.search.[default|&lt;indexname&gt;].max_buffered_docs</tt>
+    - see <a href="#lucene-indexing-performance" title="3.7.&nbsp;Tuning Lucene indexing performance">Section&nbsp;3.7, &#8220;Tuning Lucene indexing performance&#8221;</a> for more
+    details.</p></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="search-lucene-native"></a>Chapter&nbsp;8.&nbsp;Accessing Lucene natively</h2></div></div><div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e2368"></a>8.1.&nbsp;SearchFactory</h2></div></div><div></div></div><p>The <tt class="classname">SearchFactory</tt> object keeps track of the
+    underlying Lucene resources for Hibernate Search, it's also a convenient
+    way to access Lucene natively. The <tt class="classname">SearchFactory</tt>
+    can be accessed from a <tt class="classname">FullTextSession</tt>:</p><pre class="programlisting">FullTextSession fullTextSession = Search.createFullTextSession(regularSession);
+SearchFactory searchFactory = fullTextSession.getSearchFactory();</pre></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e2384"></a>8.2.&nbsp;Accessing a Lucene Directory</h2></div></div><div></div></div><p>You can always access the Lucene directories through plain Lucene,
+    the Directory structure is in no way different with or without Hibernate
+    Search. However there are some more convenient ways to access a given
+    Directory. The <tt class="classname">SearchFactory</tt> keeps track of the
+    <tt class="classname">DirectoryProvider</tt>s per indexed class. One directory
+    provider can be shared amongst several indexed classes if the classes
+    share the same underlying index directory. While usually not the case, a
+    given entity can have several <tt class="classname">DirectoryProvider</tt>s is
+    the index is sharded (see <a href="#search-configuration-directory-sharding" title="3.2.&nbsp;Index sharding">Section&nbsp;3.2, &#8220;Index sharding&#8221;</a>).</p><pre class="programlisting">DirectoryProvider[] provider = searchFactory.getDirectoryProviders(Order.class);
+org.apache.lucene.store.Directory directory = provider[0].getDirectory();</pre><p>In this example, directory points to the lucene index storing
+    <tt class="classname">Order</tt>s information. Note that the obtained Lucene
+    directory must not be closed (this is Hibernate Search
+    responsibility).</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e2407"></a>8.3.&nbsp;Using an IndexReader</h2></div></div><div></div></div><p>Queries in Lucene are executed on an <tt class="literal">IndexReader</tt>.
+    Hibernate Search caches such index readers to maximize performances. Your
+    code can access such cached / shared resources. You will just have to
+    follow some "good citizen" rules.</p><pre class="programlisting">DirectoryProvider orderProvider = searchFactory.getDirectoryProviders(Order.class)[0];
+DirectoryProvider clientProvider = searchFactory.getDirectoryProviders(Client.class)[0];
+
+ReaderProvider readerProvider = searchFactory.getReaderProvider();
+IndexReader reader = readerProvider.openReader(orderProvider, clientProvider);
+
+try {
+    //do read-only operations on the reader
+}
+finally {
+    readerProvider.closeReader(reader);
+}</pre><p>The ReaderProvider (described in <a href="#search-architecture-readerstrategy">Reader strategy</a>), will open an IndexReader
+    on top of the index(es) referenced by the directory providers. This
+    IndexReader being shared amongst several clients, you must adhere to the
+    following rules:</p><div class="itemizedlist"><ul type="disc"><li><p>Never call indexReader.close(), but always call
+        readerProvider.closeReader(reader); (a finally block is the best
+        area).</p></li><li><p>This indexReader must not be used for modification operations
+        (especially delete), if you want to use an read/write index reader,
+        open one from the Lucene Directory object.</p></li></ul></div><p>Aside from those rules, you can use the IndexReader freely,
+    especially to do native queries. Using the shared
+    <tt class="literal">IndexReader</tt>s will make most queries more
+    efficient.</p></div></div></div><!-- HibernateDoc.OutdatedContent --><script src="//code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script><script src="/hibernate/_outdated-content/outdated-content.js" type="text/javascript"></script><script type="text/javascript">var jQuery_3_1 = $.noConflict(true); jQuery_3_1(document).ready(function() { HibernateDoc.OutdatedContent.install("search"); });</script><!-- /HibernateDoc.OutdatedContent --></body></html>

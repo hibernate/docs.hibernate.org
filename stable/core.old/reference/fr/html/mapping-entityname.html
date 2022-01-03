@@ -1,0 +1,76 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>5.3.&nbsp;Mapper une classe plus d'une fois</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="mapping.html" title="Chapitre&nbsp;5.&nbsp;Mapping O/R basique">
+      <link rel="prev" href="mapping-types.html" title="5.2.&nbsp;Hibernate Types">
+      <link rel="next" href="mapping-quotedidentifiers.html" title="5.4.&nbsp;SQL quoted identifiers">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">5.3.&nbsp;Mapper une classe plus d'une fois</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="mapping-types.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;5.&nbsp;Mapping O/R basique</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="mapping-quotedidentifiers.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="mapping-entityname"></a>5.3.&nbsp;Mapper une classe plus d'une fois
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Il est possible de proposer plus d'un mapping par classe persistante. Dans ce cas, vous devez sp&eacute;cifier un <span class="emphasis"><em>nom d'entit&eacute;</em></span> pour lever l'ambiguit&eacute; entre les instances des entit&eacute;s mapp&eacute;es (par d&eacute;faut, le nom de l'entit&eacute; est celui de la classe). Hibernate
+            vous permet de sp&eacute;cifier le nom de l'entit&eacute; lorsque vous utilisez des objets persistants, lorsque vous &eacute;crivez des requ&ecirc;tes
+            ou quand vous mappez des associations vers les entit&eacute;s nomm&eacute;es. 
+         </p><pre class="programlisting">&lt;class name="Contract" table="Contracts"
+        entity-name="CurrentContract"&gt;
+    ...
+    &lt;set name="history" inverse="true"
+            order-by="effectiveEndDate desc"&gt;
+        &lt;key column="currentContractId"/&gt;
+        &lt;one-to-many entity-name="HistoricalContract"/&gt;
+    &lt;/set&gt;
+&lt;/class&gt;
+
+&lt;class name="Contract" table="ContractHistory"
+        entity-name="HistoricalContract"&gt;
+    ...
+    &lt;many-to-one name="currentContract"
+            column="currentContractId"
+            entity-name="CurrentContract"/&gt;
+&lt;/class&gt;</pre><p>Remarquez comment les associations sont d&eacute;sormais sp&eacute;cifi&eacute;es en utilisant <code class="literal">entity-name</code> au lieu de <code class="literal">class</code>. 
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="mapping-types.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="mapping.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="mapping-quotedidentifiers.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">5.2.&nbsp;Hibernate Types&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;5.4.&nbsp;SQL quoted identifiers</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

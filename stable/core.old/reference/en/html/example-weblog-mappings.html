@@ -1,0 +1,138 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>22.2.&nbsp;Hibernate Mappings</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="example-weblog.html" title="Chapter&nbsp;22.&nbsp;Example: Weblog Application">
+      <link rel="prev" href="example-weblog.html" title="Chapter&nbsp;22.&nbsp;Example: Weblog Application">
+      <link rel="next" href="example-weblog-code.html" title="22.3.&nbsp;Hibernate Code">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">22.2.&nbsp;Hibernate Mappings</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="example-weblog.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;22.&nbsp;Example: Weblog Application</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="example-weblog-code.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="example-weblog-mappings"></a>22.2.&nbsp;Hibernate Mappings
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+                        The XML mappings should now be quite straightforward.
+                    
+         </p><pre class="programlisting">&lt;?xml version="1.0"?&gt;
+&lt;!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd"&gt;
+
+&lt;hibernate-mapping package="eg"&gt;
+
+    &lt;class
+        name="Blog"
+        table="BLOGS"&gt;
+
+        &lt;id
+            name="id"
+            column="BLOG_ID"&gt;
+
+            &lt;generator class="native"/&gt;
+
+        &lt;/id&gt;
+
+        &lt;property
+            name="name"
+            column="NAME"
+            not-null="true"
+            unique="true"/&gt;
+
+        &lt;bag
+            name="items"
+            inverse="true"
+            order-by="DATE_TIME"
+            cascade="all"&gt;
+
+            &lt;key column="BLOG_ID"/&gt;
+            &lt;one-to-many class="BlogItem"/&gt;
+
+        &lt;/bag&gt;
+
+    &lt;/class&gt;
+
+&lt;/hibernate-mapping&gt;</pre><pre class="programlisting">&lt;?xml version="1.0"?&gt;
+&lt;!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd"&gt;
+
+&lt;hibernate-mapping package="eg"&gt;
+
+    &lt;class
+        name="BlogItem"
+        table="BLOG_ITEMS"
+        dynamic-update="true"&gt;
+
+        &lt;id
+            name="id"
+            column="BLOG_ITEM_ID"&gt;
+
+            &lt;generator class="native"/&gt;
+
+        &lt;/id&gt;
+
+        &lt;property
+            name="title"
+            column="TITLE"
+            not-null="true"/&gt;
+
+        &lt;property
+            name="text"
+            column="TEXT"
+            not-null="true"/&gt;
+
+        &lt;property
+            name="datetime"
+            column="DATE_TIME"
+            not-null="true"/&gt;
+
+        &lt;many-to-one
+            name="blog"
+            column="BLOG_ID"
+            not-null="true"/&gt;
+
+    &lt;/class&gt;
+
+&lt;/hibernate-mapping&gt;</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="example-weblog.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="example-weblog.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="example-weblog-code.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">Chapter&nbsp;22.&nbsp;Example: Weblog Application&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;22.3.&nbsp;Hibernate Code</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

@@ -1,0 +1,80 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>15.9.&nbsp;Requ&ecirc;tes par identifiant naturel</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="querycriteria.html" title="Chapitre&nbsp;15.&nbsp;Requ&ecirc;tes par crit&egrave;res">
+      <link rel="prev" href="querycriteria-detachedqueries.html" title="15.8.&nbsp;Requ&ecirc;tes et sous-requ&ecirc;tes d&eacute;tach&eacute;es">
+      <link rel="next" href="querysql.html" title="Chapitre&nbsp;16.&nbsp;SQL natif">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">15.9.&nbsp;Requ&ecirc;tes par identifiant naturel</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="querycriteria-detachedqueries.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;15.&nbsp;Requ&ecirc;tes par crit&egrave;res</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="querysql.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="query-criteria-naturalid"></a>15.9.&nbsp;Requ&ecirc;tes par identifiant naturel
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Pour la plupart des requ&ecirc;tes, incluant les requ&ecirc;tes par crit&egrave;re, le cache de requ&ecirc;tes n'est pas tr&egrave;s efficace, parce que l'invalidation
+            du cache de requ&ecirc;tes arrive trop souvent. Cependant, il y a une sorte sp&eacute;ciale de requ&ecirc;te o&ugrave; nous pouvons optimiser l'algorithme
+            d'invalidation du cache : les recherches sur une clef naturelle constante. Dans certaines applications, cette sorte de requ&ecirc;te
+            se produit fr&eacute;quemment. L'API de crit&egrave;re fournit une provision sp&eacute;ciale pour ce cas d'utilisation. 
+         </p>
+         <p>D'abord vous devriez mapper la clef naturelle de votre entit&eacute; en utilisant <code class="literal">&lt;natural-id&gt;</code>, et activer l'utilisation du cache de second niveau. 
+         </p><pre class="programlisting">&lt;class name="User"&gt;
+    &lt;cache usage="read-write"/&gt;
+    &lt;id name="id"&gt;
+        &lt;generator class="increment"/&gt;
+    &lt;/id&gt;
+    &lt;natural-id&gt;
+        &lt;property name="name"/&gt;
+        &lt;property name="org"/&gt;
+    &lt;/natural-id&gt;
+    &lt;property name="password"/&gt;
+&lt;/class&gt;</pre><p>Notez que cette fonctionnalit&eacute; n'est pas pr&eacute;vue pour l'utilisation avec des entit&eacute;s avec des clefs naturelles <span class="emphasis"><em>mutables</em></span>. 
+         </p>
+         <p>Ensuite, activez le cache de requ&ecirc;te d'Hibernate. </p>
+         <p>Maintenant <code class="literal">Restrictions.naturalId()</code> nous permet de rendre l'utilisation de l'algorithme de cache plus efficace. 
+         </p><pre class="programlisting">session.createCriteria(User.class)
+    .add( Restrictions.naturalId()
+        .set("name", "gavin")
+        .set("org", "hb") 
+    ).setCacheable(true)
+    .uniqueResult();</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="querycriteria-detachedqueries.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="querycriteria.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="querysql.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">15.8.&nbsp;Requ&ecirc;tes et sous-requ&ecirc;tes d&eacute;tach&eacute;es&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;Chapitre&nbsp;16.&nbsp;SQL natif</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

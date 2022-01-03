@@ -1,0 +1,66 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>14.18.&nbsp;Row value constructor syntax</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="queryhql.html" title="Chapitre&nbsp;14.&nbsp;HQL: Langage de requ&ecirc;tage d'Hibernate">
+      <link rel="prev" href="queryhql-components.html" title="14.17.&nbsp;translator-credits">
+      <link rel="next" href="querycriteria.html" title="Chapitre&nbsp;15.&nbsp;Requ&ecirc;tes par crit&egrave;res">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">14.18.&nbsp;Row value constructor syntax</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="queryhql-components.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;14.&nbsp;HQL: Langage de requ&ecirc;tage d'Hibernate</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="querycriteria.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="queryhql-tuple"></a>14.18.&nbsp;Row value constructor syntax
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>HQL supports the use of ANSI SQL <code class="literal">row value constructor</code> syntax (sometimes called <code class="literal">tuple</code> syntax), even though the underlying database may not support that notion. Here we are generally referring to multi-valued
+            comparisons, typically associated with components. Consider an entity Person which defines a name component: 
+         </p><pre class="programlisting">from Person p where p.name.first='John' and p.name.last='Jingleheimer-Schmidt'</pre><p>That's valid syntax, although a little verbose. It be nice to make this a bit more concise and use <code class="literal">row value constructor</code> syntax: 
+         </p><pre class="programlisting">from Person p where p.name=('John', 'Jingleheimer-Schmidt')</pre><p>It can also be useful to specify this in the <code class="literal">select</code> clause: 
+         </p><pre class="programlisting">select p.name from Person p</pre><p>Another time using <code class="literal">row value constructor</code> syntax can be beneficial is when using subqueries needing to compare against multiple values: 
+         </p><pre class="programlisting">from Cat as cat
+where not ( cat.name, cat.color ) in (
+    select cat.name, cat.color from DomesticCat cat
+)</pre><p>One thing to consider when deciding if you want to use this syntax is that the query will be dependent upon the ordering of
+            the component sub-properties in the metadata. 
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="queryhql-components.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="queryhql.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="querycriteria.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">14.17.&nbsp;translator-credits&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;Chapitre&nbsp;15.&nbsp;Requ&ecirc;tes par crit&egrave;res</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

@@ -1,0 +1,135 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>8.4.&nbsp;Utiliser un composant comme identifiant</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="components.html" title="Chapitre&nbsp;8.&nbsp;Mapping de composants">
+      <link rel="prev" href="components-asmapindex.html" title="8.3.&nbsp;Utiliser les composants comme index de map">
+      <link rel="next" href="components-dynamic.html" title="8.5.&nbsp;Composant Dynamique">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">8.4.&nbsp;Utiliser un composant comme identifiant</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="components-asmapindex.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;8.&nbsp;Mapping de composants</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="components-dynamic.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="components-compositeid"></a>8.4.&nbsp;Utiliser un composant comme identifiant
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Vous pouvez utiliser un composant comme identifiant d'une entit&eacute;. Mais pour cela la classe du composant doit respecter certaines
+            r&egrave;gles. 
+         </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p>Elle doit impl&eacute;menter <code class="literal">java.io.Serializable</code>. 
+                  </p>
+               </li>
+               <li>
+                  <p>Elle doit red&eacute;finir <code class="literal">equals()</code> et <code class="literal">hashCode()</code>, de fa&ccedil;on coh&eacute;rente avec le fait qu'elle d&eacute;finit une cl&eacute; composite dans la base de donn&eacute;es. 
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p>
+                        <span class="emphasis"><em>Remarque: avec hibernate3, la seconde r&egrave;gle n'est plus absolument necessaire mais fa&icirc;tes le quand m&ecirc;me.</em></span>
+                    
+         </p>
+         <p>Vous ne pouvez pas utiliser de <code class="literal">IdentifierGenerator</code> pour g&eacute;n&eacute;rer une cl&eacute; composite, l'application devra d&eacute;finir elle m&ecirc;me ses propres identifiants. 
+         </p>
+         <p>Utiliser l'&eacute;l&eacute;ment <code class="literal">&lt;composite-id&gt;</code> (en incluant l'&eacute;l&eacute;ment <code class="literal">&lt;key-property&gt;</code>) &agrave; la place de l'habituel d&eacute;claration <code class="literal">&lt;id&gt;</code>. Par exemple la classe <code class="literal">OrderLine</code> qui d&eacute;pend de la cl&eacute; primaire (composite) de <code class="literal">Order</code>. 
+         </p><pre class="programlisting">&lt;class name="OrderLine"&gt;
+    
+    &lt;composite-id name="id" class="OrderLineId"&gt;
+        &lt;key-property name="lineId"/&gt;
+        &lt;key-property name="orderId"/&gt;
+        &lt;key-property name="customerId"/&gt;
+    &lt;/composite-id&gt;
+    
+    &lt;property name="name"/&gt;
+    
+    &lt;many-to-one name="order" class="Order"
+            insert="false" update="false"&gt;
+        &lt;column name="orderId"/&gt;
+        &lt;column name="customerId"/&gt;
+    &lt;/many-to-one&gt;
+    ....
+    
+&lt;/class&gt;</pre><p>Maintenant toutes cl&eacute;s &eacute;trang&egrave;res r&eacute;f&eacute;ren&ccedil;ant la table <code class="literal">OrderLine</code> devra aussi &ecirc;tre composite. Vous devez en tenir compte lorsque vous &eacute;crivez vos mapping d'association pour les autres classes.
+            Une association &agrave; <code class="literal">OrderLine</code> devrait &ecirc;tre mapp&eacute; de la fa&ccedil;on suivante : 
+         </p><pre class="programlisting">&lt;many-to-one name="orderLine" class="OrderLine"&gt;
+&lt;!-- the "class" attribute is optional, as usual --&gt;
+    &lt;column name="lineId"/&gt;
+    &lt;column name="orderId"/&gt;
+    &lt;column name="customerId"/&gt;
+&lt;/many-to-one&gt;</pre><p>(Remarque: l'&eacute;l&eacute;ment <code class="literal">&lt;column&gt;</code> est une alternative &agrave; l'attribut <code class="literal">column</code> que l'on utilise partout.) 
+         </p>
+         <p>Une association <code class="literal">plusieurs-&agrave;-plusieurs</code> (many-to-many) &agrave; <code class="literal">OrderLine</code> utilisera aussi une cl&eacute; &eacute;trang&egrave;re composite: 
+         </p><pre class="programlisting">&lt;set name="undeliveredOrderLines"&gt;
+    &lt;key column name="warehouseId"/&gt;
+    &lt;many-to-many class="OrderLine"&gt;
+        &lt;column name="lineId"/&gt;
+        &lt;column name="orderId"/&gt;
+        &lt;column name="customerId"/&gt;
+    &lt;/many-to-many&gt;
+&lt;/set&gt;</pre><p>La collection des <code class="literal">OrderLine</code>s dans <code class="literal">Order</code> utilisera: 
+         </p><pre class="programlisting">&lt;set name="orderLines" inverse="true"&gt;
+    &lt;key&gt;
+        &lt;column name="orderId"/&gt;
+        &lt;column name="customerId"/&gt;
+    &lt;/key&gt;
+    &lt;one-to-many class="OrderLine"/&gt;
+&lt;/set&gt;</pre><p>(L'&eacute;l&eacute;ment <code class="literal">&lt;one-to-many&gt;</code>, comme d'habitude, ne d&eacute;clare pas de colonne.) 
+         </p>
+         <p>Si <code class="literal">OrderLine</code> lui-m&ecirc;me poss&egrave;de une collection, celle-ci aura aussi une cl&eacute; composite &eacute;trang&egrave;re. 
+         </p><pre class="programlisting">&lt;class name="OrderLine"&gt;
+    ....
+    ....
+    &lt;list name="deliveryAttempts"&gt;
+        &lt;key&gt;   &lt;!-- a collection inherits the composite key type --&gt;
+            &lt;column name="lineId"/&gt;
+            &lt;column name="orderId"/&gt;
+            &lt;column name="customerId"/&gt;
+        &lt;/key&gt;
+        &lt;list-index column="attemptId" base="1"/&gt;
+        &lt;composite-element class="DeliveryAttempt"&gt;
+            ...
+        &lt;/composite-element&gt;
+    &lt;/set&gt;
+&lt;/class&gt;</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="components-asmapindex.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="components.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="components-dynamic.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">8.3.&nbsp;Utiliser les composants comme index de map&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;8.5.&nbsp;Composant Dynamique</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

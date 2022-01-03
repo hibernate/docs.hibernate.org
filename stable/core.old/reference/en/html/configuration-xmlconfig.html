@@ -1,0 +1,115 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>3.7.&nbsp;XML configuration file</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="session-configuration.html" title="Chapter&nbsp;3.&nbsp;Configuration">
+      <link rel="prev" href="configuration-namingstrategy.html" title="3.6.&nbsp;Implementing a NamingStrategy">
+      <link rel="next" href="configuration-j2ee.html" title="3.8.&nbsp;J2EE Application Server integration">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">3.7.&nbsp;XML configuration file</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="configuration-namingstrategy.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;3.&nbsp;Configuration</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="configuration-j2ee.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="configuration-xmlconfig"></a>3.7.&nbsp;XML configuration file
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+                       An alternative approach to configuration is to specify a full configuration in
+                        a file named <code class="literal">hibernate.cfg.xml</code>. This file can be used as a
+                        replacement for the <code class="literal">hibernate.properties</code> file or, if both
+                        are present, to override properties.
+                    
+         </p>
+         <p>
+                        The XML configuration file is by default expected to be in the root o
+                        your <code class="literal">CLASSPATH</code>. Here is an example:
+                    
+         </p><pre class="programlisting">&lt;?xml version='1.0' encoding='utf-8'?&gt;
+&lt;!DOCTYPE hibernate-configuration PUBLIC
+    "-//Hibernate/Hibernate Configuration DTD//EN"
+    "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd"&gt;
+
+&lt;hibernate-configuration&gt;
+
+    &lt;!-- a SessionFactory instance listed as /jndi/name --&gt;
+    &lt;session-factory
+        name="java:hibernate/SessionFactory"&gt;
+
+        &lt;!-- properties --&gt;
+        &lt;property name="connection.datasource"&gt;java:/comp/env/jdbc/MyDB&lt;/property&gt;
+        &lt;property name="dialect"&gt;org.hibernate.dialect.MySQLDialect&lt;/property&gt;
+        &lt;property name="show_sql"&gt;false&lt;/property&gt;
+        &lt;property name="transaction.factory_class"&gt;
+            org.hibernate.transaction.JTATransactionFactory
+        &lt;/property&gt;
+        &lt;property name="jta.UserTransaction"&gt;java:comp/UserTransaction&lt;/property&gt;
+
+        &lt;!-- mapping files --&gt;
+        &lt;mapping resource="org/hibernate/auction/Item.hbm.xml"/&gt;
+        &lt;mapping resource="org/hibernate/auction/Bid.hbm.xml"/&gt;
+
+        &lt;!-- cache settings --&gt;
+        &lt;class-cache class="org.hibernate.auction.Item" usage="read-write"/&gt;
+        &lt;class-cache class="org.hibernate.auction.Bid" usage="read-only"/&gt;
+        &lt;collection-cache collection="org.hibernate.auction.Item.bids" usage="read-write"/&gt;
+
+    &lt;/session-factory&gt;
+
+&lt;/hibernate-configuration&gt;</pre><p>
+                        As you can see, the advantage of this approach is the externalization of the
+                        mapping file names to configuration. The <code class="literal">hibernate.cfg.xml</code>
+                        is also more convenient once you have to tune the Hibernate cache. Note that is
+                        your choice to use either <code class="literal">hibernate.properties</code> or
+                        <code class="literal">hibernate.cfg.xml</code>, both are equivalent, except for the above
+                        mentioned benefits of using the XML syntax.
+                    
+         </p>
+         <p>
+                       With the XML configuration, starting Hibernate is then as simple as
+                   
+         </p><pre class="programlisting">SessionFactory sf = new Configuration().configure().buildSessionFactory();</pre><p>
+                       You can pick a different XML configuration file using
+                   
+         </p><pre class="programlisting">SessionFactory sf = new Configuration()
+    .configure("catdb.cfg.xml")
+    .buildSessionFactory();</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="configuration-namingstrategy.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="session-configuration.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="configuration-j2ee.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">3.6.&nbsp;Implementing a <code class="literal">NamingStrategy</code>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;3.8.&nbsp;J2EE Application Server integration</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

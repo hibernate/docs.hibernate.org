@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory">Chapter 4. Configuration</title><link rel="stylesheet" href="css/hibernate.css" type="text/css"/><meta xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" name="generator" content="DocBook XSL Stylesheets V1.74.0"/><link rel="home" href="index.html" title="Technology Compatibility Kit Reference Guide for JSR-303: Bean Validation"/><link rel="up" href="pt01.html" title="Part I. Getting Acquainted with the TCK"/><link rel="prev" href="installation.html" title="Chapter 3. Installation"/><link rel="next" href="reporting.html" title="Chapter 5. Reporting"/></head><body><p id="title"><a href="http://www.hibernate.org" class="site_href"><strong>Hibernate.org</strong></a><a href="http://hibernate.org/Documentation/DocumentationOverview" class="doc_href"><strong>Community Documentation</strong></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="installation.html"><strong>Prev</strong></a></li><li class="next"><a accesskey="n" href="reporting.html"><strong>Next</strong></a></li></ul><div class="chapter" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="configuration"/>Chapter 4. Configuration</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="configuration.html#tck-harness-properties">4.1. TCK Harness Properties</a></span></dt><dt><span class="section"><a href="configuration.html#d0e515">4.2. Configuring TestNG to execute the TCK</a></span></dt><dt><span class="section"><a href="configuration.html#d0e535">4.3. Configuring your build environment to execute the TCK</a></span></dt></dl></div><p>This chapter lays out how to configure the TCK Harness by specifying
+  the SPI implementation classes, defining the target container connection
+  information, and various other switches. You then learn how to setup a TCK
+  runner project that executes the the TCK test suite, putting these settings
+  into practice. Finally, a detailed account of how the JBoss Test Harness
+  negotiates the execution of the tests in the container is given.</p><p>This chapter does not discuss in detail how to use the TCK in
+  standalone mode. The JBoss Test Harness guide provides more on running in
+  standalone mode.</p><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="tck-harness-properties"/>4.1. TCK Harness Properties</h2></div></div></div><p>The JBoss Test Harness allows the test suite to be launched in a
+    pluggable fashion. In order to execute the TCK, the JBoss Test Harness
+    must be configured by specifying implementations of the test launcher and
+    container APIs.</p><p>System properties and/or the resource
+    <code class="code">META-INF/jboss-test-harness.properties</code>, a Java properties
+    file, are used to configure the JBoss Test Harness. You can read more
+    about configuring the JBoss Test Harness in <a class="xref" href="test-harness-configuration.html#test-harness-properties" title="9.1. JBoss Test Harness Properties">Section 9.1, “JBoss Test Harness Properties”</a>.</p><p>You should set the following properties:</p><div class="table"><a id="d0e460"/><p class="title"><b>Table 4.1. Required JBoss Test Harness Configuration Properties</b></p><div class="table-contents"><table summary="Required JBoss Test Harness Configuration Properties" border="1"><colgroup><col/><col/></colgroup><thead><tr><th>Property = Required/Example Value</th><th>Description</th></tr></thead><tbody><tr><td><code class="literal">org.jboss.testharness.libraryDirectory=/path/to/extra/libraries
+            </code></td><td>Directory containing extra JARs you want placed in artifact
+            library directory.</td></tr><tr><td><code class="literal">org.jboss.testharness.standalone=false</code></td><td>You must run the tests in-container to pass the TCK</td></tr><tr><td><code class="literal">org.jboss.testharness.runIntegrationTests=true
+            </code></td><td>You must run the integration tests to pass the TCK</td></tr><tr><td><code class="literal">org.jboss.testharness.spi.Containers=com.acme.AcmeContainer
+            </code></td><td>The container implementation for deploying and executing
+            in-container tests. See <a class="xref" href="configuration.html#deployment-api-contributions" title="Note">Note</a></td></tr><tr><td><code class="literal">org.jboss.testharness.api.TestLauncher=org.jboss.testharness.impl.runner.servlet.ServletTestLauncher
+            </code></td><td>You should use the <code class="literal">ServletTestLauncher</code>
+            for Java EE 6 and Java EE 6 Web Profile.</td></tr></tbody></table></div></div><br class="table-break"/><p>To run the full TCK you must additionally implement
+    <code class="literal">org.jboss.testharness.spi.Containers</code>, which handles
+    deploying the test artifact to the container. An implementations of this
+    API is already available for JBoss AS 5.1. Therefore, you only need to
+    implement this if you wish to use another container.</p><div xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="note"><a id="deployment-api-contributions"/><h2>Note</h2><p>Red Hat Middleware LLC encourages Bean Validation implementators
+      to contribute JBoss Test Harness Deployment API implementations for
+      other containers under the ASL license. Please contact the Bean
+      Validation TCK lead.</p></div></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="d0e515"/>4.2. Configuring TestNG to execute the TCK</h2></div></div></div><p>The JBoss Test Harness is built atop TestNG, and it's TestNG that is
+    responsible for selecting the tests to execute, the order of execution,
+    and reporting the results. Detailed TestNG documentation can be found at
+    <a class="ulink" href="http://testng.org/doc/documentation-main.html">testng.org</a>.</p><p>The <code class="literal">tck-tests.xml</code> artifact provided in the TCK
+    distribution must be run by TestNG 5.9 (described by the TestNG
+    documenation as "with a <code class="literal">testng.xml</code> file") unmodified
+    for an implementation to pass the TCK. This file also allows tests to be
+    excluded from a run:</p><pre class="programlisting">&lt;suite name="JSR-303 TCK" verbose="2"&gt;
+   &lt;test name="JSR-303 TCK"&gt;
+      ...
+      &lt;classes&gt;
+         &lt;class name="org.hibernate.jsr303.tck.tests.bootstrap.ValidationProviderTest"&gt;
+            &lt;methods&gt;
+               &lt;exclude name="testFirstMatchingValidationProviderResolverIsReturned"/&gt;
+            &lt;/methods&gt;
+         &lt;/class&gt;
+      &lt;/classes&gt;
+      ...
+   &lt;/test&gt;
+&lt;/suite&gt;</pre><p>TestNG provides extensive reporting information. Depending on the
+    build tool or IDE you use, the reporting will take a different format.
+    Please consult the TestNG documentation and the tool documentation for
+    more information.</p></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="d0e535"/>4.3. Configuring your build environment to execute the TCK</h2></div></div></div><p>It's beyond the scope of this guide to describe in how to set up
+    your build environment to run the TCK. The JBoss Test Harness guide
+    describes how Bean Validation uses Maven 2 to execute the Bean Validation
+    TCK. See <a class="xref" href="executing-test-harness.html#test-suite-runner" title="10.1. Building a test suite runner using Maven 2">Section 10.1, “Building a test suite runner using Maven 2”</a>. The TestNG documentation
+    provides extensive information on launching TestNG using the Java, Ant,
+    Eclipse or IntellJ IDEA.</p></div></div><HR xmlns=""/><a xmlns="" href=""><p xmlns="http://www.w3.org/1999/xhtml" class="copyright">Copyright © 2009 - 2011 Red Hat, Inc.</p></a><ul class="docnav"><li class="previous"><a accesskey="p" href="installation.html"><strong>Prev</strong>Chapter 3. Installation</a></li><li class="up"><a accesskey="u" href="#"><strong>Top of page</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Front page</strong></a></li><li class="next"><a accesskey="n" href="reporting.html"><strong>Next</strong>Chapter 5. Reporting</a></li></ul></body></html>

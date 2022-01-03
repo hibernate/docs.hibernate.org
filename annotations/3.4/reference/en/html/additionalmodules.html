@@ -1,0 +1,59 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>Chapter&nbsp;4.&nbsp;Additional modules</title><link rel="stylesheet" href="../shared/css/html.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.65.1"><link rel="home" href="index.html" title="Hibernate Annotations"><link rel="up" href="index.html" title="Hibernate Annotations"><link rel="previous" href="xml-overriding.html" title="Chapter&nbsp;Overriding metadata through XML.&nbsp;Overriding metadata through XML"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter&nbsp;4.&nbsp;Additional modules</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="xml-overriding.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;</td></tr></table><hr></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="additionalmodules"></a>Chapter&nbsp;4.&nbsp;Additional modules</h2></div></div><div></div></div><p>Hibernate Annotations mainly focus on persistence metadata. The
+  project also have a nice integration with two Hibernate modules.</p><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e3473"></a>4.1.&nbsp;Hibernate Validator</h2></div></div><div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e3476"></a>4.1.1.&nbsp;Description</h3></div></div><div></div></div><p>Annotations are a very convenient and elegant way to specify
+      invariant constraints for a domain model. You can, for example, express
+      that a property should never be null, that the account balance should be
+      strictly positive, etc. These domain model constraints are declared in
+      the bean itself by annotating its properties. A validator can then read
+      them and check for constraint violations. The validation mechanism can
+      be executed in different layers in your application without having to
+      duplicate any of these rules (presentation layer, data access layer).
+      Following the DRY principle, Hibernate Validator has been designed for
+      that purpose.</p><p>Hibernate Validator works at two levels. First, it is able to
+      check in-memory instances of a class for constraint violations. Second,
+      it can apply the constraints to the Hibernate metamodel and incorporate
+      them into the generated database schema.</p><p>Each constraint annotation is associated to a validator
+      implementation responsible for checking the constraint on the entity
+      instance. A validator can also (optionally) apply the constraint to the
+      Hibernate metamodel, allowing Hibernate to generate DDL that expresses
+      the constraint. With the appropriate event listener, you can execute the
+      checking operation on inserts and updates done by Hibernate. Hibernate
+      Validator is not limited to use with Hibernate. You can easily use it
+      anywhere in your application.</p><p>When checking instances at runtime, Hibernate Validator returns
+      information about constraint violations in an array of
+      <tt class="classname">InvalidValue</tt> s. Among other information, the
+      <tt class="classname">InvalidValue</tt> contains an error description
+      message that can embed the parameter values bundle with the annotation
+      (eg. length limit), and message strings that may be externalized to a
+      <tt class="classname">ResourceBundle</tt> .</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e3496"></a>4.1.2.&nbsp;Integration with Hibernate Annotations</h3></div></div><div></div></div><p>If Hibernate Validator
+      (<tt class="filename">hibernate-validator.jar</tt>) is available in the
+      classpath, Hibernate Annotations will integrate in two ways:</p><div class="itemizedlist"><ul type="disc"><li><p>Constraints will be applied to the Data Definition Language.
+          In other words, the database schema will reflect the constraints
+          (provided that you use the hbm2ddl tool).</p></li><li><p>Before an entity change is applied to the database (insert or
+          update), the entity is validated. Validation errors, if any, will be
+          carried over through an
+          <tt class="classname">InvalidStateException</tt>.</p></li></ul></div><p>For entities free of validation rules, the runtime performance
+      cost is null.</p><p>To disable constraint propagation to DDL, set up
+      <tt class="literal">hibernate.validator.apply_to_ddl</tt> to false in the
+      configuration file. Such a need is very uncommon and not
+      recommended.</p><p>To disable pre-entity change validation, set up
+      <tt class="literal">hibernate.validator.autoregister_listeners</tt> to false
+      in the configuration file. Such a need is very uncommon and not
+      recommended.</p><p>Check the Hibernate Validator reference documentation for more
+      information.</p></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e3528"></a>4.2.&nbsp;Hibernate Search</h2></div></div><div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e3531"></a>4.2.1.&nbsp;Description</h3></div></div><div></div></div><p>Full text search engines like <span class="productname">Apache
+      Lucene</span>&#8482; are a very powerful technology to bring free
+      text/efficient queries to applications. If suffers several mismatches
+      when dealing with a object domain model (keeping the index up to date,
+      mismatch between the index structure and the domain model, querying
+      mismatch...) Hibernate Search indexes your domain model thanks to a few
+      annotations, takes care of the database / index synchronization and
+      brings you back regular managed objects from free text queries.
+      Hibernate Search is using <a href="http://lucene.apache.org" target="_top">Apache
+      Lucene</a> under the cover.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e3542"></a>4.2.2.&nbsp;Integration with Hibernate Annotations</h3></div></div><div></div></div><p>Hibernate Search integrates with Hibernate Annotations
+      transparently provided that hibernate-search.jar is present in the
+      classpath. If you do not wish to automatically register Hibernate Search
+      event listeners, you can set
+      <tt class="literal">hibernate.search.autoregister_listeners</tt> to false.
+      Such a need is very uncommon and not recommended.</p><p>Check the Hibernate Search reference documentation for more
+      information.</p></div></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="xml-overriding.html">Prev</a>&nbsp;</td><td width="20%" align="center"><a accesskey="u" href="index.html">Up</a></td><td width="40%" align="right">&nbsp;</td></tr><tr><td width="40%" align="left" valign="top">Chapter&nbsp;Overriding metadata through XML.&nbsp;Overriding metadata through XML&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;</td></tr></table></div></body></html>

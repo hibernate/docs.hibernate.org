@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Chapter 9. Spatial</title><!-- HibernateDoc.Meta --><meta name="description" content="Hibernate Search, full text search for your entities - Reference Documentation" /><meta name="keywords" content="hibernate, search, hibernate search, full text, lucene, elasticsearch" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://docs.jboss.org/hibernate/stable/search/reference/en-US/html_single/" /><!-- /HibernateDoc.Meta --><link rel="stylesheet" type="text/css" href="css/hibernate.css"/><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"/><link rel="home" href="index.html" title="Hibernate Search"/><link rel="up" href="index.html" title="Hibernate Search"/><link rel="prev" href="ch08.html" title="Chapter 8. Monitoring"/><link rel="next" href="ch10.html" title="Chapter 10. Advanced features"/><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/></head><body><p id="title"><a href="http://www.hibernate.org" class="site_href"><strong>Hibernate.org</strong></a><a href="http://hibernate.org/Documentation/DocumentationOverview" class="doc_href"><strong>Community Documentation</strong></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="ch08.html"><strong>Prev</strong></a></li><li class="next"><a accesskey="n" href="ch10.html"><strong>Next</strong></a></li></ul><div class="chapter" title="Chapter 9. Spatial"><div class="titlepage"><div><div><h2 class="title"><a id="spatial"/>Chapter 9. Spatial</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="ch09.html#spatial-indexing">9.1. Enable indexing of Spatial Coordinates</a></span></dt><dd><dl><dt><span class="section"><a href="ch09.html#spatial-indexing-range">9.1.1. Indexing coordinates for range queries</a></span></dt><dt><span class="section"><a href="ch09.html#spatial-indexing-spatialHash">9.1.2. Indexing coordinates in a grid with spatial hashes</a></span></dt><dt><span class="section"><a href="ch09.html#spatial-coordinatesinterface">9.1.3. Implementing the Coordinates interface</a></span></dt></dl></dd><dt><span class="section"><a href="ch09.html#spatial-queries">9.2. Performing Spatial Queries</a></span></dt><dd><dl><dt><span class="section"><a href="ch09.html#spatial-queries-distance">9.2.1. Returning distance to query point in the search results</a></span></dt></dl></dd><dt><span class="section"><a href="ch09.html#spatial-multiplecoordinates">9.3. Multiple Coordinate pairs</a></span></dt><dt><span class="section"><a href="ch09.html#spatial-behind-curtain">9.4. Insight: implementation details of spatial hashes indexing</a></span></dt><dd><dl><dt><span class="section"><a href="ch09.html#_at_indexing_level">9.4.1. At indexing level</a></span></dt><dt><span class="section"><a href="ch09.html#_at_search_level">9.4.2. At search level</a></span></dt></dl></dd></dl></div><p>With the spatial extensions you can combine full-text queries with distance restrictions, filter results based on distances
+or sort results on such a distance criteria.</p><p>The spatial support of Hibernate Search has the following goals:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">Enable spatial search on entities: find entities within x km from a given location (latitude, longitude) on Earth</li><li class="listitem">Provide an easy way to enable spatial indexing via expressive annotations</li><li class="listitem">Provide a simple way for querying</li><li class="listitem">Hide geographical complexity</li></ul></div><p>For example, you might search for restaurants somewhere in a 2 km radius around your office.</p><p>In order to use the spatial extensions for an indexed entity, you need to add the <code class="literal">@Spatial</code>
+annotation (<code class="literal">org.hibernate.search.annotations.Spatial</code>) and specify one or more sets of coordinates.</p><div class="section" title="9.1. Enable indexing of Spatial Coordinates"><div class="titlepage"><div><div><h2 class="title"><a id="spatial-indexing"/>9.1. Enable indexing of Spatial Coordinates</h2></div></div></div><p>There are different techniques to index point coordinates. Hibernate Search Spatial offers a choice between two strategies:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">index as numbers</li><li class="listitem">index as labeled spatial hashes</li></ul></div><p>We will now describe both methods, so you can make a suitable choice. You can pick a different strategy for each set of
+coordinates. The strategy is selected by specifying the <code class="literal">spatialMode</code> attribute of the <code class="literal">@Spatial</code> annotation.</p><div class="section" title="9.1.1. Indexing coordinates for range queries"><div class="titlepage"><div><div><h3 class="title"><a id="spatial-indexing-range"/>9.1.1. Indexing coordinates for range queries</h3></div></div></div><p>When setting the <code class="literal">@Spatial.spatialMode</code> attribute to <code class="literal">SpatialMode.RANGE</code> (which is the default)
+coordinates are indexed as numeric fields, so that range queries can be performed to narrow down the
+initial area of interest.</p><p>Pros:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">Is quick on small data sets (&lt; 100k entities)</li><li class="listitem">Is very simple: straightforward to debug/analyze</li><li class="listitem">Impact on index size is moderate</li></ul></div><p>Cons:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">Poor performance on large data sets</li><li class="listitem">Poor performance if your data set is distributed across the whole world (for example when
+indexing points of interest in the United States, in Europe and in Asia, large areas collide because
+they share the same latitude. The latitude range query returns large amounts of data that need to be
+cross checked with those returned by the longitude range).</li></ul></div><p>To index your entities for range querying you have to:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">add the <code class="literal">@Spatial</code> annotation on your entity</li><li class="listitem">add the <code class="literal">@Latitude</code> and <code class="literal">@Longitude</code> annotations on your properties representing the coordinates;
+these must be of type <code class="literal">Double</code></li></ul></div><div class="example"><a id="d0e7266"/><p class="title"><strong>Example 9.1. Sample Spatial indexing: Hotel class</strong></p><div class="example-contents"><pre><code class="language-java">import org.hibernate.search.annotations.*;
+
+@Entity
+@Indexed
+@Spatial
+public class Hotel {
+
+  @Latitude
+  Double latitude
+
+  @Longitude
+  Double longitude
+
+  // ...</code></pre></div></div><br class="example-break"/></div><div class="section" title="9.1.2. Indexing coordinates in a grid with spatial hashes"><div class="titlepage"><div><div><h3 class="title"><a id="spatial-indexing-spatialHash"/>9.1.2. Indexing coordinates in a grid with spatial hashes</h3></div></div></div><p>When setting <code class="literal">@Spatial.spatialMode</code> to <code class="literal">SpatialMode.HASH</code> the coordinates are encoded in several fields
+representing different zoom levels. Each box for each level is labeled so coordinates are assigned
+matching labels for each zoom level. This results in a grid encoding of labels called <code class="literal">spatial
+hashes</code>.</p><p>Pros :</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">Good performance even with large data sets</li><li class="listitem">World wide data distribution independent</li></ul></div><p>Cons :</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">Index size is larger: need to encode multiple labels per pair of coordinates</li></ul></div><p>To index your entities you have to:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">add the <code class="literal">@Spatial</code> annotation on the entity with the <code class="literal">SpatialMode</code> set to GRID :
+@Spatial(spatialMode = SpatialMode.HASH)</li><li class="listitem">add the <code class="literal">@Latitude</code> and <code class="literal">@Longitude</code> annotations on the properties representing your coordinates;
+these must be of type <code class="literal">Double</code></li></ul></div><div class="example"><a id="d0e7323"/><p class="title"><strong>Example 9.2. Indexing coordinates in a grid using spatial hashes</strong></p><div class="example-contents"><pre><code class="language-java">@Spatial(spatialMode = SpatialMode.HASH)
+@Indexed
+@Entity
+public class Hotel {
+
+  @Latitude
+  Double latitude;
+
+  @Longitude
+  Double longitude;
+
+  // ...</code></pre></div></div><br class="example-break"/></div><div class="section" title="9.1.3. Implementing the Coordinates interface"><div class="titlepage"><div><div><h3 class="title"><a id="spatial-coordinatesinterface"/>9.1.3. Implementing the Coordinates interface</h3></div></div></div><p>Instead of using the <code class="literal">@Latitude</code> and <code class="literal">@Longitude</code> annotations you can choose to implement the
+<code class="literal">org.hibernate.search.spatial.Coordinates</code> interface.</p><div class="example"><a id="d0e7342"/><p class="title"><strong>Example 9.3. Implementing the Coordinates interface</strong></p><div class="example-contents"><pre><code class="language-java">import org.hibernate.search.annotations.*;
+import org.hibernate.search.spatial.Coordinates;
+
+@Entity
+@Indexed
+@Spatial
+public class Song implements Coordinates {
+
+  @Id long id;
+  double latitude;
+  double longitude;
+  // ...
+
+  @Override
+  Double getLatitude() {
+    return latitude;
+  }
+
+  @Override
+  Double getLongitude() {
+    return longitude;
+  }
+
+  // ...</code></pre></div></div><br class="example-break"/><p>As we will see in the section <a class="xref" href="ch09.html#spatial-multiplecoordinates" title="9.3. Multiple Coordinate pairs">Section 9.3, “Multiple Coordinate pairs”</a>, an entity can have multiple <code class="literal">@Spatial</code> annotations;
+when having the entity implement <code class="literal">Coordinates</code>, the implemented methods refer to the default <code class="literal">@Spatial</code> annotation with
+the default pair of coordinates.</p><div class="tip" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Tip</h2><p>The default (field) name in case <code class="literal">@Spatial</code> is placed on the entity level is <code class="literal">org.hibernate.search.annotations.Spatial.COORDINATES_DEFAULT_FIELD</code>.</p></div><p>An alternative is to use properties implementing the <code class="literal">Coordinates</code> interface; this way you can have
+multiple <code class="literal">Spatial</code> instances:</p><div class="example"><a id="d0e7377"/><p class="title"><strong>Example 9.4. Using attributes of type Coordinates</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@Indexed
+public class Event {
+  @Id
+  Integer id;
+
+  @Field(store = Store.YES)
+  String name;
+
+  double latitude;
+  double longitude;
+
+  @Spatial(spatialMode = SpatialMode.HASH)
+  public Coordinates getLocation() {
+    return new Coordinates() {
+      @Override
+      public Double getLatitude() {
+        return latitude;
+      }
+
+      @Override
+      public Double getLongitude() {
+        return longitude;
+      }
+    };
+  }
+
+// ...</code></pre></div></div><br class="example-break"/><p>When using this form the <code class="literal">@Spatial.name</code> automatically defaults to the property name. In the above case to <code class="literal">location</code>.</p></div></div><div class="section" title="9.2. Performing Spatial Queries"><div class="titlepage"><div><div><h2 class="title"><a id="spatial-queries"/>9.2. Performing Spatial Queries</h2></div></div></div><p>You can use the Hibernate Search query DSL to build a query to search around a pair of coordinates (latitude, longitude)
+or around a bean implementing the <code class="literal">Coordinates</code> interface.</p><p>As with any full-text query, the spatial query creation flow looks like:</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem">retrieve a <code class="literal">QueryBuilder</code> from the <code class="literal">SearchFactory</code></li><li class="listitem">use the DSL to build a spatial query, defining search center and radius</li><li class="listitem">optionally combine the resulting <code class="literal">Query</code> with other filters</li><li class="listitem">call the <code class="literal">createFullTextQuery()</code> and use the resulting query like any standard Hibernate or JPA query</li></ol></div><div class="example"><a id="spatial-example-firstquery"/><p class="title"><strong>Example 9.5. Search for an Hotel by distance</strong></p><div class="example-contents"><pre><code class="language-java">QueryBuilder builder = fullTextSession.getSearchFactory()
+  .buildQueryBuilder().forEntity( Hotel.class ).get();
+
+org.apache.lucene.search.Query luceneQuery = builder
+  .spatial()
+  .within( radius, Unit.KM )
+    .ofLatitude( centerLatitude )
+    .andLongitude( centerLongitude )
+  .createQuery();
+
+org.hibernate.Query hibQuery = fullTextSession
+  .createFullTextQuery( luceneQuery, Hotel.class );
+List results = hibQuery.list();</code></pre></div></div><br class="example-break"/><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>In the above example we did not explicitly specify the field name to use. The default coordinates field name was used
+implicitly. To target an alternative pair of coordinates at query time, we need to specify the field name as well.
+See <a class="xref" href="ch09.html#spatial-multiplecoordinates" title="9.3. Multiple Coordinate pairs">Section 9.3, “Multiple Coordinate pairs”</a>.</p></div><p>A fully working example can be found in the test-suite of the <a class="link" href="https://github.com/hibernate/hibernate-search">source code</a>.
+Refer to <code class="literal">SpatialIndexingTest.testSpatialAnnotationOnClassLevel()</code> and its corresponding <code class="literal">Hotel</code> test class.</p><p>Alternatively to passing separate latitude and longitude values, you can also pass an instance implementing the
+<code class="literal">Coordinates</code> interface:</p><div class="example"><a id="d0e7450"/><p class="title"><strong>Example 9.6. DSL example with Coordinates</strong></p><div class="example-contents"><pre><code class="language-java">Coordinates coordinates = Point.fromDegrees(24d, 31.5d);
+Query query = builder
+  .spatial()
+    .within( 51, Unit.KM )
+      .ofCoordinates( coordinates )
+  .createQuery();
+
+List results = fullTextSession.createFullTextQuery( query, POI.class ).list();</code></pre></div></div><br class="example-break"/><div class="section" title="9.2.1. Returning distance to query point in the search results"><div class="titlepage"><div><div><h3 class="title"><a id="spatial-queries-distance"/>9.2.1. Returning distance to query point in the search results</h3></div></div></div><div class="section" title="9.2.1.1. Returning distance to the center in the results"><div class="titlepage"><div><div><h4 class="title"><a id="spatial-distance-projection"/>9.2.1.1. Returning distance to the center in the results</h4></div></div></div><p>To retrieve the actual distance values you need to use projection (see <a class="xref" href="ch05.html#projections" title="5.1.3.5. Projection">Section 5.1.3.5, “Projection”</a>):</p><div class="example"><a id="d0e7465"/><p class="title"><strong>Example 9.7. Distance projection example</strong></p><div class="example-contents"><pre><code class="language-java">double centerLatitude = 24.0d;
+double centerLongitude= 32.0d;
+
+QueryBuilder builder = fullTextSession.getSearchFactory()
+  .buildQueryBuilder().forEntity(POI.class).get();
+org.apache.lucene.search.Query luceneQuery = builder
+  .spatial()
+     .onField("location")
+     .within(100, Unit.KM)
+       .ofLatitude(centerLatitude)
+       .andLongitude(centerLongitude)
+  .createQuery();
+
+FullTextQuery hibQuery = fullTextSession.createFullTextQuery(luceneQuery, POI.class);
+hibQuery.setProjection(FullTextQuery.SPATIAL_DISTANCE, FullTextQuery.THIS);
+hibQuery.setSpatialParameters(centerLatitude, centerLongitude, "location");
+List results = hibQuery.list();</code></pre></div></div><br class="example-break"/><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">Use <code class="literal">FullTextQuery.setProjection</code> with <code class="literal">FullTextQuery.SPATIAL_DISTANCE</code> as one of the projected fields.</li><li class="listitem">Call <code class="literal">FullTextQuery.setSpatialParameters</code> with the latitude, longitude and the name of the
+spatial field used to build the spatial query. Note that using coordinates different than the
+center used for the query will have unexpected results.</li></ul></div><div class="tip" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Tip</h2><p>The default (field) name in case <code class="literal">@Spatial</code> is placed on the entity level is <code class="literal">org.hibernate.search.annotations.Spatial.COORDINATES_DEFAULT_FIELD</code>.</p></div><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Distance projection and null values</h2><p>Using distance projection on non <code class="literal">@Spatial</code> enabled entities and/or with a non spatial Query will have
+unexpected results as entities not spatially indexed and/or having <code class="literal">null</code> values for latitude or
+longitude will be considered to be at (0,0)/(lat,0)/(0,long).</p><p>Using distance projection with a spatial query on spatially indexed entities having, eventually,
+<code class="literal">null</code> values for latitude and/or longitude is safe as they will not be found by the spatial query
+and won’t have distance calculated.</p></div></div><div class="section" title="9.2.1.2. Sorting by distance"><div class="titlepage"><div><div><h4 class="title"><a id="spatial-distance-sort"/>9.2.1.2. Sorting by distance</h4></div></div></div><p>To sort the results by distance to the center of the search you will have to build a <code class="literal">Sort</code> instance
+using a <code class="literal">DistanceSortField</code>:</p><div class="example"><a id="d0e7522"/><p class="title"><strong>Example 9.8. Distance sort example</strong></p><div class="example-contents"><pre><code class="language-java">double centerLatitude = 24.0d;
+double centerLongitude = 32.0d;
+
+QueryBuilder builder = fullTextSession.getSearchFactory()
+   .buildQueryBuilder().forEntity( POI.class ).get();
+org.apache.lucene.search.Query luceneQuery = builder
+  .spatial()
+    .onField("location")
+      .within(100, Unit.KM)
+      .ofLatitude(centerLatitude)
+      .andLongitude(centerLongitude)
+  .createQuery();
+
+FullTextQuery hibQuery = fullTextSession.createFullTextQuery(luceneQuery, POI.class);
+Sort distanceSort = new Sort(
+	new DistanceSortField(centerLatitude, centerLongitude, "location"));
+hibQuery.setSort(distanceSort);</code></pre></div></div><br class="example-break"/><p>The <code class="literal">DistanceSortField</code> must be constructed using the same coordinates on the same spatial field used
+to build the spatial query otherwise the sorting will occur with another center than the query. This
+repetition is needed to allow you to define Queries with any tool.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Sorting and null values</h2><p>Using distance sort on non <code class="literal">@Spatial</code> enabled entities and/or with a non spatial Query will have also
+unexpected results as entities non spatially indexed and/or with null values for latitude or
+longitude will be considered to be at (0,0)/(lat,0)/(0,long)</p><p>Using distance sort with a spatial query on spatially indexed entities having, potentially, <code class="literal">null</code>
+values for latitude and/or longitude is safe as they will not be found by the spatial query and so
+won’t be sorted</p></div></div></div></div><div class="section" title="9.3. Multiple Coordinate pairs"><div class="titlepage"><div><div><h2 class="title"><a id="spatial-multiplecoordinates"/>9.3. Multiple Coordinate pairs</h2></div></div></div><p>You can associate multiple pairs of coordinates to the same entity, as long as each pair is
+uniquely identified by using a different name. This is achieved by stacking multiple <code class="literal">@Spatial</code>
+annotations within a single <code class="literal">@Spatials</code> annotation and specifying the <code class="literal">name</code> attribute on the individual <code class="literal">@Spatial</code>
+annotations.</p><div class="example"><a id="d0e7562"/><p class="title"><strong>Example 9.9. Multiple sets of coordinates</strong></p><div class="example-contents"><pre><code class="language-java">import org.hibernate.search.annotations.*;
+
+@Entity
+@Indexed
+@Spatials({
+  @Spatial,
+  @Spatial(name="work",  spatialMode = SpatialMode.HASH)
+})
+public class UserEx {
+
+  @Id
+  Integer id;
+
+  @Latitude
+  Double homeLatitude;
+
+  @Longitude
+  Double homeLongitude;
+
+  @Latitude(of="work")
+  Double workLatitude;
+
+  @Longitude(of="work")
+  Double workLongitude;</code></pre></div></div><br class="example-break"/><p>To target an alternative pair of coordinates at query time, we need to specify the pair by name using <code class="literal">onField(String)</code>:</p><div class="example"><a id="d0e7572"/><p class="title"><strong>Example 9.10. Querying on non-default coordinate set</strong></p><div class="example-contents"><pre><code class="language-java">QueryBuilder builder = fullTextSession.getSearchFactory()
+  .buildQueryBuilder().forEntity( UserEx.class ).get();
+
+org.apache.lucene.search.Query luceneQuery = builder
+  .spatial()
+  .onField( "work" )
+  .within( radius, Unit.KM )
+    .ofLatitude( centerLatitude )
+    .andLongitude( centerLongitude )
+  .createQuery();
+
+org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery,
+   Hotel.class );
+List results = hibQuery.list();</code></pre></div></div><br class="example-break"/></div><div class="section" title="9.4. Insight: implementation details of spatial hashes indexing"><div class="titlepage"><div><div><h2 class="title"><a id="spatial-behind-curtain"/>9.4. Insight: implementation details of spatial hashes indexing</h2></div></div></div><p>The following chapter is meant to provide a technical insight in spatial hash (grid) indexing. It discusses how
+coordinates are mapped to the index and how queries are implemented.</p><div class="section" title="9.4.1. At indexing level"><div class="titlepage"><div><div><h3 class="title"><a id="_at_indexing_level"/>9.4.1. At indexing level</h3></div></div></div><p>When Hibernate Search indexes an entity annotated with <code class="literal">@Spatial</code>, it instantiates a
+<code class="literal">SpatialFieldBridge</code> to transform the latitude and longitude fields accessed via the <code class="literal">Coordinates</code>
+interface to the multiple index fields stored in the Lucene index.</p><p>Principle of the spatial index: the spatial index used in Hibernate Search is a
+<a class="link" href="http://en.wikipedia.org/wiki/Grid_(spatial_index)#Grid-based_spatial_indexing">grid based spatial index</a> where grid ids
+are hashes derived from latitude and longitude.</p><p>To make computations easier the latitude and longitude field values will be
+projected into a flat coordinate system with the help of a <a class="link" href="http://en.wikipedia.org/wiki/Sinusoidal_projection">sinusoidal projection</a>.
+Origin value space is :</p><p>[-90 → +90],]-180 →; 180]</p><p>for latitude,longitude coordinates and projected space is:</p><p>]-pi → +pi],[-pi/2 → +pi/2]</p><p>for Cartesian x,y coordinates (beware of fields order inversion: x is longitude and y is latitude).</p><p>The index is divided into n levels labeled from 0 to n-1.</p><p>At the level 0 the projected space is the whole Earth. At the level 1 the projected space is divided
+into 4 rectangles (called boxes as in bounding box):</p><p>[-pi,-pi/2]→[0,0], [-pi,0]→[0,+pi/2], [0,-pi/2]→[+pi,0] and [0,0]→[+pi,+pi/2]</p><p>At level n+1 each box of level n is divided into 4 new boxes and so on. The numbers of boxes at a
+given level is 4^n.</p><p>Each box is given an id, in this format: [Box index on the X axis]|[Box index on the Y axis]. To
+calculate the index of a box on an axis we divide the axis range in 2^n slots and find the slot the
+box belongs to. At the n level the indexes on an axis are from -(2^n)/2 to (2^n)/2. For instance,
+the 5th level has 4^5 = 1024 boxes with 32 indexes on each axis (32x32 is 1024) and the box of Id
+"0|8" is covering the [0,8/32*pi/2]→[1/32*pi,9/32*pi/2] rectangle is projected space.</p><p>Beware! The boxes are rectangles in projected space but the related area on Earth is not rectangular!</p><p>Now that we have all these boxes at all these levels, we index points "into" them.</p><p>For a point (lat,long) we calculate its projection (x,y) and then we calculate for each level of the
+spatial index, the ids of the boxes it belongs to.</p><p>At each level the point is in one and only one box. For points on the edges the box are considered
+exclusive n the left side and inclusive on the right i-e ]start,end] (the points are normalized
+before projection to [-90,+90],]-180,+180]).</p><p>We store in the Lucene document corresponding to the entity to index one field for each level of the
+spatial hash grid. The field is named: <span class="emphasis"><em><span class="spatial index fields name">HSSI</span></em></span>[n]. [spatial index fields
+name] is given either by the parameter at class level annotation or derived from the name of the
+spatial annotated method of the entity, HSSI stands for Hibernate Search Spatial Index and n is the
+level of the spatial hashes grid.</p><p>We also store the latitude and longitude as a numeric field under [spatial index fields
+name]_HSSI_Latitude and [spatial index fields name]_HSSI_Longitude fields. They will be used to
+filter precisely results by distance in the second stage of the search.</p></div><div class="section" title="9.4.2. At search level"><div class="titlepage"><div><div><h3 class="title"><a id="_at_search_level"/>9.4.2. At search level</h3></div></div></div><p>Now that we have all these fields, what are they used for?</p><p>When you ask for a spatial search by providing a search discus (center+radius) we will calculate the
+box ids that do cover the search discus in the projected space, fetch all the documents that
+belong to these boxes (thus narrowing the number of documents for which we will have to calculate
+distance to the center) and then filter this subset with a real distance calculation. This is called
+two level spatial filtering.</p><div class="section" title="9.4.2.1. Step 1: Compute the best spatial hashes grid level for the search discus"><div class="titlepage"><div><div><h4 class="title"><a id="_step_1_compute_the_best_spatial_hashes_grid_level_for_the_search_discus"/>9.4.2.1. Step 1: Compute the best spatial hashes grid level for the search discus</h4></div></div></div><p>For a given search radius there is an optimal hash grid level where the number of boxes to
+retrieve shall be minimal without bringing back to many documents (level 0 has only 1 box but
+retrieve all documents). The optimal hash grid level is the maximum level where the width of each
+box is larger than the search area. Near the equator line where projection deformation is minimal,
+this will lead to the retrieval of at most 4 boxes. Towards the poles where the deformation is more
+significant, it might need to examine more boxes but as the sinusoidal projection has a simple
+Tissot’s indicatrix (see <a class="link" href="http://en.wikipedia.org/wiki/Sinusoidal_projection">Sinusoidal projection</a>) in populated areas,
+the overhead is minimal.</p></div><div class="section" title="9.4.2.2. Step 2: Compute ids of the corresponding covering boxes at that level"><div class="titlepage"><div><div><h4 class="title"><a id="_step_2_compute_ids_of_the_corresponding_covering_boxes_at_that_level"/>9.4.2.2. Step 2: Compute ids of the corresponding covering boxes at that level</h4></div></div></div><p>Now that we have chosen the optimal level, we can compute the ids of the boxes covering the search
+discus (which is not a discus in projected space anymore).</p><p>This is done by <code class="literal">org.hibernate.search.spatial.impl.SpatialHelper.getSpatialHashCellsIds(Point center,
+double radius, int spatialHashLevel)</code></p><p>It will calculate the bounding box of the search discus and then call
+<code class="literal">org.hibernate.search.spatial.impl.SpatialHelper.getSpatialHashCellsIds(Point lowerLeft, Point
+upperRight, int spatialHashLevel)</code> that will do the actual computation. If the bounding box crosses
+the meridian line it will cut the search in two and make two calls to <code class="literal">getSpatialHashCellsIds(Point
+lowerLeft, Point upperRight, int spatialHashLevel)</code> with left and right parts of the box.</p><p>There are some geo related hacks (search radius too large, search radius crossing the poles) that
+are handled in bounding box computations done by <code class="literal">Rectangle.fromBoundingCircle(Coordinates center,
+double radius)</code> (see <a class="link" href="http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates">http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates</a> for reference on
+those subjects).</p><p>The <code class="literal">SpatialHelper.getSpatialHashCellsIds(Point lowerLeft, Point upperRight, int spatialHashLevel)</code>
+project the defining points of the bounding box and compute the boxes they belong to. It returns all
+the box Ids between the lower left to the upper right corners, thus covering the area.</p></div><div class="section" title="9.4.2.3. Step 3: Lucene index lookup"><div class="titlepage"><div><div><h4 class="title"><a id="_step_3_lucene_index_lookup"/>9.4.2.3. Step 3: Lucene index lookup</h4></div></div></div><p>The query is built with theses Ids searching for documents having a <span class="emphasis"><em><span class="spatial index fields name">HSSI</span></em></span>[n] (n the level found at Step 1) field valued with one of the ids of Step 2.</p><p>See also the implementation of <code class="literal">org.hibernate.search.spatial.impl.SpatialHashFilter</code>.</p><p>This query will return all documents in the boxes covering the projected bounding box of the search
+discus. So it is too large and needs refining. But we have narrowed the distance calculation
+problems to a subset of our data.</p></div><div class="section" title="9.4.2.4. Step 4: Refine"><div class="titlepage"><div><div><h4 class="title"><a id="_step_4_refine"/>9.4.2.4. Step 4: Refine</h4></div></div></div><p>A distance calculation filter is set after the Lucene index lookup query of Step 3 to exclude false
+candidates from the result list.</p><p>See <code class="literal">SpatialQueryBuilderFromCoordinates.buildSpatialQuery(Coordinates center, double radius, String
+fieldName)</code></p></div></div></div></div><script xmlns="" xmlns:d="http://docbook.org/ns/docbook" type="text/javascript" src="highlight.js/highlight.pack.js"> </script><script xmlns="" xmlns:d="http://docbook.org/ns/docbook" type="text/javascript">hljs.initHighlightingOnLoad();</script><script type="text/javascript">
+dataLayer = [{'channel' : 'Hibernate', 'additional_tracking_code' : 'UA-45270411-3'}];
+(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NJWS5L');</script><noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-NJWS5L" height="0" width="0" style="display:none;visibility:hidden"> </iframe></noscript><hr xmlns="" xmlns:d="http://docbook.org/ns/docbook"/><a xmlns="" xmlns:d="http://docbook.org/ns/docbook" href="legalnotice.html"/><ul class="docnav"><li class="previous"><a accesskey="p" href="ch08.html"><strong>Prev</strong>Chapter 8. Monitoring</a></li><li class="up"><a accesskey="u" href="#"><strong>Up</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Home</strong></a></li><li class="next"><a accesskey="n" href="ch10.html"><strong>Next</strong>Chapter 10. Advanced features</a></li></ul><!-- HibernateDoc.OutdatedContent --><script src="//code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script><script src="/hibernate/_outdated-content/outdated-content.js" type="text/javascript"></script><script type="text/javascript">var jQuery_3_1 = $.noConflict(true); jQuery_3_1(document).ready(function() { HibernateDoc.OutdatedContent.install("search"); });</script><!-- /HibernateDoc.OutdatedContent --></body></html>

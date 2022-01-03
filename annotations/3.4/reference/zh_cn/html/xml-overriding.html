@@ -1,0 +1,167 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>&#31532;&nbsp;3&nbsp;&#31456;&nbsp;&#36890;&#36807;XML&#35206;&#20889;&#20803;&#25968;&#25454;</title><link rel="stylesheet" href="../shared/css/html.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.65.1"><link rel="home" href="index.html" title="Hibernate Annotations"><link rel="up" href="index.html" title="Hibernate Annotations"><link rel="previous" href="entity.html" title="&#31532;&nbsp;2&nbsp;&#31456;&nbsp;&#23454;&#20307;Bean"><link rel="next" href="validator.html" title="&#31532;&nbsp;4&nbsp;&#31456;&nbsp;Hibernate&#39564;&#35777;&#22120;"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">&#31532;&nbsp;3&nbsp;&#31456;&nbsp;&#36890;&#36807;XML&#35206;&#20889;&#20803;&#25968;&#25454;</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="entity.html">&#19978;&#19968;&#39029;</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="validator.html">&#19979;&#19968;&#39029;</a></td></tr></table><hr></div><div class="chapter" lang="zh_cn"><div class="titlepage"><div><div><h2 class="title"><a name="xml-overriding"></a>&#31532;&nbsp;3&nbsp;&#31456;&nbsp;&#36890;&#36807;XML&#35206;&#20889;&#20803;&#25968;&#25454;</h2></div></div><div></div></div><p>&#22312;EJB3&#20013;&#20803;&#25968;&#25454;&#30340;&#20027;&#35201;&#30446;&#26631;&#26159;&#20351;&#29992;&#27880;&#37322;,&#20294;&#26159;EJB3&#35268;&#33539;&#20063;&#25552;&#20379;&#36890;&#36807;XML&#37096;&#32626;&#25991;&#20214;&#26469;&#35206;&#20889;&#25110;&#32773;&#26367;&#25442;&#20803;&#25968;&#25454;&#27880;&#37322;.
+  &#22312;&#24403;&#21069;&#30340;&#21457;&#24067;&#29256;&#26412;&#20165;&#20165;&#25903;&#25345;EJB3&#27880;&#37322;&#30340;&#35206;&#20889;,&#22914;&#26524;&#20320;&#24819;&#20351;&#29992;Hibernate&#29305;&#26377;&#30340;&#19968;&#20123;&#23454;&#20307;&#27880;&#37322;,
+  &#20320;&#26377;&#20004;&#31181;&#36873;&#25321;:&#19968;,&#21482;&#20351;&#29992;&#27880;&#37322;;&#20108;,&#20351;&#29992;&#21407;&#26469;&#30340;hbm &#26144;&#23556;&#25991;&#20214;.&#20320;&#24403;&#28982;&#36824;&#26159;&#21487;&#20197;&#21516;&#26102;&#20351;&#29992;&#27880;&#37322;&#23454;&#20307;&#21644;hbm XML&#26144;&#23556;&#25991;&#20214;&#30340;&#23454;&#20307;.</p><p>&#22312;&#27979;&#35797;&#22871;&#20214;&#20013;&#26377;&#19968;&#20123;&#38468;&#21152;&#30340;XML&#25991;&#20214;&#30340;&#26679;&#20363;.</p><div class="section" lang="zh_cn"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e2735"></a>3.1.&nbsp;&#21407;&#21017;</h2></div></div><div></div></div><p>XML&#37096;&#32626;&#25991;&#20214;&#32467;&#26500;&#34987;&#35774;&#35745;&#20026;&#30452;&#25509;&#26144;&#23556;&#27880;&#37322;&#32467;&#26500;,&#25152;&#20197;&#22914;&#26524;&#20320;&#30693;&#36947;&#27880;&#37322;&#30340;&#32467;&#26500;,&#37027;&#20040;&#20351;&#29992;XML&#35821;&#27861;&#26159;&#24456;&#31616;&#21333;&#30340;.</p><p>&#20320;&#21487;&#20197;&#23450;&#20041;&#19968;&#20010;&#25110;&#32773;&#22810;&#20010;XML&#25991;&#20214;&#26469;&#25551;&#36848;&#20320;&#30340;&#20803;&#25968;&#25454;,&#36825;&#20123;&#25991;&#20214;&#20250;&#34987;&#35206;&#20889;&#24341;&#25806;&#21512;&#24182;(merged).</p><div class="section" lang="zh_cn"><div class="titlepage"><div><div><h3 class="title"><a name="d0e2742"></a>3.1.1.&nbsp;&#20840;&#23616;&#32423;&#21035;&#30340;&#20803;&#25968;&#25454;</h3></div></div><div></div></div><p>&#20320;&#21487;&#20197;&#20351;&#29992;XML&#25991;&#20214;&#26469;&#23450;&#20041;&#20840;&#23616;&#20803;&#25968;&#25454;,&#23545;&#27599;&#19968;&#20010;&#37096;&#32626;&#25991;&#20214;&#20320;&#19981;&#33021;&#23450;&#20041;&#22810;&#20110;&#19968;&#20010;&#30340;&#20803;&#25968;&#25454;.</p><pre class="programlisting">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+
+&lt;entity-mappings 
+  xmlns="http://java.sun.com/xml/ns/persistence/orm"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_1_0.xsd"
+  version="1.0"&gt;
+
+    &lt;persistence-unit-metadata&gt;
+        &lt;xml-mapping-metadata-complete/&gt;
+        &lt;persistence-unit-defaults&gt;
+            &lt;schema&gt;myschema&lt;/schema&gt;
+            &lt;catalog&gt;mycatalog&lt;/catalog&gt;
+            &lt;cascade-persist/&gt;
+        &lt;/persistence-unit-defaults&gt;
+    &lt;/persistence-unit-metadata&gt;</pre><p><tt class="literal">xml-mapping-metadata-complete</tt> &#24847;&#21619;&#30528;&#25152;&#26377;&#30340;&#23454;&#20307;,mapped-superclasses&#21644;&#23884;&#22871;&#30340;&#20803;&#25968;&#25454;&#24212;&#35813;&#20174;XML&#25991;&#20214;&#20013;&#21551;&#29992;(&#24573;&#30053;&#27880;&#37322;).</p><p><tt class="literal">schema / catalog</tt> &#23558;&#35206;&#20889;&#25152;&#26377;&#22312;&#20803;&#25968;&#25454;&#20013;&#40664;&#35748;&#23450;&#20041;&#30340;schema &#21644; catalog(&#21253;&#25324;XML&#21644;&#27880;&#37322;).</p><p><tt class="literal">cascade-persist</tt> &#24847;&#21619;&#30528;&#25152;&#26377;&#27880;&#37322;&#20316;&#20026;&#19968;&#20010; cascade type &#37117;&#26159;PERSIST&#30340;. &#25105;&#20204;&#25512;&#33616;&#20320;&#19981;&#35201;&#20351;&#29992;&#35813;&#29305;&#24615;.</p></div><div class="section" lang="zh_cn"><div class="titlepage"><div><div><h3 class="title"><a name="d0e2761"></a>3.1.2.&nbsp;&#23454;&#20307;&#32423;&#21035;&#30340;&#20803;&#25968;&#25454;</h3></div></div><div></div></div><p>&#20320;&#20063;&#21487;&#20197;&#22312;&#19968;&#20010;&#32473;&#23450;&#30340;&#23454;&#20307;&#19978;&#23450;&#20041;&#25110;&#32773;&#35206;&#20889;&#20803;&#25968;&#25454;</p><div class="programlistingco"><pre class="programlisting">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+
+&lt;entity-mappings                                                                    <span class="co">(1)</span>
+  xmlns="http://java.sun.com/xml/ns/persistence/orm"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_1_0.xsd"
+  version="1.0"&gt;
+
+    &lt;package&gt;org.hibernate.test.annotations.reflection&lt;/package&gt;                    <span class="co">(2)</span>
+    &lt;entity class="Administration" access="PROPERTY" metadata-complete="true"&gt;      <span class="co">(3)</span>
+        &lt;table name="tbl_admin"&gt;                                                    <span class="co">(4)</span>
+            &lt;unique-constraint&gt;
+                &lt;column-name&gt;firstname&lt;/column-name&gt;
+                &lt;column-name&gt;lastname&lt;/column-name&gt;
+            &lt;/unique-constraint&gt;
+        &lt;/table&gt;
+        &lt;secondary-table name="admin2"&gt;                                             <span class="co">(5)</span>
+            &lt;primary-key-join-column name="admin_id" referenced-column-name="id"/&gt;
+            &lt;unique-constraint&gt;
+                &lt;column-name&gt;address&lt;/column-name&gt;
+            &lt;/unique-constraint&gt;
+        &lt;/secondary-table&gt;
+        &lt;id-class class="SocialSecurityNumber"/&gt;                                    <span class="co">(6)</span>
+        &lt;inheritance strategy="JOINED"/&gt;                                            <span class="co">(7)</span>
+        &lt;sequence-generator name="seqhilo" sequence-name="seqhilo"/&gt;                <span class="co">(8)</span>
+        &lt;table-generator name="table" table="tablehilo"/&gt;                           <span class="co">(9)</span>
+        ...
+    &lt;/entity&gt;
+
+    &lt;entity class="PostalAdministration"&gt;
+        &lt;primary-key-join-column name="id"/&gt;                                        <span class="co">(10)</span>
+        ...
+    &lt;/entity&gt;
+&lt;/entity-mappings&gt;</pre><div class="calloutlist"><table border="0" summary="Callout list"><tr><td width="5%" valign="top" align="left">(1)</td><td valign="top" align="left"><p><tt class="literal">entity-mappings</tt>:entity-mappings &#26159;&#25152;&#26377;XML&#25991;&#20214;&#30340;&#26681;&#20803;&#32032;.&#20320;&#24517;&#39035;&#23450;&#20041;XML Schema, &#35813;&#25991;&#20214;&#21253;&#21547;&#22312;hibernate-annotations.jar&#20013;,&#20351;&#29992;Hibernate Annotations &#19981;&#38656;&#35201;&#35775;&#38382;&#32593;&#32476;.</p></td></tr><tr><td width="5%" valign="top" align="left">(2)</td><td valign="top" align="left"><p><tt class="literal">package</tt> (&#21487;&#36873;&#30340;): &#20316;&#20026;&#40664;&#35748;&#30340;package&#29992;&#20110;&#22312;&#19968;&#20010;&#32473;&#23450;&#30340;&#37096;&#32626;&#25551;&#36848;&#25991;&#20214;&#20013;&#25152;&#26377;&#27809;&#26377;&#38480;&#23450;&#30340;&#31867;.</p></td></tr><tr><td width="5%" valign="top" align="left">(3)</td><td valign="top" align="left"><p><tt class="literal">entity</tt>: &#25551;&#36848;&#19968;&#20010;&#23454;&#20307;. </p><p><tt class="literal">metadata-complete</tt> &#23450;&#20041;&#23545;&#20110;&#35813;&#20803;&#32032;&#26159;&#21542;&#20840;&#37096;&#20351;&#29992;&#20803;&#25968;&#25454;(&#25442;&#21477;&#35805;&#26469;&#35828;&#23601;&#26159;,&#22914;&#26524;&#27880;&#37322;&#20986;&#29616;&#22312;&#31867;&#32423;&#21035;&#24212;&#35813;&#32771;&#34385;&#25110;&#32773;&#24573;&#30053;).</p><p>&#19968;&#20010;&#23454;&#20307;&#19981;&#24471;&#19981;&#26377;&#19968;&#20010; class &#23646;&#24615;&#26469;&#24341;&#29992; &#20803;&#25968;&#25454;&#25152;&#24212;&#29992;&#30340;&#31867;. </p><p>&#36890;&#36807;<tt class="literal">name</tt>&#23646;&#24615;&#20320;&#21487;&#20197;&#35206;&#20889;&#23454;&#20307;&#30340;&#21517;&#23383;,
+			&#22914;&#26524;&#27809;&#26377;&#23450;&#20041;&#24182;&#19988;<tt class="literal">@Entity.name</tt>&#20986;&#29616;&#20102;&#30340;&#35805;,&#37027;&#20040;&#23601;&#20351;&#29992;&#35813;&#27880;&#37322;(&#20551;&#22914;metadata complete &#27809;&#26377;&#34987;&#35774;&#32622;).</p><p>
+			&#23545;&#20110;metadata complete (&#21442;&#32771;&#19979;&#38754;)&#20803;&#32032;, &#20320;&#21487;&#20197;&#23450;&#20041;&#19968;&#20010;  <tt class="literal">access</tt>(<tt class="literal">FIELD</tt> &#25110;&#32773; <tt class="literal">PROPERTY</tt>(&#40664;&#35748;&#20540;)),
+			&#23545;&#20110;&#38750;metadata complete &#20803;&#32032;,&#20351;&#29992;&#27880;&#37322;&#30340;access type.</p></td></tr><tr><td width="5%" valign="top" align="left">(4)</td><td valign="top" align="left"><p><tt class="literal">table</tt>:  &#20320;&#21487;&#20197;&#22768;&#26126;table &#23646;&#24615;(name, schema, catalog), &#22914;&#26524;&#27809;&#26377;&#23450;&#20041;, &#23558;&#20351;&#29992;Java&#27880;&#37322;.</p><p>&#23601;&#35937;&#20363;&#23376;&#20013;&#25152;&#31034;&#30340;&#37027;&#26679;&#20320;&#21487;&#20197;&#23450;&#20041;&#19968;&#20010;&#25110;&#32773;&#22810;&#20010;unique constraints</p></td></tr><tr><td width="5%" valign="top" align="left">(5)</td><td valign="top" align="left"><p><tt class="literal">secondary-table</tt>: &#23450;&#20041;&#19968;&#20010;secondary-table,&#38500;&#20102;&#20320;&#21487;&#20197;&#36890;&#36807;<tt class="literal">primary-key-join-column </tt>&#20803;&#32032;&#23450;&#20041; primary key / foreign key &#21015;&#20197;&#22806;&#26159;&#21644;&#19968;&#33324;&#30340;table&#19968;&#26679;&#30340;. &#22312;&#38750;metadata complete&#19979;, annotation secondary tables &#20165;&#20165;&#22312;&#27809;&#26377;<tt class="literal">secondary-table </tt>&#23450;&#20041;&#30340;&#24773;&#20917;&#19979;&#20351;&#29992;, &#21542;&#21017; &#27880;&#37322;&#23558;&#34987;&#24573;&#30053;.</p></td></tr><tr><td width="5%" valign="top" align="left">(6)</td><td valign="top" align="left"><p><tt class="literal">id-class</tt>: &#21644;<tt class="literal">@IdClass</tt>&#19968;&#26679;&#23450;&#20041;&#19968;&#20010;id class.</p></td></tr><tr><td width="5%" valign="top" align="left">(7)</td><td valign="top" align="left"><p><tt class="literal">inheritance</tt>: 
+			&#23450;&#20041;&#32487;&#25215;&#31574;&#30053;(<tt class="literal">JOINED</tt>,
+            <tt class="literal">TABLE_PER_CLASS</tt>,
+            <tt class="literal">SINGLE_TABLE</tt>), &#20165;&#20165;&#22312;&#26681;&#23454;&#20307;&#32423;&#21035;&#21487;&#20197;&#20351;&#29992;.</p></td></tr><tr><td width="5%" valign="top" align="left">(8)</td><td valign="top" align="left"><p><tt class="literal">sequence-generator</tt>: &#23450;&#20041;&#19968;&#20010;&#24207;&#21015;&#20135;&#29983;&#22120;.</p></td></tr><tr><td width="5%" valign="top" align="left">(9)</td><td valign="top" align="left"><p><tt class="literal">table-generator</tt>: &#23450;&#20041;&#19968;&#20010;table generator</p></td></tr><tr><td width="5%" valign="top" align="left">(10)</td><td valign="top" align="left"><p><tt class="literal"><tt class="literal">primary-key-join-column</tt></tt>:
+            &#24403; JOINED &#32487;&#25215;&#31574;&#30053;&#20351;&#29992;&#26102;,&#20026;sub entities&#23450;&#20041;&#19968;&#20010; primary key join column.</p></td></tr></table></div></div><div class="programlistingco"><pre class="programlisting">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+
+&lt;entity-mappings 
+  xmlns="http://java.sun.com/xml/ns/persistence/orm"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_1_0.xsd"
+  version="1.0"&gt;
+
+    &lt;package&gt;org.hibernate.test.annotations.reflection&lt;/package&gt;
+    &lt;entity class="Music" access="PROPERTY" metadata-complete="true"&gt;
+        &lt;discriminator-value&gt;Generic&lt;/discriminator-value&gt;                          <span class="co">(1)</span>
+        &lt;discriminator-column length="34"/&gt;
+        ...
+    &lt;/entity&gt;
+
+    &lt;entity class="PostalAdministration"&gt;
+        &lt;primary-key-join-column name="id"/&gt;
+        &lt;named-query name="adminById"&gt;                                              <span class="co">(2)</span>
+            &lt;query&gt;select m from Administration m where m.id = :id&lt;/query&gt;
+            &lt;hint name="org.hibernate.timeout" value="200"/&gt;
+        &lt;/named-query&gt;
+        &lt;named-native-query name="allAdmin" result-set-mapping="adminrs"&gt;           <span class="co">(3)</span>
+            &lt;query&gt;select *, count(taxpayer_id) as taxPayerNumber 
+            from Administration, TaxPayer
+            where taxpayer_admin_id = admin_id group by ...&lt;/query&gt;
+            &lt;hint name="org.hibernate.timeout" value="200"/&gt;
+        &lt;/named-native-query&gt;
+        &lt;sql-result-set-mapping name="adminrs"&gt;                                     <span class="co">(4)</span>
+            &lt;entity-result entity-class="Administration"&gt;
+                &lt;field-result name="name" column="fld_name"/&gt;
+            &lt;/entity-result&gt;
+            &lt;column-result name="taxPayerNumber"/&gt;
+        &lt;/sql-result-set-mapping&gt;
+        &lt;attribute-override name="ground"&gt;                                          <span class="co">(5)</span>
+            &lt;column name="fld_ground" unique="true" scale="2"/&gt;
+        &lt;/attribute-override&gt;
+        &lt;association-override name="referer"&gt;
+            &lt;join-column name="referer_id" referenced-column-name="id"/&gt;
+        &lt;/association-override&gt;
+        ...
+    &lt;/entity&gt;
+&lt;/entity-mappings&gt;</pre><div class="calloutlist"><table border="0" summary="Callout list"><tr><td width="5%" valign="top" align="left">(1)</td><td valign="top" align="left"><p><tt class="literal">discriminator-value /
+            discriminator-column</tt>: &#24403;SINGLE_TABLE&#32487;&#25215;&#31574;&#30053;&#20351;&#29992;&#26102;,&#23450;&#20041;&#37492;&#21035;&#22120;&#20540; &#21644; &#20445;&#23384;&#35813;&#20540;&#30340;&#21015;.</p></td></tr><tr><td width="5%" valign="top" align="left">(2)</td><td valign="top" align="left"><p><tt class="literal">named-query</tt>: &#23450;&#20041;&#21629;&#21517;&#26597;&#35810;&#21644;&#19968;&#20123;&#30456;&#20851;&#30340;&#21487;&#33021;&#30340;&#32447;&#32034;. &#35813;&#23450;&#20041;&#38468;&#21152;&#22312;&#27880;&#37322;&#30340;&#23450;&#20041;&#20013;,&#22914;&#26524;&#20004;&#20010;&#37117;&#23450;&#20041;&#20102;&#30456;&#21516;&#30340;&#21517;&#23383;,&#37027;&#20040;XML&#23558;&#20248;&#20808;&#32771;&#34385;.</p></td></tr><tr><td width="5%" valign="top" align="left">(3)</td><td valign="top" align="left"><p><tt class="literal">named-native-query</tt>: &#23450;&#20041;&#19968;&#20010;&#21629;&#21517;&#26412;&#22320;&#26597;&#35810; &#21644;&#20182;&#30340; sql result set  &#26144;&#23556;. &#20316;&#20026;&#21478;&#22806;&#19968;&#31181;&#36873;&#25321;,&#20320;&#21487;&#20197;&#23450;&#20041;<tt class="literal">result-class</tt>. &#36825;&#20123;&#23450;&#20041;&#38468;&#21152;&#22312;&#27880;&#37322;&#30340;&#23450;&#20041;&#20013;.&#22914;&#26524;&#20004;&#20010;&#23450;&#20041;&#20102;&#21516;&#26679;&#30340;&#21517;&#23383;,XML&#25991;&#20214;&#20248;&#20808;&#32771;&#34385;.</p></td></tr><tr><td width="5%" valign="top" align="left">(4)</td><td valign="top" align="left"><p><tt class="literal">sql-result-set-mapping</tt>: &#25551;&#36848;&#20102; result set mapping &#30340;&#32467;&#26500;. &#20320;&#21487;&#20197;&#23450;&#20041; &#23454;&#20307;&#21644;&#21015;&#26144;&#23556;. &#36825;&#20123;&#23450;&#20041;&#38468;&#21152;&#22312;&#27880;&#37322;&#30340;&#23450;&#20041;&#20013;,&#22914;&#26524;&#23450;&#20041;&#20102;&#21516;&#26679;&#30340;&#21517;&#23383;,XML&#25991;&#20214;&#20248;&#20808;&#32771;&#34385;.</p></td></tr><tr><td width="5%" valign="top" align="left">(5)</td><td valign="top" align="left"><p><tt class="literal">attribute-override /
+            association-override</tt>: &#23450;&#20041;&#19968;&#21015;&#25110;&#32773;join column overriding. &#35813;overriding &#38468;&#21152;&#22312;&#27880;&#37322;&#30340;&#23450;&#20041;&#20013;.</p></td></tr></table></div></div><p>&#19968;&#20123;&#24212;&#29992;&#20110; <tt class="literal">&lt;embeddable&gt;</tt> &#21644;
+      <tt class="literal">&lt;mapped-superclass&gt;</tt>.</p></div><div class="section" lang="zh_cn"><div class="titlepage"><div><div><h3 class="title"><a name="d0e2923"></a>3.1.3.&nbsp;&#23646;&#24615;&#32423;&#21035;&#30340;&#20803;&#25968;&#25454;</h3></div></div><div></div></div><p>
+	  &#20320;&#24403;&#28982;&#21487;&#20197;&#23450;&#20041;XML&#26469;&#35206;&#20889;&#23646;&#24615;. &#22914;&#26524;metadata complete &#32473;&#23450;&#20041;&#20102;,&#37027;&#20040;&#38468;&#21152;&#30340;&#23646;&#24615;(&#22914;: &#22312;Java &#32423;&#21035;&#30340;)&#23558;&#34987;&#24573;&#30053;.
+&#21478;&#22806;,&#19968;&#26086;&#20320;&#24320;&#22987;&#35206;&#20889;&#19968;&#20010;&#23646;&#24615;,&#22312;&#35813;&#23646;&#24615;&#19978;&#30340;&#25152;&#26377;&#27880;&#37322;&#37117;&#20250;&#34987;&#24573;&#30053;.&#25152;&#26377;&#23646;&#24615;&#32423;&#21035;&#30340;&#20803;&#25968;&#25454;&#24212;&#29992;&#20110;<tt class="literal">entity/attributes</tt>,
+      <tt class="literal">mapped-superclass/attributes</tt> &#25110;
+      <tt class="literal">embeddable/attributes</tt>.</p><pre class="programlisting">    &lt;attributes&gt;
+        &lt;id name="id"&gt;
+            &lt;column name="fld_id"/&gt;
+            &lt;generated-value generator="generator" strategy="SEQUENCE"/&gt;
+            &lt;temporal&gt;DATE&lt;/temporal&gt;
+            &lt;sequence-generator name="generator" sequence-name="seq"/&gt;
+        &lt;/id&gt;
+        &lt;version name="version"/&gt;
+        &lt;embedded name="embeddedObject"&gt;
+            &lt;attribute-override name"subproperty"&gt;
+                &lt;column name="my_column"/&gt;
+            &lt;/attribute-override&gt;
+        &lt;/embedded&gt;
+        &lt;basic name="status" optional="false"&gt;
+            &lt;enumerated&gt;STRING&lt;/enumerated&gt;
+        &lt;/basic&gt;
+        &lt;basic name="serial" optional="true"&gt;
+            &lt;column name="serialbytes"/&gt;
+            &lt;lob/&gt;
+        &lt;/basic&gt;
+        &lt;basic name="terminusTime" fetch="LAZY"&gt;
+            &lt;temporal&gt;TIMESTAMP&lt;/temporal&gt;
+        &lt;/basic&gt;
+    &lt;/attributes&gt;</pre><p>
+	  &#36890;&#36807; <tt class="literal">id</tt>,
+      <tt class="literal">embedded-id</tt>, <tt class="literal">version</tt>,
+      <tt class="literal">embedded</tt> &#21644; <tt class="literal">basic</tt>&#20320;&#21487;&#20197;&#35206;&#20889;&#19968;&#20010;&#23646;&#24615;,
+	  &#36825;&#20123;&#20803;&#32032;&#20013;&#30340;&#27599;&#19968;&#20010;&#20803;&#32032;&#37117;&#26377;&#30456;&#24212;&#30340;subelements&#65306;<tt class="literal">lob</tt>,
+      <tt class="literal">temporal</tt>, <tt class="literal">enumerated</tt>,
+      <tt class="literal">column</tt>.</p></div><div class="section" lang="zh_cn"><div class="titlepage"><div><div><h3 class="title"><a name="d0e2968"></a>3.1.4.&nbsp;&#20851;&#32852;&#32423;&#21035;&#30340;&#20803;&#25968;&#25454;</h3></div></div><div></div></div><p>&#20320;&#21487;&#20197;&#23450;&#20041;XML&#35206;&#20889;&#20851;&#32852;&#27880;&#37322;. &#25152;&#26377;&#30340;&#20851;&#32852;&#32423;&#21035;&#30340;&#20803;&#25968;&#25454;&#20316;&#29992;&#20110;
+	   <tt class="literal">entity/attributes</tt>,
+      <tt class="literal">mapped-superclass/attributes</tt> &#25110;
+      <tt class="literal">embeddable/attributes</tt>.</p><pre class="programlisting">    &lt;attributes&gt;
+        &lt;one-to-many name="players" fetch="EAGER"&gt;
+            &lt;map-key name="name"/&gt;
+            &lt;join-column name="driver"/&gt;
+            &lt;join-column name="number"/&gt;
+        &lt;/one-to-many&gt;
+        &lt;many-to-many name="roads" target-entity="Administration"&gt;
+            &lt;order-by&gt;maxSpeed&lt;/order-by&gt;
+            &lt;join-table name="bus_road"&gt;
+                &lt;join-column name="driver"/&gt;
+                &lt;join-column name="number"/&gt;
+                &lt;inverse-join-column name="road_id"/&gt;
+                &lt;unique-constraint&gt;
+                    &lt;column-name&gt;driver&lt;/column-name&gt;
+                    &lt;column-name&gt;number&lt;/column-name&gt;
+                &lt;/unique-constraint&gt;
+            &lt;/join-table&gt;
+        &lt;/many-to-many&gt;
+        &lt;many-to-many name="allTimeDrivers" mapped-by="drivenBuses"&gt;
+    &lt;/attributes&gt;</pre><p>&#36890;&#36807;<tt class="literal">one-to-many</tt>, <tt class="literal">one-to-one</tt>,
+      <tt class="literal">many-to-one</tt>, &#21644; <tt class="literal">many-to-many</tt>.
+	  &#20320;&#21487;&#20197;&#37325;&#20889;&#19968;&#20010;&#20851;&#32852;&#20851;&#31995;.&#36825;&#20123;&#20803;&#32032;&#20013;&#30340;&#27599;&#19968;&#20010;&#37117;&#26377;&#30456;&#24212;&#30340;subelements. <tt class="literal">join-table</tt>  (&#21487;&#20197;&#26377;
+	  <tt class="literal">join-column</tt>&#21644;
+      <tt class="literal">inverse-join-column</tt>),
+      <tt class="literal"><tt class="literal">join-column</tt></tt>,
+      <tt class="literal">map-key</tt>, &#21644; <tt class="literal">order-by</tt>.
+      <tt class="literal">mapped-by</tt> &#21644; <tt class="literal">target-entity</tt>
+	  &#24403;&#20182;&#20204;&#26377;&#24847;&#20041;&#30340;&#26102;&#20505;&#21487;&#20197;&#23450;&#20041;&#23646;&#24615;. &#20877;&#19968;&#27425;&#24378;&#35843; &#35813;&#32467;&#26500;&#26144;&#23556;&#20110;&#27880;&#37322;&#30340;&#32467;&#26500;.&#22312;&#25551;&#36848;&#27880;&#37322;&#30340;&#19968;&#31456;&#20013; &#20320;&#21487;&#20197;&#25214;&#21040;&#25152;&#26377;&#30340;&#35821;&#20041;&#20449;&#24687;.</p></div></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="entity.html">&#19978;&#19968;&#39029;</a>&nbsp;</td><td width="20%" align="center"><a accesskey="u" href="index.html">&#19978;&#19968;&#32423;</a></td><td width="40%" align="right">&nbsp;<a accesskey="n" href="validator.html">&#19979;&#19968;&#39029;</a></td></tr><tr><td width="40%" align="left" valign="top">&#31532;&nbsp;2&nbsp;&#31456;&nbsp;&#23454;&#20307;Bean&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="index.html">&#36215;&#22987;&#39029;</a></td><td width="40%" align="right" valign="top">&nbsp;&#31532;&nbsp;4&nbsp;&#31456;&nbsp;Hibernate&#39564;&#35777;&#22120;</td></tr></table></div></body></html>

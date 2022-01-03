@@ -1,0 +1,129 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>14.14.&nbsp;Exemples HQL</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="queryhql.html" title="Chapitre&nbsp;14.&nbsp;HQL: Langage de requ&ecirc;tage d'Hibernate">
+      <link rel="prev" href="queryhql-subqueries.html" title="14.13.&nbsp;Sous-requ&ecirc;tes">
+      <link rel="next" href="queryhql-bulk.html" title="14.15.&nbsp;Mise &agrave; jour et suppression">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">14.14.&nbsp;Exemples HQL</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="queryhql-subqueries.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;14.&nbsp;HQL: Langage de requ&ecirc;tage d'Hibernate</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="queryhql-bulk.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="queryhql-examples"></a>14.14.&nbsp;Exemples HQL
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Les requ&ecirc;tes Hibernate peuvent &ecirc;tre relativement puissantes et complexes. En fait, la puissance du langage de requ&ecirc;tage est
+            l'un des avantages principaux d'Hibernate. Voici quelques exemples tr&egrave;s similaires aux requ&ecirc;tes que nous avons utilis&eacute;es lors
+            d'un r&eacute;cent projet. Notez que la plupart des requ&ecirc;tes que vous &eacute;crirez seront plus simples que les exemples suivantes ! 
+         </p>
+         <p>La requ&ecirc;te suivante retourne l'id de commande (order), le nombre d'articles (items) et la valeur totale de la commande (order)
+            pour toutes les commandes non pay&eacute;es d'un client (customer) particulier pour un total minimum donn&eacute;, le tout tri&eacute; par la valeur
+            totale. La requ&ecirc;te SQL g&eacute;n&eacute;r&eacute;e sur les tables <code class="literal">ORDER</code>, <code class="literal">ORDER_LINE</code>, <code class="literal">PRODUCT</code>, <code class="literal">CATALOG</code> et <code class="literal">PRICE</code> est compos&eacute;e de quatre jointures interne ainsi que d'une sous-requ&ecirc;te (non corr&eacute;l&eacute;e). 
+         </p><pre class="programlisting">select order.id, sum(price.amount), count(item)
+from Order as order
+    join order.lineItems as item
+    join item.product as product,
+    Catalog as catalog
+    join catalog.prices as price
+where order.paid = false
+    and order.customer = :customer
+    and price.product = product
+    and catalog.effectiveDate &lt; sysdate
+    and catalog.effectiveDate &gt;= all (
+        select cat.effectiveDate
+        from Catalog as cat
+        where cat.effectiveDate &lt; sysdate
+    )
+group by order
+having sum(price.amount) &gt; :minAmount
+order by sum(price.amount) desc</pre><p>Quel monstre ! En principe, nous ne sommes pas tr&egrave;s fan des sous-requ&ecirc;tes, la requ&ecirc;te ressemblait donc plut&ocirc;t &agrave; cela : </p><pre class="programlisting">select order.id, sum(price.amount), count(item)
+from Order as order
+    join order.lineItems as item
+    join item.product as product,
+    Catalog as catalog
+    join catalog.prices as price
+where order.paid = false
+    and order.customer = :customer
+    and price.product = product
+    and catalog = :currentCatalog
+group by order
+having sum(price.amount) &gt; :minAmount
+order by sum(price.amount) desc</pre><p>La requ&ecirc;te suivante compte le nombre de paiements (payments) pour chaque status, en excluant les paiements dans le status
+            <code class="literal">AWAITING_APPROVAL</code> o&ugrave; le changement de status le plus r&eacute;cent &agrave; &eacute;t&eacute; fait par l'utilisateur courant. En SQL, cette requ&ecirc;te effectue deux jointures
+            internes et des sous requ&ecirc;tes corr&eacute;l&eacute;es sur les tables <code class="literal">PAYMENT</code>, <code class="literal">PAYMENT_STATUS</code> et <code class="literal">PAYMENT_STATUS_CHANGE</code>. 
+         </p><pre class="programlisting">select count(payment), status.name
+from Payment as payment
+    join payment.currentStatus as status
+    join payment.statusChanges as statusChange
+where payment.status.name &lt;&gt; PaymentStatus.AWAITING_APPROVAL
+    or (
+        statusChange.timeStamp = (
+            select max(change.timeStamp)
+            from PaymentStatusChange change
+            where change.payment = payment
+        )
+        and statusChange.user &lt;&gt; :currentUser
+    )
+group by status.name, status.sortOrder
+order by status.sortOrder</pre><p>Si nous avions mapp&eacute; la collection <code class="literal">statusChanges</code> comme une liste, au lieu d'un ensemble, la requ&ecirc;te aurait &eacute;t&eacute; plus facile &agrave; &eacute;crire. 
+         </p><pre class="programlisting">select count(payment), status.name
+from Payment as payment
+    join payment.currentStatus as status
+where payment.status.name &lt;&gt; PaymentStatus.AWAITING_APPROVAL
+    or payment.statusChanges[ maxIndex(payment.statusChanges) ].user &lt;&gt; :currentUser
+group by status.name, status.sortOrder
+order by status.sortOrder</pre><p>La requ&ecirc;te qui suit utilise la fonction de MS SQL <code class="literal">isNull()</code> pour retourner tous les comptes (accounts) et paiements (payments) impay&eacute;s pour l'organisation &agrave; laquelle l'uilisateur (user)
+            courant appartient. Elle est traduite en SQL par trois jointures internes, une jointure externe ainsi qu'une sous requ&ecirc;te
+            sur les tables <code class="literal">ACCOUNT</code>, <code class="literal">PAYMENT</code>, <code class="literal">PAYMENT_STATUS</code>, <code class="literal">ACCOUNT_TYPE</code>, <code class="literal">ORGANIZATION</code> et <code class="literal">ORG_USER</code>. 
+         </p><pre class="programlisting">select account, payment
+from Account as account
+    left outer join account.payments as payment
+where :currentUser in elements(account.holder.users)
+    and PaymentStatus.UNPAID = isNull(payment.currentStatus.name, PaymentStatus.UNPAID)
+order by account.type.sortOrder, account.accountNumber, payment.dueDate</pre><p>Pour d'autres base de donn&eacute;es, nous aurions d&ucirc; faire sans la sous-requ&ecirc;te (corr&eacute;l&eacute;e). </p><pre class="programlisting">select account, payment
+from Account as account
+    join account.holder.users as user
+    left outer join account.payments as payment
+where :currentUser = user
+    and PaymentStatus.UNPAID = isNull(payment.currentStatus.name, PaymentStatus.UNPAID)
+order by account.type.sortOrder, account.accountNumber, payment.dueDate</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="queryhql-subqueries.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="queryhql.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="queryhql-bulk.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">14.13.&nbsp;Sous-requ&ecirc;tes&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;14.15.&nbsp;Mise &agrave; jour et suppression</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

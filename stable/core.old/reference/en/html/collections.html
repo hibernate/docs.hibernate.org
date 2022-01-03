@@ -1,0 +1,127 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>Chapter&nbsp;6.&nbsp;Collection Mapping</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="prev" href="mapping-database-object.html" title="5.7.&nbsp;Auxiliary Database Objects">
+      <link rel="next" href="collections-mapping.html" title="6.2.&nbsp;Collection mappings">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">Chapter&nbsp;6.&nbsp;Collection Mapping</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="mapping-database-object.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">&nbsp;</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="collections-mapping.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="chapter" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title"><a name="collections"></a>Chapter&nbsp;6.&nbsp;Collection Mapping
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <div class="sect1" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="collections-persistent"></a>6.1.&nbsp;Persistent collections
+                     </h2>
+                  </div>
+               </div>
+            </div>
+            <p>
+               Hibernate requires that persistent collection-valued fields be declared
+                           as an interface type, for example:
+                       
+            </p><pre class="programlisting">public class Product {
+    private String serialNumber;
+    private Set parts = new HashSet();
+    
+    public Set getParts() { return parts; }
+    void setParts(Set parts) { this.parts = parts; }
+    public String getSerialNumber() { return serialNumber; }
+    void setSerialNumber(String sn) { serialNumber = sn; }
+}</pre><p>
+                           The actual interface might be <code class="literal">java.util.Set</code>,
+                           <code class="literal">java.util.Collection</code>, <code class="literal">java.util.List</code>,
+                           <code class="literal">java.util.Map</code>, <code class="literal">java.util.SortedSet</code>,
+                           <code class="literal">java.util.SortedMap</code> or ... anything you like! (Where 
+                           "anything you like" means you will have to write an implementation of 
+                           <code class="literal">org.hibernate.usertype.UserCollectionType</code>.)
+                       
+            </p>
+            <p>
+                           Notice how we initialized the instance variable with an instance of
+                           <code class="literal">HashSet</code>. This is the best way to initialize collection
+                           valued properties of newly instantiated (non-persistent) instances. When
+                           you make the instance persistent - by calling <code class="literal">persist()</code>,
+                           for example - Hibernate will actually replace the <code class="literal">HashSet</code>
+                           with an instance of Hibernate's own implementation of <code class="literal">Set</code>.
+                           Watch out for errors like this:
+                       
+            </p><pre class="programlisting">Cat cat = new DomesticCat();
+Cat kitten = new DomesticCat();
+....
+Set kittens = new HashSet();
+kittens.add(kitten);
+cat.setKittens(kittens);
+session.persist(cat);
+kittens = cat.getKittens(); // Okay, kittens collection is a Set
+(HashSet) cat.getKittens(); // Error!</pre><p>
+                           The persistent collections injected by Hibernate behave like
+                           <code class="literal">HashMap</code>, <code class="literal">HashSet</code>,
+                           <code class="literal">TreeMap</code>, <code class="literal">TreeSet</code> or
+                           <code class="literal">ArrayList</code>, depending upon the interface type.
+                       
+            </p>
+            <p>
+                           Collections instances have the usual behavior of value types. They are 
+                           automatically persisted when referenced by a persistent object and 
+                           automatically deleted when unreferenced. If a collection is passed from one
+                           persistent object to another, its elements might be moved from one table to
+                           another. Two entities may not share a reference to the same collection 
+                           instance. Due to the underlying relational model, collection-valued properties
+                           do not support null value semantics; Hibernate does not distinguish between 
+                           a null collection reference and an empty collection.
+                       
+            </p>
+            <p>
+                           You shouldn't have to worry much about any of this. Use persistent collections 
+                           the same way you use ordinary Java collections. Just make sure you understand 
+                           the semantics of bidirectional associations (discussed later).
+                       
+            </p>
+         </div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="mapping-database-object.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center">&nbsp;</td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="collections-mapping.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">5.7.&nbsp;Auxiliary Database Objects&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;6.2.&nbsp;Collection mappings</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

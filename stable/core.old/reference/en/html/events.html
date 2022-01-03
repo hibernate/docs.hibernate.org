@@ -1,0 +1,185 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>Chapter&nbsp;12.&nbsp;Interceptors and events</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="prev" href="transactions-connection-release.html" title="11.5.&nbsp;Connection Release Modes">
+      <link rel="next" href="objectstate-events.html" title="12.2.&nbsp;Event system">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">Chapter&nbsp;12.&nbsp;Interceptors and events</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="transactions-connection-release.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">&nbsp;</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="objectstate-events.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="chapter" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title"><a name="events"></a>Chapter&nbsp;12.&nbsp;Interceptors and events
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+            It is often useful for the application to react to certain events that occur
+            inside Hibernate. This allows implementation of certain kinds of generic 
+                    functionality, and extension of Hibernate functionality.
+                
+         </p>
+         <div class="sect1" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="objectstate-interceptors"></a>12.1.&nbsp;Interceptors
+                     </h2>
+                  </div>
+               </div>
+            </div>
+            <p>
+                           The <code class="literal">Interceptor</code> interface provides callbacks from the session to the 
+                           application allowing the application to inspect and/or manipulate properties of a
+                           persistent object before it is saved, updated, deleted or loaded. One 
+                           possible use for this is to track auditing information. For example, the following 
+                           <code class="literal">Interceptor</code> automatically sets the  <code class="literal">createTimestamp</code> 
+                           when an <code class="literal">Auditable</code> is created and updates the 
+                           <code class="literal">lastUpdateTimestamp</code> property when an <code class="literal">Auditable</code> is 
+                           updated.
+                       
+            </p>
+            <p>
+                           You may either implement <code class="literal">Interceptor</code> directly or (better) extend
+                           <code class="literal">EmptyInterceptor</code>.
+                       
+            </p><pre class="programlisting">package org.hibernate.test;
+
+import java.io.Serializable;
+import java.util.Date;
+import java.util.Iterator;
+
+import org.hibernate.EmptyInterceptor;
+import org.hibernate.Transaction;
+import org.hibernate.type.Type;
+
+public class AuditInterceptor extends EmptyInterceptor {
+
+    private int updates;
+    private int creates;
+    private int loads;
+
+    public void onDelete(Object entity,
+                         Serializable id,
+                         Object[] state,
+                         String[] propertyNames,
+                         Type[] types) {
+        // do nothing
+    }
+
+    public boolean onFlushDirty(Object entity,
+                                Serializable id,
+                                Object[] currentState,
+                                Object[] previousState,
+                                String[] propertyNames,
+                                Type[] types) {
+
+        if ( entity instanceof Auditable ) {
+            updates++;
+            for ( int i=0; i &lt; propertyNames.length; i++ ) {
+                if ( "lastUpdateTimestamp".equals( propertyNames[i] ) ) {
+                    currentState[i] = new Date();
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean onLoad(Object entity,
+                          Serializable id,
+                          Object[] state,
+                          String[] propertyNames,
+                          Type[] types) {
+        if ( entity instanceof Auditable ) {
+            loads++;
+        }
+        return false;
+    }
+
+    public boolean onSave(Object entity,
+                          Serializable id,
+                          Object[] state,
+                          String[] propertyNames,
+                          Type[] types) {
+
+        if ( entity instanceof Auditable ) {
+            creates++;
+            for ( int i=0; i&lt;propertyNames.length; i++ ) {
+                if ( "createTimestamp".equals( propertyNames[i] ) ) {
+                    state[i] = new Date();
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public void afterTransactionCompletion(Transaction tx) {
+        if ( tx.wasCommitted() ) {
+            System.out.println("Creations: " + creates + ", Updates: " + updates, "Loads: " + loads);
+        }
+        updates=0;
+        creates=0;
+        loads=0;
+    }
+
+}</pre><p>
+                           Interceptors come in two flavors: <code class="literal">Session</code>-scoped and
+                           <code class="literal">SessionFactory</code>-scoped.
+                       
+            </p>
+            <p>
+                           A <code class="literal">Session</code>-scoped interceptor is specified
+                           when a session is opened using one of the overloaded SessionFactory.openSession()
+                           methods accepting an <code class="literal">Interceptor</code>.
+                       
+            </p><pre class="programlisting">Session session = sf.openSession( new AuditInterceptor() );</pre><p>
+                           A <code class="literal">SessionFactory</code>-scoped interceptor is registered with the <code class="literal">Configuration</code>
+                           object prior to building the <code class="literal">SessionFactory</code>.  In this case, the supplied interceptor
+                           will be applied to all sessions opened from that <code class="literal">SessionFactory</code>; this is true unless
+                           a session is opened explicitly specifying the interceptor to use.  <code class="literal">SessionFactory</code>-scoped
+                           interceptors must be thread safe, taking care to not store session-specific state since multiple
+                           sessions will use this interceptor (potentially) concurrently.
+                       
+            </p><pre class="programlisting">new Configuration().setInterceptor( new AuditInterceptor() );</pre></div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="transactions-connection-release.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center">&nbsp;</td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="objectstate-events.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">11.5.&nbsp;Connection Release Modes&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;12.2.&nbsp;Event system</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

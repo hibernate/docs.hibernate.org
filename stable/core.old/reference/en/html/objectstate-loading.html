@@ -1,0 +1,115 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>10.3.&nbsp;Loading an object</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="objectstate.html" title="Chapter&nbsp;10.&nbsp;Working with objects">
+      <link rel="prev" href="objectstate-makingpersistent.html" title="10.2.&nbsp;Making objects persistent">
+      <link rel="next" href="objectstate-querying.html" title="10.4.&nbsp;Querying">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">10.3.&nbsp;Loading an object</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="objectstate-makingpersistent.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;10.&nbsp;Working with objects</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="objectstate-querying.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="objectstate-loading"></a>10.3.&nbsp;Loading an object
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+                        The <code class="literal">load()</code> methods of <code class="literal">Session</code> gives you
+                        a way to retrieve a persistent instance if you already know its identifier. 
+                        <code class="literal">load()</code> takes a class object and will load the state into 
+                        a newly instantiated instance of that class, in persistent state.
+                    
+         </p><pre class="programlisting">Cat fritz = (Cat) sess.load(Cat.class, generatedId);</pre><pre class="programlisting">// you need to wrap primitive identifiers
+long id = 1234;
+DomesticCat pk = (DomesticCat) sess.load( DomesticCat.class, new Long(id) );</pre><p>
+                        Alternatively, you can load state into a given instance:
+                    
+         </p><pre class="programlisting">Cat cat = new DomesticCat();
+// load pk's state into cat
+sess.load( cat, new Long(pkId) );
+Set kittens = cat.getKittens();</pre><p>
+                        Note that <code class="literal">load()</code> will throw an unrecoverable exception if 
+                        there is no matching database row. If the class is mapped with a proxy, 
+                        <code class="literal">load()</code> just returns an uninitialized proxy and does not 
+                        actually hit the database until you invoke a method of the proxy. This 
+                        behaviour is very useful if you wish to create an association to an object
+                        without actually loading it from the database. It also allows multiple
+                        instances to be loaded as a batch if <code class="literal">batch-size</code> is
+                        defined for the class mapping.
+                    
+         </p>
+         <p>
+                        If you are not certain that a matching row exists, you should use the 
+                        <code class="literal">get()</code> method, which hits the database immediately and 
+                        returns null if there is no matching row.
+                    
+         </p><pre class="programlisting">Cat cat = (Cat) sess.get(Cat.class, id);
+if (cat==null) {
+    cat = new Cat();
+    sess.save(cat, id);
+}
+return cat;</pre><p>
+                        You may even load an object using an SQL <code class="literal">SELECT ... FOR UPDATE</code>,
+                        using a <code class="literal">LockMode</code>. See the API documentation for more information.
+                    
+         </p><pre class="programlisting">Cat cat = (Cat) sess.get(Cat.class, id, LockMode.UPGRADE);</pre><p>
+                        Note that any associated instances or contained collections are 
+                        <span class="emphasis"><em>not</em></span> selected <code class="literal">FOR UPDATE</code>, unless you decide
+                        to specify <code class="literal">lock</code> or <code class="literal">all</code> as a
+                        cascade style for the association.
+                    
+         </p>
+         <p>
+                        It is possible to re-load an object and all its collections at any time, using the 
+                        <code class="literal">refresh()</code> method. This is useful when database triggers are used to
+                        initialize some of the properties of the object.
+                    
+         </p><pre class="programlisting">sess.save(cat);
+sess.flush(); //force the SQL INSERT
+sess.refresh(cat); //re-read the state (after the trigger executes)</pre><p>
+                        An important question usually appears at this point: How much does Hibernate load
+                        from the database and how many SQL <code class="literal">SELECT</code>s will it use? This
+                        depends on the <span class="emphasis"><em>fetching strategy</em></span> and is explained in
+                        <a href="performance.html#performance-fetching" title="19.1.&nbsp;Fetching strategies">Section&nbsp;19.1, &#8220;Fetching strategies&#8221;</a>.
+                    
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="objectstate-makingpersistent.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="objectstate.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="objectstate-querying.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">10.2.&nbsp;Making objects persistent&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;10.4.&nbsp;Querying</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

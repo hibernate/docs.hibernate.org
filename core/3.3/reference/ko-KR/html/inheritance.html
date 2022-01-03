@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory">9장. Inheritance mapping</title><link rel="stylesheet" href="css/hibernate.css" type="text/css"/><meta xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" name="generator" content="DocBook XSL Stylesheets V1.72.0"/><link rel="start" href="index.html" title="HIBERNATE - 개성있는 자바를 위한 관계 영속"/><link rel="up" href="index.html" title="HIBERNATE - 개성있는 자바를 위한 관계 영속"/><link rel="prev" href="components.html" title="8장. Component 매핑"/><link rel="next" href="objectstate.html" title="10장. 객체들로 작업하기"/><link rel="copyright" href="ln-Legal_Notice.html" title="Legal Notice"/></head><body><p id="title"><a href="http://www.hibernate.org" class="site_href"><strong>Hibernate.org</strong></a><a href="http://hibernate.org/Documentation/DocumentationOverview" class="doc_href"><strong>Community Documentation</strong></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="components.html"><strong>이전</strong></a></li><li class="next"><a accesskey="n" href="objectstate.html"><strong>다음</strong></a></li></ul><div class="chapter" lang="ko-KR"><div class="titlepage"><div><div><h2 class="title"><a id="inheritance"/>9장. Inheritance mapping</h2></div></div></div><div class="toc"><dl><dt><span class="sect1"><a href="inheritance.html#inheritance-strategies">9.1. The three strategies</a></span></dt><dd><dl><dt><span class="sect2"><a href="inheritance.html#inheritance-tableperclass">9.1.1. Table per class hierarchy</a></span></dt><dt><span class="sect2"><a href="inheritance.html#inheritance-tablepersubclass">9.1.2. Table per subclass</a></span></dt><dt><span class="sect2"><a href="inheritance.html#inheritance-tablepersubclass-discriminator">9.1.3. Table per subclass: using a discriminator</a></span></dt><dt><span class="sect2"><a href="inheritance.html#inheritance-mixing-tableperclass-tablepersubclass">9.1.4. table per class hierarchy와 table per subclass를 혼합하기</a></span></dt><dt><span class="sect2"><a href="inheritance.html#inheritance-tableperconcrete">9.1.5. Table per concrete class</a></span></dt><dt><span class="sect2"><a href="inheritance.html#inheritance-tableperconcreate-polymorphism">9.1.6. Table per concrete class using implicit polymorphism</a></span></dt><dt><span class="sect2"><a href="inheritance.html#inheritance-mixingpolymorphism">9.1.7. 함축적인 다형성을 다른 상속 매핑들과 혼합하기</a></span></dt></dl></dd><dt><span class="sect1"><a href="inheritance.html#inheritance-limitations">9.2. 제약들</a></span></dt></dl></div><div class="sect1" lang="ko-KR"><div class="titlepage"><div><div><h2 class="title"><a id="inheritance-strategies"/>9.1. The three strategies</h2></div></div></div><p>Hibernate는 세 가지 기본적인 상속 매핑 방도들을 지원한다: </p><div class="itemizedlist"><ul><li><p>table per class hierarchy </p></li><li><p>table per subclass </p></li><li><p>table per concrete class </p></li></ul></div><p>게다가 Hibernate는 네 번째의 약간 다른 종류의 다형성을 지원한다: </p><div class="itemizedlist"><ul><li><p>implicit polymorphism(함축적인 다형성) </p></li></ul></div><p>It is possible to use different mapping strategies for different branches of the same inheritance hierarchy. You can then make use of implicit polymorphism to achieve polymorphism across the whole hierarchy. However, Hibernate does not support mixing <code class="literal">&lt;subclass&gt;</code>, <code class="literal">&lt;joined-subclass&gt;</code> and <code class="literal">&lt;union-subclass&gt;</code> mappings under the same root <code class="literal">&lt;class&gt;</code> element. It is possible to mix together the table per hierarchy and table per subclass strategies under the the same <code class="literal">&lt;class&gt;</code> element, by combining the <code class="literal">&lt;subclass&gt;</code> and <code class="literal">&lt;join&gt;</code> elements (see below for an example). </p><p>It is possible to define <code class="literal">subclass</code>, <code class="literal">union-subclass</code>, and <code class="literal">joined-subclass</code> mappings in separate mapping documents directly beneath <code class="literal">hibernate-mapping</code>. This allows you to extend a class hierarchy by adding a new mapping file. You must specify an <code class="literal">extends</code> attribute in the subclass mapping, naming a previously mapped superclass. Previously this feature made the ordering of the mapping documents important. Since Hibernate3, the ordering of mapping files is irrelevant when using the extends keyword. The ordering inside a single mapping file still needs to be defined as superclasses before subclasses. </p><pre class="programlisting">
+ &lt;hibernate-mapping&gt;
+     &lt;subclass name="DomesticCat" extends="Cat" discriminator-value="D"&gt;
+          &lt;property name="name" type="string"/&gt;
+     &lt;/subclass&gt;
+ &lt;/hibernate-mapping&gt;</pre><div class="sect2" lang="ko-KR"><div class="titlepage"><div><div><h3 class="title"><a id="inheritance-tableperclass"/>9.1.1. Table per class hierarchy</h3></div></div></div><p>Suppose we have an interface <code class="literal">Payment</code> with the implementors <code class="literal">CreditCardPayment</code>, <code class="literal">CashPayment</code>, and <code class="literal">ChequePayment</code>. The table per hierarchy mapping would display in the following way: </p><pre class="programlisting">&lt;class name="Payment" table="PAYMENT"&gt;
+    &lt;id name="id" type="long" column="PAYMENT_ID"&gt;
+        &lt;generator class="native"/&gt;
+    &lt;/id&gt;
+    &lt;discriminator column="PAYMENT_TYPE" type="string"/&gt;
+    &lt;property name="amount" column="AMOUNT"/&gt;
+    ...
+    &lt;subclass name="CreditCardPayment" discriminator-value="CREDIT"&gt;
+        &lt;property name="creditCardType" column="CCTYPE"/&gt;
+        ...
+    &lt;/subclass&gt;
+    &lt;subclass name="CashPayment" discriminator-value="CASH"&gt;
+        ...
+    &lt;/subclass&gt;
+    &lt;subclass name="ChequePayment" discriminator-value="CHEQUE"&gt;
+        ...
+    &lt;/subclass&gt;
+&lt;/class&gt;</pre><p>Exactly one table is required. There is a limitation of this mapping strategy: columns declared by the subclasses, such as <code class="literal">CCTYPE</code>, cannot have <code class="literal">NOT NULL</code> constraints. </p></div><div class="sect2" lang="ko-KR"><div class="titlepage"><div><div><h3 class="title"><a id="inheritance-tablepersubclass"/>9.1.2. Table per subclass</h3></div></div></div><p>A table per subclass mapping looks like this: </p><pre class="programlisting">&lt;class name="Payment" table="PAYMENT"&gt;
+    &lt;id name="id" type="long" column="PAYMENT_ID"&gt;
+        &lt;generator class="native"/&gt;
+    &lt;/id&gt;
+    &lt;property name="amount" column="AMOUNT"/&gt;
+    ...
+    &lt;joined-subclass name="CreditCardPayment" table="CREDIT_PAYMENT"&gt;
+        &lt;key column="PAYMENT_ID"/&gt;
+        &lt;property name="creditCardType" column="CCTYPE"/&gt;
+        ...
+    &lt;/joined-subclass&gt;
+    &lt;joined-subclass name="CashPayment" table="CASH_PAYMENT"&gt;
+        &lt;key column="PAYMENT_ID"/&gt;
+        ...
+    &lt;/joined-subclass&gt;
+    &lt;joined-subclass name="ChequePayment" table="CHEQUE_PAYMENT"&gt;
+        &lt;key column="PAYMENT_ID"/&gt;
+        ...
+    &lt;/joined-subclass&gt;
+&lt;/class&gt;</pre><p>Four tables are required. The three subclass tables have primary key associations to the superclass table so the relational model is actually a one-to-one association. </p></div><div class="sect2" lang="ko-KR"><div class="titlepage"><div><div><h3 class="title"><a id="inheritance-tablepersubclass-discriminator"/>9.1.3. Table per subclass: using a discriminator</h3></div></div></div><p>Hibernate's implementation of table per subclass does not require a discriminator column. Other object/relational mappers use a different implementation of table per subclass that requires a type discriminator column in the superclass table. The approach taken by Hibernate is much more difficult to implement, but arguably more correct from a relational point of view. If you want to use a discriminator column with the table per subclass strategy, you can combine the use of <code class="literal">&lt;subclass&gt;</code> and <code class="literal">&lt;join&gt;</code>, as follows: </p><pre class="programlisting">&lt;class name="Payment" table="PAYMENT"&gt;
+    &lt;id name="id" type="long" column="PAYMENT_ID"&gt;
+        &lt;generator class="native"/&gt;
+    &lt;/id&gt;
+    &lt;discriminator column="PAYMENT_TYPE" type="string"/&gt;
+    &lt;property name="amount" column="AMOUNT"/&gt;
+    ...
+    &lt;subclass name="CreditCardPayment" discriminator-value="CREDIT"&gt;
+        &lt;join table="CREDIT_PAYMENT"&gt;
+            &lt;key column="PAYMENT_ID"/&gt;
+            &lt;property name="creditCardType" column="CCTYPE"/&gt;
+            ...
+        &lt;/join&gt;
+    &lt;/subclass&gt;
+    &lt;subclass name="CashPayment" discriminator-value="CASH"&gt;
+        &lt;join table="CASH_PAYMENT"&gt;
+            &lt;key column="PAYMENT_ID"/&gt;
+            ...
+        &lt;/join&gt;
+    &lt;/subclass&gt;
+    &lt;subclass name="ChequePayment" discriminator-value="CHEQUE"&gt;
+        &lt;join table="CHEQUE_PAYMENT" fetch="select"&gt;
+            &lt;key column="PAYMENT_ID"/&gt;
+            ...
+        &lt;/join&gt;
+    &lt;/subclass&gt;
+&lt;/class&gt;</pre><p>선택적인 <code class="literal">fetch="select"</code> 선언은 슈퍼클래스를 질의할 때 outer join을 사용하여 <code class="literal">ChequePayment</code> 서브클래스 데이터를 페치시키지 않도록 Hibernate에게 알려준다. </p></div><div class="sect2" lang="ko-KR"><div class="titlepage"><div><div><h3 class="title"><a id="inheritance-mixing-tableperclass-tablepersubclass"/>9.1.4. table per class hierarchy와 table per subclass를 혼합하기</h3></div></div></div><p>You can even mix the table per hierarchy and table per subclass strategies using the following approach: </p><pre class="programlisting">&lt;class name="Payment" table="PAYMENT"&gt;
+    &lt;id name="id" type="long" column="PAYMENT_ID"&gt;
+        &lt;generator class="native"/&gt;
+    &lt;/id&gt;
+    &lt;discriminator column="PAYMENT_TYPE" type="string"/&gt;
+    &lt;property name="amount" column="AMOUNT"/&gt;
+    ...
+    &lt;subclass name="CreditCardPayment" discriminator-value="CREDIT"&gt;
+        &lt;join table="CREDIT_PAYMENT"&gt;
+            &lt;property name="creditCardType" column="CCTYPE"/&gt;
+            ...
+        &lt;/join&gt;
+    &lt;/subclass&gt;
+    &lt;subclass name="CashPayment" discriminator-value="CASH"&gt;
+        ...
+    &lt;/subclass&gt;
+    &lt;subclass name="ChequePayment" discriminator-value="CHEQUE"&gt;
+        ...
+    &lt;/subclass&gt;
+&lt;/class&gt;</pre><p>이들 매핑 방도들 중 어떤 것에 대해, 루트 <code class="literal">Payment</code> 클래스에 대한 하나의 다형성 연관은 <code class="literal">&lt;many-to-one&gt;</code>을 사용하여 매핑된다. </p><pre class="programlisting">&lt;many-to-one name="payment" column="PAYMENT_ID" class="Payment"/&gt;</pre></div><div class="sect2" lang="ko-KR"><div class="titlepage"><div><div><h3 class="title"><a id="inheritance-tableperconcrete"/>9.1.5. Table per concrete class</h3></div></div></div><p>There are two ways we can map the table per concrete class strategy. First, you can use <code class="literal">&lt;union-subclass&gt;</code>. </p><pre class="programlisting">&lt;class name="Payment"&gt;
+    &lt;id name="id" type="long" column="PAYMENT_ID"&gt;
+        &lt;generator class="sequence"/&gt;
+    &lt;/id&gt;
+    &lt;property name="amount" column="AMOUNT"/&gt;
+    ...
+    &lt;union-subclass name="CreditCardPayment" table="CREDIT_PAYMENT"&gt;
+        &lt;property name="creditCardType" column="CCTYPE"/&gt;
+        ...
+    &lt;/union-subclass&gt;
+    &lt;union-subclass name="CashPayment" table="CASH_PAYMENT"&gt;
+        ...
+    &lt;/union-subclass&gt;
+    &lt;union-subclass name="ChequePayment" table="CHEQUE_PAYMENT"&gt;
+        ...
+    &lt;/union-subclass&gt;
+&lt;/class&gt;</pre><p>세 개의 테이블들이 슈퍼클래스들에 대해 수반된다. 각각의 테이블은 상속된 프로퍼티들을 포함하여, 그 클래스의 모든 프로퍼티들에 대한 컬럼들을 정의한다. </p><p>The limitation of this approach is that if a property is mapped on the superclass, the column name must be the same on all subclass tables. The identity generator strategy is not allowed in union subclass inheritance. The primary key seed has to be shared across all unioned subclasses of a hierarchy. </p><p>If your superclass is abstract, map it with <code class="literal">abstract="true"</code>. If it is not abstract, an additional table (it defaults to <code class="literal">PAYMENT</code> in the example above), is needed to hold instances of the superclass. </p></div><div class="sect2" lang="ko-KR"><div class="titlepage"><div><div><h3 class="title"><a id="inheritance-tableperconcreate-polymorphism"/>9.1.6. Table per concrete class using implicit polymorphism</h3></div></div></div><p>대안적인 접근법은 함축적인 다형성을 사용하는 것이다: </p><pre class="programlisting">&lt;class name="CreditCardPayment" table="CREDIT_PAYMENT"&gt;
+    &lt;id name="id" type="long" column="CREDIT_PAYMENT_ID"&gt;
+        &lt;generator class="native"/&gt;
+    &lt;/id&gt;
+    &lt;property name="amount" column="CREDIT_AMOUNT"/&gt;
+    ...
+&lt;/class&gt;
+
+&lt;class name="CashPayment" table="CASH_PAYMENT"&gt;
+    &lt;id name="id" type="long" column="CASH_PAYMENT_ID"&gt;
+        &lt;generator class="native"/&gt;
+    &lt;/id&gt;
+    &lt;property name="amount" column="CASH_AMOUNT"/&gt;
+    ...
+&lt;/class&gt;
+
+&lt;class name="ChequePayment" table="CHEQUE_PAYMENT"&gt;
+    &lt;id name="id" type="long" column="CHEQUE_PAYMENT_ID"&gt;
+        &lt;generator class="native"/&gt;
+    &lt;/id&gt;
+    &lt;property name="amount" column="CHEQUE_AMOUNT"/&gt;
+    ...
+&lt;/class&gt;</pre><p>Notice that the <code class="literal">Payment</code> interface is not mentioned explicitly. Also notice that properties of <code class="literal">Payment</code> are mapped in each of the subclasses. If you want to avoid duplication, consider using XML entities (for example, <code class="literal">[ &lt;!ENTITY allproperties SYSTEM "allproperties.xml"&gt; ]</code> in the <code class="literal">DOCTYPE</code> declaration and <code class="literal">&amp;allproperties;</code> in the mapping). </p><p>이 접근법의 단점은 다형성 질의들을 수행할 때 Hibernate가 생성된 SQl <code class="literal">UNION</code>들을 생성시키는 않는다는 점이다. </p><p>이 매핑 방도의 경우, <code class="literal">Payment</code>에 대한 하나의 다형성 연관은 대개 <code class="literal">&lt;any&gt;</code>를 사용하여 매핑된다. </p><pre class="programlisting">&lt;any name="payment" meta-type="string" id-type="long"&gt;
+    &lt;meta-value value="CREDIT" class="CreditCardPayment"/&gt;
+    &lt;meta-value value="CASH" class="CashPayment"/&gt;
+    &lt;meta-value value="CHEQUE" class="ChequePayment"/&gt;
+    &lt;column name="PAYMENT_CLASS"/&gt;
+    &lt;column name="PAYMENT_ID"/&gt;
+&lt;/any&gt;</pre></div><div class="sect2" lang="ko-KR"><div class="titlepage"><div><div><h3 class="title"><a id="inheritance-mixingpolymorphism"/>9.1.7. 함축적인 다형성을 다른 상속 매핑들과 혼합하기</h3></div></div></div><p>Since the subclasses are each mapped in their own <code class="literal">&lt;class&gt;</code> element, and since <code class="literal">Payment</code> is just an interface), each of the subclasses could easily be part of another inheritance hierarchy. You can still use polymorphic queries against the <code class="literal">Payment</code> interface. </p><pre class="programlisting">&lt;class name="CreditCardPayment" table="CREDIT_PAYMENT"&gt;
+    &lt;id name="id" type="long" column="CREDIT_PAYMENT_ID"&gt;
+        &lt;generator class="native"/&gt;
+    &lt;/id&gt;
+    &lt;discriminator column="CREDIT_CARD" type="string"/&gt;
+    &lt;property name="amount" column="CREDIT_AMOUNT"/&gt;
+    ...
+    &lt;subclass name="MasterCardPayment" discriminator-value="MDC"/&gt;
+    &lt;subclass name="VisaPayment" discriminator-value="VISA"/&gt;
+&lt;/class&gt;
+
+&lt;class name="NonelectronicTransaction" table="NONELECTRONIC_TXN"&gt;
+    &lt;id name="id" type="long" column="TXN_ID"&gt;
+        &lt;generator class="native"/&gt;
+    &lt;/id&gt;
+    ...
+    &lt;joined-subclass name="CashPayment" table="CASH_PAYMENT"&gt;
+        &lt;key column="PAYMENT_ID"/&gt;
+        &lt;property name="amount" column="CASH_AMOUNT"/&gt;
+        ...
+    &lt;/joined-subclass&gt;
+    &lt;joined-subclass name="ChequePayment" table="CHEQUE_PAYMENT"&gt;
+        &lt;key column="PAYMENT_ID"/&gt;
+        &lt;property name="amount" column="CHEQUE_AMOUNT"/&gt;
+        ...
+    &lt;/joined-subclass&gt;
+&lt;/class&gt;</pre><p>Once again, <code class="literal">Payment</code> is not mentioned explicitly. If we execute a query against the <code class="literal">Payment</code> interface, for example <code class="literal">from Payment</code>, Hibernate automatically returns instances of <code class="literal">CreditCardPayment</code> (and its subclasses, since they also implement <code class="literal">Payment</code>), <code class="literal">CashPayment</code> and <code class="literal">ChequePayment</code>, but not instances of <code class="literal">NonelectronicTransaction</code>. </p></div></div><div class="sect1" lang="ko-KR"><div class="titlepage"><div><div><h2 class="title"><a id="inheritance-limitations"/>9.2. 제약들</h2></div></div></div><p>There are limitations to the "implicit polymorphism" approach to the table per concrete-class mapping strategy. There are somewhat less restrictive limitations to <code class="literal">&lt;union-subclass&gt;</code> mappings. </p><p>다음 표는 Hibernate에서 table per concrete-class 매핑들에 대한 제약들, 그리고 함축적인 다형성에 대한 제약들을 보여준다. </p><div class="table"><a id="d0e9133"/><p class="title"><b>표 9.1. 상속 매핑들의 특징들</b></p><div class="table-contents"><table summary="상속 매핑들의 특징들" border="1"><colgroup><col align="left"/><col align="left"/><col align="left"/><col align="left"/><col align="left"/><col align="left"/><col align="left"/><col align="left"/><col align="left"/></colgroup><thead><tr><th align="left">상속 방도</th><th align="left">다형성 다대일</th><th align="left">다형성 일대일</th><th align="left">다형성 일대다</th><th align="left">다형성 다대다</th><th align="left">Polymorphic <code class="literal">load()/get()</code></th><th align="left">다형성 질의들</th><th align="left">다형성 조인들</th><th align="left">Outer 조인 페칭</th></tr></thead><tbody><tr><td align="left">table per class-hierarchy</td><td align="left"><code class="literal">&lt;many-to-one&gt;</code></td><td align="left"><code class="literal">&lt;one-to-one&gt;</code></td><td align="left"><code class="literal">&lt;one-to-many&gt;</code></td><td align="left"><code class="literal">&lt;many-to-many&gt;</code></td><td align="left"><code class="literal">s.get(Payment.class, id)</code></td><td align="left"><code class="literal">from Payment p</code></td><td align="left"><code class="literal">from Order o join o.payment p</code></td><td align="left"><span class="emphasis"><em>지원됨</em></span></td></tr><tr><td align="left">table per subclass</td><td align="left"><code class="literal">&lt;many-to-one&gt;</code></td><td align="left"><code class="literal">&lt;one-to-one&gt;</code></td><td align="left"><code class="literal">&lt;one-to-many&gt;</code></td><td align="left"><code class="literal">&lt;many-to-many&gt;</code></td><td align="left"><code class="literal">s.get(Payment.class, id)</code></td><td align="left"><code class="literal">from Payment p</code></td><td align="left"><code class="literal">from Order o join o.payment p</code></td><td align="left"><span class="emphasis"><em>지원됨</em></span></td></tr><tr><td align="left">table per concrete-class (union-subclass)</td><td align="left"><code class="literal">&lt;many-to-one&gt;</code></td><td align="left"><code class="literal">&lt;one-to-one&gt;</code></td><td align="left"><code class="literal">&lt;one-to-many&gt;</code> (for <code class="literal">inverse="true"</code> only)</td><td align="left"><code class="literal">&lt;many-to-many&gt;</code></td><td align="left"><code class="literal">s.get(Payment.class, id)</code></td><td align="left"><code class="literal">from Payment p</code></td><td align="left"><code class="literal">from Order o join o.payment p</code></td><td align="left"><span class="emphasis"><em>지원됨</em></span></td></tr><tr><td align="left">table per concrete class (implicit polymorphism)</td><td align="left"><code class="literal">&lt;any&gt;</code></td><td align="left"><span class="emphasis"><em>지원되지 않음</em></span></td><td align="left"><span class="emphasis"><em>지원되지 않음</em></span></td><td align="left"><code class="literal">&lt;many-to-any&gt;</code></td><td align="left"><code class="literal">s.createCriteria(Payment.class).add( Restrictions.idEq(id) ).uniqueResult()</code></td><td align="left"><code class="literal">from Payment p</code></td><td align="left"><span class="emphasis"><em>지원되지 않음</em></span></td><td align="left"><span class="emphasis"><em>지원되지 않음</em></span></td></tr></tbody></table></div></div><br class="table-break"/></div></div><HR xmlns=""/><a xmlns="" href="legalnotice.html"><p xmlns="http://www.w3.org/1999/xhtml" class="copyright">저작권 © 2004 Red Hat Middleware, LLC.</p></a><ul class="docnav"><li class="previous"><a accesskey="p" href="components.html"><strong>이전</strong>8장. Component 매핑</a></li><li class="up"><a accesskey="u" href="#"><strong>위로</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>처음으로</strong></a></li><li class="next"><a accesskey="n" href="objectstate.html"><strong>다음</strong>10장. 객체들로 작업하기</a></li></ul></body></html>

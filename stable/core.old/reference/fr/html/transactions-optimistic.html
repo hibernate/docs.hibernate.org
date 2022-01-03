@@ -1,0 +1,189 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>11.3.&nbsp;Contr&ocirc;le de consurrence optimiste</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="transactions.html" title="Chapitre&nbsp;11.&nbsp;Transactions et acc&egrave;s concurrents">
+      <link rel="prev" href="transactions-demarcation.html" title="11.2.&nbsp;D&eacute;marcation des transactions">
+      <link rel="next" href="transactions-locking.html" title="11.4.&nbsp;Verouillage pessimiste">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">11.3.&nbsp;Contr&ocirc;le de consurrence optimiste</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="transactions-demarcation.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;11.&nbsp;Transactions et acc&egrave;s concurrents</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="transactions-locking.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="transactions-optimistic"></a>11.3.&nbsp;Contr&ocirc;le de consurrence optimiste
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>La gestion optimiste des acc&egrave;s concurrents avec versionnage est la seule approche pouvant garantir l'extensibilit&eacute; des applications
+            &agrave; haut niveau de charge. Le syst&egrave;me de versionnage utilise des num&eacute;ros de version ou l'horodatage pour d&eacute;tecter les mises
+            &agrave; jour causant des conflits avec d'autres actualisations ant&eacute;rieures. Hibernate propose trois approches pour l'&eacute;criture de
+            code applicatif utilisant la gestion optimiste d'acc&egrave;s concurrents. Le cas d'utilisation d&eacute;crit plus bas fait mention de conversation,
+            mais le versionnage peut &eacute;galement am&eacute;liorer la qualit&eacute; d'une application en pr&eacute;venant la perte de mises &agrave; jour. 
+         </p>
+         <div class="sect2" lang="fr-FR">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="transactions-optimistic-manual"></a>11.3.1.&nbsp;Gestion du versionnage au niveau applicatif
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>Dans cet exemple d'impl&eacute;mentation utilisant peu les fonctionnalit&eacute;s d'Hibernate, chaque interaction avec la base de donn&eacute;es
+               se fait en utilisant une nouvelle <code class="literal">Session</code> et le d&eacute;veloppeur doit recharger les donn&eacute;es persistantes &agrave; partir de la BD avant de les manipuler. Cette impl&eacute;mentation
+               force l'application &agrave; v&eacute;rifier la version des objets afin de maintenir l'isolation transactionnelle. Cette approche, semblable
+               &agrave; celle retrouv&eacute;e pour les EJB, est la moins efficace de celles pr&eacute;sent&eacute;es dans ce chapitre. 
+            </p><pre class="programlisting">// foo is an instance loaded by a previous Session
+session = factory.openSession();
+Transaction t = session.beginTransaction();
+
+int oldVersion = foo.getVersion();
+session.load( foo, foo.getKey() ); // load the current state
+if ( oldVersion != foo.getVersion() ) throw new StaleObjectStateException();
+foo.setProperty("bar");
+
+t.commit();
+session.close();</pre><p>Le mapping de la propri&eacute;t&eacute; <code class="literal">version</code> est fait via <code class="literal">&lt;version&gt;</code> et Hibernate l'incr&eacute;mentera automatiquement &agrave; chaque flush() si l'entit&eacute; doit &ecirc;tre mise &agrave; jour. 
+            </p>
+            <p>Bien s&ucirc;r, si votre application ne fait pas face &agrave; beaucoup d'acc&egrave;s concurrents et ne n&eacute;cessite pas l'utilisation du versionnage,
+               cette approche peut &eacute;galement &ecirc;tre utilis&eacute;e, il n'y a qu'&agrave; ignorer le code reli&eacute; au versionnage. Dans ce cas, la strat&eacute;gie
+               du <span class="emphasis"><em>last commit wins</em></span> (litt&eacute;ralement: le dernier commit l'emporte) sera utilis&eacute;e pour les conversations (longues transactions applicatives). Gardez
+               &agrave; l'esprit que cette approche pourrait rendre perplexe les utilisateurs de l'application car ils pourraient perdre des donn&eacute;es
+               mises &agrave; jour sans qu'aucun message d'erreur ne leur soit pr&eacute;sent&eacute; et sans avoir la possibilit&eacute; de fusionner les donn&eacute;es. 
+            </p>
+            <p>Clearly, manual version checking is only feasible in very trivial circumstances and not practical for most applications. Often
+               not only single instances, but complete graphs of modified objects have to be checked. Hibernate offers automatic version
+               checking with either an extended <code class="literal">Session</code> or detached instances as the design paradigm. 
+            </p>
+         </div>
+         <div class="sect2" lang="fr-FR">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="transactions-optimistic-longsession"></a>11.3.2.&nbsp;Les sessions longues et le versionnage automatique.
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>Dans ce sc&eacute;nario, une seule instance de <code class="literal">Session</code> et des objets persistants est utilis&eacute;e pour toute l'application. Hibernate v&eacute;rifie la version des objets persistants avant
+               d'effectuer le flush() et lance une exception si une modification concurrente est d&eacute;tect&eacute;e. Il appartient alors au d&eacute;veloppeur
+               de g&eacute;rer l'exception. Les traitements alternatifs g&eacute;n&eacute;ralement propos&eacute;s sont alors de permettre &agrave; l'usager de faire la fusion
+               des donn&eacute;es ou de lui offrir de recommencer son travail &agrave; partie des donn&eacute;es les plus r&eacute;centes dans la BD. 
+            </p>
+            <p>Il est &agrave; noter que lorsqu'une application est en attente d'une action de la part de l?usager, La <code class="literal">Session</code> n'est pas connect&eacute;e &agrave; la couche JDBC sous-jacente. C'est la mani&egrave;re la plus efficace de g&eacute;rer les acc&egrave;s &agrave; la base de donn&eacute;es.
+               L'application ne devrait pas se pr&eacute;occuper du versionnage des objets, de la r&eacute;association des objets d&eacute;tach&eacute;s, ni du rechargement
+               de tous les objets &agrave; chaque transaction. 
+            </p><pre class="programlisting">// foo is an instance loaded earlier by the old session
+Transaction t = session.beginTransaction(); // Obtain a new JDBC connection, start transaction
+
+foo.setProperty("bar");
+
+session.flush();    // Only for last transaction in conversation
+t.commit();         // Also return JDBC connection
+session.close();    // Only for last transaction in conversation</pre><p>L'objet <code class="literal">foo</code> sait quel objet <code class="literal">Session</code> l'a charg&eacute;. <code class="literal">Session.reconnect()</code> obtient une nouvelle connexion (celle-ci peut &ecirc;tre &eacute;galement fournie) et permet &agrave; la session de continuer son travail. La
+               m&eacute;thode <code class="literal">Session.disconnect()</code> d&eacute;connecte la session de la connexion JDBC et retourne celle-ci au pool de connexion (&agrave; moins que vous ne lui ayez fourni
+               vous m&ecirc;me la connexion.) Apr&egrave;s la reconnexion, afin de forcer la v&eacute;rification du versionnage de certaines entit&eacute;s que vous
+               ne cherchez pas &agrave; actualiser, vous pouvez faire un appel &agrave; <code class="literal">Session.lock()</code> en mode <code class="literal">LockMode.READ</code> pour tout objet ayant pu &ecirc;tre modifi&eacute; par une autre transaction. Il n'est pas n&eacute;cessaire de verrouiller les donn&eacute;es que vous
+               d&eacute;sirez mettre &agrave; jour. 
+            </p>
+            <p>Si des appels implicites aux m&eacute;thodes <code class="literal">disconnect()</code> et <code class="literal">reconnect()</code> sont trop co&ucirc;teux, vous pouvez les &eacute;viter en utilisant <code class="literal">hibernate.connection.release_mode</code> . 
+            </p>
+            <p>Ce pattern peut pr&eacute;senter des probl&egrave;mes si la <code class="literal">Session</code> est trop volumineuse pour &ecirc;tre stock&eacute;e entre les actions de l'usager. Plus sp&eacute;cifiquement, une session <code class="literal">HttpSession</code> se doit d'&ecirc;tre la plus petite possible. Puisque la <code class="literal">Session</code> joue obligatoirement le r&ocirc;le de m&eacute;moire cache de premier niveau et contient &agrave; ce titre tous les objets charg&eacute;s, il est pr&eacute;f&eacute;rable
+               de n'utiliser cette strat&eacute;gie que pour quelques cycles de requ&ecirc;tes car les objets risquent d'y &ecirc;tre rapidement p&eacute;rim&eacute;s. 
+            </p>
+            <p>Notez que la <code class="literal">Session</code> d&eacute;connect&eacute;e devrait &ecirc;tre conserv&eacute;e pr&egrave;s de la couche de persistance. Autrement dit, utilisez un EJB stateful pour conserver
+               la <code class="literal">Session</code> et &eacute;vitez de la s&eacute;rialiser et de la transf&eacute;rer &agrave; la couche de pr&eacute;sentation (i.e. Il est pr&eacute;f&eacute;rable de ne pas la conserver
+               dans la session <code class="literal">HttpSession</code> .) 
+            </p>
+            <p>The extended session pattern, or <span class="emphasis"><em>session-per-conversation</em></span>, is more difficult to implement with automatic current session context management. You need to supply your own implementation
+               of the <code class="literal">CurrentSessionContext</code> for this, see the Hibernate Wiki for examples. 
+            </p>
+         </div>
+         <div class="sect2" lang="fr-FR">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="transactions-optimistic-detached"></a>11.3.3.&nbsp;Les objets d&eacute;tach&eacute;s et le versionnage automatique
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>Chaque interaction avec le syst&egrave;me de persistance se fait via une nouvelle <code class="literal">Session</code> . Toutefois, les m&ecirc;mes instances d'objets persistants sont r&eacute;utilis&eacute;es pour chacune de ces interactions. L'application doit
+               pouvoir manipuler l'&eacute;tat des instances d&eacute;tach&eacute;es ayant &eacute;t&eacute; charg&eacute;es ant&eacute;rieurement via une autre session. Pour ce faire, ces
+               objets persistants doivent &ecirc;tre rattach&eacute;s &agrave; la <code class="literal">Session</code> courante en utilisant <code class="literal">Session.update()</code> , <code class="literal">Session.saveOrUpdate()</code> , ou <code class="literal">Session.merge()</code> . 
+            </p><pre class="programlisting">// foo is an instance loaded by a previous Session
+foo.setProperty("bar");
+session = factory.openSession();
+Transaction t = session.beginTransaction();
+session.saveOrUpdate(foo); // Use merge() if "foo" might have been loaded already
+t.commit();
+session.close();</pre><p>Again, Hibernate will check instance versions during flush, throwing an exception if conflicting updates occurred. </p>
+            <p>Vous pouvez &eacute;galement utiliser <code class="literal">lock()</code> au lieu de <code class="literal">update()</code> et utiliser le mode <code class="literal">LockMode.READ</code> (qui lancera une v&eacute;rification de version, en ignorant tous les niveaux de m&eacute;moire cache) si vous &ecirc;tes certain que l'objet
+               n'a pas &eacute;t&eacute; modifi&eacute;. 
+            </p>
+         </div>
+         <div class="sect2" lang="fr-FR">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="transactions-optimistic-customizing"></a>11.3.4.&nbsp;Personnaliser le versionnage automatique
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>Vous pouvez d&eacute;sactiver l'incr&eacute;mentation automatique du num&eacute;ro de version de certains attributs et collections en mettant la
+               valeur du param&egrave;tre de mapping <code class="literal">optimistic-lock</code> &agrave; false. Hibernate cessera ainsi d'incr&eacute;menter leur num&eacute;ro de version s'ils sont mis &agrave; jour. 
+            </p>
+            <p>Legacy database schemas are often static and can't be modified. Or, other applications might also access the same database
+               and don't know how to handle version numbers or even timestamps. In both cases, versioning can't rely on a particular column
+               in a table. To force a version check without a version or timestamp property mapping, with a comparison of the state of all
+               fields in a row, turn on <code class="literal">optimistic-lock="all"</code> in the <code class="literal">&lt;class&gt;</code> mapping. Note that this conceptually only works if Hibernate can compare the old and new state, i.e. if you use a single
+               long <code class="literal">Session</code> and not session-per-request-with-detached-objects. 
+            </p>
+            <p>Il peut &ecirc;tre souhaitable de permettre les modifications concurrentes lorsque des champs distincts sont modifi&eacute;s. En mettant
+               la propri&eacute;t&eacute; <code class="literal">optimistic-lock="dirty"</code> dans l'&eacute;l&eacute;ment <code class="literal">&lt;class&gt;</code> , Hibernate ne fera la comparaison que des champs devant &ecirc;tre actualis&eacute;s lors du flush(). 
+            </p>
+            <p>In both cases, with dedicated version/timestamp columns or with full/dirty field comparison, Hibernate uses a single <code class="literal">UPDATE</code> statement (with an appropriate <code class="literal">WHERE</code> clause) per entity to execute the version check and update the information. If you use transitive persistence to cascade
+               reattachment to associated entities, Hibernate might execute unnecessary updates. This is usually not a problem, but <span class="emphasis"><em>on update</em></span> triggers in the database might be executed even when no changes have been made to detached instances. You can customize this
+               behavior by setting <code class="literal">select-before-update="true"</code> in the <code class="literal">&lt;class&gt;</code> mapping, forcing Hibernate to <code class="literal">SELECT</code> the instance to ensure that changes did actually occur, before updating the row. 
+            </p>
+         </div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="transactions-demarcation.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="transactions.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="transactions-locking.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">11.2.&nbsp;D&eacute;marcation des transactions&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;11.4.&nbsp;Verouillage pessimiste</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

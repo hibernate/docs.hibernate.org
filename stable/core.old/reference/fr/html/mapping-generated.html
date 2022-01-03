@@ -1,0 +1,70 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>5.6.&nbsp;Propri&eacute;t&eacute;s g&eacute;n&eacute;r&eacute;es</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="mapping.html" title="Chapitre&nbsp;5.&nbsp;Mapping O/R basique">
+      <link rel="prev" href="mapping-alternatives.html" title="5.5.&nbsp;alternatives Metadata">
+      <link rel="next" href="mapping-database-object.html" title="5.7.&nbsp;Objets auxiliaires de la base de donn&eacute;es">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">5.6.&nbsp;Propri&eacute;t&eacute;s g&eacute;n&eacute;r&eacute;es</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="mapping-alternatives.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;5.&nbsp;Mapping O/R basique</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="mapping-database-object.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="mapping-generated"></a>5.6.&nbsp;Propri&eacute;t&eacute;s g&eacute;n&eacute;r&eacute;es
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Les propri&eacute;t&eacute;s g&eacute;n&eacute;r&eacute;es sont des propri&eacute;t&eacute;s dont les valeurs sont g&eacute;n&eacute;r&eacute;es par la base de donn&eacute;es. Typiquement, les applications
+            Hibernate avaient besoin d'invoquer <code class="literal">refresh</code> sur les instances qui contenaient des propri&eacute;t&eacute;s pour lesquelles la base de donn&eacute;es g&eacute;n&eacute;rait des valeurs. Marquer les propri&eacute;t&eacute;s
+            comme g&eacute;n&eacute;r&eacute;es permet &agrave; l'application de d&eacute;l&eacute;guer cette responsabilit&eacute; &agrave; Hibernate. Principalement, &agrave; chaque fois qu'Hibernate
+            r&eacute;alise une insertion ou une mise &agrave; jour en base de donn&eacute;es pour une entit&eacute; marqu&eacute;e comme telle, cela provoque imm&eacute;diatement
+            un select pour r&eacute;cup&eacute;rer les valeurs g&eacute;n&eacute;r&eacute;es. 
+         </p>
+         <p>Les propri&eacute;t&eacute;s marqu&eacute;es comme g&eacute;n&eacute;r&eacute;es doivent de plus ne pas &ecirc;tre ins&eacute;rables et modifiables Seuls <a href="mapping.html#mapping-declaration-version" title="5.1.9.&nbsp;version (optionnel)">Section&nbsp;5.1.9, &laquo;&nbsp;version (optionnel)&nbsp;&raquo;</a>, <a href="mapping.html#mapping-declaration-timestamp" title="5.1.10.&nbsp;timestamp (optionnel)">Section&nbsp;5.1.10, &laquo;&nbsp;timestamp (optionnel)&nbsp;&raquo;</a>, et <a href="mapping.html#mapping-declaration-property" title="5.1.11.&nbsp;property">Section&nbsp;5.1.11, &laquo;&nbsp;property&nbsp;&raquo;</a> peuvent &ecirc;tre marqu&eacute;s comme g&eacute;n&eacute;r&eacute;es. 
+         </p>
+         <p><code class="literal">never</code> (par d&eacute;faut) - indique la valeur de la propri&eacute;t&eacute; n'est pas g&eacute;n&eacute;r&eacute;e dans la base de donn&eacute;es. 
+         </p>
+         <p><code class="literal">insert</code> - indique que la valeur de la propri&eacute;t&eacute; donn&eacute;e est g&eacute;n&eacute;r&eacute;e &agrave; l'insertion mais pas lors des futures mises &agrave; jour de l'enregistrement.
+            Les colonnes de type "date de cr&eacute;ation" sont le cas d'utilisation typique de cette option. Notez que m&ecirc;me les propri&eacute;t&eacute;s <a href="mapping.html#mapping-declaration-version" title="5.1.9.&nbsp;version (optionnel)">Section&nbsp;5.1.9, &laquo;&nbsp;version (optionnel)&nbsp;&raquo;</a> et <a href="mapping.html#mapping-declaration-timestamp" title="5.1.10.&nbsp;timestamp (optionnel)">Section&nbsp;5.1.10, &laquo;&nbsp;timestamp (optionnel)&nbsp;&raquo;</a> peuvent &ecirc;tre d&eacute;clar&eacute;es comme g&eacute;n&eacute;r&eacute;es, cette option n'est pas disponible &agrave; cet endroit... 
+         </p>
+         <p><code class="literal">always</code> - indique que la valeur de la propri&eacute;t&eacute; est g&eacute;n&eacute;r&eacute;e &agrave; l'insert comme aux updates. 
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="mapping-alternatives.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="mapping.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="mapping-database-object.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">5.5.&nbsp;alternatives Metadata&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;5.7.&nbsp;Objets auxiliaires de la base de donn&eacute;es</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

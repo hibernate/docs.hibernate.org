@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory">Chapter 10. Executing a Test Suite</title><link rel="stylesheet" href="css/hibernate.css" type="text/css"/><meta xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" name="generator" content="DocBook XSL Stylesheets V1.74.0"/><link rel="home" href="index.html" title="Technology Compatibility Kit Reference Guide for JSR-303: Bean Validation"/><link rel="up" href="test-harness.html" title="Part III. JBoss Test Harness"/><link rel="prev" href="test-harness-configuration.html" title="Chapter 9. Configuration"/></head><body><p id="title"><a href="http://www.hibernate.org" class="site_href"><strong>Hibernate.org</strong></a><a href="http://hibernate.org/Documentation/DocumentationOverview" class="doc_href"><strong>Community Documentation</strong></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="test-harness-configuration.html"><strong>Prev</strong></a></li><li class="next"/></ul><div class="chapter" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="executing-test-harness"/>Chapter 10. Executing a Test Suite</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="executing-test-harness.html#test-suite-runner">10.1. Building a test suite runner using Maven 2</a></span></dt><dt><span class="section"><a href="executing-test-harness.html#dumping-test-artifacts">10.2. Dumping the Test Artifacts to Disk</a></span></dt></dl></div><p>This chapter explains how to execute and debug a test suite built
+  using the JBoss Test Harness.</p><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="test-suite-runner"/>10.1. Building a test suite runner using Maven 2</h2></div></div></div><p>The test suite runner project is the magic that makes everything
+    come together and allows you to execute the test suite. If you fully
+    understand how the JBoss Test Harness functions, and have a good grasp on
+    Maven 2, then it's not to difficult to understand how the test suite
+    runner project works. Regardless of your background, this guide covers
+    what you need to know to get up and running by studying the test suite
+    runner used to run the Bean Validation TCK against the Bean Validation RI,
+    Hibernate Validator.</p><p>The TCK runner for the Hibernate Validator can be found in the
+    <code class="filename">hibernate-validator-tck-runner</code> directory in the
+    Hibernate Validator checkout. The dependencies of the TCK runner project
+    for Hibernate Validator are listed in <a class="xref" href="executing-test-harness.html#tck-runner-dependencies" title="Table 10.1. Bean Validation TCK Runner Dependencies">Table 10.1, “Bean Validation TCK Runner Dependencies”</a>.</p><div class="table"><a id="tck-runner-dependencies"/><p class="title"><b>Table 10.1. Bean Validation TCK Runner Dependencies</b></p><div class="table-contents"><table summary="Bean Validation TCK Runner Dependencies" border="1"><colgroup><col/><col/><col/></colgroup><thead><tr><th>Group ID</th><th>Artifact ID</th><th>Version</th></tr></thead><tbody><tr><td>javax.validation</td><td>validation-api</td><td>1.0.0.GA</td></tr><tr><td>org.hibernate</td><td>hibernate-validator</td><td>4.2.0.Final</td></tr><tr><td>org.hibernate.jsr303.tck</td><td>jsr303-tck</td><td>1.0.8.GA</td></tr><tr><td>org.hibernate.javax.persistence</td><td>hibernate-jpa-2.0-api</td><td>1.0.1.Final</td></tr><tr><td>org.sl4j</td><td>slf4j-api, slf4j-simple</td><td>1.6.1</td></tr><tr><td>org.testng</td><td>testng (classifier: jdk15)</td><td>5.8</td></tr><tr><td>org.jboss.jbossas.as7-cdi-tck</td><td>jbossas-container</td><td>1.0.0.Alpha1</td></tr></tbody></table></div></div><br class="table-break"/><p>You can find all of these artifacts in the <a class="ulink" href="http://repository.jboss.org/maven2">JBoss Maven
+    repository</a>.</p><p>You should substituate the hibernate-validator artifact from <a class="xref" href="executing-test-harness.html#tck-runner-dependencies" title="Table 10.1. Bean Validation TCK Runner Dependencies">Table 10.1, “Bean Validation TCK Runner Dependencies”</a> with your own artifact. You'll also
+    need to replace the jbossas-container artifact if you are not testing your
+    implementation on JBoss AS. The jbossas-container artifact contains
+    implementations of the <code class="literal">Containers</code> SPI for the JBoss
+    Test Harness for JBoss AS 7.</p><div xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="note"><h2>Note</h2><p>When running the test suite in the in-container mode, the tests
+      will run against libraries installed into the container.</p></div><p>The TCK is executed using the Maven TestNG plugin. Maven 2 profiles
+    are used to control the properties that are set at the time of the
+    execution. For instance, the <code class="literal">incontainer</code> profile
+    enables integration tests and disables standalone mode, changing the
+    default settings.</p></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="dumping-test-artifacts"/>10.2. Dumping the Test Artifacts to Disk</h2></div></div></div><p>As you have learned, when the test suite is executing using
+    in-container mode, each test class is packaged as a deployable artifact
+    and deployed to the container. The test is then executed within the
+    context of the deployed application. This leaves room for errors in
+    packaging. When investigating a test failure, it's helpful to be able to
+    inspect the artifact after it is generated. The JBoss Test Harness can
+    accommodate this type of inspection by "dumping" the generated artifact to
+    disk.</p><p>If you want to write the artifacts to disk, and avoid executing the
+    test suite, you can simply execute the main method of the class
+    <code class="literal">org.jboss.testharness.api.TCK</code>. For example you could
+    use a Maven profile that is activated when the
+    <code class="literal">dumpArtifacts</code> command line property is defined:</p><pre class="programlisting">mvn test-compile -DdumpArtifacts</pre><p>The output directory where the artifacts are written is defined by
+    the property
+    <code class="literal">org.jboss.testharness.outputDirectory</code>.</p><p>Once the artifact is written to disk, you have an option of manually
+    deploying it to the container. You can execute the tests in the artfact by
+    requesting the context path of the application in the browser. If you want
+    to execute an individual test method, specify the method name in the
+    <code class="literal">methodName</code> request parameter (e.g.,
+    ?methodName=testMethodName).</p></div></div><HR xmlns=""/><a xmlns="" href=""><p xmlns="http://www.w3.org/1999/xhtml" class="copyright">Copyright © 2009 - 2011 Red Hat, Inc.</p></a><ul class="docnav"><li class="previous"><a accesskey="p" href="test-harness-configuration.html"><strong>Prev</strong>Chapter 9. Configuration</a></li><li class="up"><a accesskey="u" href="#"><strong>Top of page</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Front page</strong></a></li></ul></body></html>

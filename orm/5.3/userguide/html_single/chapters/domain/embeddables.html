@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 1.5.2">
+<title>Embeddable types</title>
+<link rel="stylesheet" href="./css/hibernate.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js"></script>
+<script>document.addEventListener('DOMContentLoaded', prettyPrint)</script>
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect2">
+<h3 id="embeddables">Embeddable types</h3>
+<div class="paragraph">
+<p>Historically Hibernate called these components.
+JPA calls them embeddables.
+Either way the concept is the same: a composition of values.</p>
+</div>
+<div class="paragraph">
+<p>For example we might have a <code>Publisher</code> class that is a composition of <code>name</code> and <code>country</code>,
+or a <code>Location</code> class that is a composition of <code>country</code> and <code>city</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="title">Usage of the word <em>embeddable</em></div>
+<div class="paragraph">
+<p>To avoid any confusion with the annotation that marks a given embeddable type, the annotation will be further referred as <code>@Embeddable</code>.</p>
+</div>
+<div class="paragraph">
+<p>Throughout this chapter and thereafter, for brevity sake, embeddable types may also be referred as <em>embeddable</em>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="embeddable-type-mapping-example" class="exampleblock">
+<div class="title">Example 1. Embeddable type example</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Embeddable
+public static class Publisher {
+
+    private String name;
+
+    private Location location;
+
+    public Publisher(String name, Location location) {
+        this.name = name;
+        this.location = location;
+    }
+
+    private Publisher() {}
+
+    //Getters and setters are omitted for brevity
+}
+
+@Embeddable
+public static class Location {
+
+    private String country;
+
+    private String city;
+
+    public Location(String country, String city) {
+        this.country = country;
+        this.city = city;
+    }
+
+    private Location() {}
+
+    //Getters and setters are omitted for brevity
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>An embeddable type is another form of value type, and its lifecycle is bound to a parent entity type, therefore inheriting the attribute access from its parent (for details on attribute access, see <a href="chapters/domain/entity.html#access-embeddable-types">Access strategies</a>).</p>
+</div>
+<div class="paragraph">
+<p>Embeddable types can be made up of basic values as well as associations, with the caveat that, when used as collection elements, they cannot define collections themselves.</p>
+</div>
+<div class="sect3">
+<h4 id="_component_embedded">Component / Embedded</h4>
+<div class="paragraph">
+<p>Most often, embeddable types are used to group multiple basic type mappings and reuse them across several entities.</p>
+</div>
+<div id="simple-embeddable-type-mapping-example" class="exampleblock">
+<div class="title">Example 2. Simple Embeddedable</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Entity(name = "Book")
+public static class Book {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    private String title;
+
+    private String author;
+
+    private Publisher publisher;
+
+    //Getters and setters are omitted for brevity
+}
+
+@Embeddable
+public static class Publisher {
+
+    @Column(name = "publisher_name")
+    private String name;
+
+    @Column(name = "publisher_country")
+    private String country;
+
+    public Publisher(String name, String country) {
+        this.name = name;
+        this.country = country;
+    }
+
+    private Publisher() {}
+
+    //Getters and setters are omitted for brevity
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-sql" data-lang="sql">create table Book (
+    id bigint not null,
+    author varchar(255),
+    publisher_country varchar(255),
+    publisher_name varchar(255),
+    title varchar(255),
+    primary key (id)
+)</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>JPA defines two terms for working with an embeddable type: <code>@Embeddable</code> and <code>@Embedded</code>.</p>
+</div>
+<div class="paragraph">
+<p><code>@Embeddable</code> is used to describe the mapping type itself (e.g. <code>Publisher</code>).</p>
+</div>
+<div class="paragraph">
+<p><code>@Embedded</code> is for referencing a given embeddable type (e.g. <code>book#publisher</code>).</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>So, the embeddable type is represented by the <code>Publisher</code> class and
+the parent entity makes use of it through the <code>book#publisher</code> object composition.</p>
+</div>
+<div class="paragraph">
+<p>The composed values are mapped to the same table as the parent table.
+Composition is part of good Object-oriented data modeling (idiomatic Java).
+In fact, that table could also be mapped by the following entity type instead.</p>
+</div>
+<div id="alternative-to-embeddable-type-mapping-example" class="exampleblock">
+<div class="title">Example 3. Alternative to embeddable type composition</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Entity(name = "Book")
+public static class Book {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    private String title;
+
+    private String author;
+
+    @Column(name = "publisher_name")
+    private String publisherName;
+
+    @Column(name = "publisher_country")
+    private String publisherCountry;
+
+    //Getters and setters are omitted for brevity
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>The composition form is certainly more Object-oriented, and that becomes more evident as we work with multiple embeddable types.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="embeddable-multiple">Multiple embeddable types</h4>
+<div class="paragraph">
+<p>Although from an object-oriented perspective, it&#8217;s much more convenient to work with embeddable types, this example doesn&#8217;t work as-is.
+When the same embeddable type is included multiple times in the same parent entity type, the JPA specification demands setting the associated column names explicitly.</p>
+</div>
+<div class="paragraph">
+<p>This requirement is due to how object properties are mapped to database columns.
+By default, JPA expects a database column having the same name with its associated object property.
+When including multiple embeddables, the implicit name-based mapping rule doesn&#8217;t work anymore because multiple object properties could end-up being mapped to the same database column.</p>
+</div>
+<div class="paragraph">
+<p>We have a few options to handle this issue.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="embeddable-override">Overriding Embeddable types</h4>
+<div class="paragraph">
+<p>JPA defines the <code>@AttributeOverride</code> annotation to handle this scenario.
+This way, the mapping conflict is resolved by setting up explicit name-based property-column type mappings.</p>
+</div>
+<div class="paragraph">
+<p>If an Embeddabe type is used multiple times in some entity, you need to use the
+<a href="http://docs.oracle.com/javaee/7/api/javax/persistence/AttributeOverride.html"><code>@AttributeOverride</code></a> and
+<a href="http://docs.oracle.com/javaee/7/api/javax/persistence/AssociationOverride.html"><code>@AssociationOverride</code></a> annotations
+to override the default column names definied by the Embeddable.</p>
+</div>
+<div class="paragraph">
+<p>Considering you have the following <code>Publisher</code> embeddable type
+which defines a <code>@ManyToOne</code> association with the <code>Country</code> entity:</p>
+</div>
+<div id="embeddable-type-association-mapping-example" class="exampleblock">
+<div class="title">Example 4. Embeddable type with a <code>@ManyToOne</code> association</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Embeddable
+public static class Publisher {
+
+    private String name;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Country country;
+
+    public Publisher(String name, Country country) {
+        this.name = name;
+        this.country = country;
+    }
+
+    private Publisher() {}
+
+    //Getters and setters are omitted for brevity
+}
+
+@Entity(name = "Country")
+public static class Country {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    @NaturalId
+    private String name;
+
+    //Getters and setters are omitted for brevity
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-sql" data-lang="sql">create table Country (
+    id bigint not null,
+    name varchar(255),
+    primary key (id)
+)
+
+alter table Country
+    add constraint UK_p1n05aafu73sbm3ggsxqeditd
+    unique (name)</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Now, if you have a <code>Book</code> entity which declares two <code>Publisher</code> embeddable types for the ebook and paperback version,
+you cannot use the default <code>Publisher</code> embeddable mapping since there will be a conflict between the two embeddable column mappings.</p>
+</div>
+<div class="paragraph">
+<p>Therefore, the <code>Book</code> entity needs to override the embeddable type mappings for each <code>Publisher</code> attribute:</p>
+</div>
+<div id="embeddable-type-override-mapping-example" class="exampleblock">
+<div class="title">Example 5. Overriding embeddable type attributes</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Entity(name = "Book")
+@AttributeOverrides({
+    @AttributeOverride(
+        name = "ebookPublisher.name",
+        column = @Column(name = "ebook_publisher_name")
+    ),
+    @AttributeOverride(
+        name = "paperBackPublisher.name",
+        column = @Column(name = "paper_back_publisher_name")
+    )
+})
+@AssociationOverrides({
+    @AssociationOverride(
+        name = "ebookPublisher.country",
+        joinColumns = @JoinColumn(name = "ebook_publisher_country_id")
+    ),
+    @AssociationOverride(
+        name = "paperBackPublisher.country",
+        joinColumns = @JoinColumn(name = "paper_back_publisher_country_id")
+    )
+})
+public static class Book {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    private String title;
+
+    private String author;
+
+    private Publisher ebookPublisher;
+
+    private Publisher paperBackPublisher;
+
+    //Getters and setters are omitted for brevity
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-sql" data-lang="sql">create table Book (
+    id bigint not null,
+    author varchar(255),
+    ebook_publisher_name varchar(255),
+    paper_back_publisher_name varchar(255),
+    title varchar(255),
+    ebook_publisher_country_id bigint,
+    paper_back_publisher_country_id bigint,
+    primary key (id)
+)
+
+alter table Book
+    add constraint FKm39ibh5jstybnslaoojkbac2g
+    foreign key (ebook_publisher_country_id)
+    references Country
+
+alter table Book
+    add constraint FK7kqy9da323p7jw7wvqgs6aek7
+    foreign key (paper_back_publisher_country_id)
+    references Country</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="embeddable-multiple-namingstrategy">Embeddables and ImplicitNamingStrategy</h4>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This is a Hibernate specific feature.
+Users concerned with JPA provider portability should instead prefer explicit column naming with <code>@AttributeOverride</code>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Hibernate naming strategies are covered in detail in <a href="chapters/domain/naming.html#naming">Naming</a>.
+However, for the purposes of this discussion, Hibernate has the capability to interpret implicit column names in a way that is safe for use with multiple embeddable types.</p>
+</div>
+<div id="embeddable-multiple-namingstrategy-entity-mapping" class="exampleblock">
+<div class="title">Example 6. Implicit multiple embeddable type mapping</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Entity(name = "Book")
+public static class Book {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    private String title;
+
+    private String author;
+
+    private Publisher ebookPublisher;
+
+    private Publisher paperBackPublisher;
+
+    //Getters and setters are omitted for brevity
+}
+
+@Embeddable
+public static class Publisher {
+
+    private String name;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Country country;
+
+    public Publisher(String name, Country country) {
+        this.name = name;
+        this.country = country;
+    }
+
+    private Publisher() {}
+
+    //Getters and setters are omitted for brevity
+}
+
+@Entity(name = "Country")
+public static class Country {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    @NaturalId
+    private String name;
+
+    //Getters and setters are omitted for brevity
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>To make it work, you need to use the <code>ImplicitNamingStrategyComponentPathImpl</code> naming strategy.</p>
+</div>
+<div id="embeddable-multiple-ImplicitNamingStrategyComponentPathImpl" class="exampleblock">
+<div class="title">Example 7. Enabling implicit embeddable type mapping using the component path naming strategy</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">metadataBuilder.applyImplicitNamingStrategy(
+    ImplicitNamingStrategyComponentPathImpl.INSTANCE
+);</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Now the "path" to attributes are used in the implicit column naming:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-sql" data-lang="sql">create table Book (
+    id bigint not null,
+    author varchar(255),
+    ebookPublisher_name varchar(255),
+    paperBackPublisher_name varchar(255),
+    title varchar(255),
+    ebookPublisher_country_id bigint,
+    paperBackPublisher_country_id bigint,
+    primary key (id)
+)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You could even develop your own naming strategy to do other types of implicit naming strategies.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="embeddable-collections">Collections of embeddable types</h4>
+<div class="paragraph">
+<p>Collections of embeddable types are specifically value collections (as embeddable types are a value type).
+Value collections are covered in detail in <a href="chapters/domain/collections.html#collections-value">Collections of value types</a>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="embeddable-mapkey">Embeddable types as Map key</h4>
+<div class="paragraph">
+<p>Embeddable types can also be used as <code>Map</code> keys.
+This topic is converted in detail in <a href="chapters/domain/collections.html#collections-map">Map - key</a>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="embeddable-identifier">Embeddable types as identifiers</h4>
+<div class="paragraph">
+<p>Embeddable types can also be used as entity type identifiers.
+This usage is covered in detail in <a href="chapters/domain/identifiers.html#identifiers-composite">Composite identifiers</a>.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Embeddable types that are used as collection entries, map keys or entity type identifiers cannot include their own collection mappings.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2018-05-21 13:59:13 -04:00
+</div>
+</div>
+</body>
+</html>

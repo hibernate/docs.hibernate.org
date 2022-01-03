@@ -1,0 +1,132 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>10.11.&nbsp;Persistance transitive</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="objectstate.html" title="Chapitre&nbsp;10.&nbsp;Travailler avec des objets">
+      <link rel="prev" href="objectstate-flushing.html" title="10.10.&nbsp;Flush de la session">
+      <link rel="next" href="objectstate-metadata.html" title="10.12.&nbsp;Utilisation des m&eacute;ta-donn&eacute;es">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">10.11.&nbsp;Persistance transitive</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="objectstate-flushing.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;10.&nbsp;Travailler avec des objets</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="objectstate-metadata.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="objectstate-transitive"></a>10.11.&nbsp;Persistance transitive
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Il est assez p&eacute;nible de sauvegarder, supprimer, ou r&eacute;attacher des objets un par un, surtout si vous traitez un graphe d'objets
+            associ&eacute;s. Un cas habituel est une relation parent/enfant. Consid&eacute;rez l'exemple suivant : 
+         </p>
+         <p>Si les enfants de la relation parent/enfant &eacute;taient des types de valeur (par exemple, une collection d'adresses ou de cha&icirc;nes
+            de caract&egrave;res), leur cycle de vie d&eacute;pendraient du parent et aucune action ne serait requise pour "cascader" facilement les
+            changements d'&eacute;tat. Si le parent est sauvegard&eacute;, les objets enfants de type de valeur sont sauvegard&eacute;s &eacute;galement, si le parent
+            est supprim&eacute;, les enfants sont supprim&eacute;s, etc. Ceci fonctionne m&ecirc;me pour des op&eacute;rations telles que la suppression d'un enfant
+            de la collection ; Hibernate d&eacute;tectera cela et, puisque les objets de type de valeur ne peuvent pas avoir des r&eacute;f&eacute;rences partag&eacute;es,
+            supprimera l'enfant de la base de donn&eacute;es. 
+         </p>
+         <p>Maintenant consid&eacute;rez le m&ecirc;me sc&eacute;nario avec un parent et dont les objets enfants sont des entit&eacute;s, et non des types de valeur
+            (par exemple, des cat&eacute;gories et des objets, ou un parent et des chatons). Les entit&eacute;s ont leur propre cycle de vie, supportent
+            les r&eacute;f&eacute;rences partag&eacute;es (donc supprimer une entit&eacute; de la collection ne signifie pas qu'elle peut &ecirc;tre supprim&eacute;e), et il n'y
+            a par d&eacute;faut pas de cascade d'&eacute;tat d'une entit&eacute; vers n'importe quelle entit&eacute; associ&eacute;e. Hibernate n'impl&eacute;mente pas la <span class="emphasis"><em>persistance par accessibilit&eacute;</em></span> par d&eacute;faut. 
+         </p>
+         <p>Pour chaque op&eacute;ration basique de la session d'Hibernate - incluant <code class="literal">persist(), merge(), saveOrUpdate(), delete(), lock(), refresh(), evict(), replicate()</code> - il y a un style de cascade correspondant. Respectivement, les styles de cascade s'appellent <code class="literal">persist, merge, save-update, delete, lock, refresh, evict, replicate</code>. Si vous voulez qu'une op&eacute;ration soit cascad&eacute;e le long d'une association, vous devez l'indiquer dans le document de mapping.
+            Par exemple : 
+         </p><pre class="programlisting">&lt;one-to-one name="person" cascade="persist"/&gt;</pre><p>Les styles de cascade peuvent &ecirc;tre combin&eacute;s : </p><pre class="programlisting">&lt;one-to-one name="person" cascade="persist,delete,lock"/&gt;</pre><p>Vous pouvez m&ecirc;me utiliser <code class="literal">cascade="all"</code> pour sp&eacute;cifier que <span class="emphasis"><em>toutes</em></span> les op&eacute;rations devraient &ecirc;tre cascad&eacute;es le long de l'association. La valeur par d&eacute;faut <code class="literal">cascade="none"</code> sp&eacute;cifie qu'aucune op&eacute;ration ne sera cascad&eacute;e. 
+         </p>
+         <p>Une style de cascade sp&eacute;cial, <code class="literal">delete-orphan</code>, s'applique seulement aux associations un-vers-plusieurs, et indique que l'op&eacute;ration <code class="literal">delete()</code> devrait &ecirc;tre appliqu&eacute;e &agrave; n'importe quel enfant qui est supprim&eacute; de l'association. 
+         </p>
+         <p>Recommandations : </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p>Cela n'a g&eacute;n&eacute;ralement aucun sens d'activer la cascade sur une association <code class="literal">&lt;many-to-one&gt;</code> ou <code class="literal">&lt;many-to-many&gt;</code>. Les cascades sont souvent utiles pour des associations <code class="literal">&lt;one-to-one&gt;</code> et <code class="literal">&lt;one-to-many&gt;</code>. 
+                  </p>
+               </li>
+               <li>
+                  <p>Si la dur&eacute;e de vie de l'objet enfant est li&eacute;e &agrave; la dur&eacute;e de vie de l'objet parent, faites en un <span class="emphasis"><em>objet du cycle de vie</em></span> en sp&eacute;cifiant <code class="literal">cascade="all,delete-orphan"</code>. 
+                  </p>
+               </li>
+               <li>
+                  <p>Sinon, vous pourriez ne pas avoir besoin de cascade du tout. Mais si vous pensez que vous travaillerez souvent avec le parent
+                     et les enfants ensemble dans la m&ecirc;me transaction, et que vous voulez vous &eacute;viter quelques frappes, consid&eacute;rez l'utilisation
+                     de <code class="literal">cascade="persist,merge,save-update"</code>. 
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p>Mapper une association (soit une simple association valu&eacute;e, soit une collection) avec <code class="literal">cascade="all"</code> marque l'association comme une relation de style <span class="emphasis"><em>parent/enfant</em></span> o&ugrave; la sauvegarde/mise &agrave; jour/suppression du parent entra&icirc;ne la sauvegarde/mise &agrave; jour/suppression de l'enfant ou des enfants.
+            
+         </p>
+         <p>En outre, une simple r&eacute;f&eacute;rence &agrave; un enfant d'un parent persistant aura pour cons&eacute;quence la sauvegarde/mise &agrave; jour de l'enfant.
+            Cette m&eacute;taphore est cependant incompl&egrave;te. Un enfant qui devient non r&eacute;f&eacute;renc&eacute; par son parent <span class="emphasis"><em>n'est pas</em></span> automatiquement supprim&eacute;e, except&eacute; dans le cas d'une association <code class="literal">&lt;one-to-many&gt;</code> mapp&eacute;e avec <code class="literal">cascade="delete-orphan"</code>. La s&eacute;mantique pr&eacute;cise des op&eacute;rations de cascade pour une relation parent/enfant est la suivante : 
+         </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p>Si un parent est pass&eacute; &agrave; <code class="literal">persist()</code>, tous les enfant sont pass&eacute;s &agrave; <code class="literal">persist()</code> 
+                  </p>
+               </li>
+               <li>
+                  <p>Si un parent est pass&eacute; &agrave; <code class="literal">merge()</code>, tous les enfants sont pass&eacute;s &agrave; <code class="literal">merge()</code> 
+                  </p>
+               </li>
+               <li>
+                  <p>Si un parent est pass&eacute; &agrave; <code class="literal">save()</code>, <code class="literal">update()</code> ou <code class="literal">saveOrUpdate()</code>, tous les enfants sont pass&eacute;s &agrave; <code class="literal">saveOrUpdate()</code> 
+                  </p>
+               </li>
+               <li>
+                  <p>Si un enfant d&eacute;tach&eacute; ou &eacute;ph&eacute;m&egrave;re devient r&eacute;f&eacute;renc&eacute; par un parent persistant, il est pass&eacute; &agrave; <code class="literal">saveOrUpdate()</code> 
+                  </p>
+               </li>
+               <li>
+                  <p>Si un parent est supprim&eacute;, tous les enfants sont pass&eacute;s &agrave; <code class="literal">delete()</code> 
+                  </p>
+               </li>
+               <li>
+                  <p>Si un enfant est d&eacute;r&eacute;f&eacute;renc&eacute; par un parent persistant, <span class="emphasis"><em>rien de sp&eacute;cial n'arrive</em></span> - l'application devrait explicitement supprimer l'enfant si n&eacute;cessaire - &agrave; moins que <code class="literal">cascade="delete-orphan"</code> soit param&eacute;tr&eacute;, au quel cas l'enfant "orphelin" est supprim&eacute;. 
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p>Enfin, la cascade des op&eacute;rations peut &ecirc;tre effectu&eacute;e sur un graphe donn&eacute; lors de l'<span class="emphasis"><em>appel de l'op&eacute;ration</em></span> or lors du <span class="emphasis"><em>flush</em></span> suivant. Toutes les op&eacute;rations, lorsque cascad&eacute;es, le sont sur toutes les entit&eacute;s associ&eacute;es atteignables lorsque l'op&eacute;tation
+            est ex&eacute;cut&eacute;e. Cependant <code class="literal">save-upate</code> et <code class="literal">delete-orphan</code> sont cascad&eacute;es &agrave; toutes les entit&eacute;s associ&eacute;es atteignables lors du flush de la <code class="literal">Session</code>. 
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="objectstate-flushing.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="objectstate.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="objectstate-metadata.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">10.10.&nbsp;Flush de la session&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;10.12.&nbsp;Utilisation des m&eacute;ta-donn&eacute;es</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

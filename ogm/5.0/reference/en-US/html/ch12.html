@@ -1,0 +1,492 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Chapter 12. Neo4j</title><!-- HibernateDoc.Meta --><meta name="description" content="Hibernate OGM, JPA for NoSQL datastores - Reference Documentation" /><meta name="keywords" content="hibernate, ogm, hibernate ogm, nosql, jpa, infinispan, mongodb, neo4j, cassandra, couchdb, ehcache, redis" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://docs.jboss.org/hibernate/stable/ogm/reference/en-US/html_single/" /><!-- /HibernateDoc.Meta --><link rel="stylesheet" type="text/css" href="css/hibernate.css"/><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"/><link rel="home" href="index.html" title="Hibernate OGM Reference Guide"/><link rel="up" href="index.html" title="Hibernate OGM Reference Guide"/><link rel="prev" href="ch11.html" title="Chapter 11. MongoDB"/><link rel="next" href="ch13.html" title="Chapter 13. CouchDB (Experimental)"/><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/></head><body><p id="title"><a href="http://www.hibernate.org" class="site_href"><strong>Hibernate.org</strong></a><a href="http://hibernate.org/Documentation/DocumentationOverview" class="doc_href"><strong>Community Documentation</strong></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="ch11.html"><strong>Prev</strong></a></li><li class="next"><a accesskey="n" href="ch13.html"><strong>Next</strong></a></li></ul><div class="chapter" title="Chapter 12. Neo4j"><div class="titlepage"><div><div><h2 class="title"><a id="ogm-neo4j"/>Chapter 12. Neo4j</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="ch12.html#how_to_add_neo4j_integration">12.1. How to add Neo4j integration</a></span></dt><dt><span class="section"><a href="ch12.html#configuring_neo4j">12.2. Configuring Neo4j</a></span></dt><dt><span class="section"><a href="ch12.html#ogm-neo4j-storage-principles">12.3. Storage principles</a></span></dt><dd><dl><dt><span class="section"><a href="ch12.html#ogm-neo4j-built-in-types">12.3.1. Properties and built-in types</a></span></dt><dt><span class="section"><a href="ch12.html#entities_5">12.3.2. Entities</a></span></dt><dt><span class="section"><a href="ch12.html#associations_4">12.3.3. Associations</a></span></dt><dt><span class="section"><a href="ch12.html#auto_generated_values">12.3.4. Auto-generated Values</a></span></dt><dt><span class="section"><a href="ch12.html#labels_summary">12.3.5. Labels summary</a></span></dt></dl></dd><dt><span class="section"><a href="ch12.html#ogm-neo4j-transactions">12.4. Transactions</a></span></dt><dt><span class="section"><a href="ch12.html#ogm-neo4j-queries">12.5. Queries</a></span></dt><dd><dl><dt><span class="section"><a href="ch12.html#jp_ql_queries_2">12.5.1. JP-QL queries</a></span></dt><dt><span class="section"><a href="ch12.html#ogm-neo4j-queries-native">12.5.2. Cypher queries</a></span></dt></dl></dd></dl></div><p><a class="link" href="http://www.neo4j.org">Neo4j</a> is a robust (fully ACID) transactional property graph database.
+This kind of databases are suited for those type of problems that can be represented with a graph
+like social relationships or road maps for example.</p><p>At the moment only the support for the embedded Neo4j is included in OGM.</p><div class="section" title="12.1. How to add Neo4j integration"><div class="titlepage"><div><div><h2 class="title"><a id="how_to_add_neo4j_integration"/>12.1. How to add Neo4j integration</h2></div></div></div><p title="1. Add the dependencies to your project"><strong>1. Add the dependencies to your project. </strong>If your project uses Maven you can add this to the pom.xml:</p><pre><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.hibernate.ogm&lt;/groupId&gt;
+    &lt;artifactId&gt;hibernate-ogm-neo4j&lt;/artifactId&gt;
+    &lt;version&gt;5.0.4.Final&lt;/version&gt;
+&lt;/dependency&gt;</code></pre><p>Alternatively you can find the required libraries in the distribution package on <a class="link" href="https://downloads.sourceforge.net/project/hibernate/hibernate-ogm/5.0.4.Final/hibernate-ogm-5.0.4.Final-dist.zip">SourceForge</a></p><p title="2. Add the following properties:"><strong>2. Add the following properties: </strong>
+</p><pre><code class="language-properties">hibernate.ogm.datastore.provider = neo4j_embedded
+hibernate.ogm.neo4j.database_path = C:\example\mydb</code></pre><p title="2. Add the following properties:">
+</p></div><div class="section" title="12.2. Configuring Neo4j"><div class="titlepage"><div><div><h2 class="title"><a id="configuring_neo4j"/>12.2. Configuring Neo4j</h2></div></div></div><p>The following properties are available to configure Neo4j support:</p><div class="variablelist" title="Neo4j datastore configuration properties"><p class="title"><strong>Neo4j datastore configuration properties</strong></p><dl><dt><span class="term">hibernate.ogm.neo4j.database_path</span></dt><dd>The absolute path representing the location of the Neo4j database. Example: <code class="literal">C:\neo4jdb\mydb</code></dd><dt><span class="term">hibernate.ogm.neo4j.configuration_resource_name (optional)</span></dt><dd>Location of the Neo4j embedded properties file. It can be an URL, name of a classpath resource or file system path.</dd><dt><span class="term">hibernate.schema_update.unique_constraint_strategy (optional)</span></dt><dd>If set to <code class="literal">SKIP</code>, Hibernate OGM won’t create any unique constraints on the nodes representing the entities.
+This property won’t affect the unique constraints generated for sequences.
+Other possible values (defined on the <code class="literal">org.hibernate.tool.hbm2ddl.UniqueConstraintSchemaUpdateStrategy</code> enum) are <code class="literal">DROP_RECREATE_QUIETLY</code> and <code class="literal">RECREATE_QUIETLY</code>
+but the effect will be the same (since Neo4j constraints don’t have a name):
+keep the existing constraints and create the missing one.
+Default value is <code class="literal">DROP_RECREATE_QUIETLY</code>.</dd></dl></div><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>When bootstrapping a session factory or entity manager factory programmatically,
+you should use the constants defined on <code class="literal">org.hibernate.ogm.datastore.neo4j.Neo4jProperties</code>
+when specifying the configuration properties listed above.</p><p>Common properties shared between stores are declared on <code class="literal">OgmProperties</code>
+(a super interface of <code class="literal">Neo4jProperties</code>).</p><p>For maximum portability between stores, use the most generic interface possible.</p></div></div><div class="section" title="12.3. Storage principles"><div class="titlepage"><div><div><h2 class="title"><a id="ogm-neo4j-storage-principles"/>12.3. Storage principles</h2></div></div></div><p>Hibernate OGM tries to make the mapping to the underlying datastore as natural as possible
+so that third party applications not using Hibernate OGM can still read
+and update the same datastore.</p><p>To make things simple, each entity is represented by a node,
+each embedded object is also represented by a node.
+Links between entities (whether to-one to to-many associations)
+are represented by relationships between nodes.
+Entity and embedded nodes are labelled <code class="literal">ENTITY</code> and <code class="literal">EMBEDDED</code> respectively.</p><div class="section" title="12.3.1. Properties and built-in types"><div class="titlepage"><div><div><h3 class="title"><a id="ogm-neo4j-built-in-types"/>12.3.1. Properties and built-in types</h3></div></div></div><p>Each entity is represented by a node.
+Each property or more precisely column is represented by an attribute of this node.</p><p>The following types (and corresponding primitives) get passed to Neo4j without any conversion:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.lang.Boolean</code>; Optionally the annotations <code class="literal">@Type(type = "true_false")</code>, <code class="literal">@Type(type = "yes_no")</code> and <code class="literal">@Type(type = "numeric_boolean")</code> can be used to map boolean properties to the characters 'T'/'F', 'Y'/'N' or the int values 0/1, respectively.</li><li class="listitem"><code class="literal">java.lang.Character</code></li><li class="listitem"><code class="literal">java.lang.Byte</code></li><li class="listitem"><code class="literal">java.lang.Short</code></li><li class="listitem"><code class="literal">java.lang.Integer</code></li><li class="listitem"><code class="literal">java.lang.Long</code></li><li class="listitem"><code class="literal">java.lang.Float</code></li><li class="listitem"><code class="literal">java.lang.Double</code></li><li class="listitem"><code class="literal">java.lang.String</code></li></ul></div><p>The following types get converted into <code class="literal">java.lang.String</code>:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.math.BigDecimal</code></li><li class="listitem"><code class="literal">java.math.BigInteger</code></li><li class="listitem"><p class="simpara"><code class="literal">java.util.Calendar</code></p><pre class="literallayout">stored as `String` with the format "yyyy/MM/dd HH:mm:ss:SSS Z"</pre></li><li class="listitem"><p class="simpara"><code class="literal">java.util.Date</code></p><pre class="literallayout">stored as `String` with the format "yyyy/MM/dd HH:mm:ss:SSS Z"</pre></li><li class="listitem"><code class="literal">java.util.UUID</code></li><li class="listitem"><code class="literal">java.util.URL</code></li></ul></div><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>Hibernate OGM doesn’t store null values in Neo4J,
+setting a value to null is the same as removing the corresponding entry
+from Neo4J.</p><p>This can have consequences when it comes to queries on null value.</p></div></div><div class="section" title="12.3.2. Entities"><div class="titlepage"><div><div><h3 class="title"><a id="entities_5"/>12.3.2. Entities</h3></div></div></div><p>Entities are stored as Neo4j nodes,
+which means each entity property will be translated into a property of the node.
+The name of the table mapping the entity is used as label.</p><p>You can use the name property of the <code class="literal">@Table</code> and <code class="literal">@Column</code> annotations
+to rename the label and the node’s properties.</p><p>An additional label <code class="literal">ENTITY</code> is added to the node.</p><div class="example"><a id="d0e10895"/><p class="title"><strong>Example 12.1. Default JPA mapping for an entity</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class News {
+
+    @Id
+    private String id;
+    private String title;
+
+    // getters, setters ...
+}</code></pre><div class="informalfigure"><div class="mediaobject" align="center"><img src="images/neo4j-single-node-example.png" align="middle" alt="neo4j single node example"/></div></div></div></div><br class="example-break"/><div class="example"><a id="d0e10907"/><p class="title"><strong>Example 12.2. Rename node label and properties using @Table and @Column</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@Table(name="ARTICLE")
+public class News {
+
+    @Id
+    private String id;
+
+    @Column(name = "headline")
+    private String title;
+
+    // getters, setters ...
+}</code></pre><div class="informalfigure"><div class="mediaobject" align="center"><img src="images/neo4j-@Column-@Table-example.png" align="middle" alt="neo4j @Column @Table example"/></div></div></div></div><br class="example-break"/><div class="section" title="12.3.2.1. Identifiers and unique constraints"><div class="titlepage"><div><div><h4 class="title"><a id="identifiers_and_unique_constraints"/>12.3.2.1. Identifiers and unique constraints</h4></div></div></div><div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Warning</h2><p>Neo4j does not support constraints on more than one property.
+For this reason, Hibernate OGM will create a unique constraint ONLY when it spans
+a single property and it will ignore the ones spanning multiple properties.</p><p>The lack of unique constraints on node properties might result in the creation of multiple
+nodes with the same identifier.</p></div><p>Hibernate OGM will create unique constraints for the identifier of entities and for the properties
+annotated with:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">@Id</code></li><li class="listitem"><code class="literal">@EmbeddedId</code></li><li class="listitem"><code class="literal">@NaturalId</code></li><li class="listitem"><code class="literal">@Column( unique = true )</code></li><li class="listitem"><code class="literal">@Table( uniqueConstraints = @UniqueConstraint(columnNames = { "column_name" } ) )</code></li></ul></div><p>Embedded identifiers are currently stored as dot separated properties.</p><div class="example"><a id="d0e10952"/><p class="title"><strong>Example 12.3. Entity with @EmbeddedId</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class News {
+
+    @EmbeddedId
+    private NewsID newsId;
+
+    private String content
+
+    // getters, setters ...
+}
+
+@Embeddable
+public class NewsID implements Serializable {
+
+    private String title;
+    private String author;
+
+    // getters, setters ...
+}</code></pre><div class="informalfigure"><div class="mediaobject" align="center"><img src="images/neo4j-@EmbeddedId-example.png" align="middle" alt="neo4j @EmbeddedId example"/></div></div></div></div><br class="example-break"/></div><div class="section" title="12.3.2.2. Embedded objects and collections"><div class="titlepage"><div><div><h4 class="title"><a id="embedded_objects_and_collections_4"/>12.3.2.2. Embedded objects and collections</h4></div></div></div><p>Embedded elements are stored as separate nodes labeled with <code class="literal">EMBEDDED</code>.</p><p>The type of the relationship that connects the entity node to the embedded node is
+the attribute name representing the embedded in the java class.</p><div class="example"><a id="d0e10974"/><p class="title"><strong>Example 12.4. Embedded object</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class News {
+
+    @EmbeddedId
+    private NewsID newsId;
+
+    @Embedded
+    private NewsPaper paper;
+
+    // getters, setters ...
+}
+
+@Embeddable
+public class NewsID implements Serializable {
+
+    private String title;
+    private String author;
+
+    // getters, setters ...
+}
+
+@Embeddable
+public class NewsPaper {
+
+    private String name;
+    private String owner;
+
+    // getters, setters ...
+}</code></pre><div class="informalfigure"><div class="mediaobject" align="center"><img src="images/neo4j-@Embedded-example.png" align="middle" alt="neo4j @Embedded example"/></div></div></div></div><br class="example-break"/><div class="example"><a id="d0e10986"/><p class="title"><strong>Example 12.5. @ElementCollection</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class GrandMother {
+
+    @Id
+    private String id;
+
+    @ElementCollection
+    private List&lt;GrandChild&gt; grandChildren = new ArrayList&lt;GrandChild&gt;();
+
+    // getters, setters ...
+}
+
+@Embeddable
+public class GrandChild {
+
+    private String name;
+
+    // getters, setters ...
+}</code></pre><div class="informalfigure"><div class="mediaobject" align="center"><img src="images/neo4j-@ElementCollection-example.png" align="middle" alt="neo4j @ElementCollection example"/></div></div></div></div><br class="example-break"/><p>Note that in the previous examples no property is added to the relationships;
+in the following one, one property is added to keep track of the order of the elements in the list.</p><div class="example"><a id="d0e11000"/><p class="title"><strong>Example 12.6. @ElementCollection with @OrderColumn</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class GrandMother {
+
+    @Id
+    private String id;
+
+    @ElementCollection
+    @OrderColumn( name = "birth_order" )
+    private List&lt;GrandChild&gt; grandChildren = new ArrayList&lt;GrandChild&gt;();
+
+    // getters, setters ...
+}
+
+@Embeddable
+public class GrandChild {
+
+    private String name;
+
+    // getters, setters ...
+}</code></pre><div class="informalfigure"><div class="mediaobject" align="center"><img src="images/neo4j-@ElementCollection-@OrderColumn-example.png" align="middle" alt="neo4j @ElementCollection @OrderColumn example"/></div></div></div></div><br class="example-break"/></div></div><div class="section" title="12.3.3. Associations"><div class="titlepage"><div><div><h3 class="title"><a id="associations_4"/>12.3.3. Associations</h3></div></div></div><p>An association, bidirectional or unidirectional, is always mapped using one relationship,
+beginning at the owning side of the association.
+This is possible because in Neo4j relationships can be navigated in both directions.</p><p>The type of the relationships depends on the type of the association,
+but in general it is the role of the association on the main side.
+The only property stored on the relationship is going to be the index of the association when required,
+for example when the association is annotated with <code class="literal">@OrderColumn</code> or when a <code class="literal">java.util.Map</code> is used.</p><p>In Neo4j nodes are connected via relationship, this means that we don’t need to create properties
+which store foreign column keys. This means that annotation like <code class="literal">@JoinColumn</code> won’t have any effect.</p><div class="example"><a id="d0e11030"/><p class="title"><strong>Example 12.7. Unidirectional one-to-one</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Vehicule {
+
+    @Id
+    private String id;
+    private String brand;
+
+    // getters, setters ...
+}
+
+
+@Entity
+public class Wheel {
+
+    @Id
+    private String id;
+    private String company;
+    private double diameter;
+
+    @OneToOne
+    private Vehicule vehicule;
+
+    // getters, setters ...
+}</code></pre><div class="informalfigure"><div class="mediaobject" align="center"><img src="images/neo4j-uni-one-to-one-example.png" align="middle" alt="neo4j uni one to one example"/></div></div></div></div><br class="example-break"/><div class="example"><a id="d0e11042"/><p class="title"><strong>Example 12.8. Bidirectional one-to-one</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Husband {
+
+    @Id
+    private String id;
+    private String name;
+
+    @OneToOne
+    private Wife wife;
+
+    // getters, setters ...
+}
+
+@Entity
+public class Wife {
+
+    @Id
+    private String id;
+    private String name;
+
+    @OneToOne(mappedBy = "wife")
+    private Husband husband;
+
+    // getters, setters ...
+}</code></pre><div class="informalfigure"><div class="mediaobject" align="center"><img src="images/neo4j-bi-one-to-one-example.png" align="middle" alt="neo4j bi one to one example"/></div></div></div></div><br class="example-break"/><div class="example"><a id="d0e11054"/><p class="title"><strong>Example 12.9. Unidirectional one-to-many</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Basket {
+
+    @Id
+    private String id;
+
+    private String owner;
+
+    @OneToMany
+    private List&lt;Product&gt; products = new ArrayList&lt;Product&gt;();
+
+    // getters, setters ...
+}
+
+@Entity
+public class Product {
+
+    @Id
+    private String name;
+
+    private String description;
+
+    // getters, setters ...
+}</code></pre><div class="informalfigure"><div class="mediaobject" align="center"><img src="images/neo4j-uni-one-to-many-example.png" align="middle" alt="neo4j uni one to many example"/></div></div></div></div><br class="example-break"/><div class="example"><a id="d0e11066"/><p class="title"><strong>Example 12.10. Unidirectional one-to-many using maps with defaults</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class User {
+
+    @Id
+    private String id;
+
+    @OneToMany
+    private Map&lt;String, Address&gt; addresses = new HashMap&lt;String, Address&gt;();
+
+    // getters, setters ...
+}
+
+@Entity
+public class Address {
+
+    @Id
+    private String id;
+    private String city;
+
+    // getters, setters ...
+}</code></pre><div class="informalfigure"><div class="mediaobject" align="center"><img src="images/neo4j-uni-one-to-many-with-map-example.png" align="middle" alt="neo4j uni one to many with map example"/></div></div></div></div><br class="example-break"/><div class="example"><a id="d0e11078"/><p class="title"><strong>Example 12.11. Unidirectional one-to-many using maps with @MapKeyColumn</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class User {
+
+    @Id
+    private String id;
+
+    @OneToMany
+    @MapKeyColumn(name = "addressType")
+    private Map&lt;String, Address&gt; addresses = new HashMap&lt;String, Address&gt;();
+
+    // getters, setters ...
+}
+
+@Entity
+public class Address {
+
+    @Id
+    private String id;
+    private String city;
+
+    // getters, setters ...
+}</code></pre><div class="informalfigure"><div class="mediaobject" align="center"><img src="images/neo4j-uni-one-to-many-with-@MapKeyColumn-example.png" align="middle" alt="neo4j uni one to many with @MapKeyColumn example"/></div></div></div></div><br class="example-break"/><div class="example"><a id="d0e11090"/><p class="title"><strong>Example 12.12. Unidirectional many-to-one</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class JavaUserGroup {
+
+    @Id
+    private String jug_id;
+    private String name;
+
+    // getters, setters ...
+}
+
+@Entity
+public class Member {
+
+    @Id
+    private String id;
+    private String name;
+
+    @ManyToOne
+    private JavaUserGroup memberOf;
+
+    // getters, setters ...
+}</code></pre><div class="informalfigure"><div class="mediaobject" align="center"><img src="images/neo4j-uni-many-to-one-example.png" align="middle" alt="neo4j uni many to one example"/></div></div></div></div><br class="example-break"/><div class="example"><a id="d0e11102"/><p class="title"><strong>Example 12.13. Bidirectional many-to-one</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class SalesForce {
+
+    @Id
+    private String id;
+    private String corporation;
+
+    @OneToMany(mappedBy = "salesForce")
+    private Set&lt;SalesGuy&gt; salesGuys = new HashSet&lt;SalesGuy&gt;();
+
+    // getters, setters ...
+}
+
+@Entity
+public class SalesGuy {
+    private String id;
+    private String name;
+
+    @ManyToOne
+    private SalesForce salesForce;
+
+    // getters, setters ...
+}</code></pre><div class="informalfigure"><div class="mediaobject" align="center"><img src="images/neo4j-bi-many-to-one-example.png" align="middle" alt="neo4j bi many to one example"/></div></div></div></div><br class="example-break"/><div class="example"><a id="d0e11114"/><p class="title"><strong>Example 12.14. Unidirectional many-to-many</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Student {
+
+    @Id
+    private String id;
+    private String name;
+
+    // getters, setters ...
+}
+
+@Entity
+public class ClassRoom {
+
+    @Id
+    private long id;
+    private String lesson;
+
+    @ManyToMany
+    private List&lt;Student&gt; students = new ArrayList&lt;Student&gt;();
+
+    // getters, setters ...
+}</code></pre><div class="informalfigure"><div class="mediaobject" align="center"><img src="images/neo4j-uni-many-to-many-example.png" align="middle" alt="neo4j uni many to many example"/></div></div></div></div><br class="example-break"/><div class="example"><a id="d0e11126"/><p class="title"><strong>Example 12.15. Bidirectional many-to-many</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class AccountOwner {
+
+    @Id
+    private String id;
+
+    private String SSN;
+
+    @ManyToMany
+    private Set&lt;BankAccount&gt; bankAccounts;
+
+    // getters, setters ...
+}
+
+@Entity
+public class BankAccount {
+
+    @Id
+    private String id;
+
+    private String accountNumber;
+
+    @ManyToMany( mappedBy = "bankAccounts" )
+    private Set&lt;AccountOwner&gt; owners = new HashSet&lt;AccountOwner&gt;();
+
+    // getters, setters ...
+}</code></pre><div class="informalfigure"><div class="mediaobject" align="center"><img src="images/neo4j-bi-many-to-many-example.png" align="middle" alt="neo4j bi many to many example"/></div></div></div></div><br class="example-break"/></div><div class="section" title="12.3.4. Auto-generated Values"><div class="titlepage"><div><div><h3 class="title"><a id="auto_generated_values"/>12.3.4. Auto-generated Values</h3></div></div></div><p>Hibernate OGM supports the table generation strategy as well as the sequence generation strategy with Neo4j.
+It is generally recommended to work with the latter,
+as it allows a slightly more efficient querying for the next sequence value.</p><p>Sequence-based generators are represented by nodes in the following form:</p><div class="example"><a id="d0e11145"/><p class="title"><strong>Example 12.16. GenerationType.SEQUENCE</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Song {
+
+    ...
+
+    @Id
+    @GeneratedValue( strategy = GenerationType.SEQUENCE, generator = "songSequenceGenerator" )
+    @SequenceGenerator(
+            name = "songSequenceGenerator",
+            sequenceName = "song_sequence",
+            initialValue = INITIAL_VALUE,
+            allocationSize = 10)
+    public Long getId() {
+        return id;
+    }
+
+    ...</code></pre><div class="informalfigure"><div class="mediaobject" align="center"><img src="images/neo4j-sequence-example.png" align="middle" alt="neo4j sequence example"/></div></div></div></div><br class="example-break"/><p>Each sequence generator node is labelled with <code class="literal">SEQUENCE</code>.
+The sequence name can be specified via <code class="literal">@SequenceGenerator#sequenceName()</code>.
+A unique constraint is applied to the property <code class="literal">sequence_name</code> in order to ensure uniqueness of sequences.</p><p>If required, you can set the initial value of a sequence and the increment size via
+<code class="literal">@SequenceGenerator#initialValue()</code> and <code class="literal">@SequenceGenerator#allocationSize()</code>, respectively.
+The options <code class="literal">@SequenceGenerator#catalog()</code> and <code class="literal">@SequenceGenerator#schema()</code> are not supported.</p><p>Table-based generators are represented by nodes in the following form:</p><div class="example"><a id="d0e11184"/><p class="title"><strong>Example 12.17. GenerationType.TABLE</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Video {
+
+    ...
+
+    @Id
+    @GeneratedValue( strategy = GenerationType.TABLE, generator = "video" )
+    @TableGenerator(
+         name = "video",
+         table = "Sequences",
+         pkColumnName = "key",
+         pkColumnValue = "video",
+         valueColumnName = "seed"
+    )
+    public Integer getId() {
+        return id;
+    }
+
+    ...</code></pre><div class="informalfigure"><div class="mediaobject" align="center"><img src="images/neo4j-table-based-sequence-example.png" align="middle" alt="neo4j table based sequence example"/></div></div></div></div><br class="example-break"/><p>Each table generator node is labelled with <code class="literal">TABLE_BASED_SEQUENCE</code>
+and the table name as specified via <code class="literal">@TableGenerator#table()</code>.
+The sequence name is to be given via <code class="literal">@TableGenerator#pkColumnValue()</code>.
+The node properties holding the sequence name and value can be configured via
+<code class="literal">@TableGenerator#pkColumnName()</code> and <code class="literal">@TableGenerator#valueColumnName()</code>, respectively.
+A unique constraint is applied to the property <code class="literal">sequence_name</code> to avoid the same sequence name is used twice within the same "table".</p><p>If required, you can set the initial value of a sequence and the increment size via
+<code class="literal">@TableGenerator#initialValue()</code> and <code class="literal">@TableGenerator#allocationSize()</code>, respectively.
+The options <code class="literal">@TableGenerator#catalog()</code>, <code class="literal">@TableGenerator#schema()</code>, <code class="literal">@TableGenerator#uniqueConstraints()</code> and <code class="literal">@TableGenerator#indexes()</code>  are not supported.</p></div><div class="section" title="12.3.5. Labels summary"><div class="titlepage"><div><div><h3 class="title"><a id="labels_summary"/>12.3.5. Labels summary</h3></div></div></div><p>The maximum number of labels the database can contain is roughly 2 billion.</p><p>The following summary will help you to keep track of the labels assigned to a new node:</p><div class="table"><a id="d0e11243"/><p class="title"><strong>Table 12.1. Summary of the labels assigned to a new node</strong></p><div class="table-contents"><table summary="Summary of the labels assigned to a new node" border="1"><colgroup><col width="50*" class="col_1"/><col width="50*" class="col_2"/></colgroup><thead><tr><th align="center" valign="top">NODE TYPE</th><th align="center" valign="top">LABELS</th></tr></thead><tbody><tr><td align="left" valign="top"><p>Entity</p></td><td align="left" valign="top"><p>ENTITY, &lt;Entity class name&gt;</p></td></tr><tr><td align="left" valign="top"><p>Embeddable</p></td><td align="left" valign="top"><p>EMBEDDED, &lt;Embeddable class name&gt;</p></td></tr><tr><td align="left" valign="top"><p>GenerationType.SEQUENCE</p></td><td align="left" valign="top"><p>SEQUENCE</p></td></tr><tr><td align="left" valign="top"><p>GenerationType.TABLE</p></td><td align="left" valign="top"><p>TABLE_BASED_SEQUENCE, &lt;Table name&gt;</p></td></tr></tbody></table></div></div><br class="table-break"/></div></div><div class="section" title="12.4. Transactions"><div class="titlepage"><div><div><h2 class="title"><a id="ogm-neo4j-transactions"/>12.4. Transactions</h2></div></div></div><p>In Neo4j, operations must be executed inside a transaction.
+Make sure your interactions with Hibernate OGM are within a transaction when you target Neo4J.</p><div class="example"><a id="d0e11289"/><p class="title"><strong>Example 12.18. Example of starting and committing transactions</strong></p><div class="example-contents"><pre><code class="language-java">Session session = factory.openSession();
+Transaction tx = session.beginTransaction();
+
+Account account = new Account();
+account.setLogin( "myAccount" );
+session.persist( account );
+
+tx.commit();
+
+...
+
+tx = session.beginTransaction();
+Account savedAccount =  (Account) session.get( Account.class, account.getId() );
+tx.commit();</code></pre></div></div><br class="example-break"/><p>In the case of JTA, Hibernate OGM attaches the Neo4J internal transaction to the JTA
+transaction lifecycle.
+That way when the JTA transaction is committed or rollbacked (for example by an EJB CMT or
+explicitly), the Neo4J transaction is also committed or rollbacked.
+This makes for a nice integration in a Java EE container.</p><pre class="screen">This is NOT a true JTA/XA integration but more a lifecycle alignment:
+changes on more than one datasource won't be executed as a single atomic transaction.
+
+In particular, if the JTA transaction involves multiple resources, Neo4j might commit
+before a failure of another resource. In this case, Neo4j won't be able to rollback even
+if the JTA transaction will.</pre></div><div class="section" title="12.5. Queries"><div class="titlepage"><div><div><h2 class="title"><a id="ogm-neo4j-queries"/>12.5. Queries</h2></div></div></div><p>You can express queries in a few different ways:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">using JP-QL</li><li class="listitem">using the Cypher query language</li></ul></div><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>Neo4J makes use of a Lucene version which
+is not compatible with the most recent Hibernate Search version.
+This unfortunately makes it impossible to use the latest Hibernate Search version
+and Neo4J embedded in the same application.</p></div><p>While you can use JP-QL for simple queries, you might hit limitations.
+The current recommended approach is to use native Cypher queries
+if your query involves nested (list of) elements.</p><div class="section" title="12.5.1. JP-QL queries"><div class="titlepage"><div><div><h3 class="title"><a id="jp_ql_queries_2"/>12.5.1. JP-QL queries</h3></div></div></div><p>Hibernate OGM is a work in progress, so only a sub-set of JP-QL constructs is available
+when using the JP-QL query support. This includes:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">simple comparisons using "&lt;", "&lt;=", "=", "&gt;=" and "&gt;"</li><li class="listitem"><code class="literal">IS NULL</code> and <code class="literal">IS NOT NULL</code></li><li class="listitem">the boolean operators <code class="literal">AND</code>, <code class="literal">OR</code>, <code class="literal">NOT</code></li><li class="listitem"><code class="literal">LIKE</code>, <code class="literal">IN</code> and <code class="literal">BETWEEN</code></li><li class="listitem"><code class="literal">ORDER BY</code></li><li class="listitem">inner <code class="literal">JOIN</code> on embedded collections</li><li class="listitem">projections of regular and embedded properties</li></ul></div><p>Queries using these constructs will be transformed into equivalent <a class="link" href="http://docs.neo4j.org/chunked/stable/cypher-query-lang.html">Cypher queries</a>.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>Let us know <a class="link" href="ch01.html" title="Chapter 1. How to get help and contribute on Hibernate OGM">by opening an issue or sending an email</a>
+what query you wish to execute.
+Expanding our support in this area is high on our priority list.</p></div></div><div class="section" title="12.5.2. Cypher queries"><div class="titlepage"><div><div><h3 class="title"><a id="ogm-neo4j-queries-native"/>12.5.2. Cypher queries</h3></div></div></div><p>Hibernate OGM also supports <a class="link" href="http://docs.neo4j.org/chunked/stable/cypher-query-lang.html">Cypher queries</a> for Neo4j.
+You can execute Cypher queries as shown in the following example:</p><div class="example"><a id="d0e11384"/><p class="title"><strong>Example 12.19. Using the JPA API</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Poem {
+
+    @Id
+    private Long id;
+
+    private String name;
+
+    private String author;
+
+   // getters, setters ...
+
+}
+
+...
+
+javax.persistence.EntityManager em = ...
+
+// a single result query
+String query1 = "MATCH ( n:Poem { name:'Portia', author:'Oscar Wilde' } ) RETURN n";
+Poem poem = (Poem) em.createNativeQuery( query1, Poem.class ).getSingleResult();
+
+// query with order by
+String query2 = "MATCH ( n:Poem { name:'Portia', author:'Oscar Wilde' } ) " +
+                "RETURN n ORDER BY n.name";
+List&lt;Poem&gt; poems = em.createNativeQuery( query2, Poem.class ).getResultList();
+
+// query with projections
+String query3 = MATCH ( n:Poem ) RETURN n.name, n.author ORDER BY n.name";
+List&lt;Object[]&gt; poemNames = (List&lt;Object[]&gt;) em.createNativeQuery( query3 )
+                               .getResultList();</code></pre></div></div><br class="example-break"/><p>The result of a query is a managed entity (or a list thereof) or a projection of attributes in form of an object array,
+just like you would get from a JP-QL query.</p><div class="example"><a id="d0e11391"/><p class="title"><strong>Example 12.20. Using the Hibernate native API</strong></p><div class="example-contents"><pre><code class="language-java">OgmSession session = ...
+
+String query1 = "MATCH ( n:Poem { name:'Portia', author:'Oscar Wilde' } ) " +
+                "RETURN n";
+Poem poem = session.createNativeQuery( query1 )
+                      .addEntity( "Poem", Poem.class )
+                      .uniqueResult();
+
+String query2 = "MATCH ( n:Poem { name:'Portia', author:'Oscar Wilde' } ) " +
+                "RETURN n ORDER BY n.name";
+List&lt;Poem&gt; poems = session.createNativeQuery( query2 )
+                      .addEntity( "Poem", Poem.class )
+                      .list();</code></pre></div></div><br class="example-break"/><p>Native queries can also be created using the <code class="literal">@NamedNativeQuery</code> annotation:</p><div class="example"><a id="d0e11401"/><p class="title"><strong>Example 12.21. Using @NamedNativeQuery</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@NamedNativeQuery(
+   name = "AthanasiaPoem",
+   query = "MATCH ( n:Poem { name:'Athanasia', author:'Oscar Wilde' } ) RETURN n",
+   resultClass = Poem.class )
+public class Poem { ... }
+
+...
+
+// Using the EntityManager
+Poem poem1 = (Poem) em.createNamedQuery( "AthanasiaPoem" )
+                     .getSingleResult();
+
+// Using the Session
+Poem poem2 = (Poem) session.getNamedQuery( "AthanasiaPoem" )
+                     .uniqueResult();</code></pre></div></div><br class="example-break"/><p>Hibernate OGM stores data in a natural way so you can still execute queries using your favorite tool,
+the main drawback is that the results are going to be raw Neo4j elements and not managed entities.</p></div></div></div><script xmlns="" xmlns:d="http://docbook.org/ns/docbook" type="text/javascript" src="highlight.js/highlight.pack.js"> </script><script xmlns="" xmlns:d="http://docbook.org/ns/docbook" type="text/javascript">hljs.initHighlightingOnLoad();</script><script type="text/javascript">
+dataLayer = [{'channel' : 'Hibernate', 'additional_tracking_code' : 'UA-45270411-3'}];
+(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NJWS5L');</script><noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-NJWS5L" height="0" width="0" style="display:none;visibility:hidden"> </iframe></noscript><hr xmlns="" xmlns:d="http://docbook.org/ns/docbook"/><a xmlns="" xmlns:d="http://docbook.org/ns/docbook" href="legalnotice.html"/><ul class="docnav"><li class="previous"><a accesskey="p" href="ch11.html"><strong>Prev</strong>Chapter 11. MongoDB</a></li><li class="up"><a accesskey="u" href="#"><strong>Up</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Home</strong></a></li><li class="next"><a accesskey="n" href="ch13.html"><strong>Next</strong>Chapter 13. CouchDB (Experimental)</a></li></ul><!-- HibernateDoc.OutdatedContent --><script src="//code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script><script src="/hibernate/_outdated-content/outdated-content.js" type="text/javascript"></script><script type="text/javascript">var jQuery_3_1 = $.noConflict(true); jQuery_3_1(document).ready(function() { HibernateDoc.OutdatedContent.install("ogm"); });</script><!-- /HibernateDoc.OutdatedContent --></body></html>

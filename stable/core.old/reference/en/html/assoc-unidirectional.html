@@ -1,0 +1,173 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>7.2.&nbsp;Unidirectional associations</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="associations.html" title="Chapter&nbsp;7.&nbsp;Association Mappings">
+      <link rel="prev" href="associations.html" title="Chapter&nbsp;7.&nbsp;Association Mappings">
+      <link rel="next" href="assoc-unidirectional-join.html" title="7.3.&nbsp;Unidirectional associations with join tables">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">7.2.&nbsp;Unidirectional associations</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="associations.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;7.&nbsp;Association Mappings</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="assoc-unidirectional-join.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="assoc-unidirectional"></a>7.2.&nbsp;Unidirectional associations
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="assoc-unidirectional-m21"></a>7.2.1.&nbsp;many to one
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                           A <span class="emphasis"><em>unidirectional many-to-one association</em></span> is the most 
+                           common kind of unidirectional association.
+                       
+            </p><pre class="programlisting">&lt;class name="Person"&gt;
+    &lt;id name="id" column="personId"&gt;
+        &lt;generator class="native"/&gt;
+    &lt;/id&gt;
+    &lt;many-to-one name="address" 
+        column="addressId"
+        not-null="true"/&gt;
+&lt;/class&gt;
+
+&lt;class name="Address"&gt;
+    &lt;id name="id" column="addressId"&gt;
+        &lt;generator class="native"/&gt;
+    &lt;/id&gt;
+&lt;/class&gt;</pre><pre class="programlisting">
+create table Person ( personId bigint not null primary key, addressId bigint not null )
+create table Address ( addressId bigint not null primary key )
+        </pre></div>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="assoc-unidirectional-121"></a>7.2.2.&nbsp;one to one
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                           A <span class="emphasis"><em>unidirectional one-to-one association on a foreign key</em></span>
+                           is almost identical. The only difference is the column unique constraint.
+                       
+            </p><pre class="programlisting">&lt;class name="Person"&gt;
+    &lt;id name="id" column="personId"&gt;
+        &lt;generator class="native"/&gt;
+    &lt;/id&gt;
+    &lt;many-to-one name="address" 
+        column="addressId" 
+        unique="true"
+        not-null="true"/&gt;
+&lt;/class&gt;
+
+&lt;class name="Address"&gt;
+    &lt;id name="id" column="addressId"&gt;
+        &lt;generator class="native"/&gt;
+    &lt;/id&gt;
+&lt;/class&gt;</pre><pre class="programlisting">
+create table Person ( personId bigint not null primary key, addressId bigint not null unique )
+create table Address ( addressId bigint not null primary key )
+        </pre><p>
+                           A <span class="emphasis"><em>unidirectional one-to-one association on a primary key</em></span>
+                           usually uses a special id generator. (Notice that we've reversed the direction
+                           of the association in this example.)
+                       
+            </p><pre class="programlisting">&lt;class name="Person"&gt;
+    &lt;id name="id" column="personId"&gt;
+        &lt;generator class="native"/&gt;
+    &lt;/id&gt;
+&lt;/class&gt;
+
+&lt;class name="Address"&gt;
+    &lt;id name="id" column="personId"&gt;
+        &lt;generator class="foreign"&gt;
+            &lt;param name="property"&gt;person&lt;/param&gt;
+        &lt;/generator&gt;
+    &lt;/id&gt;
+    &lt;one-to-one name="person" constrained="true"/&gt;
+&lt;/class&gt;</pre><pre class="programlisting">
+create table Person ( personId bigint not null primary key )
+create table Address ( personId bigint not null primary key )
+        </pre></div>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="assoc-unidirectional-12m"></a>7.2.3.&nbsp;one to many
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                           A <span class="emphasis"><em>unidirectional one-to-many association on a foreign key</em></span> 
+                           is a very unusual case, and is not really recommended.
+                       
+            </p><pre class="programlisting">&lt;class name="Person"&gt;
+    &lt;id name="id" column="personId"&gt;
+        &lt;generator class="native"/&gt;
+    &lt;/id&gt;
+    &lt;set name="addresses"&gt;
+        &lt;key column="personId" 
+            not-null="true"/&gt;
+        &lt;one-to-many class="Address"/&gt;
+    &lt;/set&gt;
+&lt;/class&gt;
+
+&lt;class name="Address"&gt;
+    &lt;id name="id" column="addressId"&gt;
+        &lt;generator class="native"/&gt;
+    &lt;/id&gt;
+&lt;/class&gt;</pre><pre class="programlisting">
+create table Person ( personId bigint not null primary key )
+create table Address ( addressId bigint not null primary key, personId bigint not null )
+        </pre><p>
+                           We think it's better to use a join table for this kind of association.
+                       
+            </p>
+         </div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="associations.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="associations.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="assoc-unidirectional-join.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">Chapter&nbsp;7.&nbsp;Association Mappings&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;7.3.&nbsp;Unidirectional associations with join tables</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

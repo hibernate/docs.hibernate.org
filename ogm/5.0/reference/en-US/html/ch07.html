@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Chapter 7. Query your entities</title><!-- HibernateDoc.Meta --><meta name="description" content="Hibernate OGM, JPA for NoSQL datastores - Reference Documentation" /><meta name="keywords" content="hibernate, ogm, hibernate ogm, nosql, jpa, infinispan, mongodb, neo4j, cassandra, couchdb, ehcache, redis" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://docs.jboss.org/hibernate/stable/ogm/reference/en-US/html_single/" /><!-- /HibernateDoc.Meta --><link rel="stylesheet" type="text/css" href="css/hibernate.css"/><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"/><link rel="home" href="index.html" title="Hibernate OGM Reference Guide"/><link rel="up" href="index.html" title="Hibernate OGM Reference Guide"/><link rel="prev" href="ch06.html" title="Chapter 6. Hibernate OGM APIs"/><link rel="next" href="ch08.html" title="Chapter 8. NoSQL datastores"/><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/></head><body><p id="title"><a href="http://www.hibernate.org" class="site_href"><strong>Hibernate.org</strong></a><a href="http://hibernate.org/Documentation/DocumentationOverview" class="doc_href"><strong>Community Documentation</strong></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="ch06.html"><strong>Prev</strong></a></li><li class="next"><a accesskey="n" href="ch08.html"><strong>Next</strong></a></li></ul><div class="chapter" title="Chapter 7. Query your entities"><div class="titlepage"><div><div><h2 class="title"><a id="ogm-query"/>Chapter 7. Query your entities</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="ch07.html#using_jp_ql">7.1. Using JP-QL</a></span></dt><dt><span class="section"><a href="ch07.html#ogm-query-native">7.2. Using the native query language of your NoSQL</a></span></dt><dt><span class="section"><a href="ch07.html#using_hibernate_search">7.3. Using Hibernate Search</a></span></dt><dt><span class="section"><a href="ch07.html#using_the_criteria_api">7.4. Using the Criteria API</a></span></dt></dl></div><p>Once your data is in the datastore, it’s time for some query fun!
+With Hibernate OGM, you have a few alternatives that should get you covered:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">Use JP-QL - only for simple queries for now</li><li class="listitem">Use the NoSQL native query mapping the result as managed entities</li><li class="listitem">Use Hibernate Search queries - primarily full-text queries</li></ul></div><div class="section" title="7.1. Using JP-QL"><div class="titlepage"><div><div><h2 class="title"><a id="using_jp_ql"/>7.1. Using JP-QL</h2></div></div></div><p>For Hibernate OGM, we developed a brand new JP-QL parser
+which is already able to convert simple queries into the native underlying datastore query language
+(e.g. MongoQL for MongoDB, CypherQL for Neo4J, etc).
+This parser can also generate Hibernate Search queries
+for datastores that do not support a query language.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>For datastores like Infinispan that require Hibernate Search to execute JP-QL queries,
+the following preconditions must be met:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">no join, aggregation, or other relational operations are implied</li><li class="listitem">the entity involved in the query must be indexed</li><li class="listitem">the properties involved in the predicates must be indexed</li></ul></div><p>Here is an example:</p><pre><code class="language-java">@Entity @Indexed
+public class Hypothesis {
+
+    @Id
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+    private String id;
+
+    @Field(analyze=Analyze.NO)
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    private String description;
+}
+
+Query query = session
+    .createQuery("from Hypothesis h where h.description = :desc")
+    .setString("desc", "tomorrow it's going to rain");</code></pre><p>Note that the <code class="literal">description</code> field is marked as not analysed.
+This is necessary to support field equality and comparison as defined by JP-QL.</p></div><p>You can make use of the following JP-QL constructs:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">simple comparisons using "&lt;", "&lt;=", "=", "&gt;=" and "&gt;"</li><li class="listitem"><code class="literal">IS NULL</code> and <code class="literal">IS NOT NULL</code></li><li class="listitem">the boolean operators <code class="literal">AND</code>, <code class="literal">OR</code>, <code class="literal">NOT</code></li><li class="listitem"><code class="literal">LIKE</code>, <code class="literal">IN</code> and <code class="literal">BETWEEN</code></li><li class="listitem"><code class="literal">ORDER BY</code></li></ul></div><p>In particular and of notice, what is not supported is:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">cross entity joins</li><li class="listitem">JP-QL functions in particular aggregation functions like <code class="literal">count</code></li><li class="listitem">JP-QL update and delete queries</li></ul></div><p>That may sound rather limiting for your use cases so bear with us.
+This is a hot area we want to improve, please tell us what feature you miss
+<a class="link" href="ch01.html#ogm-howtocontribute-contribute" title="1.2. How to contribute">by opening a JIRA or via email</a>.
+Also read the next section, you will see other alternatives to implement your queries.</p><p>Let’s look at some of the queries you can express in JP-QL:</p><div class="example"><a id="d0e2292"/><p class="title"><strong>Example 7.1. Some JP-QL queries</strong></p><div class="example-contents"><pre class="screen">// query returning an entity based on a simple predicate
+select h from Hypothesis h where id = 16
+
+// projection of the entity property
+select id, description from Hypothesis h where id = 16
+
+// projection of the embedded properties
+select h.author.address.street from Hypothesis h where h.id = 16
+
+// predicate comparing a property value and a literal
+from Hypothesis h where h.position = '2'
+
+// negation
+from Hypothesis h where not h.id = '13'
+from Hypothesis h where h.position &lt;&gt; 4
+
+// conjunction
+from Hypothesis h where h.position = 2 and not h.id = '13'
+
+// named parameters
+from Hypothesis h where h.description = :myParam
+
+// range query
+from Hypothesis h where h.description BETWEEN :start and :end"
+
+// comparisons
+from Hypothesis h where h.position &lt; 3
+
+// in
+from Hypothesis h where h.position IN (2, 3, 4)
+
+// like
+from Hypothesis h where h.description LIKE '%dimensions%'
+
+// comparison with null
+from Hypothesis h where h.description IS null
+
+// order by
+from Hypothesis h where h.description IS NOT null ORDER BY id
+from Helicopter h order by h.make desc, h.name</pre></div></div><br class="example-break"/><p>There are also features that are partially supported:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">Inner <code class="literal">JOIN</code> on an embedded association:
+works as expected with Neo4j and MongoDB;
+doesn’t work if your datastore provider implements JP-QL queries using Hibernate Search.</li><li class="listitem">Projections or filters on properties of an embedded identifier:
+works as expected with Neo4j and MongoDB;
+doesn’t work if your datastore provider implements JP-QL queries using Hibernate Search.</li></ul></div><p>These are better illustrated by the following example:</p><div class="example"><a id="d0e2311"/><p class="title"><strong>Example 7.2. Entity with embedded collection and supported JP-QL queries</strong></p><div class="example-contents"><pre><code class="language-java">@Indexed
+@Entity
+public class StoryGame {
+
+    @DocumentId
+    @EmbeddedId
+    @FieldBridge(impl = NewsIdFieldBridge.class)
+    private StoryID storyId;
+
+    @ElementCollection
+    @IndexedEmbedded
+    private List&lt;OptionalStoryBranch&gt; optionalEndings;
+
+    ...
+
+}
+
+@Embeddable
+public class StoryID implements Serializable {
+
+    private String title;
+    private String author;
+
+    ...
+}
+
+@Embeddable
+public class OptionalStoryBranch {
+
+    // Analyze.NO for filtering in query
+    // Store.YES for projection in query
+    @Field(store = Store.YES, analyze = Analyze.NO)
+    private String text;
+
+    ...
+
+}</code></pre><p>Filter the results using the supported operators will work for all the datastores:</p><pre><code class="language-java">String query =
+    "SELECT sg" +
+    "FROM StoryGame sg JOIN sg.optionalEndings ending WHERE ending.text = 'Happy ending'"
+List&lt;StoryGame&gt; stories = session.createQuery( query ).list();</code></pre><p>Projection of properties of an embedded association works with Neo4j and MongoDB,
+but the other datastores will only return one element from the association.
+This is due to the fact that Hibernate Search is currently not supporting projection
+of associations.
+Here’s an example of a query affected by this:</p><pre><code class="language-java">String query =
+     "SELECT ending.text " +
+     "FROM StoryGame sg JOIN sg.optionalEndings ending WHERE ending.text LIKE 'Happy%'";
+List&lt;String&gt; endings = session.createQuery( query ).list();</code></pre><p>Projecting and filtering on embedded id properties works with Neo4j and MongoDB
+but throws an exception with the other datastores:</p><pre><code class="language-java">String query =
+     "SELECT sg.storyId.title FROM StoryGame sg WHERE sg.storyId.title = 'Best Story Ever'";
+List&lt;String&gt; title = session.createQuery( query ).list();</code></pre><p>It will cause the following exception if the datastore uses Hibernate Search
+to execute JP-QL queries:</p><pre><code class="language-java">org.hibernate.hql.ParsingException: HQL100002: The type [storyId] has no indexed property named title.</code></pre></div></div><br class="example-break"/><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>In order to reflect changes performed in the current session,
+all entities affected by a given query are flushed to the datastore prior to query execution
+(that’s the case for Hibernate ORM as well as Hibernate OGM).</p><p>For not fully transactional stores,
+this can cause changes to be written as a side-effect of running queries
+which cannot be reverted by a possible later rollback.</p><p>Depending on your specific use cases and requirements you may prefer to disable auto-flushing,
+e.g. by invoking <code class="literal">query.setFlushMode(FlushMode.MANUAL)</code>.
+Bear in mind though that query results will then not reflect changes applied within the current session.</p></div></div><div class="section" title="7.2. Using the native query language of your NoSQL"><div class="titlepage"><div><div><h2 class="title"><a id="ogm-query-native"/>7.2. Using the native query language of your NoSQL</h2></div></div></div><p>Often you want the raw power of the underlying NoSQL query engine.
+Even if that costs you portability.</p><p>Hibernate OGM addresses that problem by letting you express native queries (e.g. in MongoQL or CypherQL)
+and map the result of these queries as mapped entities.</p><p>In JPA, use <code class="literal">EntityManager.createNativeQuery</code>.
+The first form accepts a result class if your result set maps the mapping definition of the entity.
+The second form accepts the name of a resultSetMapping
+and lets you customize how properties are mapped to columns by the query.
+You can also used a predefined named query which defines its result set mapping.</p><p>Let’s take a look at how it is done for Neo4J:</p><div class="example"><a id="d0e2356"/><p class="title"><strong>Example 7.3. Various ways to create a native query in JPA</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@NamedNativeQuery(
+   name = "AthanasiaPoem",
+   query = "{ $and: [ { name : 'Athanasia' }, { author : 'Oscar Wilde' } ] }",
+   resultClass = Poem.class )
+public class Poem {
+
+    @Id
+    private Long id;
+
+    private String name;
+
+    private String author;
+
+   // getters, setters ...
+
+}
+
+...
+
+javax.persistence.EntityManager em = ...
+
+// a single result query
+String query1 = "MATCH ( n:Poem { name:'Portia', author:'Oscar Wilde' } ) RETURN n";
+Poem poem = (Poem) em.createNativeQuery( query1, Poem.class ).getSingleResult();
+
+// query with order by
+String query2 = "MATCH ( n:Poem { name:'Portia', author:'Oscar Wilde' } ) " +
+                "RETURN n ORDER BY n.name";
+List&lt;Poem&gt; poems = em.createNativeQuery( query2, Poem.class ).getResultList();
+
+// query with projections
+String query3 = MATCH ( n:Poem ) RETURN n.name, n.author ORDER BY n.name";
+List&lt;Object[]&gt; poemNames = (List&lt;Object[]&gt;)em.createNativeQuery( query3 )
+                               .getResultList();
+
+// named query
+Poem poem = (Poem) em.createNamedQuery( "AthanasiaPoem" ).getSingleResult();</code></pre></div></div><br class="example-break"/><p>In the native Hibernate API, use <code class="literal">OgmSession.createNativeQuery</code> or <code class="literal">Session.getNamedQuery</code>.
+The former form lets you define the result set mapping programmatically.
+The latter is receiving the name of a predefined query already describing its result set mapping.</p><div class="example"><a id="d0e2369"/><p class="title"><strong>Example 7.4. Hibernate API defining a result set mapping</strong></p><div class="example-contents"><pre><code class="language-java">OgmSession session = ...
+String query1 = "{ $and: [ { name : 'Portia' }, { author : 'Oscar Wilde' } ] }";
+Poem poem = session.createNativeQuery( query1 )
+                      .addEntity( "Poem", Poem.class )
+                      .uniqueResult();</code></pre></div></div><br class="example-break"/><p>Check out each individual datastore chapter for more info
+on the specifics of the native query language mapping.
+In particular <a class="link" href="ch12.html#ogm-neo4j-queries-native" title="12.5.2. Cypher queries">Neo4J</a> and <a class="link" href="ch11.html#ogm-mongodb-queries-native" title="11.5.2. Native MongoDB queries">MongoDB</a>.</p></div><div class="section" title="7.3. Using Hibernate Search"><div class="titlepage"><div><div><h2 class="title"><a id="using_hibernate_search"/>7.3. Using Hibernate Search</h2></div></div></div><p>Hibernate Search offers a way to index Java objects into Lucene indexes
+and to execute full-text queries on them.
+The indexes do live outside your datastore.
+This offers a few interesting properties in terms of feature set and scalability.</p><p>Apache Lucene is a full-text indexing and query engine with excellent query performance.
+Feature wise, <span class="emphasis"><em>full-text</em></span> means
+you can do much more than a simple equality match.</p><p>Hibernate Search natively integrates with Hibernate ORM.
+And Hibernate OGM of course!</p><div class="example"><a id="d0e2394"/><p class="title"><strong>Example 7.5. Using Hibernate Search for full-text matching</strong></p><div class="example-contents"><pre><code class="language-java">@Entity @Indexed
+public class Hypothesis {
+
+    @Id
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+    private String id;
+
+    @Field(analyze=Analyze.YES)
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    private String description;
+}</code></pre><pre><code class="language-java">EntityManager entityManager = ...
+//Add full-text superpowers to any EntityManager:
+FullTextEntityManager ftem = Search.getFullTextEntityManager(entityManager);
+
+//Optionally use the QueryBuilder to simplify Query definition:
+QueryBuilder b = ftem.getSearchFactory()
+   .buildQueryBuilder()
+   .forEntity(Hypothesis.class)
+   .get();
+
+//Create a Lucene Query:
+Query lq = b.keyword().onField("description").matching("tomorrow").createQuery();
+
+//Transform the Lucene Query in a JPA Query:
+FullTextQuery ftQuery = ftem.createFullTextQuery(lq, Hypothesis.class);
+
+//List all matching Hypothesis:
+List&lt;Hypothesis&gt; resultList = ftQuery.getResultList();</code></pre></div></div><br class="example-break"/><p>Assuming our database contains an <code class="literal">Hypothesis</code> instance
+having description "Sometimes tomorrow we release",
+that instance will be returned by our full-text query.</p><p>Text similarity can be very powerful as it can be configured for specific languages
+or domain specific terminology;
+it can deal with typos and synonyms,
+and above all it can return results by <span class="emphasis"><em>relevance</em></span>.</p><p>Worth noting the Lucene index is a vectorial space of term occurrence statistics:
+so extracting tags from text, frequencies of strings
+and correlate this data makes it very easy to build efficient data analysis applications.</p><p>While the potential of Lucene queries is very high,
+it’s not suited for all use cases
+ Let’s see some of the limitations of Lucene Queries as our main query engine:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">Lucene doesn’t support Joins.
+Any <code class="literal">to-One</code> relations can be mapped fine,
+and the Lucene community is making progress on other forms,
+but restrictions on <code class="literal">OneToMany</code> or <code class="literal">ManyToMany</code> can’t be implemented today.</li><li class="listitem">Since we apply changes to the index at commit time,
+your updates won’t affect queries until you commit
+(we might improve on this).</li><li class="listitem">While queries are extremely fast, write operations are not as fast
+(but we can make it scale).</li></ul></div><p>For a complete understanding of what Hibernate Search can do for you
+and how to use it,
+go check the <a class="link" href="http://docs.jboss.org/hibernate/stable/search/reference/en-US/html_single/">Hibernate Search reference documentation</a>.</p></div><div class="section" title="7.4. Using the Criteria API"><div class="titlepage"><div><div><h2 class="title"><a id="using_the_criteria_api"/>7.4. Using the Criteria API</h2></div></div></div><p>At this time, we have not implemented support for the Criteria APIs (neither Hibernate native nor JPA).</p></div></div><script xmlns="" xmlns:d="http://docbook.org/ns/docbook" type="text/javascript" src="highlight.js/highlight.pack.js"> </script><script xmlns="" xmlns:d="http://docbook.org/ns/docbook" type="text/javascript">hljs.initHighlightingOnLoad();</script><script type="text/javascript">
+dataLayer = [{'channel' : 'Hibernate', 'additional_tracking_code' : 'UA-45270411-3'}];
+(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NJWS5L');</script><noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-NJWS5L" height="0" width="0" style="display:none;visibility:hidden"> </iframe></noscript><hr xmlns="" xmlns:d="http://docbook.org/ns/docbook"/><a xmlns="" xmlns:d="http://docbook.org/ns/docbook" href="legalnotice.html"/><ul class="docnav"><li class="previous"><a accesskey="p" href="ch06.html"><strong>Prev</strong>Chapter 6. Hibernate OGM APIs</a></li><li class="up"><a accesskey="u" href="#"><strong>Up</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Home</strong></a></li><li class="next"><a accesskey="n" href="ch08.html"><strong>Next</strong>Chapter 8. NoSQL datastores</a></li></ul><!-- HibernateDoc.OutdatedContent --><script src="//code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script><script src="/hibernate/_outdated-content/outdated-content.js" type="text/javascript"></script><script type="text/javascript">var jQuery_3_1 = $.noConflict(true); jQuery_3_1(document).ready(function() { HibernateDoc.OutdatedContent.install("ogm"); });</script><!-- /HibernateDoc.OutdatedContent --></body></html>

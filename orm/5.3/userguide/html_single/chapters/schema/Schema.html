@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 1.5.2">
+<title>Schema generation</title>
+<link rel="stylesheet" href="./css/hibernate.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js"></script>
+<script>document.addEventListener('DOMContentLoaded', prettyPrint)</script>
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="schema-generation">Schema generation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Hibernate allows you to generate the database from the entity mappings.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Although the automatic schema generation is very useful for testing and prototyping purposes, in a production environment,
+it&#8217;s much more flexible to manage the schema using incremental migration scripts.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Traditionally, the process of generating  schema from entity mapping has been called <code>HBM2DDL</code>.
+To get a list of Hibernate-native and JPA-specific configuration properties consider reading the <a href="appendices/Configurations.html#configurations-hbmddl">Configurations</a> section.</p>
+</div>
+<div class="paragraph">
+<p>Considering the following Domain Model:</p>
+</div>
+<div id="schema-generation-domain-model-example" class="exampleblock">
+<div class="title">Example 1. Schema generation Domain Model</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">@Entity(name = "Customer")
+public class Customer {
+
+    @Id
+    private Integer id;
+
+    private String name;
+
+    @Basic( fetch = FetchType.LAZY )
+    private UUID accountsPayableXrefId;
+
+    @Lob
+    @Basic( fetch = FetchType.LAZY )
+    @LazyGroup( "lobs" )
+    private Blob image;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public UUID getAccountsPayableXrefId() {
+        return accountsPayableXrefId;
+    }
+
+    public void setAccountsPayableXrefId(UUID accountsPayableXrefId) {
+        this.accountsPayableXrefId = accountsPayableXrefId;
+    }
+
+    public Blob getImage() {
+        return image;
+    }
+
+    public void setImage(Blob image) {
+        this.image = image;
+    }
+}
+
+@Entity(name = "Person")
+public static class Person {
+
+    @Id
+    private Long id;
+
+    private String name;
+
+    @OneToMany(mappedBy = "author")
+    private List&lt;Book&gt; books = new ArrayList&lt;&gt;(  );
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List&lt;Book&gt; getBooks() {
+        return books;
+    }
+}
+
+@Entity(name = "Book")
+public static class Book {
+
+    @Id
+    private Long id;
+
+    private String title;
+
+    @NaturalId
+    private String isbn;
+
+    @ManyToOne
+    private Person author;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Person getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(Person author) {
+        this.author = author;
+    }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>If the <code>hibernate.hbm2ddl.auto</code> configuration is set to <code>create</code>, Hibernate is going to generate the following database schema:</p>
+</div>
+<div id="sql-schema-generation-domain-model-example" class="exampleblock">
+<div class="title">Example 2. Auto-generated database schema</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-SQL" data-lang="SQL">create table Customer (
+    id integer not null,
+    accountsPayableXrefId binary,
+    image blob,
+    name varchar(255),
+    primary key (id)
+)
+
+create table Book (
+    id bigint not null,
+    isbn varchar(255),
+    title varchar(255),
+    author_id bigint,
+    primary key (id)
+)
+
+create table Person (
+    id bigint not null,
+    name varchar(255),
+    primary key (id)
+)
+
+alter table Book
+    add constraint UK_u31e1frmjp9mxf8k8tmp990i unique (isbn)
+
+alter table Book
+    add constraint FKrxrgiajod1le3gii8whx2doie
+    foreign key (author_id)
+    references Person</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="schema-generation-script-files">Importing script files</h3>
+<div class="paragraph">
+<p>To customize the schema generation process, the <code>hibernate.hbm2ddl.import_files</code> configuration property must be used to provide other scripts files that Hibernate can use when the <code>SessionFactory</code> is started.</p>
+</div>
+<div class="paragraph">
+<p>For instance, considering the following <code>schema-generation.sql</code> import file:</p>
+</div>
+<div id="schema-generation-import-file-example" class="exampleblock">
+<div class="title">Example 3. Schema generation import file</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">create sequence book_sequence start with 1 increment by 1</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>If we configure Hibernate to import the script above:</p>
+</div>
+<div id="schema-generation-import-file-configuration-example" class="exampleblock">
+<div class="title">Example 4. Enabling query cache</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-XML" data-lang="XML">&lt;property
+    name="hibernate.hbm2ddl.import_files"
+    value="schema-generation.sql" /&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Hibernate is going to execute the script file after the schema is automatically generated.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="schema-generation-database-objects">Database objects</h3>
+<div class="paragraph">
+<p>Hibernate allows you to customize the schema generation process via the HBM <code>database-object</code> element.</p>
+</div>
+<div class="paragraph">
+<p>Considering the following HBM mapping:</p>
+</div>
+<div id="schema-generation-database-object-example" class="exampleblock">
+<div class="title">Example 5. Schema generation HBM database-object</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">&lt;?xml version="1.0"?&gt;
+&lt;!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd" &gt;
+
+&lt;hibernate-mapping&gt;
+    &lt;database-object&gt;
+        &lt;create&gt;
+            CREATE OR REPLACE FUNCTION sp_count_books(
+                IN authorId bigint,
+                OUT bookCount bigint)
+                RETURNS bigint AS
+            $BODY$
+                BEGIN
+                    SELECT COUNT(*) INTO bookCount
+                    FROM book
+                    WHERE author_id = authorId;
+                END;
+            $BODY$
+            LANGUAGE plpgsql;
+        &lt;/create&gt;
+        &lt;drop&gt;&lt;/drop&gt;
+        &lt;dialect-scope name="org.hibernate.dialect.PostgreSQL95Dialect" /&gt;
+    &lt;/database-object&gt;
+&lt;/hibernate-mapping&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>When the <code>SessionFactory</code> is bootstrapped, Hibernate is going to execute the <code>database-object</code>, therefore creating the <code>sp_count_books</code> function.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="schema-generation-database-checks">Database-level checks</h3>
+<div class="paragraph">
+<p>Hibernate offers the <code>@Check</code> annotation so that you can specify an arbitrary SQL CHECK constraint which can be defined as follows:</p>
+</div>
+<div id="schema-generation-database-checks-example" class="exampleblock">
+<div class="title">Example 6. Database check entity mapping example</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">@Entity(name = "Book")
+@Check( constraints = "CASE WHEN isbn IS NOT NULL THEN LENGTH(isbn) = 13 ELSE true END")
+public static class Book {
+
+    @Id
+    private Long id;
+
+    private String title;
+
+    @NaturalId
+    private String isbn;
+
+    private Double price;
+
+    //Getters and setters omitted for brevity
+
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Now, if you try to add a <code>Book</code> entity with an <code>isbn</code> attribute whose length is not 13 characters,
+a <code>ConstraintViolationException</code> is going to be thrown.</p>
+</div>
+<div id="stag::schema-generation-database-checks-persist-example" class="exampleblock">
+<div class="title">Example 7. Database check failure example</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">Book book = new Book();
+book.setId( 1L );
+book.setPrice( 49.99d );
+book.setTitle( "High-Performance Java Persistence" );
+book.setIsbn( "11-11-2016" );
+
+entityManager.persist( book );</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-SQL" data-lang="SQL">INSERT  INTO Book (isbn, price, title, id)
+VALUES  ('11-11-2016', 49.99, 'High-Performance Java Persistence', 1)
+
+-- WARN SqlExceptionHelper:129 - SQL Error: 0, SQLState: 23514
+-- ERROR SqlExceptionHelper:131 - ERROR: new row for relation "book" violates check constraint "book_isbn_check"</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="schema-generation-column-default-value">Default value for database column</h3>
+<div class="paragraph">
+<p>With Hibernate, you can specify a default value for a given database column using the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/annotations/ColumnDefault.html"><code>@ColumnDefault</code></a> annotation.</p>
+</div>
+<div id="schema-generation-column-default-value-mapping-example" class="exampleblock">
+<div class="title">Example 8. <code>@ColumnDefault</code> mapping example</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">@Entity(name = "Person")
+@DynamicInsert
+public static class Person {
+
+    @Id
+    private Long id;
+
+    @ColumnDefault("'N/A'")
+    private String name;
+
+    @ColumnDefault("-1")
+    private Long clientId;
+
+    //Getter and setters omitted for brevity
+
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-SQL" data-lang="SQL">CREATE TABLE Person (
+  id BIGINT NOT NULL,
+  clientId BIGINT DEFAULT -1,
+  name VARCHAR(255) DEFAULT 'N/A',
+  PRIMARY KEY (id)
+)</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>In the mapping above, both the <code>name</code> and <code>clientId</code> table columns are going to use a <code>DEFAULT</code> value.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The entity is annotated with the <code>@DynamicInsert</code> annotation so that the <code>INSERT</code> statement does not include the entity attribute that have not been set.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>This way, when omitting the <code>name</code> and the <code>clientId</code> attribute, the database is going to set them according to their default values.</p>
+</div>
+<div id="schema-generation-column-default-value-persist-example" class="exampleblock">
+<div class="title">Example 9. <code>@ColumnDefault</code> mapping example</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">doInJPA( this::entityManagerFactory, entityManager -&gt; {
+    Person person = new Person();
+    person.setId( 1L );
+    entityManager.persist( person );
+} );
+doInJPA( this::entityManagerFactory, entityManager -&gt; {
+    Person person = entityManager.find( Person.class, 1L );
+    assertEquals( "N/A", person.getName() );
+    assertEquals( Long.valueOf( -1L ), person.getClientId() );
+} );</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-SQL" data-lang="SQL">INSERT INTO Person (id) VALUES (?)</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="schema-generation-columns-unique-constraint">Columns unique constraint</h3>
+<div class="paragraph">
+<p>The <a href="http://docs.oracle.com/javaee/7/api/javax/persistence/UniqueConstraint.html"><code>@UniqueConstraint</code></a> annotation is used to specify a unique constraint to be included by the automated schema generator for the primary or secondary table associated with the current annotated entity.</p>
+</div>
+<div class="paragraph">
+<p>Considering the following entity mapping, Hibernate generates the unique constraint DDL when creating the database schema:</p>
+</div>
+<div id="schema-generation-columns-unique-constraint-mapping-example" class="exampleblock">
+<div class="title">Example 10. <code>@UniqueConstraint</code> mapping example</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">@Entity
+@Table(
+    name = "book",
+    uniqueConstraints =  @UniqueConstraint(
+        name = "uk_book_title_author",
+        columnNames = {
+            "title",
+            "author_id"
+        }
+    )
+)
+public static class Book {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    private String title;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+        name = "author_id",
+        foreignKey = @ForeignKey(name = "fk_book_author_id")
+    )
+    private Author author;
+
+    //Getter and setters omitted for brevity
+}
+
+@Entity
+@Table(name = "author")
+public static class Author {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Column(name = "last_name")
+    private String lastName;
+
+    //Getter and setters omitted for brevity
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-SQL" data-lang="SQL">create table author (
+    id bigint not null,
+    first_name varchar(255),
+    last_name varchar(255),
+    primary key (id)
+)
+
+create table book (
+    id bigint not null,
+    title varchar(255),
+    author_id bigint,
+    primary key (id)
+)
+
+alter table book
+   add constraint uk_book_title_author
+   unique (title, author_id)
+
+alter table book
+   add constraint fk_book_author_id
+   foreign key (author_id)
+   references author</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>With the <code>uk_book_title_author</code> unique constraint in place,
+it&#8217;s no longer possible to add two books with the same title and for the same author.</p>
+</div>
+<div id="schema-generation-columns-unique-constraint-persist-example" class="exampleblock">
+<div class="title">Example 11. <code>@UniqueConstraintTest</code> persist example</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">Author _author = doInJPA( this::entityManagerFactory, entityManager -&gt; {
+    Author author = new Author();
+    author.setFirstName( "Vlad" );
+    author.setLastName( "Mihalcea" );
+    entityManager.persist( author );
+
+    Book book = new Book();
+    book.setTitle( "High-Performance Java Persistence" );
+    book.setAuthor( author );
+    entityManager.persist( book );
+
+    return author;
+} );
+
+try {
+    doInJPA( this::entityManagerFactory, entityManager -&gt; {
+        Book book = new Book();
+        book.setTitle( "High-Performance Java Persistence" );
+        book.setAuthor( _author );
+        entityManager.persist( book );
+    } );
+}
+catch (Exception expected) {
+    assertNotNull( ExceptionUtil.findCause( expected, ConstraintViolationException.class ) );
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-SQL" data-lang="SQL">insert
+into
+    author
+    (first_name, last_name, id)
+values
+    (?, ?, ?)
+
+-- binding parameter [1] as [VARCHAR] - [Vlad]
+-- binding parameter [2] as [VARCHAR] - [Mihalcea]
+-- binding parameter [3] as [BIGINT]  - [1]
+
+insert
+into
+    book
+    (author_id, title, id)
+values
+    (?, ?, ?)
+
+-- binding parameter [1] as [BIGINT]  - [1]
+-- binding parameter [2] as [VARCHAR] - [High-Performance Java Persistence]
+-- binding parameter [3] as [BIGINT]  - [2]
+
+insert
+into
+    book
+    (author_id, title, id)
+values
+    (?, ?, ?)
+
+-- binding parameter [1] as [BIGINT]  - [1]
+-- binding parameter [2] as [VARCHAR] - [High-Performance Java Persistence]
+-- binding parameter [3] as [BIGINT]  - [3]
+
+-- SQL Error: 23505, SQLState: 23505
+-- Unique index or primary key violation: "UK_BOOK_TITLE_AUTHOR_INDEX_1 ON PUBLIC.BOOK(TITLE, AUTHOR_ID) VALUES ( /* key:1 */ 3, 'High-Performance Java Persistence', 1)";</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>The second INSERT statement fails because of the unique constraint violation.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="schema-generation-columns-index">Columns index</h3>
+<div class="paragraph">
+<p>The <a href="http://docs.oracle.com/javaee/7/api/javax/persistence/Index.html"><code>@Index</code></a> annotation is used by the automated schema generation tool to create a database index.</p>
+</div>
+<div class="paragraph">
+<p>Considering the following entity mapping, Hibernate generates the index when creating the database schema:</p>
+</div>
+<div id="schema-generation-columns-index-mapping-example" class="exampleblock">
+<div class="title">Example 12. <code>@Index</code> mapping example</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">@Entity
+@Table(
+    name = "author",
+    indexes =  @Index(
+        name = "idx_author_first_last_name",
+        columnList = "first_name, last_name",
+        unique = false
+    )
+)
+public static class Author {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Column(name = "last_name")
+    private String lastName;
+
+    //Getter and setters omitted for brevity
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-SQL" data-lang="SQL">create table author (
+    id bigint not null,
+    first_name varchar(255),
+    last_name varchar(255),
+    primary key (id)
+)
+
+create index idx_author_first_last_name
+    on author (first_name, last_name)</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2018-05-21 13:59:13 -04:00
+</div>
+</div>
+</body>
+</html>

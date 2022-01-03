@@ -1,0 +1,189 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>Chapter&nbsp;2.&nbsp;Architecture</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="prev" href="tutorial-summary.html" title="1.5.&nbsp;Summary">
+      <link rel="next" href="architecture-states.html" title="2.2.&nbsp;Instance states">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">Chapter&nbsp;2.&nbsp;Architecture</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="tutorial-summary.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">&nbsp;</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="architecture-states.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="chapter" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title"><a name="architecture"></a>Chapter&nbsp;2.&nbsp;Architecture
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <div class="sect1" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="architecture-overview"></a>2.1.&nbsp;Overview
+                     </h2>
+                  </div>
+               </div>
+            </div>
+            <p>
+                           A (very) high-level view of the Hibernate architecture:
+                       
+            </p>
+            <div class="mediaobject" align="center"><img src="images/overview.png" align="middle"></div>
+            <p>
+                 This diagram shows Hibernate using the database and configuration data to
+                           provide persistence services (and persistent objects) to the application.
+                       
+            </p>
+            <p>
+               We would like to show a more detailed view of the runtime architecture.
+                           Unfortunately, Hibernate is flexible and supports several approaches. We will
+                           show the two extremes. The "lite" architecture has the application
+                           provide its own JDBC connections and manage its own transactions. This approach
+                           uses a minimal subset of Hibernate's APIs:
+                       
+            </p>
+            <div class="mediaobject" align="center"><img src="images/lite.png" align="middle"></div>
+            <p>
+                           The "full cream" architecture abstracts the application away from the
+                           underlying JDBC/JTA APIs and lets Hibernate take care of the details.
+                       
+            </p>
+            <div class="mediaobject" align="center"><img src="images/full_cream.png" align="middle"></div>
+            <p>
+                           Heres some definitions of the objects in the diagrams:
+               
+                           
+            </p>
+            <div class="variablelist">
+               <dl>
+                  <dt><span class="term">SessionFactory (<code class="literal">org.hibernate.SessionFactory</code>)</span></dt>
+                  <dd>
+                     <p>
+                                                    A threadsafe (immutable) cache of compiled mappings for a single database.
+                                                    A factory for <code class="literal">Session</code> and a client of
+                                                    <code class="literal">ConnectionProvider</code>. Might hold an optional (second-level)
+                                                    cache of data that is reusable between transactions, at a
+                                                    process- or cluster-level.
+                                                
+                     </p>
+                  </dd>
+                  <dt><span class="term">Session (<code class="literal">org.hibernate.Session</code>)</span></dt>
+                  <dd>
+                     <p>
+                                                    A single-threaded, short-lived object representing a conversation between
+                                                    the application and the persistent store. Wraps a JDBC connection. Factory
+                                                    for <code class="literal">Transaction</code>. Holds a mandatory (first-level) cache
+                                                    of persistent objects, used when navigating the object graph or looking up
+                                                    objects by identifier.
+                                                
+                     </p>
+                  </dd>
+                  <dt><span class="term">Persistent objects and collections</span></dt>
+                  <dd>
+                     <p>
+                                                    Short-lived, single threaded objects containing persistent state and business
+                                                    function. These might be ordinary JavaBeans/POJOs, the only special thing about
+                                                    them is that they are currently associated with (exactly one)
+                                                    <code class="literal">Session</code>. As soon as the <code class="literal">Session</code> is closed,
+                                                    they will be detached and free to use in any application layer (e.g. directly
+                                                    as data transfer objects to and from presentation).
+                                                
+                     </p>
+                  </dd>
+                  <dt><span class="term">Transient and detached objects and collections</span></dt>
+                  <dd>
+                     <p>
+                                                    Instances of persistent classes that are not currently associated with a
+                                                    <code class="literal">Session</code>. They may have been instantiated by
+                                                    the application and not (yet) persisted or they may have been instantiated by a
+                                                    closed <code class="literal">Session</code>.
+                                                
+                     </p>
+                  </dd>
+                  <dt><span class="term">Transaction (<code class="literal">org.hibernate.Transaction</code>)</span></dt>
+                  <dd>
+                     <p>
+                                                    (Optional) A single-threaded, short-lived object used by the application to
+                                                    specify atomic units of work. Abstracts application from underlying JDBC,
+                                                    JTA or CORBA transaction. A <code class="literal">Session</code> might span several
+                                                    <code class="literal">Transaction</code>s in some cases. However, transaction demarcation,
+                                                    either using the underlying API or <code class="literal">Transaction</code>, is never
+                                                    optional!
+                                                
+                     </p>
+                  </dd>
+                  <dt><span class="term">ConnectionProvider (<code class="literal">org.hibernate.connection.ConnectionProvider</code>)</span></dt>
+                  <dd>
+                     <p>
+                                                    (Optional) A factory for (and pool of) JDBC connections. Abstracts application from
+                                                    underlying <code class="literal">Datasource</code> or <code class="literal">DriverManager</code>.
+                                                    Not exposed to application, but can be extended/implemented by the developer.
+                                                
+                     </p>
+                  </dd>
+                  <dt><span class="term">TransactionFactory (<code class="literal">org.hibernate.TransactionFactory</code>)</span></dt>
+                  <dd>
+                     <p>
+                                                    (Optional) A factory for <code class="literal">Transaction</code> instances. Not exposed to the
+                                                    application, but can be extended/implemented by the developer.
+                                                
+                     </p>
+                  </dd>
+                  <dt><span class="term"><span class="emphasis"><em>Extension Interfaces</em></span></span></dt>
+                  <dd>
+                     <p>
+                                                    Hibernate offers many optional extension interfaces you can implement to customize
+                                                    the behavior of your persistence layer. See the API documentation for details.
+                                                
+                     </p>
+                  </dd>
+               </dl>
+            </div>
+            <p>
+                       
+            </p>
+            <p>
+                           Given a "lite" architecture, the application bypasses the
+                           <code class="literal">Transaction</code>/<code class="literal">TransactionFactory</code> and/or
+                           <code class="literal">ConnectionProvider</code> APIs to talk to JTA or JDBC directly.
+                       
+            </p>
+         </div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="tutorial-summary.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center">&nbsp;</td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="architecture-states.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">1.5.&nbsp;Summary&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;2.2.&nbsp;Instance states</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

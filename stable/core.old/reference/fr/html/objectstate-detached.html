@@ -1,0 +1,90 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>10.6.&nbsp;Modifier des objets d&eacute;tach&eacute;s</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="objectstate.html" title="Chapitre&nbsp;10.&nbsp;Travailler avec des objets">
+      <link rel="prev" href="objectstate-modifying.html" title="10.5.&nbsp;Modifier des objets persistants">
+      <link rel="next" href="objectstate-saveorupdate.html" title="10.7.&nbsp;D&eacute;tection automatique d'un &eacute;tat">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">10.6.&nbsp;Modifier des objets d&eacute;tach&eacute;s</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="objectstate-modifying.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;10.&nbsp;Travailler avec des objets</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="objectstate-saveorupdate.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="objectstate-detached"></a>10.6.&nbsp;Modifier des objets d&eacute;tach&eacute;s
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Beaucoup d'applications ont besoin de r&eacute;cup&eacute;rer un objet dans une transaction, l'envoyer &agrave; la couche interfac&eacute;e avec l'utilisateur
+            pour les manipulations, puis sauvegarder les changements dans une nouvelle transaction. Les applications qui utilisent cette
+            approche dans un environnement &agrave; haute concurrence utilisent g&eacute;n&eacute;ralement des donn&eacute;es versionn&eacute;es pour assurer l'isolation
+            pour les "longues" unit&eacute;s de travail. 
+         </p>
+         <p>Hibernate supporte ce mod&egrave;le en permettant pour le r&eacute;attachement d'instances d&eacute;tach&eacute;es l'utilisation des m&eacute;thodes <code class="literal">Session.update()</code> ou <code class="literal">Session.merge()</code> : 
+         </p><pre class="programlisting">// in the first session
+Cat cat = (Cat) firstSession.load(Cat.class, catId);
+Cat potentialMate = new Cat();
+firstSession.save(potentialMate);
+
+// in a higher layer of the application
+cat.setMate(potentialMate);
+
+// later, in a new session
+secondSession.update(cat);  // update cat
+secondSession.update(mate); // update mate</pre><p>Si le <code class="literal">Cat</code> avec l'identifiant <code class="literal">catId</code> avait d&eacute;j&agrave; &eacute;t&eacute; charg&eacute; par <code class="literal">secondSession</code> lorsque l'application a essay&eacute; de le r&eacute;attacher, une exception aurait &eacute;t&eacute; lev&eacute;e. 
+         </p>
+         <p>Utilisez <code class="literal">update()</code> si vous &ecirc;tes sure que la session ne contient pas d&eacute;j&agrave; une instance persistante avec le m&ecirc;me identifiant, et <code class="literal">merge()</code> si vous voulez fusionner vos modifications n'importe quand sans consid&eacute;rer l'&eacute;tat de la session. En d'autres mots, <code class="literal">update()</code> est g&eacute;n&eacute;ralement la premi&egrave;re m&eacute;thode que vous devriez appeler dans une session fra&icirc;che, pour s'assurer que le r&eacute;attachement
+            de vos instances d&eacute;tach&eacute;es est la premi&egrave;re op&eacute;ration qui est ex&eacute;cut&eacute;e. 
+         </p>
+         <p>L'application devrait individuellement <code class="literal">update()</code> (NdT : mettre &agrave; jour) les instances d&eacute;tach&eacute;es accessibles depuis l'instance d&eacute;tach&eacute;e donn&eacute;e si et <span class="emphasis"><em>seulement</em></span> si elle veut que leur &eacute;tat soit aussi mis &agrave; jour. Ceci peut &ecirc;tre automatis&eacute; bien s&ucirc;r, en utilisant la <span class="emphasis"><em>persistance transitive</em></span>, voir <a href="objectstate-transitive.html" title="10.11.&nbsp;Persistance transitive">Section&nbsp;10.11, &laquo;&nbsp;Persistance transitive&nbsp;&raquo;</a>. 
+         </p>
+         <p>La m&eacute;thode <code class="literal">lock()</code> permet aussi &agrave; une application de r&eacute;associer un objet avec une nouvelle session. Pourtant, l'instance d&eacute;tach&eacute;e doit &ecirc;tre
+            non modifi&eacute;e ! 
+         </p><pre class="programlisting">//just reassociate:
+sess.lock(fritz, LockMode.NONE);
+//do a version check, then reassociate:
+sess.lock(izi, LockMode.READ);
+//do a version check, using SELECT ... FOR UPDATE, then reassociate:
+sess.lock(pk, LockMode.UPGRADE);</pre><p>Notez que <code class="literal">lock()</code> peut &ecirc;tre utilis&eacute; avec diff&eacute;rents <code class="literal">LockMode</code>s, voir la documentation de l'API documentation et le chapitre sur la gestion des transactions pour plus d'informations. Le
+            r&eacute;attachement n'est pas le seul cas d'utilisation pour <code class="literal">lock()</code>. 
+         </p>
+         <p>D'autres mod&egrave;les pour de longues unit&eacute;s de travail sont trait&eacute;s dans <a href="transactions-optimistic.html" title="11.3.&nbsp;Contr&ocirc;le de consurrence optimiste">Section&nbsp;11.3, &laquo;&nbsp;Contr&ocirc;le de consurrence optimiste&nbsp;&raquo;</a>. 
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="objectstate-modifying.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="objectstate.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="objectstate-saveorupdate.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">10.5.&nbsp;Modifier des objets persistants&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;10.7.&nbsp;D&eacute;tection automatique d'un &eacute;tat</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

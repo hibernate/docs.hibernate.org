@@ -1,0 +1,542 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>Chapter&nbsp;4.&nbsp;Transactions and Concurrency</title><link rel="stylesheet" href="../shared/css/html.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.65.1"><link rel="home" href="index.html" title="Hibernate EntityManager"><link rel="up" href="index.html" title="Hibernate EntityManager"><link rel="previous" href="objectstate.html" title="Chapter&nbsp;3.&nbsp;Working with objects"><link rel="next" href="listeners.html" title="Chapter&nbsp;5.&nbsp;Entity listeners and Callback methods"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter&nbsp;4.&nbsp;Transactions and Concurrency</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="objectstate.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="listeners.html">Next</a></td></tr></table><hr></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="transactions"></a>Chapter&nbsp;4.&nbsp;Transactions and Concurrency</h2></div></div><div></div></div><p>The most important point about Hibernate Entity Manager and
+  concurrency control is that it is very easy to understand. Hibernate Entity
+  Manager directly uses JDBC connections and JTA resources without adding any
+  additional locking behavior. We highly recommend you spend some time with
+  the JDBC, ANSI, and transaction isolation specification of your database
+  management system. Hibernate Entity Manager only adds automatic versioning
+  but does not lock objects in memory or change the isolation level of your
+  database transactions. Basically, use Hibernate Entity Manager like you
+  would use direct JDBC (or JTA/CMT) with your database resources.</p><p>We start the discussion of concurrency control in Hibernate with the
+  granularity of <tt class="literal">EntityManagerFactory</tt>, and
+  <tt class="literal">EntityManager</tt>, as well as database transactions and long
+  units of work..</p><p>In this chapter, and unless explicitly expressed, we will mix and
+  match the concept of entity manager and persistence context. One is an API
+  and programming object, the other a definition of scope. However, keep in
+  mind the essential difference. A persistence context is usually bound to a
+  JTA transaction in Java EE, and a persistence context starts and ends at
+  transaction boundaries (transaction-scoped) unless you use an extended
+  entity manager. Please refer to <a href="architecture.html#architecture-ejb-persistctxscope" title="1.2.3.&nbsp;Persistence context scope">Section&nbsp;1.2.3, &#8220;Persistence context scope&#8221;</a> for more information.</p><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="transactions-basics"></a>4.1.&nbsp;Entity manager and transaction scopes</h2></div></div><div></div></div><p>A <tt class="literal">EntityManagerFactory</tt> is an expensive-to-create,
+    threadsafe object intended to be shared by all application threads. It is
+    created once, usually on application startup.</p><p>An <tt class="literal">EntityManager</tt> is an inexpensive,
+    non-threadsafe object that should be used once, for a single business
+    process, a single unit of work, and then discarded. An
+    <tt class="literal">EntityManager</tt> will not obtain a JDBC
+    <tt class="literal">Connection</tt> (or a <tt class="literal">Datasource</tt>) unless
+    it is needed, so you may safely open and close an
+    <tt class="literal">EntityManager</tt> even if you are not sure that data access
+    will be needed to serve a particular request. (This becomes important as
+    soon as you are implementing some of the following patterns using request
+    interception.)</p><p>To complete this picture you also have to think about database
+    transactions. A database transaction has to be as short as possible, to
+    reduce lock contention in the database. Long database transactions will
+    prevent your application from scaling to highly concurrent load.</p><p>What is the scope of a unit of work? Can a single Hibernate
+    <tt class="literal">EntityManager</tt> span several database transactions or is
+    this a one-to-one relationship of scopes? When should you open and close a
+    <tt class="literal">Session</tt> and how do you demarcate the database
+    transaction boundaries?</p><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="transactions-basics-uow"></a>4.1.1.&nbsp;Unit of work</h3></div></div><div></div></div><p>First, don't use the
+      <span class="emphasis"><em>entitymanager-per-operation</em></span> antipattern, that is,
+      don't open and close an <tt class="literal">EntityManager</tt> for every
+      simple database call in a single thread! Of course, the same is true for
+      database transactions. Database calls in an application are made using a
+      planned sequence, they are grouped into atomic units of work. (Note that
+      this also means that auto-commit after every single SQL statement is
+      useless in an application, this mode is intended for ad-hoc SQL console
+      work.)</p><p>The most common pattern in a multi-user client/server application
+      is <span class="emphasis"><em>entitymanager-per-request</em></span>. In this model, a
+      request from the client is send to the server (where the EJB3
+      persistence layer runs), a new <tt class="literal">EntityManager</tt> is
+      opened, and all database operations are executed in this unit of work.
+      Once the work has been completed (and the response for the client has
+      been prepared), the persistence context is flushed and closed, as well
+      as the entity manager object. You would also use a single database
+      transaction to serve the clients request. The relationship between the
+      two is one-to-one and this model is a perfect fit for many
+      applications.</p><p>This is the default EJB3 persistence model in a Java EE
+      environment (JTA bounded, transaction-scoped persistence context);
+      injected (or looked up) entity managers share the same persistence
+      context for a particular JTA transaction. The beauty of EJB3 is that you
+      don't have to care about that anymore and just see data access through
+      entity manager and demaraction of transaction scope on session beans as
+      completely orthogonal.</p><p>The challenge is the implementation of this (and other) behavior
+      outside an EJB3 container: not only has the
+      <tt class="literal">EntityManager</tt> and resource-local transaction to be
+      started and ended correctly, but they also have to be accessible for
+      data access operations. The demarcation of a unit of work is ideally
+      implemented using an interceptor that runs when a request hits the
+      non-EJB3 container server and before the response will be send (i.e. a
+      <tt class="literal">ServletFilter</tt> if you are using a standalone servlet
+      container). We recommend to bind the <tt class="literal">EntityManager</tt> to
+      the thread that serves the request, using a
+      <tt class="literal">ThreadLocal</tt> variable. This allows easy access (like
+      accessing a static variable) in all code that runs in this thread.
+      Depending on the database transaction demarcation mechanism you chose,
+      you might also keep the transaction context in a
+      <tt class="literal">ThreadLocal</tt> variable. The implementation patterns for
+      this are known as <span class="emphasis"><em>ThreadLocal Session</em></span> and
+      <span class="emphasis"><em>Open Session in View</em></span> in the Hibernate community.
+      You can easily extend the <tt class="literal">HibernateUtil</tt> shown in the
+      Hibernate reference documentation to implement this pattern, you don't
+      need any external software (it's in fact very trivial). Of course, you'd
+      have to find a way to implement an interceptor and set it up in your
+      environment. See the Hibernate website for tips and examples. Once
+      again, remember that your first choice is naturally an EJB3 container -
+      preferably a light and modular one such as JBoss application
+      server.</p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="transactions-basics-apptx"></a>4.1.2.&nbsp;Long units of work</h3></div></div><div></div></div><p>The entitymanager-per-request pattern is not the only useful
+      concept you can use to design units of work. Many business processes
+      require a whole series of interactions with the user interleaved with
+      database accesses. In web and enterprise applications it is not
+      acceptable for a database transaction to span a user interaction with
+      possibly long waiting time between requests. Consider the following
+      example:</p><div class="itemizedlist"><ul type="disc"><li><p>The first screen of a dialog opens, the data seen by the user
+          has been loaded in a particular <tt class="literal">EntityManager</tt> and
+          resource-local transaction. The user is free to modify the detached
+          objects.</p></li><li><p>The user clicks "Save" after 5 minutes and expects his
+          modifications to be made persistent; he also expects that he was the
+          only person editing this information and that no conflicting
+          modification can occur.</p></li></ul></div><p>We call this unit of work, from the point of view of the user, a
+      long running <span class="emphasis"><em>application transaction</em></span>. There are
+      many ways how you can implement this in your application.</p><p>A first naive implementation might keep the
+      <tt class="literal">EntityManager</tt> and database transaction open during
+      user think time, with locks held in the database to prevent concurrent
+      modification, and to guarantee isolation and atomicity. This is of
+      course an anti-pattern, a pessimistic approach, since lock contention
+      would not allow the application to scale with the number of concurrent
+      users.</p><p>Clearly, we have to use several database transactions to implement
+      the application transaction. In this case, maintaining isolation of
+      business processes becomes the partial responsibility of the application
+      tier. A single application transaction usually spans several database
+      transactions. It will be atomic if only one of these database
+      transactions (the last one) stores the updated data, all others simply
+      read data (e.g. in a wizard-style dialog spanning several
+      request/response cycles). This is easier to implement than it might
+      sound, especially if you use EJB3 entity manager and persistence context
+      features:</p><div class="itemizedlist"><ul type="disc"><li><p><span class="emphasis"><em>Automatic Versioning</em></span> - An entity manager
+          can do automatic optimistic concurrency control for you, it can
+          automatically detect if a concurrent modification occured during
+          user think time (usually by comparing version numbers or timestamps
+          when updating the data in the final resource-local
+          transaction).</p></li><li><p><span class="emphasis"><em>Detached Entities</em></span> - If you decide to use
+          the already discussed <span class="emphasis"><em>entity-per-request</em></span>
+          pattern, all loaded instances will be in detached state during user
+          think time. The entity manager allows you to merge the detached
+          (modified) state and persist the modifications, the pattern is
+          called
+          <span class="emphasis"><em>entitymanager-per-request-with-detached-entities</em></span>.
+          Automatic versioning is used to isolate concurrent
+          modifications.</p></li><li><p><span class="emphasis"><em>Extended Entity Manager</em></span> - The Hibernate
+          Entity Manager may be disconnected from the underlying JDBC
+          connection between two client calls and reconnected when a new
+          client request occurs. This pattern is known as
+          <span class="emphasis"><em>entitymanager-per-application-transaction</em></span> and
+          makes even merging unnecessary. An extend persistence context is
+          responsible to collect and retain any modification (persist, merge,
+          remove) made outside a transaction. The next client call made inside
+          an active transaction (typically the last operation of a user
+          conversation) will execute all queued modifications. Automatic
+          versioning is used to isolate concurrent modifications.</p></li></ul></div><p>Both
+      <span class="emphasis"><em>entitymanager-per-request-with-detached-objects</em></span> and
+      <span class="emphasis"><em>entitymanager-per-application-transaction</em></span> have
+      advantages and disadvantages, we discuss them later in this chapter in
+      the context of optimistic concurrency control.</p><p>TODO: This note should probably come later.</p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="transactions-basics-identity"></a>4.1.3.&nbsp;Considering object identity</h3></div></div><div></div></div><p>An application may concurrently access the same persistent state
+      in two different persistence contexts. However, an instance of a managed
+      class is never shared between two persistence contexts. Hence there are
+      two different notions of identity:</p><div class="variablelist"><dl><dt><span class="term">Database Identity</span></dt><dd><p>
+              <tt class="literal">foo.getId().equals( bar.getId() )</tt>
+            </p></dd><dt><span class="term">JVM Identity</span></dt><dd><p>
+              <tt class="literal">foo==bar</tt>
+            </p></dd></dl></div><p>Then for objects attached to a <span class="emphasis"><em>particular</em></span>
+      persistence context (i.e. in the scope of an
+      <tt class="literal">EntityManager</tt>) the two notions are equivalent, and
+      JVM identity for database identity is guaranteed by the Hibernate Entity
+      Manager. However, while the application might concurrently access the
+      "same" (persistent identity) business object in two different
+      persistence contexts, the two instances will actually be "different"
+      (JVM identity). Conflicts are resolved using (automatic versioning) at
+      flush/commit time, using an optimistic approach.</p><p>This approach leaves Hibernate and the database to worry about
+      concurrency; it also provides the best scalability, since guaranteeing
+      identity in single-threaded units of work only doesn't need expensive
+      locking or other means of synchronization. The application never needs
+      to synchronize on any business object, as long as it sticks to a single
+      thread per <tt class="literal">EntityManager</tt>. Within a persistence
+      context, the application may safely use <tt class="literal">==</tt> to compare
+      entities.</p><p>However, an application that uses <tt class="literal">==</tt> outside of
+      a persistence context might see unexpected results. This might occur
+      even in some unexpected places, for example, if you put two detached
+      instances into the same <tt class="literal">Set</tt>. Both might have the same
+      database identity (i.e. they represent the same row), but JVM identity
+      is by definition not guaranteed for instances in detached state. The
+      developer has to override the <tt class="literal">equals()</tt> and
+      <tt class="literal">hashCode()</tt> methods in persistent classes and
+      implement his own notion of object equality. There is one caveat: Never
+      use the database identifier to implement equality, use a business key, a
+      combination of unique, usually immutable, attributes. The database
+      identifier will change if a transient entity is made persistent (see the
+      contract of the <tt class="literal">persist()</tt> operation). If the
+      transient instance (usually together with detached instances) is held in
+      a <tt class="literal">Set</tt>, changing the hashcode breaks the contract of
+      the <tt class="literal">Set</tt>. Attributes for good business keys don't have
+      to be as stable as database primary keys, you only have to guarantee
+      stability as long as the objects are in the same <tt class="literal">Set</tt>.
+      See the Hibernate website for a more thorough discussion of this issue.
+      Also note that this is not a Hibernate issue, but simply how Java object
+      identity and equality has to be implemented.</p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="transactions-basics-issues"></a>4.1.4.&nbsp;Common concurrency control issues</h3></div></div><div></div></div><p>Never use the anti-patterns
+      <span class="emphasis"><em>entitymanager-per-user-session</em></span> or
+      <span class="emphasis"><em>entitymanager-per-application</em></span> (of course, there are
+      rare exceptions to this rule, e.g. entitymanager-per-application might
+      be acceptable in a desktop application, with manual flushing of the
+      persistence context). Note that some of the following issues might also
+      appear with the recommended patterns, make sure you understand the
+      implications before making a design decision:</p><div class="itemizedlist"><ul type="disc"><li><p>An entity manager is not thread-safe. Things which are
+          supposed to work concurrently, like HTTP requests, session beans, or
+          Swing workers, will cause race conditions if an
+          <tt class="literal">EntityManager</tt> instance would be shared. If you
+          keep your Hibernate <tt class="literal">EntityManager</tt> in your
+          <tt class="literal">HttpSession</tt> (discussed later), you should
+          consider synchronizing access to your Http session. Otherwise, a
+          user that clicks reload fast enough may use the same
+          <tt class="literal">EntityManager</tt> in two concurrently running
+          threads. You will very likely have provisions for this case already
+          in place, for other non-threadsafe but session-scoped
+          objects.</p></li><li><p>An exception thrown by the Entity Manager means you have to
+          rollback your database transaction and close the
+          <tt class="literal">EntityManager</tt> immediately (discussed later in
+          more detail). If your <tt class="literal">EntityManager</tt> is bound to
+          the application, you have to stop the application. Rolling back the
+          database transaction doesn't put your business objects back into the
+          state they were at the start of the transaction. This means the
+          database state and the business objects do get out of sync. Usually
+          this is not a problem, because exceptions are not recoverable and
+          you have to start over your unit of work after rollback
+          anyway.</p></li><li><p>The persistence context caches every object that is in managed
+          state (watched and checked for dirty state by Hibernate). This means
+          it grows endlessly until you get an
+          <tt class="classname">OutOfMemoryException</tt>, if you keep it open for
+          a long time or simply load too much data. One solution for this is
+          some kind batch processing with regular flushing of the persistence
+          context, but you should consider using a database stored procedure
+          if you need mass data operations. Some solutions for this problem
+          are shown in <a href="batch.html" title="Chapter&nbsp;6.&nbsp;Batch processing">Chapter&nbsp;6, <i>Batch processing</i></a>. Keeping a persistence context
+          open for the duration of a user session also means a high
+          probability of stale data, which you have to know about and control
+          appropriately.</p></li></ul></div></div></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="transactions-demarcation"></a>4.2.&nbsp;Database transaction demarcation</h2></div></div><div></div></div><p>Datatabase (or system) transaction boundaries are always necessary.
+    No communication with the database can occur outside of a database
+    transaction (this seems to confuse many developers who are used to the
+    auto-commit mode). Always use clear transaction boundaries, even for
+    read-only operations. Depending on your isolation level and database
+    capabilities this might not be required but there is no downside if you
+    always demarcate transactions explicitly. You'll have to do operations
+    outside a transaction, though, when you'll need to retain modifications in
+    an <tt class="literal">EXTENDED</tt> persistence context.</p><p>An EJB3 application can run in non-managed (i.e. standalone, simple
+    Web- or Swing applications) and managed J2EE environments. In a
+    non-managed environment, an <tt class="literal">EntityManagerFactory</tt> is
+    usually responsible for its own database connection pool. The application
+    developer has to manually set transaction boundaries, in other words,
+    begin, commit, or rollback database transactions itself. A managed
+    environment usually provides container-managed transactions, with the
+    transaction assembly defined declaratively through annotations of EJB
+    session beans, for example. Programmatic transaction demarcation is then
+    no longer necessary, even flushing the <tt class="literal">EntityManager</tt> is
+    done automatically.</p><p>Usually, ending a unit of work involves four distinct phases:</p><div class="itemizedlist"><ul type="disc" compact><li><p>commit the (resource-local or JTA) transaction (this
+        automatically flushes the entity manager and persistence
+        context)</p></li><li><p>close the entity manager (if using an application-managed entity
+        manager)</p></li><li><p>handle exceptions</p></li></ul></div><p>We'll now have a closer look at transaction demarcation and
+    exception handling in both managed- and non-managed environments.</p><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="transactions-demarcation-nonmanaged"></a>4.2.1.&nbsp;Non-managed environment</h3></div></div><div></div></div><p>If an EJB3 persistence layer runs in a non-managed environment,
+      database connections are usually handled by Hibernate's pooling
+      mechanism behind the scenes. The common entity manager and transaction
+      handling idiom looks like this:</p><pre class="programlisting">// Non-managed environment idiom
+EntityManager em = emf.createEntityManager();
+EntityTransaction tx = null;
+try {
+    tx = em.getTransaction();
+    tx.begin();
+
+    // do some work
+    ...
+
+    tx.commit();
+}
+catch (RuntimeException e) {
+    if ( tx != null &amp;&amp; tx.isActive() ) tx.rollback();
+    throw e; // or display error message
+}
+finally {
+    em.close();
+}</pre><p>You don't have to <tt class="literal">flush()</tt> the
+      <tt class="literal">EntityManager</tt> explicitly - the call to
+      <tt class="literal">commit()</tt> automatically triggers the
+      synchronization.</p><p>A call to <tt class="literal">close()</tt> marks the end of an
+      <tt class="literal">EntityManager</tt>. The main implication of
+      <tt class="literal">close()</tt> is the release of resources - make sure you
+      always close and never outside of guaranteed finally block.</p><p>You will very likely never see this idiom in business code in a
+      normal application; fatal (system) exceptions should always be caught at
+      the "top". In other words, the code that executes entity manager calls
+      (in the persistence layer) and the code that handles
+      <tt class="literal">RuntimeException</tt> (and usually can only clean up and
+      exit) are in different layers. This can be a challenge to design
+      yourself and you should use J2EE/EJB container services whenever they
+      are available. Exception handling is discussed later in this
+      chapter.</p><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="d0e1530"></a>4.2.1.1.&nbsp;EntityTransaction</h4></div></div><div></div></div><p>In a JTA environment, you don't need any extra API to interact
+        with the transaction in your environment. Simply use transaction
+        declaration or the JTA APIs.</p><p>If you are using a <tt class="literal">RESOURCE_LOCAL</tt> entity
+        manager, you need to demarcate your transaction boundaries through the
+        <tt class="literal">EntityTransaction</tt> API. You can get an
+        <tt class="literal">EntityTransaction</tt> through
+        <tt class="literal">entityManager.getTransaction()</tt>. This
+        <tt class="literal">EntityTransaction</tt> API provides the regular
+        <tt class="methodname">begin()</tt>, <tt class="methodname">commit()</tt>,
+        <tt class="methodname">rollback()</tt> and
+        <tt class="methodname">isActive()</tt> methods. It also provide a way to
+        mark a transaction as rollback only, ie force the transaction to
+        rollback. This is very similar to the JTA operation
+        <tt class="methodname">setRollbackOnly()</tt>. When a
+        <tt class="literal">commit()</tt> operation fail and/or if the transaction
+        is marked as <tt class="literal">setRollbackOnly()</tt>, the
+        <tt class="literal">commit()</tt> method will try to rollback the
+        transaction and raise a
+        <tt class="literal">javax.transaction.RollbackException</tt>.</p><p>In a <tt class="literal">JTA</tt> entity manager,
+        <tt class="literal">entityManager.getTransaction()</tt> calls are not
+        permitted.</p></div></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="transactions-demarcation-jta"></a>4.2.2.&nbsp;Using JTA</h3></div></div><div></div></div><p>If your persistence layer runs in an application server (e.g.
+      behind EJB3 session beans), every datasource connection obtained
+      internally by the entity manager will automatically be part of the
+      global JTA transaction. Hibernate offers two strategies for this
+      integration.</p><p>If you use bean-managed transactions (BMT), the code will look
+      like this:</p><pre class="programlisting">// BMT idiom
+@Resource public UserTransaction utx;
+@Resource public EntityManagerFactory factory;
+
+public void doBusiness() {
+    EntityManager em = factory.createEntityManager();
+    try {
+
+    // do some work
+    ...
+
+    utx.commit();
+}
+catch (RuntimeException e) {
+    if (utx != null) utx.rollback();
+    throw e; // or display error message
+}
+finally {
+    em.close();
+}</pre><p>With Container Managed Transactions (CMT) in an EJB3 container,
+      transaction demarcation is done in session bean annotations or
+      deployment descriptors, not programatically. The
+      <tt class="literal">EntityManager</tt> will automatically be flushed on
+      transaction completion (and if you have injected or lookup the
+      <tt class="literal">EntityManager</tt>, it will be also closed automatically).
+      If an exception occurs during the <tt class="literal">EntityManager</tt> use,
+      transaction rollback occurs automatically if you don't catch the
+      exception. Since <tt class="literal">EntityManager</tt> exceptions are
+      <tt class="literal">RuntimeException</tt>s they will rollback the transaction
+      as per the EJB specification (system exception vs. application
+      exception).</p><p>It is important to let Hibernate EntityManager define the
+      <tt class="literal">hibernate.transaction.factory_class</tt> (ie not
+      overriding this value). Remember to also set
+      <tt class="literal">org.hibernate.transaction.manager_lookup_class</tt>.</p><p>If you work in a CMT environment, you might also want to use the
+      same entity manager in different parts of your code. Typically, in a
+      non-managed environment you would use a <tt class="literal">ThreadLocal</tt>
+      variable to hold the entity manager, but a single EJB request might
+      execute in different threads (e.g. session bean calling another session
+      bean). The EJB3 container takes care of the persistence context
+      propagation for you. Either using injection or lookup, the EJB3
+      container will return an entity manager with the same persistence
+      context bound to the JTA context if any, or create a new one and bind it
+      (see <a href="architecture.html#architecture-ejb-persistctxpropagation" title="1.2.4.&nbsp;Persistence context propagation">Section&nbsp;1.2.4, &#8220;Persistence context propagation&#8221;</a> .)</p><p>Our entity manager/transaction management idiom for CMT and EJB3
+      container-use is reduced to this:</p><pre class="programlisting">//CMT idiom through injection
+@PersistenceContext(name="sample") EntityManager em;</pre><p>In other words, all you have to do in a managed environment is to
+      inject the <tt class="literal">EntityManager</tt>, do your data access work,
+      and leave the rest to the container. Transaction boundaries are set
+      declaratively in the annotations or deployment descriptors of your
+      session beans. The lifecycle of the entity manager and persistence
+      context is completely managed by the container.</p><p>TODO: The following paragraph is very confusing, especially the
+      beginning...</p><p>When using particular Hibernate native APIs, one caveat has to be
+      remembered: <tt class="literal">after_statement</tt> connection release mode.
+      Due to a silly limitation of the JTA spec, it is not possible for
+      Hibernate to automatically clean up any unclosed
+      <tt class="literal">ScrollableResults</tt> or <tt class="literal">Iterator</tt>
+      instances returned by <tt class="literal">scroll()</tt> or
+      <tt class="literal">iterate()</tt>. You <span class="emphasis"><em>must</em></span> release the
+      underlying database cursor by calling
+      <tt class="literal">ScrollableResults.close()</tt> or
+      <tt class="literal">Hibernate.close(Iterator)</tt> explicity from a
+      <tt class="literal">finally</tt> block. (Of course, most applications can
+      easily avoid using <tt class="literal">scroll()</tt> or
+      <tt class="literal">iterate()</tt> at all from the CMT code.)</p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="transactions-demarcation-exceptions"></a>4.2.3.&nbsp;Exception handling</h3></div></div><div></div></div><p>If the <tt class="literal">EntityManager</tt> throws an exception
+      (including any <tt class="literal">SQLException</tt>), you should immediately
+      rollback the database transaction, call
+      <tt class="literal">EntityManager.close()</tt> (if
+      <tt class="methodname">createEntityManager()</tt> has been called) and
+      discard the <tt class="literal">EntityManager</tt> instance. Certain methods
+      of <tt class="literal">EntityManager</tt> will <span class="emphasis"><em>not</em></span> leave
+      the persistence context in a consistent state. No exception thrown by an
+      entity manager can be treated as recoverable. Ensure that the
+      <tt class="literal">EntityManager</tt> will be closed by calling
+      <tt class="literal">close()</tt> in a <tt class="literal">finally</tt> block. Note
+      that a container managed entity manager will do that for you. You just
+      have to let the RuntimeException propagate up to the container.</p><p>The Hibernate entity manager generally raises exceptions which
+      encapsulate the Hibernate core exception. Common exceptions raised by
+      the <tt class="literal">EntityManager</tt> API are</p><div class="itemizedlist"><ul type="disc"><li><p>IllegalArgumentException: something wrong happen</p></li><li><p>EntityNotFoundException: an entity was expected but none match
+          the requirement</p></li><li><p>TransactionRequiredException: this operation has to be in a
+          transaction</p></li><li><p>IllegalStateException: the entity manager is used in a wrong
+          way</p></li></ul></div><p>The <tt class="literal">HibernateException</tt>, which wraps most of the
+      errors that can occur in a Hibernate persistence layer, is an unchecked
+      exception. Note that Hibernate might also throw other unchecked
+      exceptions which are not a <tt class="literal">HibernateException</tt>. These
+      are, again, not recoverable and appropriate action should be
+      taken.</p><p>Hibernate wraps <tt class="literal">SQLException</tt>s thrown while
+      interacting with the database in a <tt class="literal">JDBCException</tt>. In
+      fact, Hibernate will attempt to convert the eexception into a more
+      meningful subclass of <tt class="literal">JDBCException</tt>. The underlying
+      <tt class="literal">SQLException</tt> is always available via
+      <tt class="literal">JDBCException.getCause()</tt>. Hibernate converts the
+      <tt class="literal">SQLException</tt> into an appropriate
+      <tt class="literal">JDBCException</tt> subclass using the
+      <tt class="literal">SQLExceptionConverter</tt> attached to the
+      <tt class="literal">SessionFactory</tt>. By default, the
+      <tt class="literal">SQLExceptionConverter</tt> is defined by the configured
+      dialect; however, it is also possible to plug in a custom implementation
+      (see the javadocs for the
+      <tt class="literal">SQLExceptionConverterFactory</tt> class for details). The
+      standard <tt class="literal">JDBCException</tt> subtypes are:</p><div class="itemizedlist"><ul type="disc" compact><li><p><tt class="literal">JDBCConnectionException</tt> - indicates an
+          error with the underlying JDBC communication.</p></li><li><p><tt class="literal">SQLGrammarException</tt> - indicates a grammar
+          or syntax problem with the issued SQL.</p></li><li><p><tt class="literal">ConstraintViolationException</tt> - indicates
+          some form of integrity constraint violation.</p></li><li><p><tt class="literal">LockAcquisitionException</tt> - indicates an
+          error acquiring a lock level necessary to perform the requested
+          operation.</p></li><li><p><tt class="literal">GenericJDBCException</tt> - a generic exception
+          which did not fall into any of the other categories.</p></li></ul></div></div></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e1799"></a>4.3.&nbsp;EXTENDED Persistence Context</h2></div></div><div></div></div><p>All application managed entity manager and container managed
+    persistence contexts defined as such are <tt class="literal">EXTENDED</tt>. This
+    means that the persistence context type goes beyond the transaction life
+    cycle. We should then understand what happens to operations made outside
+    the scope of a transaction.</p><p>In an <tt class="literal">EXTENDED</tt> persistence context, all read only
+    operations of the entity manager can be executed outside a transaction
+    (<tt class="literal">find()</tt>, <tt class="literal">getReference()</tt>,
+    <tt class="literal">refresh()</tt>, and read queries). Some modifications
+    operations can be executed outside a transaction, but they are queued
+    until the persistence context join a transaction: this is the case of
+    <tt class="literal">persist()</tt>,
+    <tt class="literal"><tt class="literal">merge()</tt></tt>,
+    <tt class="literal">remove()</tt>. Some operations cannot be called outside a
+    transaction: <tt class="literal">flush()</tt>, <tt class="literal">lock()</tt>, and
+    update/delete queries.</p><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e1837"></a>4.3.1.&nbsp;Container Managed Entity Manager</h3></div></div><div></div></div><p>When using an EXTENDED persistence context with a container
+      managed entity manager, the lifecycle of the persistence context is
+      binded to the lifecycle of the Stateful Session Bean. Plus if the entity
+      manager is created outside a transaction, modifications operations
+      (persist, merge, remove) are queued in the persistence context and not
+      executed to the database.</p><p>When a method of the stateful session bean involved or starting a
+      transaction is later called, the entity manager join the transaction.
+      All queued operation will then be executed to synchronize the
+      persistence context.</p><p>This is perfect to implement the
+      <tt class="literal">entitymanager-per-conversation</tt> pattern. A stateful
+      session bean represents the conversation implementation. All
+      intermediate conversation work will be processed in methods not
+      involving transaction. The end of the conversation will be processed
+      inside a <tt class="literal">JTA</tt> transaction. Hence all queued operations
+      will be executed to the database and commited. If you are interested in
+      the notion of conversation inside your application, have a look at JBoss
+      Seam. Jboss Seam emphasizes the concept of conversation and entity
+      manager lifecycle and bind EJB3 and JSF together.</p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="d0e1852"></a>4.3.2.&nbsp;Application Managed Entity Manager</h3></div></div><div></div></div><p>Application-managed entity manager are always
+      <tt class="literal">EXTENDED</tt>. When you create an entity manager inside a
+      transaction, the entity manager automatically join the current
+      transaction. If the entity manager is created outside a transaction, the
+      entity manager will queue the modification operations. When</p><div class="itemizedlist"><ul type="disc"><li><p><tt class="methodname">entityManager.joinTransaction()</tt> is
+          called when a JTA transaction is active for a <tt class="literal">JTA</tt>
+          entity manager</p></li><li><p><tt class="literal">entityManager.getTransaction().begin()</tt> is
+          called for a <tt class="literal">RESOURCE_LOCAL</tt> entity manager</p></li></ul></div><p>the entity manager join the transaction and all the queued
+      operations will then be executed to synchronize the persistence
+      context.</p><p>It is not legal to call
+      <tt class="methodname">entityManager.joinTransaction()</tt> if no JTA
+      transaction is involved.</p></div></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="transactions-optimistic"></a>4.4.&nbsp;Optimistic concurrency control</h2></div></div><div></div></div><p>The only approach that is consistent with high concurrency and high
+    scalability is optimistic concurrency control with versioning. Version
+    checking uses version numbers, or timestamps, to detect conflicting
+    updates (and to prevent lost updates). Hibernate provides for three
+    possible approaches to writing application code that uses optimistic
+    concurrency. The use cases we show are in the context of long application
+    transactions but version checking also has the benefit of preventing lost
+    updates in single database transactions.</p><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="transactions-optimistic-manual"></a>4.4.1.&nbsp;Application version checking</h3></div></div><div></div></div><p>In an implementation without much help from the persistence
+      mechanism, each interaction with the database occurs in a new
+      <tt class="literal">EntityManager</tt> and the developer is responsible for
+      reloading all persistent instances from the database before manipulating
+      them. This approach forces the application to carry out its own version
+      checking to ensure application transaction isolation. This approach is
+      the least efficient in terms of database access. It is the approach most
+      similar to EJB2 entities:</p><pre class="programlisting">// foo is an instance loaded by a previous entity manager
+em = factory.createEntityManager();
+EntityTransaction t = em.getTransaction();
+t.begin();
+int oldVersion = foo.getVersion();
+Foo dbFoo = em.find( foo.getClass(), foo.getKey() ); // load the current state
+if ( dbFoo.getVersion()!=foo.getVersion ) throw new StaleObjectStateException();
+dbFoo.setProperty("bar");
+t.commit();
+em.close();</pre><p>The <tt class="literal">version</tt> property is mapped using
+      <tt class="literal">@Version</tt>, and the entity manager will automatically
+      increment it during flush if the entity is dirty.</p><p>Of course, if you are operating in a low-data-concurrency
+      environment and don't require version checking, you may use this
+      approach and just skip the version check. In that case, <span class="emphasis"><em>last
+      commit wins</em></span> will be the default strategy for your long
+      application transactions. Keep in mind that this might confuse the users
+      of the application, as they might experience lost updates without error
+      messages or a chance to merge conflicting changes.</p><p>Clearly, manual version checking is only feasible in very trivial
+      circumstances and not practical for most applications. Often not only
+      single instances, but complete graphs of modified ojects have to be
+      checked. Hibernate offers automatic version checking with either
+      detached instances or an extended entity manager and persistence context
+      as the design paradigm.</p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="transactions-optimistic-longsession"></a>4.4.2.&nbsp;Extended entity manager and automatic versioning</h3></div></div><div></div></div><p>A single persistence context is used for the whole application
+      transaction. The entity manager checks instance versions at flush time,
+      throwing an exception if concurrent modification is detected. It's up to
+      the developer to catch and handle this exception (common options are the
+      opportunity for the user to merge his changes or to restart the business
+      process with non-stale data).</p><p>In an <tt class="literal">EXTENDED</tt> persistence context, all
+      operations made outside an active transaction are queued. The
+      <tt class="literal">EXTENDED</tt> persistence context is flushed when executed
+      in an active transaction (at worse at commit time).</p><p>The <tt class="literal">Entity Manager</tt> is disconnected from any
+      underlying JDBC connection when waiting for user interaction. In an
+      application-managed extended entity manager, this occurs automatically
+      at transaction completion. In a stateful session bean holding a
+      container-managed extended entity manager (i.e. a SFSB annotated with
+      <tt class="literal">@PersistenceContext(EXTENDED)</tt>), this occurs
+      transparently as well. This approach is the most efficient in terms of
+      database access. The application need not concern itself with version
+      checking or with merging detached instances, nor does it have to reload
+      instances in every database transaction. For those who might be
+      concerned by the number of connections opened and closed, remember that
+      the connection provider should be a connection pool, so there is no
+      performance impact. The following examples show the idiom in a
+      non-managed environment:</p><pre class="programlisting">// foo is an instance loaded earlier by the extended entity manager
+em.getTransaction.begin(); // new connection to data store is obtained and tx started
+foo.setProperty("bar");
+em.getTransaction().commit();  // End tx, flush and check version, disconnect</pre><p>The <tt class="literal">foo</tt> object still knows which
+      <tt class="literal">persistence context</tt> it was loaded in. With
+      <tt class="literal">getTransaction.begin();</tt> the entity manager obtains a
+      new connection and resumes the persistence context. The method
+      <tt class="literal">getTransaction().commit()</tt> will not only flush and
+      check versions, but also disconnects the entity manager from the JDBC
+      connection and return the connection to the pool.</p><p>This pattern is problematic if the persistence context is too big
+      to be stored during user think time, and if you don't know where to
+      store it. E.g. the <tt class="literal">HttpSession</tt> should be kept as
+      small as possible. As the persistence context is also the (mandatory)
+      first-level cache and contains all loaded objects, we can probably use
+      this strategy only for a few request/response cycles. This is indeed
+      recommended, as the persistence context will soon also have stale
+      data.</p><p>It is up to you where you store the extended entity manager during
+      requests, inside an EJB3 container you simply use a stateful session
+      bean as described above. Don't transfer it to the web layer (or even
+      serialize it to a separate tier) to store it in the
+      <tt class="literal">HttpSession</tt>. In a non-managed, two-tiered environment
+      the <tt class="literal">HttpSession</tt> might indeed be the right place to
+      store it.</p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="transactions-optimistic-detached"></a>4.4.3.&nbsp;Detached objects and automatic versioning</h3></div></div><div></div></div><p>With this paradigm, each interaction with the data store occurs in
+      a new persistence context. However, the same persistent instances are
+      reused for each interaction with the database. The application
+      manipulates the state of detached instances originally loaded in another
+      persistence context and then merges the changes using
+      <tt class="literal">EntityManager.merge()</tt>:</p><pre class="programlisting">// foo is an instance loaded by a non-extended entity manager
+foo.setProperty("bar");
+entityManager = factory.createEntityManager();
+entityManager.getTransaction().begin();
+managedFoo = session.merge(foo); // discard foo and from now on use managedFoo
+entityManager.getTransaction().commit();
+entityManager.close();</pre><p>Again, the entity manager will check instance versions during
+      flush, throwing an exception if conflicting updates occured.</p></div></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="objectstate.html">Prev</a>&nbsp;</td><td width="20%" align="center"><a accesskey="u" href="index.html">Up</a></td><td width="40%" align="right">&nbsp;<a accesskey="n" href="listeners.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter&nbsp;3.&nbsp;Working with objects&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;Chapter&nbsp;5.&nbsp;Entity listeners and Callback methods</td></tr></table></div></body></html>

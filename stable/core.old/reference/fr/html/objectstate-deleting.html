@@ -1,0 +1,61 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>10.8.&nbsp;Suppression d'objets persistants</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="objectstate.html" title="Chapitre&nbsp;10.&nbsp;Travailler avec des objets">
+      <link rel="prev" href="objectstate-saveorupdate.html" title="10.7.&nbsp;D&eacute;tection automatique d'un &eacute;tat">
+      <link rel="next" href="objectstate-replicating.html" title="10.9.&nbsp;R&eacute;plication d'objets entre deux entrep&ocirc;ts de donn&eacute;es">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">10.8.&nbsp;Suppression d'objets persistants</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="objectstate-saveorupdate.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;10.&nbsp;Travailler avec des objets</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="objectstate-replicating.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="objectstate-deleting"></a>10.8.&nbsp;Suppression d'objets persistants
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p><code class="literal">Session.delete()</code> supprimera l'&eacute;tat d'un objet de la base de donn&eacute;es. Bien s&ucirc;r, votre application pourrait encore conserver une r&eacute;f&eacute;rence vers
+            un objet effac&eacute;. Il est mieux de penser &agrave; <code class="literal">delete()</code> comme rendant une instance persistante &eacute;ph&eacute;m&egrave;re. 
+         </p><pre class="programlisting">sess.delete(cat);</pre><p>Vous pouvez effacer des objets dans l'ordre que vous voulez, sans risque de violations de contrainte de clef &eacute;trang&egrave;re. Il
+            est encore possible de violer une contrainte <code class="literal">NOT NULL</code> sur une colonne de clef &eacute;trang&egrave;re en effa&ccedil;ant des objets dans le mauvais ordre, par exemple si vous effacer le parent, mais
+            oubliez d'effacer les enfants. 
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="objectstate-saveorupdate.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="objectstate.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="objectstate-replicating.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">10.7.&nbsp;D&eacute;tection automatique d'un &eacute;tat&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;10.9.&nbsp;R&eacute;plication d'objets entre deux entrep&ocirc;ts de donn&eacute;es</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

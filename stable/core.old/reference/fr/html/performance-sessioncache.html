@@ -1,0 +1,101 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>19.3.&nbsp;G&eacute;rer les caches</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="performance.html" title="Chapitre&nbsp;19.&nbsp;Am&eacute;liorer les performances">
+      <link rel="prev" href="performance-cache.html" title="19.2.&nbsp;Le cache de second niveau">
+      <link rel="next" href="performance-querycache.html" title="19.4.&nbsp;Le cache de requ&ecirc;tes">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">19.3.&nbsp;G&eacute;rer les caches</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="performance-cache.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;19.&nbsp;Am&eacute;liorer les performances</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="performance-querycache.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="performance-sessioncache"></a>19.3.&nbsp;G&eacute;rer les caches
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>A chaque fois que vous passez un objet &agrave; la m&eacute;thode <code class="literal">save()</code>, <code class="literal">update()</code> ou <code class="literal">saveOrUpdate()</code> et &agrave; chaque fois que vous r&eacute;cup&eacute;rez un objet avec <code class="literal">load()</code>, <code class="literal">get()</code>, <code class="literal">list()</code>, <code class="literal">iterate()</code> or <code class="literal">scroll()</code>, cet objet est ajout&eacute; au cache interne de la <code class="literal">Session</code>. 
+         </p>
+         <p>Lorsqu'il y a un appel &agrave; la m&eacute;thode <code class="literal">flush()</code>, l'&eacute;tat de cet objet va &ecirc;tre synchronis&eacute; avec la base de donn&eacute;es. Si vous ne voulez pas que cette synchronisation ait lieu
+            ou si vous traitez un grand nombre d'objets et que vous avez besoin de g&eacute;rer la m&eacute;moire de mani&egrave;re efficace, vous pouvez utiliser
+            la m&eacute;thode <code class="literal">evict()</code> pour supprimer l'objet et ses collections d&eacute;pendantes du cache de la session 
+         </p><pre class="programlisting">ScrollableResult cats = sess.createQuery("from Cat as cat").scroll(); //a huge result set
+while ( cats.next() ) {
+    Cat cat = (Cat) cats.get(0);
+    doSomethingWithACat(cat);
+    sess.evict(cat);
+}</pre><p>La <code class="literal">Session</code> dispose aussi de la m&eacute;thode <code class="literal">contains()</code> pour d&eacute;terminer si une instance appartient au cache de la session. 
+         </p>
+         <p>Pour retirer tous les objets du cache session, appelez <code class="literal">Session.clear()</code> 
+         </p>
+         <p>Pour le cache de second niveau, il existe des m&eacute;thodes d&eacute;finies dans <code class="literal">SessionFactory</code> pour retirer des instances du cache, la classe enti&egrave;re, une instance de collection ou le r&ocirc;le entier d'une collection. 
+         </p><pre class="programlisting">sessionFactory.evict(Cat.class, catId); //evict a particular Cat
+sessionFactory.evict(Cat.class);  //evict all Cats
+sessionFactory.evictCollection("Cat.kittens", catId); //evict a particular collection of kittens
+sessionFactory.evictCollection("Cat.kittens"); //evict all kitten collections</pre><p>Le <code class="literal">CacheMode</code> contr&ocirc;le comme une session particuli&egrave;re interragit avec le cache de second niveau 
+         </p>
+         <div class="itemizedlist">
+            <ul type="disc">
+               <li>
+                  <p><code class="literal">CacheMode.NORMAL</code> - lit et &eacute;crit les items dans le cache de second niveau 
+                  </p>
+               </li>
+               <li>
+                  <p><code class="literal">CacheMode.GET</code> - lit les items dans le cache de second niveau mais ne les &eacute;crit pas sauf dans le cache d'une mise &agrave; jour d'une donn&eacute;e 
+                  </p>
+               </li>
+               <li>
+                  <p><code class="literal">CacheMode.PUT</code> - &eacute;crit les items dans le cache de second niveau mais ne les lit pas dans le cache de second niveau 
+                  </p>
+               </li>
+               <li>
+                  <p><code class="literal">CacheMode.REFRESH</code> - &eacute;crit les items dans le cache de second niveau mais ne les lit pas dans le cache de second niveau, outrepasse l'effet de<code class="literal">hibernate.cache.use_minimal_puts</code>, en for&ccedil;ant un rafra&icirc;chissement du cache de second niveau pour chaque item lu dans la base 
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p>Pour parcourir le contenu du cache de second niveau ou la r&eacute;gion du cache d&eacute;di&eacute;e au requ&ecirc;tes, vous pouvez utiliser l'API <code class="literal">Statistics</code> API: 
+         </p><pre class="programlisting">Map cacheEntries = sessionFactory.getStatistics()
+        .getSecondLevelCacheStatistics(regionName)
+        .getEntries();</pre><p>Vous devez pour cela activer les statistiques et optionnellement forcer Hibernate &agrave; conserver les entr&eacute;es dans le cache sous
+            un format plus compr&eacute;hensible pour l'utilisateur : 
+         </p><pre class="programlisting">hibernate.generate_statistics true
+hibernate.cache.use_structured_entries true</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="performance-cache.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="performance.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="performance-querycache.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">19.2.&nbsp;Le cache de second niveau&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;19.4.&nbsp;Le cache de requ&ecirc;tes</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

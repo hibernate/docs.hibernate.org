@@ -1,0 +1,1306 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Chapter 13. CouchDB (Experimental)</title><!-- HibernateDoc.Meta --><meta name="description" content="Hibernate OGM, JPA for NoSQL datastores - Reference Documentation" /><meta name="keywords" content="hibernate, ogm, hibernate ogm, nosql, jpa, infinispan, mongodb, neo4j, cassandra, couchdb, ehcache, redis" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://docs.jboss.org/hibernate/stable/ogm/reference/en-US/html_single/" /><!-- /HibernateDoc.Meta --><link rel="stylesheet" type="text/css" href="css/hibernate.css"/><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"/><link rel="home" href="index.html" title="Hibernate OGM Reference Guide"/><link rel="up" href="index.html" title="Hibernate OGM Reference Guide"/><link rel="prev" href="ch12.html" title="Chapter 12. Neo4j"/><link rel="next" href="ch14.html" title="Chapter 14. Cassandra (Experimental)"/><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/></head><body><p id="title"><a href="http://www.hibernate.org" class="site_href"><strong>Hibernate.org</strong></a><a href="http://hibernate.org/Documentation/DocumentationOverview" class="doc_href"><strong>Community Documentation</strong></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="ch12.html"><strong>Prev</strong></a></li><li class="next"><a accesskey="n" href="ch14.html"><strong>Next</strong></a></li></ul><div class="chapter" title="Chapter 13. CouchDB (Experimental)"><div class="titlepage"><div><div><h2 class="title"><a id="ogm-couchdb"/>Chapter 13. CouchDB (Experimental)</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="ch13.html#configuring_couchdb">13.1. Configuring CouchDB</a></span></dt><dd><dl><dt><span class="section"><a href="ch13.html#ogm-couchdb-annotation-configuration">13.1.1. Annotation based configuration</a></span></dt><dt><span class="section"><a href="ch13.html#ogm-couchdb-programmatic-configuration">13.1.2. Programmatic configuration</a></span></dt></dl></dd><dt><span class="section"><a href="ch13.html#ogm-couchdb-storage-principles">13.2. Storage principles</a></span></dt><dd><dl><dt><span class="section"><a href="ch13.html#couchdb-built-in-types">13.2.1. Properties and built-in types</a></span></dt><dt><span class="section"><a href="ch13.html#entities_6">13.2.2. Entities</a></span></dt><dt><span class="section"><a href="ch13.html#associations_5">13.2.3. Associations</a></span></dt></dl></dd><dt><span class="section"><a href="ch13.html#transactions_2">13.3. Transactions</a></span></dt><dt><span class="section"><a href="ch13.html#queries">13.4. Queries</a></span></dt></dl></div><p><a class="link" href="https://couchdb.apache.org/">CouchDB</a> is a document-oriented datastore
+which stores your data in form of JSON documents and exposes its API via HTTP based on REST principles.
+It is thus very easy to access from a wide range of languages and applications.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>Support for CouchDB is considered an EXPERIMENTAL feature as of this release.
+In particular you should be prepared for possible changes to the persistent representation of mapped objects in future releases.</p><p>Also be aware that partial updates are unsupported at the moment
+(<a class="link" href="https://hibernate.atlassian.net/browse/OGM-388">OGM-388</a>).
+The entire document will be replaced during any updates.
+This means that fields possibly written by other applications but not mapped to properties in your domain model will get lost.</p><p>The <code class="literal">ASSOCIATION_DOCUMENT</code> mode for storing associations should be used with care
+as there is potential for lost updates (<a class="link" href="https://hibernate.atlassian.net/browse/OGM-461">OGM-461</a>).
+It is recommended to use the <code class="literal">IN_ENTITY</code> mode (which is the default).</p><p>Should you find any bugs or have feature requests for this dialect,
+then please open a ticket in the <a class="link" href="https://hibernate.atlassian.net/browse/OGM">OGM issue tracker</a>.</p></div><div class="section" title="13.1. Configuring CouchDB"><div class="titlepage"><div><div><h2 class="title"><a id="configuring_couchdb"/>13.1. Configuring CouchDB</h2></div></div></div><p>Hibernate OGM uses the excellent <a class="link" href="https://www.jboss.org/resteasy">RESTEasy</a> library to talk to CouchDB stores,
+so there is no need to include any of the Java client libraries for CouchDB in your classpath.</p><p>The following properties are available to configure CouchDB support in Hibernate OGM:</p><div class="variablelist" title="CouchDB datastore configuration properties"><p class="title"><strong>CouchDB datastore configuration properties</strong></p><dl><dt><span class="term">hibernate.ogm.datastore.provider</span></dt><dd>To use CouchDB as a datastore provider, this property must be set to <code class="literal">couchdb_experimental</code></dd><dt><span class="term">hibernate.ogm.option.configurator</span></dt><dd>The fully-qualified class name or an instance of a programmatic option configurator (see <a class="xref" href="ch13.html#ogm-couchdb-programmatic-configuration" title="13.1.2. Programmatic configuration">Section 13.1.2, “Programmatic configuration”</a>)</dd><dt><span class="term">hibernate.ogm.datastore.host</span></dt><dd><p class="simpara">The hostname and port of the CouchDB instance.
+The optional port is concatenated to the host and separated by a colon.
+Let’s see a few valid examples:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">couchdb.example.com</code></li><li class="listitem"><code class="literal">couchdb.example.com:5985</code></li><li class="listitem"><code class="literal">2001:db8::ff00:42:8329</code> (IPv6)</li><li class="listitem"><p class="simpara"><code class="literal">[2001:db8::ff00:42:8329]:5985</code> (IPv6 with port requires the IPv6 to be surrounded by square brackets)</p><p class="simpara">Listing multiple initial hosts for fault tolerance is not supported.
+The default value is <code class="literal">127.0.0.1:5984</code>. If left undefined, the default port is <code class="literal">5984</code>.</p></li></ul></div></dd><dt><span class="term">hibernate.ogm.datastore.port</span></dt><dd>Deprecated: use <code class="literal">hibernate.ogm.datastore.host</code>.
+The port used by the CouchDB instance.
+The default value is <code class="literal">5984</code>.</dd><dt><span class="term">hibernate.ogm.datastore.database</span></dt><dd>The database to connect to. This property has no default value.</dd><dt><span class="term">hibernate.ogm.datastore.create_database</span></dt><dd>Whether to create the specified database in case it does not exist or not.
+Can be <code class="literal">true</code> or <code class="literal">false</code> (default). Note that the specified user must have the right to
+create databases if set to <code class="literal">true</code>.</dd><dt><span class="term">hibernate.ogm.datastore.username</span></dt><dd>The username used when connecting to the CouchDB server.
+Note that this user must have the right to create design documents in the chosen database.
+This property has no default value.
+Hibernate OGM currently does not support accessing CouchDB via HTTPS;
+if you’re interested in such functionality, let us know.</dd><dt><span class="term">hibernate.ogm.datastore.password</span></dt><dd>The password used to connect to the CouchDB server.
+This property has no default value.
+This property is ignored if the username isn’t specified.</dd><dt><span class="term">hibernate.ogm.error_handler</span></dt><dd>The fully-qualified class name, class object or an instance of <code class="literal">ErrorHandler</code> to get notified upon errors during flushes (see <a class="xref" href="ch06.html#ogm-api-error-handler" title="6.3.1. Acting upon errors during application of changes">Section 6.3.1, “Acting upon errors during application of changes”</a>)</dd><dt><span class="term">hibernate.ogm.datastore.document.association_storage</span></dt><dd>Defines the way OGM stores association information in CouchDB.</dd></dl></div><p>The following two strategies exist (values of the <code class="literal">org.hibernate.ogm.datastore.document.options.AssociationStorageType</code> enum):
+<code class="literal">IN_ENTITY</code> (store association information within the entity) and
+<code class="literal">ASSOCIATION_DOCUMENT</code> (store association information in a dedicated document per association).</p><p><code class="literal">IN_ENTITY</code> is the default and recommended option
+unless the association navigation data is much bigger than the core of the document and leads to performance degradation.</p><div class="variablelist"><dl><dt><span class="term">hibernate.ogm.datastore.document.map_storage</span></dt><dd><p class="simpara">Defines the way OGM stores the contents of map-typed associations in CouchDB.
+The following two strategies exist (values of the <code class="literal">org.hibernate.ogm.datastore.document.options.MapStorageType</code> enum):</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">BY_KEY</code>: map-typed associations with a single key column which is of type <code class="literal">String</code> will be stored as a sub-document,
+organized by the given key; Not applicable for other types of key columns, in which case always <code class="literal">AS_LIST</code> will be used</li><li class="listitem"><code class="literal">AS_LIST</code>: map-typed associations will be stored as an array containing a sub-document for each map entry.
+All key and value columns will be contained within the array elements</li></ul></div></dd></dl></div><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>When bootstrapping a session factory or entity manager factory programmatically,
+you should use the constants accessible via <code class="literal">CouchDBProperties</code>
+when specifying the configuration properties listed above.
+Common properties shared between (document) stores are declared on <code class="literal">OgmProperties</code> and <code class="literal">DocumentStoreProperties</code>, respectively.
+To ease migration between stores, it is recommended to reference these constants directly from there.</p></div><div class="section" title="13.1.1. Annotation based configuration"><div class="titlepage"><div><div><h3 class="title"><a id="ogm-couchdb-annotation-configuration"/>13.1.1. Annotation based configuration</h3></div></div></div><p>Hibernate OGM allows to configure store-specific options via Java annotations.</p><p>When working with the CouchDB backend, you can specify the following settings:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">a strategy for storing associations using the <code class="literal">@AssociationStorage</code> and <code class="literal">@AssociationDocumentStorage</code> annotations</li><li class="listitem">a strategy for storing the contents of map-typed associations using the <code class="literal">@MapStorage</code> annotation</li></ul></div><p>Refer to &lt;&lt;ogm-couchdb-storage-principles&gt; to learn more about the options related to storing associations.</p><p>The following shows an example:</p><div class="example"><a id="d0e11644"/><p class="title"><strong>Example 13.1. Configuring the association storage strategy using annotations</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@AssociationStorage(AssociationStorageType.ASSOCIATION_DOCUMENT)
+@MapStorage(MapStorageType.AS_LIST)
+public class Zoo {
+
+    @OneToMany
+    private Set&lt;Animal&gt; animals;
+
+    @OneToMany
+    private Set&lt;Person&gt; employees;
+
+    @OneToMany
+    @AssociationStorage(AssociationStorageType.IN_ENTITY)
+    private Set&lt;Person&gt; visitors;
+
+    //...
+}</code></pre></div></div><br class="example-break"/><p>The annotation on the entity level expresses that all associations of the <code class="literal">Zoo</code>
+class should be stored in separate assocation documents.
+This setting applies to the <code class="literal">animals</code> and <code class="literal">employees</code> associations.
+Only the elements of the <code class="literal">visitors</code> association will be stored in the document of the corresponding <code class="literal">Zoo</code> entity
+as per the configuration of that specific property which takes precedence over the entity-level configuration.</p></div><div class="section" title="13.1.2. Programmatic configuration"><div class="titlepage"><div><div><h3 class="title"><a id="ogm-couchdb-programmatic-configuration"/>13.1.2. Programmatic configuration</h3></div></div></div><p>In addition to the annotation mechanism,
+Hibernate OGM also provides a programmatic API for applying store-specific configuration options.
+This can be useful if you can’t modify certain entity types or
+don’t want to add store-specific configuration annotations to them.
+The API allows set options in a type-safe fashion on the global, entity and property levels.</p><p>When working with CouchDB, you can currently configure the following options using the API:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">association storage strategy (on the global, entity and property level)</li><li class="listitem">strategy for storing the contents of map-typed associations</li></ul></div><p>To set this option via the API, you need to create an <code class="literal">OptionConfigurator</code> implementation
+as shown in the following example:</p><div class="example"><a id="d0e11685"/><p class="title"><strong>Example 13.2. Example of an option configurator</strong></p><div class="example-contents"><pre><code class="language-java">public class MyOptionConfigurator extends OptionConfigurator {
+
+    @Override
+    public void configure(Configurable configurable) {
+        configurable.configureOptionsFor( CouchDB.class )
+            .associationStorage( AssociationStorageType.ASSOCIATION_DOCUMENT )
+            .entity( Zoo.class )
+                .property( "visitors", ElementType.FIELD )
+                    .associationStorage( AssociationStorageType.IN_ENTITY )
+                    .mapStorage( MapStorageType.ASLIST )
+            .entity( Animal.class )
+                .associationStorage( AssociationStorageType.ASSOCIATION_DOCUMENT );
+    }
+}</code></pre></div></div><br class="example-break"/><p>The call to <code class="literal">configureOptionsFor()</code>, passing the store-specific identifier type <code class="literal">CouchDB</code>,
+provides the entry point into the API. Following the fluent API pattern, you then can configure
+global options and navigate to single entities or properties to apply options specific to these.</p><p>Options given on the property level precede entity-level options. So e.g. the <code class="literal">visitors</code> association of the <code class="literal">Zoo</code>
+class would be stored using the in entity strategy, while all other associations of the <code class="literal">Zoo</code> entity would
+be stored using separate association documents.</p><p>Similarly, entity-level options take precedence over options given on the global level.
+Global-level options specified via the API complement the settings given via configuration properties.
+In case a setting is given via a configuration property and the API at the same time,
+the latter takes precedence.</p><p>Note that for a given level (property, entity, global),
+an option set via annotations is overridden by the same option set programmatically.
+This allows you to change settings in a more flexible way if required.</p><p>To register an option configurator, specify its class name using the <code class="literal">hibernate.ogm.option.configurator</code> property.
+When bootstrapping a session factory or entity manager factory programmatically,
+you also can pass in an <code class="literal">OptionConfigurator</code> instance or the class object representing the configurator type.</p></div></div><div class="section" title="13.2. Storage principles"><div class="titlepage"><div><div><h2 class="title"><a id="ogm-couchdb-storage-principles"/>13.2. Storage principles</h2></div></div></div><p>Hibernate OGM tries to make the mapping to the underlying datastore as natural as possible
+so that third party applications not using Hibernate OGM can still read
+and update the same datastore.
+The following describe how entities and associations are mapped to CouchDB documents by Hibernate OGM.</p><div class="section" title="13.2.1. Properties and built-in types"><div class="titlepage"><div><div><h3 class="title"><a id="couchdb-built-in-types"/>13.2.1. Properties and built-in types</h3></div></div></div><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>Hibernate OGM doesn’t store null values in CouchDB,
+setting a value to null will be the same as removing the field
+in the corresponding object in the db.</p></div><p>Hibernate OGM support by default the following types:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.lang.String</code></li></ul></div><pre><code class="language-json">  { "text" : "Hello world!" }</code></pre><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.lang.Character</code> (or char primitive)</li></ul></div><pre><code class="language-json">  { "delimiter" : "/" }</code></pre><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.lang.Boolean</code> (or boolean primitive)</li></ul></div><pre><code class="language-json">  { "favorite" : true } # default mapping
+  { "favorite" : "T" } # if @Type(type = "true_false") is given
+  { "favorite" : "Y" } # if @Type(type = "yes_no") is given
+  { "favorite" : 1 } # if @Type(type = "numeric_boolean") is given</code></pre><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.lang.Byte</code> (or byte primitive)</li></ul></div><pre><code class="language-json">  { "display_mask" : "70" }</code></pre><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.lang.Short</code> (or short primitive)</li></ul></div><pre><code class="language-json">  { "urlPort" : 80 }</code></pre><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.lang.Integer</code> (or int primitive)</li></ul></div><pre><code class="language-json">  { "stockCount" : 12309 }</code></pre><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.lang.Long</code> (or long primitive)</li></ul></div><pre><code class="language-json">  { "userId" : "-6718902786625749549" }</code></pre><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.lang.Float</code> (or float primitive)</li></ul></div><pre><code class="language-json">  { "visitRatio" : 10.4 }</code></pre><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.lang.Double</code> (or double primitive)</li></ul></div><pre><code class="language-json">  { "tax_percentage" : 12.34 }</code></pre><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.math.BigDecimal</code></li></ul></div><pre><code class="language-json">  { "site_weight" : "21.77" }</code></pre><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.math.BigInteger</code></li></ul></div><pre><code class="language-json">  { "site_weight" : "444" }</code></pre><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.util.Calendar</code></li></ul></div><pre><code class="language-json">  { "creation" : "2014-11-18T15:51:26.252Z" }</code></pre><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.util.Date</code></li></ul></div><pre><code class="language-json">  { "last_update" : "2014-11-18T15:51:26.252Z" }</code></pre><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.util.UUID</code></li></ul></div><pre><code class="language-json">  { "serialNumber" : "71f5713d-69c4-4b62-ad15-aed8ce8d10e0" }</code></pre><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.util.URL</code></li></ul></div><pre><code class="language-json">  { "url" : "http://www.hibernate.org/" }</code></pre></div><div class="section" title="13.2.2. Entities"><div class="titlepage"><div><div><h3 class="title"><a id="entities_6"/>13.2.2. Entities</h3></div></div></div><p>Entities are stored as CouchDB documents and not as BLOBs
+which means each entity property will be translated into a document field.
+You can use the name property of the <code class="literal">@Table</code> and <code class="literal">@Column</code> annotations
+to rename the collections and the document’s fields if you need to.</p><p>CouchDB provides a built-in mechanism for detecting concurrent updates to one and the same document.
+For that purpose each document has an attribute named <code class="literal">_rev</code> (for "revision")
+which is to be passed back to the store when doing an update.
+So when writing back a document and the document’s revision has been altered by another writer in parallel,
+CouchDB will raise an optimistic locking error
+(you could then e.g. re-read the current document version and try another update).</p><p>For this mechanism to work, you need to declare a property for the <code class="literal">_rev</code> attribute in all your entity types
+and mark it with the <code class="literal">@Version</code> and <code class="literal">@Generated</code> annotations.
+The first marks it as a property used for optimistic locking, while the latter advices Hibernate OGM
+to refresh that property after writes since its value is managed by the datastore.</p><div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Warning</h2><p>Not mapping the <code class="literal">_rev</code> attribute may cause lost updates,
+as Hibernate OGM needs to re-read the current revision before doing an update in this case.
+Thus a warning will be issued during initialization for each entity type which fails to map that property.</p></div><p>The following shows an example of an entity and its persistent representation in CouchDB.</p><div class="example"><a id="d0e11882"/><p class="title"><strong>Example 13.3. Example of an entity and its representation in CouchDB</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class News {
+
+    @Id
+    private String id;
+
+    @Version
+    @Generated
+    @Column(name="_rev")
+    private String revision;
+
+    private String title;
+
+    private String description;
+
+    //getters, setters ...
+}</code></pre><pre><code class="language-json">{
+    "_id": "News:id_:news-1_",
+    "_rev": "1-d1cd3b00a677a2e31cd0480a796e8480",
+    "$type": "entity",
+    "$table": "News",
+    "title": "On the merits of NoSQL",
+    "description": "This paper discuss why NoSQL will save the world for good"
+}</code></pre></div></div><br class="example-break"/><p>Note that CouchDB doesn’t have a concept of "tables" or "collections" as e.g. MongoDB does;
+Instead all documents are stored in one large bucket.
+Thus Hibernate OGM needs to add two additional attributes:
+<code class="literal">$type</code> which contains the type of a document (entity vs. association documents)
+and <code class="literal">$table</code> which specifies the entity name as derived from the type or given via the <code class="literal">@Table</code> annotation.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>Attributes whose name starts with the "$" character are managed by Hibernate OGM and
+thus should not be modified manually.
+Also it is not recommended to start the names of your attributes with the "$" character to avoid collisions
+with attributes possibly introduced by Hibernate OGM in future releases.</p></div><div class="example"><a id="d0e11903"/><p class="title"><strong>Example 13.4. Rename field and collection using @Table and @Column</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@Table(name="Article")
+public class News {
+
+    @Id
+    @Column(name="code")
+    private String id;
+
+    @Version
+    @Generated
+    @Column(name="_rev")
+    private String revision;
+
+    private String title;
+
+    @Column(name="desc")
+    private String description;
+
+    //getters, setters ...
+}</code></pre><pre><code class="language-json">{
+    "_id": "Article:code_:news-1_",
+    "_rev": "1-d1cd3b00a677a2e31cd0480a796e8480",
+    "$type": "entity",
+    "$table": "Article",
+    "title": "On the merits of NoSQL",
+    "desc": "This paper discuss why NoSQL will save the world for good"
+}</code></pre></div></div><br class="example-break"/><div class="section" title="13.2.2.1. Identifiers"><div class="titlepage"><div><div><h4 class="title"><a id="identifiers_4"/>13.2.2.1. Identifiers</h4></div></div></div><p>The <code class="literal">_id</code> field of a CouchDB document is directly used
+to store the identifier columns mapped in the entities.
+You can use any persistable Java type as identifier type, e.g. <code class="literal">String</code> or <code class="literal">long</code>.</p><p>Hibernate OGM will convert the <code class="literal">@Id</code> property into a <code class="literal">_id</code> document field
+so you can name the entity id like you want, it will always be stored into <code class="literal">_id</code>.</p><p>Note that you also can work with embedded ids (via <code class="literal">@EmbeddedId</code>),
+but be aware of the fact that CouchDB doesn’t support storing embedded structures in the <code class="literal">_id</code> attribute.
+Hibernate OGM thus will create a concatenated representation of the embedded id’s properties in this case.</p><div class="example"><a id="d0e11943"/><p class="title"><strong>Example 13.5. Entity with @EmbeddedId</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class News {
+
+    @EmbeddedId
+    private NewsID newsId;
+
+    // getters, setters ...
+}
+
+@Embeddable
+public class NewsID implements Serializable {
+
+    private String title;
+    private String author;
+
+    // getters, setters ...
+}</code></pre><pre><code class="language-json">{
+    "_id": "News:newsId.author_newsId.title_:Guillaume_How to use Hibernate OGM ?_",
+    "_rev": "2-1f02af4fabba7b4fa7394f1167244226",
+    "$type": "entity",
+    "$table": "News",
+    "newsId": {
+        "author": "Guillaume",
+        "title": "How to use Hibernate OGM ?"
+    }
+}</code></pre></div></div><br class="example-break"/></div><div class="section" title="13.2.2.2. Identifier generation strategies"><div class="titlepage"><div><div><h4 class="title"><a id="identifier_generation_strategies_4"/>13.2.2.2. Identifier generation strategies</h4></div></div></div><p>You can assign id values yourself or let Hibernate OGM generate the value using the
+<code class="literal">@GeneratedValue</code> annotation.</p><p>Two main strategies are supported:</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><a class="link" href="ch13.html#couchdb-table-id-generation-strategy">TABLE</a></li><li class="listitem"><a class="link" href="ch13.html#couchdb-sequence-id-generation-strategy">SEQUENCE</a></li></ol></div><p>Both strategy will create a new document containg the next value to use for the id, the difference
+between the two strategies is the name of the field containing the values.</p><p>Hibernate OGM goes not support the <code class="literal">IDENTITY</code> strategy and an exception is thrown at startup
+when it is used.
+The <code class="literal">AUTO</code> strategy is the same as the <a class="link" href="ch13.html#couchdb-sequence-id-generation-strategy">SEQUENCE</a> one.</p><p><a id="couchdb-table-id-generation-strategy"/><span class="strong"><strong>1) TABLE generation strategy</strong></span></p><div class="example"><a id="d0e11985"/><p class="title"><strong>Example 13.6. Id generation strategy TABLE using default values</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Video {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.TABLE)
+    private Integer id;
+    private String name
+
+    // getters, setters, ...
+}</code></pre><pre><code class="language-json">{
+   "_id": "Video:id_:1_",
+   "_rev": "1-b4c16b6cd8a083f2173f8df19bd24750",
+   "$type": "entity",
+   "$table": "Video",
+   "id": 1,
+   "name": "Scream",
+   "director": "Wes Craven"
+}</code></pre><pre><code class="language-json">{
+   "_id": "hibernate_sequences:sequence_name:default",
+   "_rev": "1-ebb82f1cea26d57f47a290fb0c1cc58f",
+   "$type": "sequence",
+   "next_val": "2"
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e11994"/><p class="title"><strong>Example 13.7. Id generation strategy TABLE using a custom table</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Video {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "video")
+    @TableGenerator(
+            name = "video",
+            table = "sequences",
+            pkColumnName = "key",
+            pkColumnValue = "video",
+            valueColumnName = "seed"
+    )
+    private Integer id;
+
+    private String name;
+
+    // getter, setters, ...
+}</code></pre><pre><code class="language-json">@Entity
+public class Video {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "video")
+    @TableGenerator(
+            name = "video",
+            table = "sequences",
+            pkColumnName = "key",
+            pkColumnValue = "video",
+            valueColumnName = "seed"
+    )
+    private Integer id;
+    private String name
+
+    // getters, setters, ...
+}</code></pre><pre><code class="language-json">{
+   "_id": "sequences:key:video",
+   "_rev": "2-78b3450e0658743164828c4076e06a49",
+   "$type": "sequence",
+   "seed": "101"
+}</code></pre></div></div><br class="example-break"/><p><a id="couchdb-sequence-id-generation-strategy"/><span class="strong"><strong>2) SEQUENCE generation strategy</strong></span></p><div class="example"><a id="d0e12006"/><p class="title"><strong>Example 13.8. SEQUENCE id generation strategy using default values</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Song {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE)
+  private Long id;
+
+  private String title;
+
+  // getters, setters ...
+}</code></pre><pre><code class="language-json">{
+   "_id": "Song:id_:2_",
+   "_rev": "1-63bc100449fb2840067028c3825ed784",
+   "$type": "entity",
+   "$table": "Song",
+   "id": "2",
+   "title": "Ave Maria",
+   "singer": "Charlotte Church"
+}</code></pre><pre><code class="language-json">{
+   "_id": "hibernate_sequences:sequence_name:hibernate_sequence",
+   "_rev": "2-dcc622bcb1389ad18829dcfc8b812c87",
+   "$type": "sequence",
+   "next_val": "3"
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e12015"/><p class="title"><strong>Example 13.9. SEQUENCE id generation strategy using custom values</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Song {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "songSequenceGenerator")
+  @SequenceGenerator(
+      name = "songSequenceGenerator",
+      sequenceName = "song_sequence",
+      initialValue = 2,
+      allocationSize = 20
+  )
+  private Long id;
+
+  private String title;
+
+  // getters, setters ...
+}</code></pre><pre><code class="language-json">{
+   "_id": "Song:id_:2_",
+   "_rev": "1-63bc100449fb2840067028c3825ed784",
+   "$type": "entity",
+   "$table": "Song",
+   "id": "2",
+   "title": "Ave Maria",
+   "singer": "Charlotte Church"
+}</code></pre><pre><code class="language-json">{
+   "_id": "hibernate_sequences:sequence_name:song_sequence",
+   "_rev": "2-df47883f076c84cb953f9184de7aa82a",
+   "$type": "sequence",
+   "next_val": "21"
+}</code></pre></div></div><br class="example-break"/></div><div class="section" title="13.2.2.3. Embedded objects and collections"><div class="titlepage"><div><div><h4 class="title"><a id="embedded_objects_and_collections_5"/>13.2.2.3. Embedded objects and collections</h4></div></div></div><p>Hibernate OGM stores elements annotated with <code class="literal">@Embedded</code>
+or <code class="literal">@ElementCollection</code> as nested documents of the owning entity.</p><div class="example"><a id="d0e12035"/><p class="title"><strong>Example 13.10. Embedded object</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class News {
+
+    @Id
+    private String id;
+    private String title;
+
+    @Embedded
+    private NewsPaper paper;
+
+    // getters, setters ...
+}
+
+@Embeddable
+public class NewsPaper {
+
+    private String name;
+    private String owner;
+
+    // getters, setters ...
+}</code></pre><pre><code class="language-json">{
+    "_id": "News:id_:939c892d-1129-4aff-abf8-e6c26e59dcb_",
+    "_rev": "2-1f02af4fabba7b4fa7394f1167244226",
+    "$type": "entity",
+    "$table": "News",
+    "id": "939c892d-1129-4aff-abf8-e6c26e59dcb",
+    "paper": {
+        "name": "NoSQL journal of prophecies",
+        "owner": "Delphy"
+    }
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e12042"/><p class="title"><strong>Example 13.11. @ElementCollection with primitive types</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class AccountWithPhone {
+
+    @Id
+    private String id;
+
+    @ElementCollection
+    private List&lt;String&gt; mobileNumbers;
+
+    // getters, setters ...
+}</code></pre><p>AccountWithPhone collection</p><pre><code class="language-json">{
+   "_id": "AccountWithPhone:id_:2_",
+   "_rev": "2-a71f7c0d621a08232568f9840bff05ce",
+   "$type": "entity",
+   "$table": "AccountWithPhone",
+   "id": "2",
+   "mobileNumbers": [
+       "+1-222-555-0222",
+       "+1-202-555-0333"
+   ]
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e12051"/><p class="title"><strong>Example 13.12. @ElementCollection with one attribute</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class GrandMother {
+
+    @Id
+    private String id;
+
+    @ElementCollection
+    private List&lt;GrandChild&gt; grandChildren = new ArrayList&lt;GrandChild&gt;();
+
+    // getters, setters ...
+}
+
+@Embeddable
+public class GrandChild {
+
+    private String name;
+
+    // getters, setters ...
+}</code></pre><pre><code class="language-json">{
+    "_id": "grandmother:id_:86ada718-f2a2-4299-b6ac-3d90b1ef2331_",
+    "_rev": "2-1f02af4fabba7b4fa7394f1167244226",
+    "$type": "entity",
+    "$table": "grandmother",
+    "id": "86ada718-f2a2-4299-b6ac-3d90b1ef2331",
+    "grandChildren" : [ "Luke", "Leia" ]
+}</code></pre></div></div><br class="example-break"/><p>The class <code class="literal">GrandChild</code> has only one attribute <code class="literal">name</code>,
+this means that Hibernate OGM doesn’t need to store the name of the attribute.</p><p>If the nested document has two or more fields, like in the following example,
+Hibernate OGM will store the name of the fields as well.</p><div class="example"><a id="d0e12068"/><p class="title"><strong>Example 13.13. @ElementCollection with @OrderColumn</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class GrandMother {
+
+    @Id
+    private String id;
+
+    @ElementCollection
+    @OrderColumn( name = "birth_order" )
+    private List&lt;GrandChild&gt; grandChildren = new ArrayList&lt;GrandChild&gt;();
+
+    // getters, setters ...
+}
+
+@Embeddable
+public class GrandChild {
+
+    private String name;
+
+    // getters, setters ...
+}</code></pre><pre><code class="language-json">{
+    "_id": "GrandMother:id_:86ada718-f2a2-4299-b6ac-3d90b1ef2331_",
+    "_rev": "2-1f02af4fabba7b4fa7394f1167244226",
+    "$type": "entity",
+    "$table": "GrandMother",
+    "grandChildren" : [
+            {
+                "name" : "luke",
+                "birth_order" : 0
+            },
+            {
+                "name" : "leia",
+                "birthorder" : 1
+            }
+    ]
+}</code></pre></div></div><br class="example-break"/></div></div><div class="section" title="13.2.3. Associations"><div class="titlepage"><div><div><h3 class="title"><a id="associations_5"/>13.2.3. Associations</h3></div></div></div><p>Hibernate OGM CouchDB provides two strategies to store navigation information for associations:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">IN_ENTITY</code> (default)</li><li class="listitem"><code class="literal">ASSOCIATION_DOCUMENT</code></li></ul></div><p>You can switch between the two strategies using:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">the <code class="literal">@AssociationStorage</code> annotation (see <a class="xref" href="ch13.html#ogm-couchdb-annotation-configuration" title="13.1.1. Annotation based configuration">Section 13.1.1, “Annotation based configuration”</a>)</li><li class="listitem">the API for programmatic configuration (see <a class="xref" href="ch13.html#ogm-couchdb-programmatic-configuration" title="13.1.2. Programmatic configuration">Section 13.1.2, “Programmatic configuration”</a>)</li><li class="listitem">specifying a gloabl default strategy via the <code class="literal">hibernate.ogm.datastore.document.association_storage</code> configuration property</li></ul></div><div class="section" title="13.2.3.1. In Entity strategy"><div class="titlepage"><div><div><h4 class="title"><a id="in_entity_strategy"/>13.2.3.1. In Entity strategy</h4></div></div></div><p>With this strategy, Hibernate OGM directly stores the id(s)
+of the other side of the association
+into a field or an embedded document
+depending if the mapping concerns a single object or a collection.
+The field that stores the relationship information is named like the entity property.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>When using this strategy the annotations <code class="literal">@JoinTable</code> will be ignored because no collection is created
+for associations.</p><p>You can use <code class="literal">@JoinColumn</code> to change the name of the field that stores the foreign key (as an example, see
+<a class="xref" href="">???</a>).</p></div><div class="example"><a id="d0e12130"/><p class="title"><strong>Example 13.14. Java entity</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class AccountOwner {
+
+    @Id
+    private String id;
+
+    @ManyToMany
+    public Set&lt;BankAccount&gt; bankAccounts;
+
+    // getters, setters, ...</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e12135"/><p class="title"><strong>Example 13.15. JSON representation</strong></p><div class="example-contents"><pre><code class="language-json">{
+    "_id": "AccountOwner:id_:owner0001_",
+    "_rev": "1-d1cd3b00a677a2e31cd0480a796e8480",
+    "$type": "entity",
+    "$table": "AccountOwner",
+    "bankAccounts" : [
+        "accountABC",
+        "accountXYZ"
+    ]
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e12140"/><p class="title"><strong>Example 13.16. Unidirectional one-to-one</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Vehicule {
+
+    @Id
+    private String id;
+    private String brand;
+
+    // getters, setters ...
+}
+
+
+@Entity
+public class Wheel {
+
+    @Id
+    private String id;
+    private double diameter;
+
+    @OneToOne
+    private Vehicule vehicule;
+
+    // getters, setters ...
+}</code></pre><pre><code class="language-json">{
+    "_id": "Vehicule:id_:V001_",
+    "_rev": "1-41dc2d2fd68ce2fc683241a60e59a676",
+    "$type": "entity",
+    "$table": "Vehicule",
+    "id": "V001",
+    "brand": "Mercedes",
+}</code></pre><pre><code class="language-json">{
+  "_id": "Wheel:id_:W1_",
+  "_rev": "1-30430d67174484f6b647480dbf781f55",
+  "$type": "entity",
+  "$table": "Wheel",
+  "id": "W1",
+  "diameter" : 0,
+  "vehicule_id" : "V001"
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="coucdhdb-in-entity-one-to-one-join-column"/><p class="title"><strong>Example 13.17. Unidirectional one-to-one with @JoinColumn</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Vehicule {
+
+    @Id
+    private String id;
+    private String brand;
+
+    // getters, setters ...
+}
+
+
+@Entity
+public class Wheel {
+
+    @Id
+    private String id;
+    private double diameter;
+
+    @OneToOne
+    @JoinColumn( name = "part_of" )
+    private Vehicule vehicule;
+
+    // getters, setters ...
+}</code></pre><pre><code class="language-json">{
+    "_id": "Vehicule:id_:V001_",
+    "_rev": "1-41dc2d2fd68ce2fc683241a60e59a676",
+    "$type": "entity",
+    "$table": "Vehicule",
+    "id": "V001",
+    "brand": "Mercedes",
+}</code></pre><pre><code class="language-json">{
+  "_id": "Wheel:id_:W1_",
+  "_rev": "1-30430d67174484f6b647480dbf781f55",
+  "$type": "entity",
+  "$table": "Wheel",
+  "id": "W1",
+  "diameter" : 0,
+  "part_of" : "V001"
+}</code></pre></div></div><br class="example-break"/><p>In a true one-to-one association, it is possible to share the same id between the two entities
+and therefore a foreign key is not required. You can see how to map this type of association in
+the following example:</p><div class="example"><a id="d0e12160"/><p class="title"><strong>Example 13.18. Unidirectional one-to-one with @MapsId and @PrimaryKeyJoinColumn</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Vehicule {
+
+    @Id
+    private String id;
+    private String brand;
+
+    // getters, setters ...
+}
+
+@Entity
+public class Wheel {
+
+    @Id
+    private String id;
+    private double diameter;
+
+    @OneToOne
+    @PrimaryKeyJoinColumn
+    @MapsId
+    private Vehicule vehicule;
+
+    // getters, setters ...
+}</code></pre><pre><code class="language-json">{
+    "_id": "Vehicule:id_:V001_",
+    "_rev": "1-41dc2d2fd68ce2fc683241a60e59a676",
+    "$type": "entity",
+    "$table": "Vehicule",
+    "id": "V001",
+    "brand": "Mercedes",
+}</code></pre><pre><code class="language-json">{
+  "_id": "Wheel:vehicule/_id_:V001_",
+  "_rev": "1-30430d67174484f6b647480dbf781f55",
+  "$type": "entity",
+  "$table": "Wheel",
+  "diameter" : 0,
+  "vehicule_id" : "V001"
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e12169"/><p class="title"><strong>Example 13.19. Bidirectional one-to-one</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Husband {
+
+    @Id
+    private String id;
+    private String name;
+
+    @OneToOne
+    private Wife wife;
+
+    // getters, setters ...
+}
+
+@Entity
+public class Wife {
+
+    @Id
+    private String id;
+    private String name;
+
+    @OneToOne
+    private Husband husband;
+
+    // getters, setters ...
+}</code></pre><pre><code class="language-json">{
+  "_id": "Husband:id_:alex_",
+  "_rev": "2-8f976fc216130fb40144b000910b9c1d",
+  "$type": "entity",
+  "$table": "Husband",
+  "id" : "alex",
+  "name" : "Alex",
+  "wife" : "bea"
+}</code></pre><pre><code class="language-json">{
+  "_id": "Wife:id_:bea_",
+  "_rev": "2-69130cc082958becbdf4154a3d19c2e6",
+  "$type": "entity",
+  "$table": "Wife",
+  "id" : "bea",
+  "name" : "Bea",
+  "husband" : "alex"
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e12178"/><p class="title"><strong>Example 13.20. Unidirectional one-to-many</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Basket {
+
+    @Id
+    private String id;
+
+    private String owner;
+
+    @OneToMany
+    private List&lt;Product&gt; products = new ArrayList&lt;Product&gt;();
+
+    // getters, setters ...
+}
+
+@Entity
+public class Product {
+
+    @Id
+    private String name;
+
+    private String description;
+
+    // getters, setters ...
+}</code></pre><p>Basket collection</p><pre><code class="language-json">{
+  "_id": "Basket:id_:davide/_basket_",
+  "_rev": "2-8f976fc216130fb40144b000910b9c1d",
+  "$type": "entity",
+  "$table": "Basket",
+  "id" : "davide_basket",
+  "owner" : "Davide",
+  "products" : [ "Beer", "Pretzel" ]
+}</code></pre><p>Product collection</p><pre><code class="language-json">{
+  "_id": "Product:name_:Beer_",
+  "_rev": "1-e2a51de970f3e5a0e1118989eef1cf7b",
+  "$type": "entity",
+  "$table": "Product",
+  "name" : "Beer",
+  "description" : "Tactical nuclear penguin"
+}
+{
+  "_id": "Product:name_:Pretzel_",
+  "_rev": "1-b78ce2687db2fb550d9e8753423db3f3",
+  "$type": "entity",
+  "$table": "Product",
+  "name" : "Pretzel",
+  "description" : "Glutino Pretzel Sticks"
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e12191"/><p class="title"><strong>Example 13.21. Unidirectional one-to-many using one collection per strategy with @OrderColumn</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Basket {
+
+    @Id
+    private String id;
+
+    private String owner;
+
+    @OneToMany
+    private List&lt;Product&gt; products = new ArrayList&lt;Product&gt;();
+
+    // getters, setters ...
+}
+
+@Entity
+public class Product {
+
+    @Id
+    private String name;
+
+    private String description;
+
+    // getters, setters ...
+}</code></pre><p>Basket collection</p><pre><code class="language-json">{
+  "_id" : "davide_basket",
+  "owner" : "Davide"
+}</code></pre><p>Product collection</p><pre><code class="language-json">{
+  "_id" : "Pretzel",
+  "description" : "Glutino Pretzel Sticks"
+}
+{
+  "_id" : "Beer",
+  "description" : "Tactical nuclear penguin"
+}</code></pre><p>associations_Basket_Product collection</p><pre><code class="language-json">{
+  "_id" : { "Basket_id" : "davide_basket" },
+  "rows" : [
+    {
+      "products_name" : "Pretzel",
+      "products_ORDER" : 1
+    },
+    {
+      "products_name" : "Beer",
+      "products_ORDER" : 0
+    }
+  ]
+}</code></pre></div></div><br class="example-break"/><p>A map can be used to represents an association,
+in this case Hibernate OGM will store the key of the map
+and the associated id.</p><div class="example"><a id="d0e12210"/><p class="title"><strong>Example 13.22. Unidirectional one-to-many using maps with defaults</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class User {
+
+    @Id
+    private String id;
+
+    @OneToMany
+    private Map&lt;String, Address&gt; addresses = new HashMap&lt;String, Address&gt;();
+
+    // getters, setters ...
+}
+
+@Entity
+public class Address {
+
+    @Id
+    private String id;
+    private String city;
+
+    // getters, setters ...
+}</code></pre><pre><code class="language-json">{
+  "_id": "User:id_:user/_001",
+  "_rev": "3-77de96250380a79a20a38e78826bf4f7",
+  "$type": "entity",
+  "$table": "User",
+  "id" : "user_001",
+  "addresses" : {
+    "work" : "address_001",
+    "home" : "address_002"
+  }
+}</code></pre><pre><code class="language-json">{
+  "_id": "Address:id_:address/_001",
+  "_rev": "1-dd366cd017f87548956dc55d3b12fefd",
+  "$type": "entity",
+  "$table": "Address",
+  "id" : "address_001",
+  "city" : "Rome"
+}</code></pre><pre><code class="language-json">{
+  "_id": "Address:id_:address/_002",
+  "_rev": "1-04f13666a62473ac951dd039c7cdc780",
+  "$type": "entity",
+  "$table": "Address",
+  "id" : "address_002",
+  "city" : "Paris"
+}</code></pre></div></div><br class="example-break"/><p>If the map value cannot be represented by a single field (e.g. when referencing a type with a composite id
+or using an embeddable type as map value type),
+a sub-document containing all the required fields will be stored as value.</p><p>If the map key either is not of type <code class="literal">String</code> or it is made up of several columns (composite map key),
+the optimized structure shown in the example above cannot be used.
+In that case the association will be represented by a list of sub-documents, also containing the map key column(s).
+You can use <code class="literal">@MapKeyColumn</code> to rename the field containing the key of the map,
+otherwise it will default to "&lt;%COLLECTION_ROLE%&gt;_KEY", e.g. "addresses_KEY".</p><p>In case you want to enforce the list-style represention also for maps with a single key column of type <code class="literal">String</code>
+you can use the option <code class="literal">hibernate.ogm.datastore.document.map_storage</code> to do so.</p><div class="example"><a id="d0e12239"/><p class="title"><strong>Example 13.23. Unidirectional one-to-many using maps with @MapKeyColumn</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class User {
+
+    @Id
+    private String id;
+
+    @OneToMany
+    @MapKeyColumn(name = "addressType")
+    private Map&lt;String, Address&gt; addresses = new HashMap&lt;String, Address&gt;();
+
+    // getters, setters ...
+}
+
+@Entity
+public class Address {
+
+    @Id
+    private String id;
+    private String city;
+
+    // getters, setters ...
+}</code></pre><pre><code class="language-json">{
+  "_id": "User:id_:user/_001",
+  "_rev": "3-77de96250380a79a20a38e78826bf4f7",
+  "$type": "entity",
+  "$table": "User",
+  "id" : "user_001",
+  "addresses" : [
+    {
+      "addressType" : "work",
+      "addresses_id" : "address_001"
+    },
+    {
+      "addressType" : "home",
+      "addresses_id" : "address_002"
+    }
+  ]
+}</code></pre><pre><code class="language-json">{
+  "_id": "Address:id_:address/_001",
+  "_rev": "1-dd366cd017f87548956dc55d3b12fefd",
+  "$type": "entity",
+  "$table": "Address",
+  "id" : "address_001",
+  "city" : "Rome"
+}</code></pre><pre><code class="language-json">{
+  "_id": "Address:id_:address/_002",
+  "_rev": "1-04f13666a62473ac951dd039c7cdc780",
+  "$type": "entity",
+  "$table": "Address",
+  "id" : "address_002",
+  "city" : "Paris"
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e12250"/><p class="title"><strong>Example 13.24. Unidirectional many-to-one</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class JavaUserGroup {
+
+    @Id
+    private String jugId;
+    private String name;
+
+    // getters, setters ...
+}
+
+@Entity
+public class Member {
+
+    @Id
+    private String id;
+    private String name;
+
+    @ManyToOne
+    private JavaUserGroup memberOf;
+
+    // getters, setters ...
+}</code></pre><pre><code class="language-json">{
+  "_id": "JavaUserGroups:id_:summer/_camp",
+  "_rev": "1-04f13666a62473ac951dd039c7cdc780",
+  "$type": "entity",
+  "$table": "JavaUserGroup",
+  "id" : "summer_camp",
+  "name" : "JUG Summer Camp"
+}</code></pre><pre><code class="language-json">{
+  "_id": "Member:id_:jerome",
+  "_rev": "1-880bf595c39a965dec0216d9d990ebd1",
+  "$type": "entity",
+  "$table": "Member",
+  "id" : "jerome",
+  "name" : "Jerome"
+  "memberOf_jugId" : "summer_camp"
+}</code></pre><pre><code class="language-json">{
+  "_id": "Member:id_:emmanuel",
+  "_rev": "1-18e83ce9774a769814c401c49a5afcf3",
+  "$type": "entity",
+  "$table": "Member",
+  "id" : "emmanuel",
+  "name" : "Emmanuel Bernard"
+  "memberOf_jugId" : "summer_camp"
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e12261"/><p class="title"><strong>Example 13.25. Bidirectional many-to-one</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class SalesForce {
+
+    @Id
+    private String id;
+    private String corporation;
+
+    @OneToMany(mappedBy = "salesForce")
+    private Set&lt;SalesGuy&gt; salesGuys = new HashSet&lt;SalesGuy&gt;();
+
+    // getters, setters ...
+}
+
+@Entity
+public class SalesGuy {
+
+    private String id;
+    private String name;
+
+    @ManyToOne
+    private SalesForce salesForce;
+
+    // getters, setters ...
+}</code></pre><pre><code class="language-json">{
+  "_id": "SalesForce:id_:red/_hat",
+  "_rev": "1-04f13666a62473ac951dd039c7cdc780",
+  "$type": "entity",
+  "$table": "SalesForce",
+  "_id": "red_hat",
+  "corporation": "Red Hat",
+  "salesGuys": [ "eric", "simon" ]
+}</code></pre><pre><code class="language-json">{
+  "_id": "SalesGuy:id_:eric",
+  "_rev": "1-18e83ce9774a769814c401c49a5afcf3",
+  "$type": "entity",
+  "$table": "SalesGuy",
+  "id": "eric",
+  "name": "Eric"
+  "salesForce_id": "red_hat",
+}</code></pre><pre><code class="language-json">{
+  "_id": "SalesGuy:id_:eric",
+  "_rev": "1-18e83ce9774a769814c401c49a5afcf3",
+  "$type": "entity",
+  "$table": "SalesGuy",
+  "id": "simon",
+  "name": "Simon",
+  "salesForce_id": "red_hat"
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e12272"/><p class="title"><strong>Example 13.26. Unidirectional many-to-many using in entity strategy</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Student {
+
+    @Id
+    private String id;
+    private String name;
+
+    // getters, setters ...
+}
+
+@Entity
+public class ClassRoom {
+
+    @Id
+    private Long id;
+    private String lesson;
+
+    @ManyToMany
+    private List&lt;Student&gt; students = new ArrayList&lt;Student&gt;();
+
+    // getters, setters ...
+}</code></pre><pre><code class="language-json">{
+   "_id": "ClassRoom:id_:1_",
+   "_rev": "2-ae1d9748a84af991615fa842a7e796ea",
+   "$type": "entity",
+   "$table": "ClassRoom",
+   "id": "1",
+   "students": [
+       "mario",
+       "john"
+   ],
+   "name": "Math"
+}</code></pre><pre><code class="language-json">{
+   "_id": "ClassRoom:id_:2_",
+   "_rev": "2-0e58f03f518c5c1982bb7936308604e4",
+   "$type": "entity",
+   "$table": "ClassRoom",
+   "id": "2",
+   "students": [
+       "kate",
+       "mario"
+   ],
+   "name": "English"
+}</code></pre><pre><code class="language-json">{
+   "_id": "Student:id_:john_",
+   "_rev": "1-60b642619f0e62e079da8a6521ea9750",
+   "$type": "entity",
+   "$table": "Student",
+   "id": "john",
+   "name": "John Doe"
+}</code></pre><pre><code class="language-json">{
+   "_id": "Student:id_:kate_",
+   "_rev": "1-911bb5cbc9b16c6d90f1e91e856a9224",
+   "$type": "entity",
+   "$table": "Student",
+   "id": "kate",
+   "name": "Kate Doe"
+}</code></pre><pre><code class="language-json">{
+   "_id": "Student:id_:mario_",
+   "_rev": "1-7dc611e3c627a837033e7eb5e244f7f8",
+   "$type": "entity",
+   "$table": "Student",
+   "id": "mario",
+   "name": "Mario Rossi"
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e12287"/><p class="title"><strong>Example 13.27. Bidirectional many-to-many</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class AccountOwner {
+
+    @Id
+    private String id;
+
+    private String SSN;
+
+    @ManyToMany
+    private Set&lt;BankAccount&gt; bankAccounts;
+
+    // getters, setters ...
+}
+
+@Entity
+public class BankAccount {
+
+    @Id
+    private String id;
+
+    private String accountNumber;
+
+    @ManyToMany( mappedBy = "bankAccounts" )
+    private Set&lt;AccountOwner&gt; owners = new HashSet&lt;AccountOwner&gt;();
+
+    // getters, setters ...
+}</code></pre><pre><code class="language-json">{
+   "_id": "AccountOwner:id_:owner/_1_",
+   "_rev": "3-07eb9959eac966afedd0547aa74a59a7",
+   "$type": "entity",
+   "$table": "AccountOwner",
+   "id": "owner_1",
+   "SSN": "0123456",
+   "bankAccounts": [
+       "account_1",
+       "account_2"
+   ]
+}</code></pre><pre><code class="language-json">{
+   "_id": "BankAccount:id_:account/_1_",
+   "_rev": "2-87252fffa4ab443485f55504215fbed3",
+   "$type": "entity",
+   "$table": "BankAccount",
+   "id": "account_1",
+   "accountNumber": "X2345000",
+   "owners": [
+       "owner_1"
+   ]
+}</code></pre><pre><code class="language-json">{
+   "_id": "BankAccount:id_:account/_2_",
+   "_rev": "2-15bdfeda927dd10fa10aa19ceee4ea34",
+   "$type": "entity",
+   "$table": "BankAccount",
+   "id": "account_2",
+   "accountNumber": "ZZZ-009",
+   "owners": [
+       "owner_1"
+   ]
+}</code></pre></div></div><br class="example-break"/></div><div class="section" title="13.2.3.2. Association document strategy"><div class="titlepage"><div><div><h4 class="title"><a id="couchdb-association-document-strategy"/>13.2.3.2. Association document strategy</h4></div></div></div><p>With this strategy, Hibernate OGM uses separate association documents
+(with <code class="literal">$type</code> set to "association") to store all navigation information.
+Each assocation document is structured in 2 parts.
+The first is the <code class="literal">_id</code> field which contains the identifier information
+of the association owner and the name of the association table.
+The second part is the <code class="literal">rows</code> field which stores (into an embedded collection) all ids
+that the current instance is related to.</p><div class="example"><a id="d0e12312"/><p class="title"><strong>Example 13.28. Unidirectional relationship</strong></p><div class="example-contents"><pre><code class="language-json">{
+   "_id": "AccountOwner_BankAccount:owners/_id_:4f5b48ad-f074-4a64-8cf4-1f9c54a33f76_",
+   "_rev": "1-18ef25ec73c1942c45c868aa92f24f2c",
+   "$type": "association",
+   "rows": [
+        "7873a2a7-c77c-447c-b000-890f0a4dfa9a"
+   ]
+}</code></pre></div></div><br class="example-break"/><p>For a bidirectional relationship, another document is created where ids are reversed.
+Don’t worry, Hibernate OGM takes care of keeping them in sync:</p><div class="example"><a id="d0e12319"/><p class="title"><strong>Example 13.29. Bidirectional relationship</strong></p><div class="example-contents"><pre><code class="language-json">{
+   "_id": "AccountOwner_BankAccount:owners/_id_:4f5b48ad-f074-4a64-8cf4-1f9c54a33f76_",
+   "_rev": "1-18ef25ec73c1942c45c868aa92f24f2c",
+   "$type": "association",
+   "rows": [
+        "7873a2a7-c77c-447c-b000-890f0a4dfa9a"
+   ]
+}
+{
+   "_id": "AccountOwner_BankAccount:bankAccounts/_id_:7873a2a7-c77c-447c-b000-890f0a4dfa9a_",
+   "_rev": "1-78e92f980745941a779abb914da65a6c",
+   "$type": "association",
+   "rows": [
+        "4f5b48ad-f074-4a64-8cf4-1f9c54a33f76"
+   ]
+}</code></pre></div></div><br class="example-break"/><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>This strategy won’t affect *-to-one associations or embedded collections.</p></div><div class="example"><a id="d0e12327"/><p class="title"><strong>Example 13.30. Unidirectional one-to-many using document strategy</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Basket {
+
+    @Id
+    private String id;
+
+    private String owner;
+
+    @OneToMany
+    private List&lt;Product&gt; products = new ArrayList&lt;Product&gt;();
+
+    // getters, setters ...
+}
+
+@Entity
+public class Product {
+
+    @Id
+    private String name;
+
+    private String description;
+
+    // getters, setters ...
+}</code></pre><pre><code class="language-json">{
+   "_id": "Basket:id_:davide/_basket_",
+   "_rev": "1-ba920ac3d1ed5544a71d6c6c5f2ee286",
+   "$type": "entity",
+   "$table": "Basket",
+   "id": "davide_basket",
+   "owner": "Davide"
+}</code></pre><pre><code class="language-json">{
+   "_id": "Basket:id_:davide/_basket_",
+   "_rev": "1-ba920ac3d1ed5544a71d6c6c5f2ee286",
+   "$type": "entity",
+   "$table": "Basket",
+   "id": "davide_basket",
+   "owner": "Davide"
+}</code></pre><pre><code class="language-json">{
+   "_id": "Product:name_:Pretzel_",
+   "_rev": "1-b78ce2687db2fb550d9e8753423db3f3",
+   "$type": "entity",
+   "$table": "Product",
+   "description": "Glutino Pretzel Sticks",
+   "name": "Pretzel"
+}</code></pre><pre><code class="language-json">{
+   "_id": "Basket_Product:Basket/_id_:davide/_basket_",
+   "_rev": "1-f6d9aa44a7ca4f01b68c94b1f5599956",
+   "$type": "association",
+   "rows": [
+       "Beer",
+       "Pretzel"
+   ]
+}</code></pre></div></div><br class="example-break"/><p>Using the annotation <code class="literal">@JoinTable</code> it is possible to change the value of
+the document containing the association.</p><div class="example"><a id="d0e12345"/><p class="title"><strong>Example 13.31. Unidirectional one-to-many using document strategy with <code class="literal">@JoinTable</code></strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Basket {
+
+    @Id
+    private String id;
+
+    private String owner;
+
+    @OneToMany
+    @JoinTable( name = "BasketContent" )
+    private List&lt;Product&gt; products = new ArrayList&lt;Product&gt;();
+
+    // getters, setters ...
+}
+
+@Entity
+public class Product {
+
+    @Id
+    private String name;
+
+    private String description;
+
+    // getters, setters ...
+}</code></pre><pre><code class="language-json">{
+   "_id": "Basket:id_:davide/_basket_",
+   "_rev": "1-ba920ac3d1ed5544a71d6c6c5f2ee286",
+   "$type": "entity",
+   "$table": "Basket",
+   "id": "davide_basket",
+   "owner": "Davide"
+}</code></pre><pre><code class="language-json">{
+   "_id": "Basket:id_:davide/_basket_",
+   "_rev": "1-ba920ac3d1ed5544a71d6c6c5f2ee286",
+   "$type": "entity",
+   "$table": "Basket",
+   "id": "davide_basket",
+   "owner": "Davide"
+}</code></pre><pre><code class="language-json">{
+   "_id": "Product:name_:Pretzel_",
+   "_rev": "1-b78ce2687db2fb550d9e8753423db3f3",
+   "$type": "entity",
+   "$table": "Product",
+   "description": "Glutino Pretzel Sticks",
+   "name": "Pretzel"
+}</code></pre><pre><code class="language-json">{
+   "_id": "BasketContent:Basket/_id_:davide/_basket_",
+   "_rev": "1-f6d9aa44a7ca4f01b68c94b1f5599956",
+   "$type": "association",
+   "rows": [
+       "Beer",
+       "Pretzel"
+   ]
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e12360"/><p class="title"><strong>Example 13.32. Unidirectional many-to-many using document strategy</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Student {
+
+    @Id
+    private String id;
+    private String name;
+
+    // getters, setters ...
+}
+
+@Entity
+public class ClassRoom {
+
+    @Id
+    private Long id;
+    private String lesson;
+
+    @ManyToMany
+    private List&lt;Student&gt; students = new ArrayList&lt;Student&gt;();
+
+    // getters, setters ...
+}</code></pre><pre><code class="language-json">{
+   "_id": "ClassRoom:id_:1_",
+   "_rev": "2-ae1d9748a84af991615fa842a7e796ea",
+   "$type": "entity",
+   "$table": "ClassRoom",
+   "id": "1",
+   "name": "Math"
+}</code></pre><pre><code class="language-json">{
+   "_id": "ClassRoom:id_:2_",
+   "_rev": "2-0e58f03f518c5c1982bb7936308604e4",
+   "$type": "entity",
+   "$table": "ClassRoom",
+   "id": "2",
+   "name": "English"
+}</code></pre><pre><code class="language-json">{
+   "_id": "Student:id_:john_",
+   "_rev": "1-60b642619f0e62e079da8a6521ea9750",
+   "$type": "entity",
+   "$table": "Student",
+   "id": "john",
+   "name": "John Doe"
+}</code></pre><pre><code class="language-json">{
+   "_id": "Student:id_:kate_",
+   "_rev": "1-911bb5cbc9b16c6d90f1e91e856a9224",
+   "$type": "entity",
+   "$table": "Student",
+   "id": "kate",
+   "name": "Kate Doe"
+}</code></pre><pre><code class="language-json">{
+   "_id": "Student:id_:mario_",
+   "_rev": "1-7dc611e3c627a837033e7eb5e244f7f8",
+   "$type": "entity",
+   "$table": "Student",
+   "id": "mario",
+   "name": "Mario Rossi"
+}</code></pre><pre><code class="language-json">{
+   "_id": "ClassRoom_Student:ClassRoom/_id_:1_",
+   "_rev": "1-351e470a8c134a084d9ad282796a7464",
+   "$type": "association",
+   "rows": [
+       "mario",
+       "john"
+   ]
+}</code></pre><pre><code class="language-json">{
+   "_id": "ClassRoom_Student:ClassRoom/_id_:2_",
+   "_rev": "1-825d1900ec216dc73e0152564de8e975",
+   "$type": "association",
+   "rows": [
+       "kate"
+   ]
+}</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e12379"/><p class="title"><strong>Example 13.33. Bidirectional many-to-many using document strategy</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class AccountOwner {
+
+    @Id
+    private String id;
+
+    private String SSN;
+
+    @ManyToMany
+    private Set&lt;BankAccount&gt; bankAccounts;
+
+    // getters, setters ...
+}
+
+@Entity
+public class BankAccount {
+
+    @Id
+    private String id;
+
+    private String accountNumber;
+
+    @ManyToMany(mappedBy = "bankAccounts")
+    private Set&lt;AccountOwner&gt; owners = new HashSet&lt;AccountOwner&gt;();
+
+    // getters, setters ...
+}</code></pre><pre><code class="language-json">{
+   "_id": "AccountOwner:id_:owner/_1_",
+   "_rev": "3-07eb9959eac966afedd0547aa74a59a7",
+   "$type": "entity",
+   "$table": "AccountOwner",
+   "id": "owner_1",
+   "SSN": "0123456",
+}</code></pre><pre><code class="language-json">{
+   "_id": "BankAccount:id_:account/_1_",
+   "_rev": "2-87252fffa4ab443485f55504215fbed3",
+   "$type": "entity",
+   "$table": "BankAccount",
+   "id": "account_1",
+   "accountNumber": "X2345000",
+}</code></pre><pre><code class="language-json">{
+   "_id": "BankAccount:id_:account/_2_",
+   "_rev": "2-15bdfeda927dd10fa10aa19ceee4ea34",
+   "$type": "entity",
+   "$table": "BankAccount",
+   "id": "account_2",
+   "accountNumber": "ZZZ-009",
+}</code></pre><pre><code class="language-json">{
+   "_id": "AccountOwner_BankAccount:bankAccounts/_id_:account/_1_",
+   "_rev": "1-34ecb6bcadae6e51112de0cf50387521",
+   "$type": "association",
+   "rows": [
+       "owner_1"
+   ]
+}</code></pre><pre><code class="language-json">{
+   "_id": "AccountOwner_BankAccount:bankAccounts/_id_:account/_2_",
+   "_rev": "1-34ecb6bcadae6e51112de0cf50387521",
+   "$type": "association",
+   "rows": [
+       "owner_1"
+   ]
+}</code></pre><pre><code class="language-json">{
+   "_id": "AccountOwner_BankAccount:owners/_id_:owner/_1_",
+   "_rev": "2-d2cc7816eae5498a0829a3cdae0b208e",
+   "$type": "association",
+   "rows": [
+       "account_1",
+       "account_2"
+   ]
+}</code></pre></div></div><br class="example-break"/></div></div></div><div class="section" title="13.3. Transactions"><div class="titlepage"><div><div><h2 class="title"><a id="transactions_2"/>13.3. Transactions</h2></div></div></div><p>CouchDB does not support transactions.
+Only changes applied to the same document are done atomically.
+A change applied to more than one document will not be applied atomically.
+This problem is slightly mitigated by the fact that Hibernate OGM queues all changes
+before applying them during flush time.
+So the window of time used to write to CouchDB is smaller than what you would have done manually.</p><p>We recommend that you still use transaction demarcations with Hibernate OGM
+to trigger the flush operation transparently (on commit).
+But consider that rolling back the transaction isn’t an option: operations already flushed will not be undone.</p></div><div class="section" title="13.4. Queries"><div class="titlepage"><div><div><h2 class="title"><a id="queries"/>13.4. Queries</h2></div></div></div><p>Hibernate OGM is a work in progress
+and we are actively working on JP-QL query support.</p><p>In the mean time, you have two strategies to query entities stored by Hibernate OGM:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">use native CouchDB queries</li><li class="listitem">use Hibernate Search</li></ul></div><p>Because Hibernate OGM stores data in CouchDB in a natural way,
+you can the HTTP client or REST library of your choice and execute queries (using CouchDB views)
+on the datastore directly without involving Hibernate OGM.
+The benefit of this approach is to use the query capabilities of CouchDB.
+The drawback is that raw CouchDB documents will be returned and not managed entities.</p><p>The alternative approach is to index your entities with Hibernate Search.
+That way, a set of secondary indexes independent of CouchDB is maintained by Hibernate Search
+and you can write queries on top of them.
+The benefit of this approach is a nice integration at the JPA / Hibernate API level
+(managed entities are returned by the queries).
+The drawback is that you need to store the Lucene indexes somewhere
+(file system, Infinispan grid etc).
+Have a look at the Infinispan section for more info on how to use Hibernate Search.</p></div></div><script xmlns="" xmlns:d="http://docbook.org/ns/docbook" type="text/javascript" src="highlight.js/highlight.pack.js"> </script><script xmlns="" xmlns:d="http://docbook.org/ns/docbook" type="text/javascript">hljs.initHighlightingOnLoad();</script><script type="text/javascript">
+dataLayer = [{'channel' : 'Hibernate', 'additional_tracking_code' : 'UA-45270411-3'}];
+(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NJWS5L');</script><noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-NJWS5L" height="0" width="0" style="display:none;visibility:hidden"> </iframe></noscript><hr xmlns="" xmlns:d="http://docbook.org/ns/docbook"/><a xmlns="" xmlns:d="http://docbook.org/ns/docbook" href="legalnotice.html"/><ul class="docnav"><li class="previous"><a accesskey="p" href="ch12.html"><strong>Prev</strong>Chapter 12. Neo4j</a></li><li class="up"><a accesskey="u" href="#"><strong>Up</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Home</strong></a></li><li class="next"><a accesskey="n" href="ch14.html"><strong>Next</strong>Chapter 14. Cassandra (Experimental)</a></li></ul><!-- HibernateDoc.OutdatedContent --><script src="//code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script><script src="/hibernate/_outdated-content/outdated-content.js" type="text/javascript"></script><script type="text/javascript">var jQuery_3_1 = $.noConflict(true); jQuery_3_1(document).ready(function() { HibernateDoc.OutdatedContent.install("ogm"); });</script><!-- /HibernateDoc.OutdatedContent --></body></html>

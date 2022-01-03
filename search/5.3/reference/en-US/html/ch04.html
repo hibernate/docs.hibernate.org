@@ -1,0 +1,1544 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Chapter 4. Mapping entities to the index structure</title><!-- HibernateDoc.Meta --><meta name="description" content="Hibernate Search, full text search for your entities - Reference Documentation" /><meta name="keywords" content="hibernate, search, hibernate search, full text, lucene" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://docs.jboss.org/hibernate/stable/search/reference/en-US/html_single/" /><!-- /HibernateDoc.Meta --><link rel="stylesheet" type="text/css" href="css/hibernate.css"/><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"/><link rel="home" href="index.html" title="Hibernate Search"/><link rel="up" href="index.html" title="Hibernate Search"/><link rel="prev" href="ch03.html" title="Chapter 3. Configuration"/><link rel="next" href="ch05.html" title="Chapter 5. Querying"/><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/></head><body><p id="title"><a href="http://www.hibernate.org" class="site_href"><strong>Hibernate.org</strong></a><a href="http://hibernate.org/Documentation/DocumentationOverview" class="doc_href"><strong>Community Documentation</strong></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="ch03.html"><strong>Prev</strong></a></li><li class="next"><a accesskey="n" href="ch05.html"><strong>Next</strong></a></li></ul><div class="chapter" title="Chapter 4. Mapping entities to the index structure"><div class="titlepage"><div><div><h2 class="title"><a id="search-mapping"/>Chapter 4. Mapping entities to the index structure</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="ch04.html#search-mapping-entity">4.1. Mapping an entity</a></span></dt><dd><dl><dt><span class="section"><a href="ch04.html#basic-mapping">4.1.1. Basic mapping</a></span></dt><dt><span class="section"><a href="ch04.html#facets-annotation">4.1.2. Mapping properties multiple times</a></span></dt><dt><span class="section"><a href="ch04.html#search-mapping-associated">4.1.3. Embedded and associated objects</a></span></dt><dt><span class="section"><a href="ch04.html#_associated_objects_building_a_dependency_graph_with_containedin">4.1.4. Associated objects: building a dependency graph with @ContainedIn</a></span></dt></dl></dd><dt><span class="section"><a href="ch04.html#section-boosting">4.2. Boosting</a></span></dt><dd><dl><dt><span class="section"><a href="ch04.html#section-boost-annotation">4.2.1. Static index time boosting</a></span></dt><dt><span class="section"><a href="ch04.html#section-dynamic-boost">4.2.2. Dynamic index time boosting</a></span></dt></dl></dd><dt><span class="section"><a href="ch04.html#_analysis">4.3. Analysis</a></span></dt><dd><dl><dt><span class="section"><a href="ch04.html#analyzer">4.3.1. Default analyzer and analyzer by class</a></span></dt><dt><span class="section"><a href="ch04.html#_named_analyzers">4.3.2. Named analyzers</a></span></dt><dt><span class="section"><a href="ch04.html#_dynamic_analyzer_selection">4.3.3. Dynamic analyzer selection</a></span></dt><dt><span class="section"><a href="ch04.html#analyzer-retrievinganalyzer">4.3.4. Retrieving an analyzer</a></span></dt></dl></dd><dt><span class="section"><a href="ch04.html#search-mapping-bridge">4.4. Bridges</a></span></dt><dd><dl><dt><span class="section"><a href="ch04.html#section-built-in-bridges">4.4.1. Built-in bridges</a></span></dt><dt><span class="section"><a href="ch04.html#_tika_bridge">4.4.2. Tika bridge</a></span></dt><dt><span class="section"><a href="ch04.html#section-custom-bridges">4.4.3. Custom bridges</a></span></dt><dt><span class="section"><a href="ch04.html#_bridgeprovider_associate_a_bridge_to_a_given_return_type">4.4.4. BridgeProvider: associate a bridge to a given return type</a></span></dt></dl></dd><dt><span class="section"><a href="ch04.html#search-mapping-indexinginterceptor">4.5. Conditional indexing</a></span></dt><dt><span class="section"><a href="ch04.html#provided-id">4.6. Providing your own id</a></span></dt><dd><dl><dt><span class="section"><a href="ch04.html#ProvidedId">4.6.1. The ProvidedId annotation</a></span></dt></dl></dd><dt><span class="section"><a href="ch04.html#hsearch-mapping-programmaticapi">4.7. Programmatic API</a></span></dt><dd><dl><dt><span class="section"><a href="ch04.html#_mapping_an_entity_as_indexable">4.7.1. Mapping an entity as indexable</a></span></dt><dt><span class="section"><a href="ch04.html#_adding_documentid_to_indexed_entity">4.7.2. Adding DocumentId to indexed entity</a></span></dt><dt><span class="section"><a href="ch04.html#_defining_analyzers">4.7.3. Defining analyzers</a></span></dt><dt><span class="section"><a href="ch04.html#_defining_full_text_filter_definitions">4.7.4. Defining full text filter definitions</a></span></dt><dt><span class="section"><a href="ch04.html#_defining_fields_for_indexing">4.7.5. Defining fields for indexing</a></span></dt><dt><span class="section"><a href="ch04.html#_programmatically_defining_embedded_entities">4.7.6. Programmatically defining embedded entities</a></span></dt><dt><span class="section"><a href="ch04.html#_contained_in_definition">4.7.7. Contained In definition</a></span></dt><dt><span class="section"><a href="ch04.html#_date_calendar_bridge">4.7.8. Date/Calendar Bridge</a></span></dt><dt><span class="section"><a href="ch04.html#_declaring_bridges">4.7.9. Declaring bridges</a></span></dt><dt><span class="section"><a href="ch04.html#_mapping_class_bridge">4.7.10. Mapping class bridge</a></span></dt><dt><span class="section"><a href="ch04.html#_mapping_dynamic_boost">4.7.11. Mapping dynamic boost</a></span></dt></dl></dd></dl></div><div class="section" title="4.1. Mapping an entity"><div class="titlepage"><div><div><h2 class="title"><a id="search-mapping-entity"/>4.1. Mapping an entity</h2></div></div></div><p>In <a class="xref" href="ch01.html" title="Chapter 1. Getting started">Chapter 1, <em>Getting started</em></a> you have already seen that all the metadata information needed to index
+entities is described through annotations. There is no need for XML mapping files. You can still use
+Hibernate mapping files for the basic Hibernate configuration, but the Hibernate Search specific
+configuration has to be expressed via annotations.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>There is no XML configuration available for Hibernate Search but we provide a programmatic
+mapping API that elegantly replaces this kind of deployment form (see
+<a class="xref" href="ch04.html#hsearch-mapping-programmaticapi" title="4.7. Programmatic API">Section 4.7, “Programmatic API”</a> for more information).</p><p>If you want to contribute the XML mapping implementation, see
+<a class="link" href="https://hibernate.onjira.com/browse/HSEARCH-210">HSEARCH-210</a>.</p></div><div class="section" title="4.1.1. Basic mapping"><div class="titlepage"><div><div><h3 class="title"><a id="basic-mapping"/>4.1.1. Basic mapping</h3></div></div></div><p>Lets start with the most commonly used annotations when mapping an entity.</p><div class="section" title="4.1.1.1. @Indexed"><div class="titlepage"><div><div><h4 class="title"><a id="indexed-annotation"/>4.1.1.1. @Indexed</h4></div></div></div><p>Foremost you must declare a persistent class as indexable by annotating the class with <code class="literal">@Indexed.</code>
+All entities not annotated with <code class="literal">@Indexed</code> will be ignored by the indexing process.</p><div class="example"><a id="d0e2516"/><p class="title"><strong>Example 4.1. Making a class indexable with <code class="literal">@Indexed</code></strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@Indexed
+public class Essay {
+    ...
+}</code></pre></div></div><br class="example-break"/><p>You can optionally specify the <code class="literal">Indexed.index</code> attribute to change the default name of the index.
+For more information regarding index naming see <a class="xref" href="ch03.html#search-configuration-directory" title="3.3. Directory configuration">Section 3.3, “Directory configuration”</a>.</p><p>You can also specify an optional indexing interceptor. For more information see
+<a class="link" href="ch04.html#search-mapping-indexinginterceptor" title="4.5. Conditional indexing">conditional indexing</a>.</p></div><div class="section" title="4.1.1.2. @Field"><div class="titlepage"><div><div><h4 class="title"><a id="field-annotation"/>4.1.1.2. @Field</h4></div></div></div><p>For each property of your entity, you have the ability to describe whether and how it
+will be indexed. Adding the <code class="literal">@Field</code> annotation declares a property as indexed and allows you to
+configure various aspects of the indexing process. Without <code class="literal">@Field</code> the property is ignored by
+the indexing process.</p><p>Hibernate Search tries to determine the best way to index your property. In most
+cases this will be as string, but for the types int, long, double and float (and their respective
+Java wrapper types) Lucene’s numeric field encoding (see <a class="xref" href="ch04.html#numeric-field-annotation" title="4.1.1.3. @NumericField">Section 4.1.1.3, “@NumericField”</a>) is used.
+This numeric encoding uses a so called <a class="link" href="http://en.wikipedia.org/wiki/Trie">Trie structure</a> which
+allows for efficient range queries and sorting, resulting in query response times
+being orders of magnitude faster than with the plain string encoding. Byte and short properties
+will only be encoded in numeric fields if explicitly marked with the <code class="literal">@NumericField</code> annotation.</p><div class="caution" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Caution</h2><p>Prior to Search 5, numeric field encoding was only chosen if explicitly requested via <code class="literal">@NumericField</code>.
+As of Search 5 this encoding is automatically chosen for numeric types. To avoid numeric encoding
+you can explicitly specify a non numeric field bridge via <code class="literal">@Field.bridge</code> or <code class="literal">@FieldBridge</code>. The
+package <code class="literal">org.hibernate.search.bridge.builtin</code> contains a set of bridges which encode numbers as strings,
+for example <code class="literal">org.hibernate.search.bridge.builtin.IntegerBridge</code>.</p></div><p>The following attributes of the <code class="literal">@Field</code> annotation help you control the indexing outcome:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">name</code>: describes under which name the property should be stored in the Lucene Document. The
+default value is the property name (following the JavaBeans convention)</li><li class="listitem"><code class="literal">store</code>: describes whether or not the property is stored in the Lucene index. You can store the
+value <code class="literal">Store.YES</code> (consuming more space in the index but allowing <a class="link" href="ch05.html#projections" title="5.1.3.5. Projection">projection</a>),
+store it in a compressed way <code class="literal">Store.COMPRESS</code> (this does consume more CPU), or avoid any storage
+<code class="literal">Store.NO</code> (this is the default value). When a property is stored, you can retrieve its original
+value from the Lucene Document. Storing the property has no impact on whether the value is
+searchable or not.</li><li class="listitem"><p class="simpara"><code class="literal">index</code>: describes whether the property is indexed or not. The different values are <code class="literal">Index.NO</code>
+(no indexing, meaning the value cannot be found by a query), <code class="literal">Index.YES</code> (the element gets indexed
+and is searchable). The default value is <code class="literal">Index.YES</code>. <code class="literal">Index.NO</code> can be useful for cases where a
+property is not required to be searchable, but needed for projection.</p><div class="tip" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Tip</h2><p><code class="literal">Index.NO</code> in combination with <code class="literal">Analyze.YES</code> or <code class="literal">Norms.YES</code> is not useful, since analyze and norms
+require the property to be indexed</p></div></li><li class="listitem"><p class="simpara"><code class="literal">analyze</code>: determines whether the property is analyzed (<code class="literal">Analyze.YES</code>) or not (<code class="literal">Analyze.NO</code>).
+The default value is <code class="literal">Analyze.YES</code>.</p><div class="tip" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Tip</h2><p>Whether or not you want to analyze a property depends on whether you wish to search the element as
+is, or by the words it contains. It make sense to analyze a text field, but probably not a date
+field.</p></div><div class="tip" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Tip</h2><p>Fields used for sorting or faceting <span class="emphasis"><em>must not</em></span> be analyzed.</p></div></li><li class="listitem"><code class="literal">norms</code>: describes whether index time boosting information should be stored (<code class="literal">Norms.YES</code>) or
+not (<code class="literal">Norms.NO</code>). Not storing the norms can save a considerable amount of memory, but index time
+boosting will not be available in this case. The default value is <code class="literal">Norms.YES</code>.</li><li class="listitem"><p class="simpara"><code class="literal">termVector</code>: describes collections of term-frequency pairs. This attribute enables the storing
+of the term vectors within the documents during indexing. The default value is <code class="literal">TermVector.NO</code>.</p><p class="simpara">The different values of this attribute are:</p><div class="informaltable"><table border="1"><colgroup><col width="50*" class="col_1"/><col width="50*" class="col_2"/></colgroup><thead><tr><th align="left" valign="top">Value</th><th align="left" valign="top">Definition</th></tr></thead><tbody><tr><td align="left" valign="top"><p>TermVector.YES</p></td><td align="left" valign="top"><p>Store the term vectors of each document. This
+                    produces two synchronized arrays, one contains document
+                    terms and the other contains the term’s frequency.</p></td></tr><tr><td align="left" valign="top"><p>TermVector.NO</p></td><td align="left" valign="top"><p>Do not store term vectors.</p></td></tr><tr><td align="left" valign="top"><p>TermVector.WITH_OFFSETS</p></td><td align="left" valign="top"><p>Store the term vector and token offset information.
+                    This is the same as TermVector.YES plus it contains the
+                    starting and ending offset position information for the
+                    terms.</p></td></tr><tr><td align="left" valign="top"><p>TermVector.WITH_POSITIONS</p></td><td align="left" valign="top"><p>Store the term vector and token position
+                    information. This is the same as TermVector.YES plus it
+                    contains the ordinal positions of each occurrence of a
+                    term in a document.</p></td></tr><tr><td align="left" valign="top"><p>TermVector.WITH_POSITION_OFFSETS</p></td><td align="left" valign="top"><p>Store the term vector, token position and offset
+                    information. This is a combination of the YES,
+                    WITH_OFFSETS and WITH_POSITIONS.</p></td></tr></tbody></table></div></li><li class="listitem"><p class="simpara"><code class="literal">indexNullAs</code>: Per default null values are ignored and not indexed. However, using <code class="literal">indexNullAs</code>
+you can specify a string which will be inserted as token for the null value. Per default this value
+is set to <code class="literal">org.hibernate.search.annotations.Field.DO_NOT_INDEX_NULL</code> indicating that null values
+should not be indexed. You can set this value to <code class="literal">DEFAULT_NULL_TOKEN</code> to indicate that a default null
+token should be used. This default null token can be specified in the configuration using
+<code class="literal">hibernate.search.default_null_token</code>. If this property is not set the string "<span class="emphasis"><em>null</em></span>" will
+be used as default.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>When indexNullAs is used, it is important to use the chosen null token in search queries (see
+<a class="xref" href="ch05.html" title="Chapter 5. Querying">Chapter 5, <em>Querying</em></a>) in order to find null values. It is also advisable to use this feature only with
+un-analyzed fields (<code class="literal">analyze=Analyze.NO</code>).</p></div><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>When implementing a custom <code class="literal">FieldBridge</code> or <code class="literal">TwoWayFieldBridge</code> it is up to the developer to handle the
+indexing of null values (see JavaDocs of <code class="literal">LuceneOptions.indexNullAs()</code>).</p></div></li><li class="listitem"><code class="literal">boost</code>: Refer to section about <a class="link" href="ch04.html#section-boosting" title="4.2. Boosting">boosting</a></li><li class="listitem"><code class="literal">bridge</code>: Refer to section about <a class="link" href="ch04.html#section-custom-bridges" title="4.4.3. Custom bridges">field bridges</a></li></ul></div></div><div class="section" title="4.1.1.3. @NumericField"><div class="titlepage"><div><div><h4 class="title"><a id="numeric-field-annotation"/>4.1.1.3. @NumericField</h4></div></div></div><p><code class="literal">@NumericField</code> is a companion annotation to <code class="literal">@Field</code>. It can be specified in the
+same scope as <code class="literal">@Field</code>, but only on properties of numeric type like byte, short, int, long, double and float
+(and their respective Java wrapper types). It allows to define a custom <code class="literal">precisionStep</code> for the
+numeric encoding of the property value.</p><p><code class="literal">@NumericField</code> accepts the following parameters:</p><div class="informaltable"><table border="1"><colgroup><col width="50*" class="col_1"/><col width="50*" class="col_2"/></colgroup><thead><tr><th align="left" valign="top">Value</th><th align="left" valign="top">Definition</th></tr></thead><tbody><tr><td align="left" valign="top"><p><code class="literal">forField</code></p></td><td align="left" valign="top"><p>(Optional) Specify the name of of the related <code class="literal">@Field</code>
+                  that will be indexed numerically. It’s only mandatory when
+                  the property contains more than a <code class="literal">@Field</code> declaration</p></td></tr><tr><td align="left" valign="top"><p><code class="literal">precisionStep</code></p></td><td align="left" valign="top"><p>(Optional) Change the way that the Trie structure is
+                  stored in the index. Smaller <code class="literal">precisionSteps</code> lead to more
+                  disk space usage and faster range and sort queries. Larger
+                  values lead to less space used and range query performance
+                  more close to the range query using string encoding. Default
+                  value is 4.</p></td></tr></tbody></table></div><p>Lucene supports the numeric types: <code class="literal">Double</code>, <code class="literal">Long</code>, <code class="literal">Integer</code> and <code class="literal">Float</code>. For properties of types
+<code class="literal">Byte</code> and <code class="literal">Short</code>, an <code class="literal">Integer</code> field will be used in the index. Other numeric types
+should use the default string encoding (via <code class="literal">@Field</code>), unless the application can deal with a
+potential loss in precision, in which case a custom <code class="literal">NumericFieldBridge</code> can be used. See
+<a class="xref" href="ch04.html#example-custom-numericfieldbridge" title="Example 4.2. Defining a custom NumericFieldBridge for BigDecimal">Example 4.2, “Defining a custom NumericFieldBridge for BigDecimal”</a>.</p><div class="example"><a id="example-custom-numericfieldbridge"/><p class="title"><strong>Example 4.2. Defining a custom NumericFieldBridge for BigDecimal</strong></p><div class="example-contents"><pre><code class="language-java">public class BigDecimalNumericFieldBridge extends NumericFieldBridge {
+    private static final BigDecimal storeFactor = BigDecimal.valueOf(100);
+
+    @Override
+    public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
+        if ( value != null ) {
+            BigDecimal decimalValue = (BigDecimal) value;
+            long tmpLong = decimalValue.multiply( storeFactor ).longValue();
+            Long indexedValue = Long.valueOf( tmpLong );
+            luceneOptions.addNumericFieldToDocument( name, indexedValue, document );
+        }
+    }
+
+    @Override
+    public Object get(String name, Document document) {
+        String fromLucene = document.get( name );
+        BigDecimal storedBigDecimal = new BigDecimal( fromLucene );
+        return storedBigDecimal.divide( storeFactor );
+    }
+}</code></pre></div></div><br class="example-break"/><p>You would use this custom bridge like seen in <a class="xref" href="ch04.html#example-useof-custom-numericfieldbridge" title="Example 4.3. Use of BigDecimalNumericFieldBridge">Example 4.3, “Use of <code class="literal">BigDecimalNumericFieldBridge</code>”</a>. In this
+case three annotations are used - <code class="literal">@Field</code>, <code class="literal">@NumericField</code> and <code class="literal">@FieldBridge</code>. <code class="literal">@Field</code> is required
+to mark the property for being indexed (a standalone <code class="literal">@NumericField</code> is never allowed).
+<code class="literal">@NumericField</code> might be omitted in this specific case, because the used <code class="literal">@FieldBridge</code> annotation
+refers already to a <code class="literal">NumericFieldBridge</code> instance. However, the use of <code class="literal">@NumericField</code> makes the
+use of the property as numeric value explicit.</p><div class="example"><a id="example-useof-custom-numericfieldbridge"/><p class="title"><strong>Example 4.3. Use of <code class="literal">BigDecimalNumericFieldBridge</code></strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@Indexed
+public static class Item {
+    @Id
+    @GeneratedValue
+    private int id;
+
+    @Field
+    @NumericField
+    @FieldBridge(impl = BigDecimalNumericFieldBridge.class)
+    private BigDecimal price;
+
+    public int getId() {
+        return id;
+    }
+
+    public BigDecimal getPrice() {
+       return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+}</code></pre></div></div><br class="example-break"/></div><div class="section" title="4.1.1.4. @Id"><div class="titlepage"><div><div><h4 class="title"><a id="id-annotation"/>4.1.1.4. @Id</h4></div></div></div><p>Finally, the id property of an entity is a special property used by Hibernate Search to ensure index
+unicity of a given entity. By design, an id has to be stored and must not be tokenized. It is also
+always string encoded, even if the id is a number. To mark a property as index id, use the
+<code class="literal">@DocumentId</code> annotation. If you are using JPA and you are using <code class="literal">@Id</code> you can omit <code class="literal">@DocumentId</code>.
+The chosen entity id will also be used as document id.</p><div class="example"><a id="example-annotated-entity"/><p class="title"><strong>Example 4.4. Specifying indexed properties</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@Indexed
+public class Essay {
+    ...
+
+    @Id
+    @DocumentId
+    public Long getId() { return id; }
+
+    @Field(name="Abstract", store=Store.YES)
+    public String getSummary() { return summary; }
+
+    @Lob
+    @Field
+    public String getText() { return text; }
+
+    @Field
+    @NumericField(precisionStep = 6)
+    public float getGrade() { return grade; }
+}</code></pre></div></div><br class="example-break"/><p><a class="xref" href="ch04.html#example-annotated-entity" title="Example 4.4. Specifying indexed properties">Example 4.4, “Specifying indexed properties”</a> defines an index with four fields: <code class="literal">id</code>, <code class="literal">Abstract</code>, <code class="literal">text</code> and
+<code class="literal">grade</code>. Note that by default the field name is de-capitalized, following the JavaBean
+specification. The <code class="literal">grade</code> field is annotated as Numeric with a slightly larger precisionStep than
+the default.</p></div></div><div class="section" title="4.1.2. Mapping properties multiple times"><div class="titlepage"><div><div><h3 class="title"><a id="facets-annotation"/>4.1.2. Mapping properties multiple times</h3></div></div></div><p>Sometimes one has to map a property multiple times per index, with slightly different indexing
+strategies. For example, sorting a query by field requires the field to be un-analyzed. If one wants
+to search by words in this property and still sort it, one need to index it twice - once analyzed
+and once un-analyzed. @Fields allows to achieve this goal.</p><div class="example"><a id="example-fields-annotation"/><p class="title"><strong>Example 4.5. Using @Fields to map a property multiple times</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@Indexed(index = "Book")
+public class Book {
+    @Fields( {
+            @Field,
+            @Field(name = "summary_forSort", analyze = Analyze.NO, store = Store.YES)
+            } )
+    public String getSummary() {
+        return summary;
+    }
+
+    // ...
+}</code></pre></div></div><br class="example-break"/><p>In <a class="xref" href="ch04.html#example-fields-annotation" title="Example 4.5. Using @Fields to map a property multiple times">Example 4.5, “Using @Fields to map a property multiple times”</a> the field <code class="literal">summary</code> is indexed twice, once as <code class="literal">summary</code> in a
+tokenized way, and once as <code class="literal">summary_forSort</code> in an un-tokenized way. @Field supports 2 attributes
+useful when @Fields is used:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">analyzer: defines a @Analyzer annotation per field rather than per property</li><li class="listitem">bridge: defines a @FieldBridge annotation per field rather than per property</li></ul></div><p>See below for more information about analyzers and field bridges.</p></div><div class="section" title="4.1.3. Embedded and associated objects"><div class="titlepage"><div><div><h3 class="title"><a id="search-mapping-associated"/>4.1.3. Embedded and associated objects</h3></div></div></div><p>Associated objects as well as embedded objects can be indexed as part of the root entity index. This
+is useful if you expect to search a given entity based on properties of the associated objects.</p><p>In the example <a class="xref" href="ch04.html#example-indexing-associations" title="Example 4.6. Indexing associations">Example 4.6, “Indexing associations”</a> the aim is to return places where the associated
+city is Atlanta (in Lucene query parser language, it would translate into <code class="literal">address.city:Atlanta</code>).
+All place fields are added to the <code class="literal">Place</code> index, but also the address related fields <code class="literal">address.street</code>,
+and <code class="literal">address.city</code> will be added and made queryable. The embedded object id,
+<code class="literal">address.id</code>, is not added per default. To include it you need to also set
+<code class="literal">@IndexedEmbedded(includeEmbeddedObjectId=true, …​)</code>.</p><div class="tip" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Tip</h2><p>Only actual indexed fields (properties annotated with <code class="literal">@Field</code>) are added to the root entity index
+when embedded objects are indexed. The embedded object identifiers are treated differently and need to
+be included explicitly.</p></div><div class="example"><a id="example-indexing-associations"/><p class="title"><strong>Example 4.6. Indexing associations</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@Indexed
+public class Place {
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    @Field
+    private String name;
+
+    @OneToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @IndexedEmbedded
+    private Address address;
+    ....
+}</code></pre><pre><code class="language-java">@Entity
+public class Address {
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    @Field
+    private String street;
+
+    @Field
+    private String city;
+
+    @ContainedIn
+    @OneToMany(mappedBy="address")
+    private Set&lt;Place&gt; places;
+    ...
+}</code></pre></div></div><br class="example-break"/><p>Be careful. Because the data is de-normalized in the Lucene index when using the <code class="literal">@IndexedEmbedded</code>
+technique, Hibernate Search needs to be aware of any change in the <code class="literal">Place</code> object and any change in
+the <code class="literal">Address</code> object to keep the index up to date. To make sure the <code class="literal">Place</code> Lucene document is updated
+when it’s <code class="literal">Address</code> changes, you need to mark the other side of the bidirectional relationship with
+<code class="literal">@ContainedIn</code>.</p><div class="tip" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Tip</h2><p><code class="literal">@ContainedIn</code> is useful on both associations pointing to entities and on embedded (collection of)
+objects.</p></div><p>Let’s make <a class="xref" href="ch04.html#example-indexing-associations" title="Example 4.6. Indexing associations">Example 4.6, “Indexing associations”</a> a bit more complex by nesting <code class="literal">@IndexedEmbedded</code> as seen
+in <a class="xref" href="ch04.html#example-nested-index-embedded" title="Example 4.7. Nested usage of @IndexedEmbedded and @ContainedIn">Example 4.7, “Nested usage of <code class="literal">@IndexedEmbedded</code> and <code class="literal">@ContainedIn</code>”</a>.</p><div class="example"><a id="example-nested-index-embedded"/><p class="title"><strong>Example 4.7. Nested usage of <code class="literal">@IndexedEmbedded</code> and <code class="literal">@ContainedIn</code></strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@Indexed
+public class Place {
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    @Field
+    private String name;
+
+    @OneToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @IndexedEmbedded
+    private Address address;
+
+    // ...
+}</code></pre><pre><code class="language-java">@Entity
+public class Address {
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    @Field
+    private String street;
+
+    @Field
+    private String city;
+
+    @IndexedEmbedded(depth = 1, prefix = "ownedBy_")
+    private Owner ownedBy;
+
+    @ContainedIn
+    @OneToMany(mappedBy="address")
+    private Set&lt;Place&gt; places;
+
+    // ...
+}</code></pre><pre><code class="language-java">@Embeddable
+public class Owner {
+    @Field
+    private String name;
+    // ...
+}</code></pre></div></div><br class="example-break"/><p>As you can see, any <code class="literal">@*ToMany</code>, <code class="literal">@*ToOne</code> or <code class="literal">@Embedded</code> attribute can be annotated with
+<code class="literal">@IndexedEmbedded</code>. The attributes of the associated class will then be added to the main entity
+index. In <a class="xref" href="ch04.html#example-nested-index-embedded" title="Example 4.7. Nested usage of @IndexedEmbedded and @ContainedIn">Example 4.7, “Nested usage of <code class="literal">@IndexedEmbedded</code> and <code class="literal">@ContainedIn</code>”</a> the index will contain the following fields</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">id</li><li class="listitem">name</li><li class="listitem">address.street</li><li class="listitem">address.city</li><li class="listitem">address.ownedBy_name</li></ul></div><p>The default prefix is <code class="literal">propertyName.</code>, following the traditional object navigation convention. You
+can override it using the <code class="literal">prefix</code> attribute as it is shown on the <code class="literal">ownedBy</code> property.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>The prefix cannot be set to the empty string.</p></div><p>The <code class="literal">depth</code> property is necessary when the object graph contains a cyclic dependency of classes (not
+instances). For example, if <code class="literal">Owner</code> points to <code class="literal">Place</code>. Hibernate Search will stop including indexed
+embedded attributes after reaching the expected depth (or the object graph boundaries are reached).
+A class having a self reference is an example of cyclic dependency. In our example, because <code class="literal">depth</code>
+is set to 1, any <code class="literal">@IndexedEmbedded</code> attribute in <code class="literal">Owner</code> (if any) will be ignored.</p><p>Using <code class="literal">@IndexedEmbedded</code> for object associations allows you to express queries (using Lucene’s query
+syntax) such as:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">Return places where name contains JBoss and where address city is Atlanta. In Lucene query this would be</li></ul></div><pre class="screen">+name:jboss +address.city:atlanta</pre><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">Return places where name contains JBoss and where owner’s name contain Joe. In Lucene query this would be</li></ul></div><pre class="screen">+name:jboss +address.ownedBy_name:joe</pre><p>In a way it mimics the relational join operation in a more efficient way (at the cost of data
+duplication). Remember that, out of the box, Lucene indexes have no notion of association, the join
+operation is simply non-existent. It might help to keep the relational model normalized while
+benefiting from the full text index speed and feature richness.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>An associated object can itself (but does not have to) be <code class="literal">@Indexed</code></p></div><p>When <code class="literal">@IndexedEmbedded</code> points to an entity, the association has to be directional and the other side
+has to be annotated with <code class="literal">@ContainedIn</code>. If not, Hibernate Search has
+no way to update the root index when the associated entity is updated (in our example, a <code class="literal">Place</code>
+index document has to be updated when the associated <code class="literal">Address</code> instance is updated).</p><p>Sometimes, the object type annotated by <code class="literal">@IndexedEmbedded</code> is not the object type targeted by
+Hibernate and Hibernate Search. This is especially the case when interfaces are used in lieu of
+their implementation. For this reason you can override the object type targeted by Hibernate Search
+using the <code class="literal">targetElement</code> parameter.</p><div class="example"><a id="d0e3176"/><p class="title"><strong>Example 4.8. Using the targetElement property of @IndexedEmbedded</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@Indexed
+public class Address {
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    @Field
+    private String street;
+
+    @IndexedEmbedded(depth = 1, prefix = "ownedBy_", targetElement = Owner.class)
+    @Target(Owner.class)
+    private Person ownedBy;
+
+    // ...
+}</code></pre><pre><code class="language-java">@Embeddable
+public class Owner implements Person { ... }</code></pre></div></div><br class="example-break"/><div class="section" title="4.1.3.1. Limiting object embedding to specific paths"><div class="titlepage"><div><div><h4 class="title"><a id="search-mapping-associated-viapaths"/>4.1.3.1. Limiting object embedding to specific paths</h4></div></div></div><p>The <code class="literal">@IndexedEmbedded</code> annotation provides also an attribute <code class="literal">includePaths</code> which can be used as an
+alternative to <code class="literal">depth</code>, or in combination with it.</p><p>When using only <code class="literal">depth</code> all indexed fields of the embedded type will be added recursively at the same
+depth; this makes it harder to pick only a specific path without adding all other fields as well,
+which might not be needed.</p><p>To avoid unnecessarily loading and indexing entities you can specify exactly which paths are needed.
+A typical application might need different depths for different paths, or in other words it might
+need to specify paths explicitly, as shown in <a class="xref" href="ch04.html#indexedembedded-includePath" title="Example 4.9. Using the includePaths property of @IndexedEmbedded">Example 4.9, “Using the includePaths property of @IndexedEmbedded”</a></p><div class="example"><a id="indexedembedded-includePath"/><p class="title"><strong>Example 4.9. Using the includePaths property of @IndexedEmbedded</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@Indexed
+public class Person {
+
+   @Id
+   public int getId() {
+      return id;
+   }
+
+   @Field
+   public String getName() {
+      return name;
+   }
+
+   @Field
+   public String getSurname() {
+      return surname;
+   }
+
+   @OneToMany
+   @IndexedEmbedded(includePaths = { "name" })
+   public Set&lt;Person&gt; getParents() {
+      return parents;
+   }
+
+   @ContainedIn
+   @ManyToOne
+   public Human getChild() {
+      return child;
+   }
+
+   // ... other fields omitted</code></pre></div></div><br class="example-break"/><p>Using a mapping as in <a class="xref" href="ch04.html#indexedembedded-includePath" title="Example 4.9. Using the includePaths property of @IndexedEmbedded">Example 4.9, “Using the includePaths property of @IndexedEmbedded”</a>, you would be able to search on a <code class="literal">Person</code> by
+<code class="literal">name</code> and/or <code class="literal">surname</code>, and/or the <code class="literal">name</code> of the parent. It will not index the <code class="literal">surname</code> of the
+parent, so searching on parent’s surnames will not be possible but speeds up indexing, saves space
+and improve overall performance.</p><p>The <code class="literal">@IndexedEmbedded.includePaths</code> will include the specified paths <span class="emphasis"><em>in addition to</em></span> what you would
+index normally specifying a limited value for depth. Using <code class="literal">includePaths</code> with a undefined (default)
+value for <code class="literal">depth</code> is equivalent to setting <code class="literal">depth=0</code>: only the included paths are indexed.</p><div class="example"><a id="indexedembedded-includePathsAndDepth"/><p class="title"><strong>Example 4.10. Using the includePaths property of @IndexedEmbedded</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@Indexed
+public class Human {
+
+   @Id
+   public int getId() {
+      return id;
+   }
+
+   @Field
+   public String getName() {
+      return name;
+   }
+
+   @Field
+   public String getSurname() {
+      return surname;
+   }
+
+   @OneToMany
+   @IndexedEmbedded(depth = 2, includePaths = { "parents.parents.name" })
+   public Set&lt;Human&gt; getParents() {
+      return parents;
+   }
+
+   @ContainedIn
+   @ManyToOne
+   public Human getChild() {
+      return child;
+   }
+
+    // ... other fields omitted</code></pre></div></div><br class="example-break"/><p>In <a class="xref" href="ch04.html#indexedembedded-includePathsAndDepth" title="Example 4.10. Using the includePaths property of @IndexedEmbedded">Example 4.10, “Using the includePaths property of @IndexedEmbedded”</a>, every human will have it’s name and surname attributes
+indexed. The name and surname of parents will be indexed too, recursively up to second line because
+of the depth attribute. It will be possible to search by name or surname, of the person directly,
+his parents or of his grand parents. Beyond the second level, we will in addition index one more
+level but only the name, not the surname.</p><p>This results in the following fields in the index:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">id</code> - as primary key</li><li class="listitem"><code class="literal">_hibernate_class</code> - stores entity type</li><li class="listitem"><code class="literal">name</code> - as direct field</li><li class="listitem"><code class="literal">surname</code> - as direct field</li><li class="listitem"><code class="literal">parents.name</code> - as embedded field at depth 1</li><li class="listitem"><code class="literal">parents.surname</code> - as embedded field at depth 1</li><li class="listitem"><code class="literal">parents.parents.name</code> - as embedded field at depth 2</li><li class="listitem"><code class="literal">parents.parents.surname</code> - as embedded field at depth 2</li><li class="listitem"><code class="literal">parents.parents.parents.name</code> - as additional path as specified by includePaths. The first
+<code class="literal">parents.</code> is inferred from the field name, the remaining path is the attribute of includePaths</li></ul></div><div class="tip" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Tip</h2><p>You can explicitly include the id of the embedded object using <code class="literal">includePath</code>, for example
+<code class="literal">@IndexedEmbedded(includePaths = { "parents.id" })</code>. This will work regardless of the
+<code class="literal">includeEmbeddedObjectId</code> attribute. However, it is recommended to just set
+<code class="literal">includeEmbeddedObjectId=true</code>.</p></div><div class="tip" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Tip</h2><p>Having explicit control of the indexed paths might be easier if you’re designing your application by
+defining the needed queries first, as at that point you might know exactly which fields you need,
+and which other fields are unnecessary to implement your use case.</p></div></div></div><div class="section" title="4.1.4. Associated objects: building a dependency graph with @ContainedIn"><div class="titlepage"><div><div><h3 class="title"><a id="_associated_objects_building_a_dependency_graph_with_containedin"/>4.1.4. Associated objects: building a dependency graph with @ContainedIn</h3></div></div></div><p>While <code class="literal">@ContainedIn</code> is often seen as the counterpart of <code class="literal">@IndexedEmbedded</code>, it can also be used
+on its own to build an indexing dependency graph.</p><p>When an entity is reindexed, all the entities pointed by <code class="literal">@ContainedIn</code> are also going to be
+reindexed.</p></div></div><div class="section" title="4.2. Boosting"><div class="titlepage"><div><div><h2 class="title"><a id="section-boosting"/>4.2. Boosting</h2></div></div></div><p>Lucene has the notion of <span class="emphasis"><em>boosting</em></span> which allows you to give certain documents or fields more or
+less importance than others. Lucene differentiates between index and search time boosting. The
+following sections show you how you can achieve index time boosting using Hibernate Search.</p><div class="section" title="4.2.1. Static index time boosting"><div class="titlepage"><div><div><h3 class="title"><a id="section-boost-annotation"/>4.2.1. Static index time boosting</h3></div></div></div><p>To define a static boost value for an indexed class or property you can use the @Boost annotation.
+You can use this annotation within @Field or specify it directly on method or class level.</p><div class="example"><a id="example-boost"/><p class="title"><strong>Example 4.11. Different ways of using @Boost</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@Indexed
+@Boost(1.7f)
+public class Essay {
+    ...
+
+    @Id
+    @DocumentId
+    public Long getId() { return id; }
+
+    @Field(name="Abstract", store=Store.YES, boost=@Boost(2f))
+    @Boost(1.5f)
+    public String getSummary() { return summary; }
+
+    @Lob
+    @Field(boost=@Boost(1.2f))
+    public String getText() { return text; }
+
+    @Field
+    public String getISBN() { return isbn; }
+
+}</code></pre></div></div><br class="example-break"/><p>In <a class="xref" href="ch04.html#example-boost" title="Example 4.11. Different ways of using @Boost">Example 4.11, “Different ways of using @Boost”</a>, Essay’s probability to reach the top of the search list will be multiplied by
+1.7. The summary field will be 3.0 (2 * 1.5, because <code class="literal">@Field.boost</code> and <code class="literal">@Boost</code> on a property are
+cumulative) more important than the <code class="literal">isbn</code> field. The text field will be 1.2 times more important than
+the <code class="literal">isbn</code> field. Note that this explanation is wrong in strictest terms, but it is simple and close
+enough to reality for all practical purposes. Please check the Lucene documentation or the excellent
+Lucene In Action from Otis Gospodnetic and Erik Hatcher.</p></div><div class="section" title="4.2.2. Dynamic index time boosting"><div class="titlepage"><div><div><h3 class="title"><a id="section-dynamic-boost"/>4.2.2. Dynamic index time boosting</h3></div></div></div><p>The <code class="literal">@Boost</code> annotation used in <a class="xref" href="ch04.html#section-boost-annotation" title="4.2.1. Static index time boosting">Section 4.2.1, “Static index time boosting”</a> defines a static boost factor which
+is independent of the state of of the indexed entity at runtime. However, there are use cases in
+which the boost factor may depend on the actual state of the entity. In this case you can use the
+<code class="literal">@DynamicBoost</code> annotation together with an accompanying custom BoostStrategy.</p><div class="example"><a id="example-dynamic-boosting"/><p class="title"><strong>Example 4.12. Dynamic boost example</strong></p><div class="example-contents"><pre><code class="language-java">public enum PersonType {
+    NORMAL,
+    VIP
+}</code></pre><pre><code class="language-java">@Entity
+@Indexed
+@DynamicBoost(impl = VIPBoostStrategy.class)
+public class Person {
+    private PersonType type;
+
+    // ...
+}</code></pre><pre><code class="language-java">public class VIPBoostStrategy implements BoostStrategy {
+    public float defineBoost(Object value) {
+        Person person = ( Person ) value;
+        if ( person.getType().equals( PersonType.VIP ) ) {
+            return 2.0f;
+        }
+        else {
+            return 1.0f;
+        }
+    }
+}</code></pre></div></div><br class="example-break"/><p>In <a class="xref" href="ch04.html#example-dynamic-boosting" title="Example 4.12. Dynamic boost example">Example 4.12, “Dynamic boost example”</a> a dynamic boost is defined on class level specifying
+VIPBoostStrategy as implementation of the BoostStrategy interface to be used at indexing time. You
+can place the <code class="literal">@DynamicBoost</code> either at class or field level. Depending on the placement of the
+annotation either the whole entity is passed to the defineBoost method or just the annotated
+field/property value. It’s up to you to cast the passed object to the correct type. In the example
+all indexed values of a VIP person would be double as important as the values of a normal person.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>The specified BoostStrategy implementation must define a public no-arg constructor.</p></div><p>Of course you can mix and match <code class="literal">@Boost</code> and <code class="literal">@DynamicBoost</code> annotations in your entity. All
+defined boost factors are cumulative.</p></div></div><div class="section" title="4.3. Analysis"><div class="titlepage"><div><div><h2 class="title"><a id="_analysis"/>4.3. Analysis</h2></div></div></div><p>Analysis is the process of converting text into single terms (words) and can be considered as one
+of the key features of a fulltext search engine. Lucene uses the concept of Analyzers to control
+this process. In the following section we cover the multiple ways Hibernate Search offers to
+configure the analyzers.</p><div class="section" title="4.3.1. Default analyzer and analyzer by class"><div class="titlepage"><div><div><h3 class="title"><a id="analyzer"/>4.3.1. Default analyzer and analyzer by class</h3></div></div></div><p>The default analyzer class used to index tokenized fields is configurable through the
+<code class="literal">hibernate.search.analyzer</code> property. The default value for this property is
+org.apache.lucene.analysis.standard.StandardAnalyzer.</p><p>You can also define the analyzer class per entity, property and even per @Field (useful when
+multiple fields are indexed from a single property).</p><div class="example"><a id="d0e3429"/><p class="title"><strong>Example 4.13. Different ways of using @Analyzer</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@Indexed
+@Analyzer(impl = EntityAnalyzer.class)
+public class MyEntity {
+    @Id
+    @GeneratedValue
+    @DocumentId
+    private Integer id;
+
+    @Field
+    private String name;
+
+    @Field
+    @Analyzer(impl = PropertyAnalyzer.class)
+    private String summary;
+
+    @Field(analyzer = @Analyzer(impl = FieldAnalyzer.class)
+    private String body;
+
+    ...
+}</code></pre></div></div><br class="example-break"/><p>In this example, EntityAnalyzer is used to index all tokenized properties (eg. <code class="literal">name</code>), except
+<code class="literal">summary</code> and <code class="literal">body</code> which are indexed with PropertyAnalyzer and FieldAnalyzer respectively.</p><div class="caution" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Caution</h2><p>Mixing different analyzers in the same entity is most of the time a bad practice. It makes query
+building more complex and results less predictable (for the novice), especially if you are using a
+QueryParser (which uses the same analyzer for the whole query). As a rule of thumb, for any given
+field the same analyzer should be used for indexing and querying.</p></div></div><div class="section" title="4.3.2. Named analyzers"><div class="titlepage"><div><div><h3 class="title"><a id="_named_analyzers"/>4.3.2. Named analyzers</h3></div></div></div><p>Analyzers can become quite complex to deal with. For this reason introduces Hibernate Search the
+notion of analyzer definitions. An analyzer definition can be reused by many @Analyzer declarations
+and is composed of:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">a name: the unique string used to refer to the definition</li><li class="listitem">a list of char filters: each char filter is responsible to pre-process input characters before the
+tokenization. Char filters can add, change or remove characters; one common usage is for characters
+normalization</li><li class="listitem">a tokenizer: responsible for tokenizing the input stream into individual words</li><li class="listitem">a list of filters: each filter is responsible to remove, modify or sometimes even add words into
+the stream provided by the tokenizer</li></ul></div><p>This separation of tasks - a list of char filters, and a tokenizer followed by a list of filters -
+allows for easy reuse of each individual component and let you build your customized analyzer in a
+very flexible way (just like Lego). Generally speaking the char filters do some pre-processing in
+the character input, then the Tokenizer starts the tokenizing process by turning the character input
+into tokens which are then further processed by the TokenFilters. Hibernate Search supports this
+infrastructure by utilizing the advanced analyzers provided by Lucene; this is often referred to as
+the Analyzer Framework.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>Some of the analyzers and filters will require additional dependencies. For example to use the
+snowball stemmer you have to also include the <code class="literal">lucene-snowball</code> jar and for the
+PhoneticFilterFactory you need the <a class="link" href="http://commons.apache.org/codec">commons-codec</a> jar. Your
+distribution of Hibernate Search provides these dependencies in its <span class="emphasis"><em>lib/optional</em></span> directory. Have a
+look at <a class="xref" href="ch04.html#table-available-tokenizers" title="Table 4.2. Example of available tokenizers">Table 4.2, “Example of available tokenizers”</a> and <a class="xref" href="ch04.html#table-available-filters" title="Table 4.3. Examples of available filters">Table 4.3, “Examples of available filters”</a> to see which analyzers and
+filters have additional dependencies</p><p>Prior to Hibernate Search 5 it was required to add the Apache Solr dependency to your project as
+well; this is no longer required.</p></div><p>Let’s have a look at a concrete example now - <a class="xref" href="ch04.html#example-analyzer-def" title="Example 4.14. @AnalyzerDef and the Analyzer Framework">Example 4.14, “@AnalyzerDef and the Analyzer Framework”</a>. First a char filter is
+defined by its factory. In our example, a mapping char filter is used, and will replace characters
+in the input based on the rules specified in the mapping file. Next a tokenizer is defined. This
+example uses the standard tokenizer. Last but not least, a list of filters is defined by their
+factories. In our example, the StopFilter filter is built reading the dedicated words property file.
+The filter is also expected to ignore case.</p><div class="example"><a id="example-analyzer-def"/><p class="title"><strong>Example 4.14. @AnalyzerDef and the Analyzer Framework</strong></p><div class="example-contents"><pre><code class="language-java">@AnalyzerDef(name="customanalyzer",
+  charFilters = {
+    @CharFilterDef(factory = MappingCharFilterFactory.class, params = {
+      @Parameter(name = "mapping",
+        value = "org/hibernate/search/test/analyzer/mapping-chars.properties")
+    })
+  },
+  tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+  filters = {
+    @TokenFilterDef(factory = ASCIIFoldingFilterFactory.class),
+    @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+    @TokenFilterDef(factory = StopFilterFactory.class, params = {
+      @Parameter(name="words",
+        value= "org/hibernate/search/test/analyzer/stoplist.properties" ),
+      @Parameter(name="ignoreCase", value="true")
+    })
+})
+public class Team {
+    // ...
+}</code></pre></div></div><br class="example-break"/><div class="tip" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Tip</h2><p>Filters and char filters are applied in the order they are defined in the @AnalyzerDef annotation.
+Order matters!</p></div><p>Some tokenizers, token filters or char filters load resources like a configuration or metadata file.
+This is the case for the stop filter and the synonym filter.</p><div class="example"><a id="example-analyzer-def-charset"/><p class="title"><strong>Example 4.15. Use a specific charset to load the property file</strong></p><div class="example-contents"><pre><code class="language-java">@AnalyzerDef(name="customanalyzer",
+  charFilters = {
+    @CharFilterDef(factory = MappingCharFilterFactory.class, params = {
+      @Parameter(name = "mapping",
+        value = "org/hibernate/search/test/analyzer/mapping-chars.properties")
+    })
+  },
+  tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+  filters = {
+    @TokenFilterDef(factory = ASCIIFoldingFilterFactory.class),
+    @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+    @TokenFilterDef(factory = StopFilterFactory.class, params = {
+      @Parameter(name="words",
+        value= "org/hibernate/search/test/analyzer/stoplist.properties" ),
+      @Parameter(name="ignoreCase", value="true")
+  })
+})
+public class Team {
+    // ...
+}</code></pre></div></div><br class="example-break"/><p>Once defined, an analyzer definition can be reused by an @Analyzer declaration as seen in
+<a class="xref" href="ch04.html#example-referencing-analyzer-def" title="Example 4.16. Referencing an analyzer by name">Example 4.16, “Referencing an analyzer by name”</a>.</p><div class="example"><a id="example-referencing-analyzer-def"/><p class="title"><strong>Example 4.16. Referencing an analyzer by name</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@Indexed
+@AnalyzerDef(name="customanalyzer", ... )
+public class Team {
+    @Id
+    @DocumentId
+    @GeneratedValue
+    private Integer id;
+
+    @Field
+    private String name;
+
+    @Field
+    private String location;
+
+    @Field
+    @Analyzer(definition = "customanalyzer")
+    private String description;
+}</code></pre></div></div><br class="example-break"/><p>Analyzer instances declared by @AnalyzerDef are also available by their name in the SearchFactory
+which is quite useful wen building queries.</p><div class="informalexample"><pre><code class="language-java">Analyzer analyzer = fullTextSession.getSearchFactory().getAnalyzer("customanalyzer");</code></pre></div><p>Fields in queries should be analyzed with the same analyzer used to index the field so that they
+speak a common "language": the same tokens are reused between the query and the indexing process.
+This rule has some exceptions but is true most of the time. Respect it unless you know what you are
+doing.</p><div class="section" title="4.3.2.1. Available analyzers"><div class="titlepage"><div><div><h4 class="title"><a id="_available_analyzers"/>4.3.2.1. Available analyzers</h4></div></div></div><p>Apache Lucene comes with a lot of useful default char filters, tokenizers and filters.
+You can find a complete list of char filter factories, tokenizer factories and filter factories at
+<a class="link" href="http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters">http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters</a>.
+Let’s check a few of them.</p><div class="table"><a id="table-available-char-filters"/><p class="title"><strong>Table 4.1. Example of available char filters</strong></p><div class="table-contents"><table summary="Example of available char filters" border="1"><colgroup><col width="25*" class="col_1"/><col width="25*" class="col_2"/><col width="25*" class="col_3"/><col width="25*" class="col_4"/></colgroup><thead><tr><th align="left" valign="top">Factory</th><th align="left" valign="top">Description</th><th align="left" valign="top">Parameters</th><th align="left" valign="top">Additional dependencies</th></tr></thead><tbody><tr><td align="left" valign="top"><p>MappingCharFilterFactory</p></td><td align="left" valign="top"><p>Replaces one or more characters with one or more characters, based on
+mappings specified in the resource file</p></td><td align="left" valign="top"><p><code class="literal">mapping</code>: points to a resource file containing the mappings
+using the format:
+"á" ⇒ "a"<br/>
+"ñ" ⇒ "n"<br/>
+"ø" ⇒ "o"</p></td><td align="left" valign="top"><p>lucene-analyzers-common</p></td></tr><tr><td align="left" valign="top"><p>HTMLStripCharFilterFactory</p></td><td align="left" valign="top"><p>Remove HTML standard tags, keeping the text</p></td><td align="left" valign="top"><p>none</p></td><td align="left" valign="top"><p>lucene-analyzers-common</p></td></tr></tbody></table></div></div><br class="table-break"/><div class="table"><a id="table-available-tokenizers"/><p class="title"><strong>Table 4.2. Example of available tokenizers</strong></p><div class="table-contents"><table summary="Example of available tokenizers" border="1"><colgroup><col width="25*" class="col_1"/><col width="25*" class="col_2"/><col width="25*" class="col_3"/><col width="25*" class="col_4"/></colgroup><thead><tr><th align="left" valign="top">Factory</th><th align="left" valign="top">Description</th><th align="left" valign="top">Parameters</th><th align="left" valign="top">Additional dependencies</th></tr></thead><tbody><tr><td align="left" valign="top"><p>StandardTokenizerFactory</p></td><td align="left" valign="top"><p>Use the Lucene StandardTokenizer</p></td><td align="left" valign="top"><p>none</p></td><td align="left" valign="top"><p>lucene-analyzers-common</p></td></tr><tr><td align="left" valign="top"><p>HTMLStripCharFilterFactory</p></td><td align="left" valign="top"><p>Remove HTML tags, keep the text and pass it to a
+                StandardTokenizer.</p></td><td align="left" valign="top"><p>none</p></td><td align="left" valign="top"><p><code class="literal">lucene-analyzers-common</code></p></td></tr><tr><td align="left" valign="top"><p>PatternTokenizerFactory</p></td><td align="left" valign="top"><p>Breaks text at the specified regular expression
+                pattern.</p></td><td align="left" valign="top"><p><code class="literal">pattern</code>: the regular expression to use for tokenizing
+</p><p>group: says which pattern group to extract into tokens</p></td><td align="left" valign="top"><p><code class="literal">lucene-analyzers-common</code></p></td></tr></tbody></table></div></div><br class="table-break"/><div class="table"><a id="table-available-filters"/><p class="title"><strong>Table 4.3. Examples of available filters</strong></p><div class="table-contents"><table summary="Examples of available filters" border="1"><colgroup><col width="25*" class="col_1"/><col width="25*" class="col_2"/><col width="25*" class="col_3"/><col width="25*" class="col_4"/></colgroup><thead><tr><th align="left" valign="top">Factory</th><th align="left" valign="top">Description</th><th align="left" valign="top">Parameters</th><th align="left" valign="top">Additional dependencies</th></tr></thead><tbody><tr><td align="left" valign="top"><p>StandardFilterFactory</p></td><td align="left" valign="top"><p>Remove dots from acronyms and 's from words</p></td><td align="left" valign="top"><p>none</p></td><td align="left" valign="top"><p><code class="literal">lucene-analyzers-common</code></p></td></tr><tr><td align="left" valign="top"><p>LowerCaseFilterFactory</p></td><td align="left" valign="top"><p>Lowercases all words</p></td><td align="left" valign="top"><p>none</p></td><td align="left" valign="top"><p><code class="literal">lucene-analyzers-common</code></p></td></tr><tr><td align="left" valign="top"><p>StopFilterFactory</p></td><td align="left" valign="top"><p>Remove words (tokens) matching a list of stop
+                words</p></td><td align="left" valign="top"><p><code class="literal">words</code>: points to a resource file containing the stop words
+</p><p>ignoreCase: true if <code class="literal">case</code> should be ignore when comparing stop words, <code class="literal">false</code> otherwise</p></td><td align="left" valign="top"><p><code class="literal">lucene-analyzers-common</code></p></td></tr><tr><td align="left" valign="top"><p>SnowballPorterFilterFactory</p></td><td align="left" valign="top"><p>Reduces a word to it’s root in a given language. (eg.
+                protect, protects, protection share the same root). Using such
+                a filter allows searches matching related words.</p></td><td align="left" valign="top"><p><code class="literal">language</code>: Danish, Dutch, English,
+                Finnish, French, German, Italian, Norwegian, Portuguese,
+                Russian, Spanish, Swedish and a few more</p></td><td align="left" valign="top"><p><code class="literal">lucene-analyzers-common</code></p></td></tr><tr><td align="left" valign="top"><p>ASCIIFoldingFilterFactory</p></td><td align="left" valign="top"><p>Remove accents for languages like French</p></td><td align="left" valign="top"><p>none</p></td><td align="left" valign="top"><p><code class="literal">lucene-analyzers-common</code></p></td></tr><tr><td align="left" valign="top"><p>PhoneticFilterFactory</p></td><td align="left" valign="top"><p>Inserts phonetically similar tokens into the token
+                stream</p></td><td align="left" valign="top"><p><code class="literal">encoder</code>: One of DoubleMetaphone, Metaphone, Soundex or RefinedSoundex
+</p><p>inject: true will add tokens to the stream, false will replace the existing token
+</p><p><code class="literal">maxCodeLength</code>: sets the maximum length of the code to be generated. Supported only for Metaphone and DoubleMetaphone encodings</p></td><td align="left" valign="top"><p><code class="literal">lucene-analyzers-phonetic</code> and
+                <code class="literal">commons-codec</code></p></td></tr><tr><td align="left" valign="top"><p>CollationKeyFilterFactory</p></td><td align="left" valign="top"><p>Converts each token into its
+                java.text.CollationKey, and then
+                encodes the CollationKey with
+                IndexableBinaryStringTools, to allow it
+                to be stored as an index term.</p></td><td align="left" valign="top"><p><code class="literal">custom</code>, <code class="literal">language</code>,
+                <code class="literal">country</code>, <code class="literal">variant</code>,
+                <code class="literal">strength</code>, `decomposition
+                `see Lucene’s
+                CollationKeyFilter javadocs for more
+                info</p></td><td align="left" valign="top"><p><code class="literal">lucene-analyzers-common</code> and
+                <code class="literal">commons-io</code></p></td></tr></tbody></table></div></div><br class="table-break"/><p>We recommend to check out the implementations of org.apache.lucene.analysis.util.TokenizerFactory
+and org.apache.lucene.analysis.util.TokenFilterFactory in your IDE to see the implementations
+available.</p></div></div><div class="section" title="4.3.3. Dynamic analyzer selection"><div class="titlepage"><div><div><h3 class="title"><a id="_dynamic_analyzer_selection"/>4.3.3. Dynamic analyzer selection</h3></div></div></div><p>So far all the introduced ways to specify an analyzer were static. However, there are use cases
+where it is useful to select an analyzer depending on the current state of the entity to be indexed,
+for example in a multilingual applications. For an BlogEntry class for example the analyzer could
+depend on the language property of the entry. Depending on this property the correct language
+specific stemmer should be chosen to index the actual text.</p><p>To enable this dynamic analyzer selection Hibernate Search introduces the AnalyzerDiscriminator
+annotation. <a class="xref" href="ch04.html#example-analyzer-discriminator" title="Example 4.17. Usage of @AnalyzerDiscriminator">Example 4.17, “Usage of @AnalyzerDiscriminator”</a> demonstrates the usage of this annotation.</p><div class="example"><a id="example-analyzer-discriminator"/><p class="title"><strong>Example 4.17. Usage of @AnalyzerDiscriminator</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@Indexed
+@AnalyzerDefs({
+  @AnalyzerDef(name = "en",
+    tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+    filters = {
+      @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+      @TokenFilterDef(factory = EnglishPorterFilterFactory.class
+      )
+    }),
+  @AnalyzerDef(name = "de",
+    tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+    filters = {
+      @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+      @TokenFilterDef(factory = GermanStemFilterFactory.class)
+    })
+})
+public class BlogEntry {
+
+    @Id
+    @GeneratedValue
+    @DocumentId
+    private Integer id;
+
+    @Field
+    @AnalyzerDiscriminator(impl = LanguageDiscriminator.class)
+    private String language;
+
+    @Field
+    private String text;
+
+    private Set&lt;BlogEntry&gt; references;
+
+    // standard getter/setter
+    // ...
+}</code></pre><pre><code class="language-java">public class LanguageDiscriminator implements Discriminator {
+
+    public String getAnalyzerDefinitionName(Object value, Object entity, String field) {
+        if ( value == null || !( entity instanceof Article ) ) {
+            return null;
+        }
+        return (String) value;
+
+    }
+}</code></pre></div></div><br class="example-break"/><p>The prerequisite for using @AnalyzerDiscriminator is that all analyzers which are going to be used
+dynamically are predefined via @AnalyzerDef definitions. If this is the case, one can place the
+@AnalyzerDiscriminator annotation either on the class or on a specific property of the entity for
+which to dynamically select an analyzer. Via the <code class="literal">impl</code> parameter of the AnalyzerDiscriminator you
+specify a concrete implementation of the Discriminator interface. It is up to you to provide an
+implementation for this interface. The only method you have to implement is
+getAnalyzerDefinitionName() which gets called for each field added to the Lucene document. The
+entity which is getting indexed is also passed to the interface method. The <code class="literal">value</code> parameter is
+only set if the AnalyzerDiscriminator is placed on property level instead of class level. In this
+case the value represents the current value of this property.</p><p>An implementation of the Discriminator interface has to return the name of an existing analyzer
+definition or null if the default analyzer should not be overridden.
+<a class="xref" href="ch04.html#example-analyzer-discriminator" title="Example 4.17. Usage of @AnalyzerDiscriminator">Example 4.17, “Usage of @AnalyzerDiscriminator”</a> assumes that the language parameter is either 'de' or 'en' which matches the
+specified names in the @AnalyzerDefs.</p></div><div class="section" title="4.3.4. Retrieving an analyzer"><div class="titlepage"><div><div><h3 class="title"><a id="analyzer-retrievinganalyzer"/>4.3.4. Retrieving an analyzer</h3></div></div></div><p>In some situations retrieving analyzers can be handy. For example, if your domain model makes use of
+multiple analyzers (maybe to benefit from stemming, use phonetic approximation and so on), you need
+to make sure to use the same analyzers when you build your query.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>This rule can be broken but you need a good reason for it. If you are unsure, use the same
+analyzers. If you use the Hibernate Search query DSL (see <a class="xref" href="ch05.html#search-query-querydsl" title="5.1.2. Building a Lucene query with the Hibernate Search query DSL">Section 5.1.2, “Building a Lucene query with the Hibernate Search query DSL”</a>), you don’t have
+to think about it. The query DSL does use the right analyzer transparently for you.</p></div><p>Whether you are using the Lucene programmatic API or the Lucene query parser, you can retrieve the
+scoped analyzer for a given entity. A scoped analyzer is an analyzer which applies the right
+analyzers depending on the field indexed. Remember, multiple analyzers can be defined on a given
+entity each one working on an individual field. A scoped analyzer unifies all these analyzers into a
+context-aware analyzer. While the theory seems a bit complex, using the right analyzer in a query is
+very easy.</p><div class="example"><a id="d0e3843"/><p class="title"><strong>Example 4.18. Using the scoped analyzer when building a full-text query</strong></p><div class="example-contents"><pre><code class="language-java">org.apache.lucene.queryparser.classic.QueryParser parser = new QueryParser(
+    "title",
+    fullTextSession.getSearchFactory().getAnalyzer( Song.class )
+);
+
+org.apache.lucene.search.Query luceneQuery =
+    parser.parse( "title:sky Or title_stemmed:diamond" );
+
+org.hibernate.Query fullTextQuery =
+    fullTextSession.createFullTextQuery( luceneQuery, Song.class );
+
+List result = fullTextQuery.list(); //return a list of managed objects</code></pre></div></div><br class="example-break"/><p>In the example above, the song title is indexed in two fields: the standard analyzer is used in the
+field <code class="literal">title</code> and a stemming analyzer is used in the field <code class="literal">title_stemmed</code>. By using the
+analyzer provided by the search factory, the query uses the appropriate analyzer depending on the
+field targeted.</p><div class="tip" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Tip</h2><p>You can also retrieve analyzers defined via @AnalyzerDef by their definition name using
+searchFactory.getAnalyzer(String).</p></div></div></div><div class="section" title="4.4. Bridges"><div class="titlepage"><div><div><h2 class="title"><a id="search-mapping-bridge"/>4.4. Bridges</h2></div></div></div><p>When discussing the basic mapping for an entity one important fact was so far disregarded. In Lucene
+all index fields have to be represented as strings. All entity properties annotated with <code class="literal">@Field</code>
+have to be converted to strings to be indexed. The reason we have not mentioned it so far is, that
+for most of your properties Hibernate Search does the translation job for you thanks to a set of
+built-in bridges. However, in some cases you need a more fine grained control over the translation
+process.</p><div class="section" title="4.4.1. Built-in bridges"><div class="titlepage"><div><div><h3 class="title"><a id="section-built-in-bridges"/>4.4.1. Built-in bridges</h3></div></div></div><p>Hibernate Search comes bundled with a set of built-in bridges between a Java property type and its
+full text representation.</p><div class="variablelist"><dl><dt><span class="term"><code class="literal">null</code></span></dt><dd>Per default <code class="literal">null</code> elements are not indexed. Lucene does not support <code class="literal">null</code> elements.
+However, in some situation it can be useful to insert a custom token representing the <code class="literal">null</code> value.
+See <a class="xref" href="ch04.html#field-annotation" title="4.1.1.2. @Field">Section 4.1.1.2, “@Field”</a> for more information.</dd><dt><span class="term"><code class="literal">java.lang.String</code></span></dt><dd>Strings are indexed as are</dd><dt><span class="term"><code class="literal">short</code>, <code class="literal">Short</code>, <code class="literal">integer</code>, <code class="literal">Integer</code>, <code class="literal">long</code>, <code class="literal">Long</code>, <code class="literal">float</code>, <code class="literal">Float</code>, <code class="literal">double</code>, <code class="literal">Double</code></span></dt><dd>Are
+per default indexed numerically using a <a class="link" href="http://en.wikipedia.org/wiki/Trie">Trie structure</a>. You
+need to use a <code class="literal">NumericRangeQuery</code> to search for values. See also <a class="xref" href="ch04.html#field-annotation" title="4.1.1.2. @Field">Section 4.1.1.2, “@Field”</a> and
+<a class="xref" href="ch04.html#numeric-field-annotation" title="4.1.1.3. @NumericField">Section 4.1.1.3, “@NumericField”</a></dd><dt><span class="term"><code class="literal">BigInteger</code>, <code class="literal">BigDecimal</code></span></dt><dd><code class="literal">BigInteger</code> and <code class="literal">BigDecimal</code> are converted into their string representation and indexed. Note that
+in this form the values cannot be compared by Lucene using for example a <code class="literal">TermRangeQuery</code>.
+For that the string representation would need to be padded. An alternative using numeric encoding
+with a potential loss in precision can be seen in <a class="xref" href="ch04.html#example-custom-numericfieldbridge" title="Example 4.2. Defining a custom NumericFieldBridge for BigDecimal">Example 4.2, “Defining a custom NumericFieldBridge for BigDecimal”</a>.</dd><dt><span class="term"><code class="literal">java.util.Date</code>, <code class="literal">java.util.Calendar</code></span></dt><dd><p class="simpara">Dates are indexed as <code class="literal">long</code> value representing the number
+of milliseconds since <span class="emphasis"><em>January 1, 1970, 00:00:00 GMT</em></span>. You shouldn’t really bother with the
+internal format. It is important, however, to query a numerically indexed date via a <code class="literal">NumericRangeQuery</code>.</p><p class="simpara">Usually, storing the date up to the millisecond is not necessary. <code class="literal">@DateBridge</code> defines the
+appropriate resolution you are willing to store in the index.</p><div class="informalexample"><pre><code class="language-java">@Entity
+@Indexed
+public class Meeting {
+    @Field(analyze=Analyze.NO)
+    @DateBridge(resolution=Resolution.MINUTE)
+    private Date date;
+    // ...</code></pre></div><p class="simpara">You can also choose to encode the date as string using the <code class="literal">encoding=EncodingType.STRING</code> of
+<code class="literal">DateBridge</code>. In this case the dates are stored in the format <span class="emphasis"><em>yyyyMMddHHmmssSSS</em></span> (using GMT time).</p><div class="important" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Important</h2><p>A Date whose resolution is lower than <code class="literal">MILLISECOND</code> cannot be a <code class="literal">@DocumentId</code></p></div><div class="important" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Important</h2><p>The default date bridge uses Lucene’s <code class="literal">DateTools</code> to convert from <code class="literal">Date</code> or <code class="literal">Calendar</code> to its indexed
+value. This means that all dates are expressed in GMT time. If your requirements are to store dates
+in a fixed time zone you have to implement a custom date bridge. Make sure you understand the
+requirements of your applications regarding to date indexing and searching.</p></div></dd><dt><span class="term"><code class="literal">java.net.URI</code>, <code class="literal">java.net.URL</code></span></dt><dd><code class="literal">URI</code> and <code class="literal">URL</code> are converted to their string representation</dd><dt><span class="term"><code class="literal">java.lang.Class</code></span></dt><dd>Classes are converted to their fully qualified class name. The thread context
+classloader is used when the class is rehydrated</dd></dl></div></div><div class="section" title="4.4.2. Tika bridge"><div class="titlepage"><div><div><h3 class="title"><a id="_tika_bridge"/>4.4.2. Tika bridge</h3></div></div></div><p>Hibernate Search allows you to extract text from various document types using the built-in
+TikaBridge which utilizes <a class="link" href="http://tika.apache.org">Apache Tika</a> to extract text and metadata
+from the provided documents. The TikaBridge annotation can be used with String, URI, byte[] or
+java.sql.Blob properties. In the case of String and URI the bridge interprets the values are file
+paths and tries to open a file to parse the document. In the case of byte[] and Blob the values are
+directly passed to Tika for parsing.</p><p>Tika uses metadata as in- and output of the parsing process and it also allows to provide additional
+context information. This process is described in
+<a class="link" href="http://tika.apache.org/1.1/parser.html#apiorgapachetikametadataMetadata.html">Parser interface</a>.
+The Hibernate Search Tika bridge allows you to make use of these additional
+configuration options by providing two interfaces in conjunction with TikaBridge. The first
+interface is the TikaParseContextProvider. It allows you to create a custom ParseContext for the
+document parsing. The second interface is TikaMetadataProcessor which has two methods -
+prepareMetadata() and set(String, Object, Document, LuceneOptions, Metadata metadata). The former
+allows to add additional metadata to the parsing process (for example the file name) and the latter
+allows you to index metadata discovered during the parsing process.</p><p>TikaParseContextProvider as well as TikaMetadataProcessor implementation classes can both be
+specified as parameters on the TikaBridge annotation.</p><div class="example"><a id="example-tika-mapping"/><p class="title"><strong>Example 4.19. Example mapping with Apache Tika</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@Indexed
+public class Song {
+    @Id
+    @GeneratedValue
+    long id;
+
+    @Field
+    @TikaBridge(metadataProcessor = Mp3TikaMetadataProcessor.class)
+    String mp3FileName;
+
+    // ...
+}</code></pre><pre><code class="language-java">QueryBuilder queryBuilder = fullTextSession.getSearchFactory()
+    .buildQueryBuilder()
+    .forEntity( Song.class )
+    .get();
+Query query = queryBuilder.keyword()
+    .onField( "mp3FileName" )
+    .ignoreFieldBridge() //mandatory
+    .matching( "Apes" )
+    .createQuery();
+List result = fullTextSession.createFullTextQuery( query ).list();</code></pre></div></div><br class="example-break"/><p>In the <a class="xref" href="ch04.html#example-tika-mapping" title="Example 4.19. Example mapping with Apache Tika">Example 4.19, “Example mapping with Apache Tika”</a> the property mp3FileName represents a path to an MP3 file; the
+headers of this file will be indexed and so the performed query will be able to match the MP3
+metadata.</p><div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Warning</h2><p>TikaBridge does not implement TwoWayFieldBridge: queries built using the DSL (as in the
+<a class="xref" href="ch04.html#example-tika-mapping" title="Example 4.19. Example mapping with Apache Tika">Example 4.19, “Example mapping with Apache Tika”</a>) need to explicitly enable the option ignoreFieldBridge().</p></div></div><div class="section" title="4.4.3. Custom bridges"><div class="titlepage"><div><div><h3 class="title"><a id="section-custom-bridges"/>4.4.3. Custom bridges</h3></div></div></div><p>Sometimes, the built-in bridges of Hibernate Search do not cover some of your property types, or the
+String representation used by the bridge does not meet your requirements. The following paragraphs
+describe several solutions to this problem.</p><div class="section" title="4.4.3.1. StringBridge"><div class="titlepage"><div><div><h4 class="title"><a id="_stringbridge"/>4.4.3.1. StringBridge</h4></div></div></div><p>The simplest custom solution is to give Hibernate Search an implementation of your expected Object
+to String bridge. To do so you need to implement the <code class="literal">org.hibernate.search.bridge.StringBridge</code>
+interface. All implementations have to be thread-safe as they are used concurrently.</p><div class="example"><a id="example-custom-string-bridge"/><p class="title"><strong>Example 4.20. Custom <code class="literal">StringBridge</code> implementation</strong></p><div class="example-contents"><pre><code class="language-java">/**
+ * Padding Integer bridge.
+ * All numbers will be padded with 0 to match 5 digits
+ *
+ * @author Emmanuel Bernard
+ */
+public class PaddedIntegerBridge implements StringBridge {
+
+    private int padding = 5;
+
+    public String objectToString(Object object) {
+        String rawInteger = ((Integer) object).toString();
+        if (rawInteger.length() &gt; padding)
+            throw new IllegalArgumentException("Number too big to be padded");
+        StringBuilder paddedInteger = new StringBuilder();
+        for (int padIndex = rawInteger.length(); padIndex &lt; padding; padIndex++) {
+            paddedInteger.append('0');
+        }
+        return paddedInteger.append( rawInteger ).toString();
+    }
+}</code></pre></div></div><br class="example-break"/><p>Given the string bridge defined in <a class="xref" href="ch04.html#example-custom-string-bridge" title="Example 4.20. Custom StringBridge implementation">Example 4.20, “Custom <code class="literal">StringBridge</code> implementation”</a>, any property or field can use
+this bridge thanks to the <code class="literal">@FieldBridge</code> annotation:</p><div class="informalexample"><pre><code class="language-java">@FieldBridge(impl = PaddedIntegerBridge.class)
+private Integer length;</code></pre></div><div class="section" title="4.4.3.1.1. Parameterized bridge"><div class="titlepage"><div><div><h5 class="title"><a id="_parameterized_bridge"/>4.4.3.1.1. Parameterized bridge</h5></div></div></div><p>Parameters can also be passed to the bridge implementation making it more flexible.
+<a class="xref" href="ch04.html#example-passing-bridge-parameters" title="Example 4.21. Passing parameters to your bridge implementation">Example 4.21, “Passing parameters to your bridge implementation”</a> implements a ParameterizedBridge interface and parameters are
+passed through the <code class="literal">@FieldBridge</code> annotation.</p><div class="example"><a id="example-passing-bridge-parameters"/><p class="title"><strong>Example 4.21. Passing parameters to your bridge implementation</strong></p><div class="example-contents"><pre><code class="language-java">public class PaddedIntegerBridge implements StringBridge, ParameterizedBridge {
+
+    public static String PADDING_PROPERTY = "padding";
+    private int padding = 5; //default
+
+    public void setParameterValues(Map&lt;String,String&gt; parameters) {
+        String padding = parameters.get( PADDING_PROPERTY );
+        if (padding != null) this.padding = Integer.parseInt( padding );
+    }
+
+    public String objectToString(Object object) {
+        String rawInteger = ((Integer) object).toString();
+        if (rawInteger.length() &gt; padding)
+            throw new IllegalArgumentException("Number too big to be padded");
+        StringBuilder paddedInteger = new StringBuilder( );
+        for (int padIndex = rawInteger.length(); padIndex &lt; padding; padIndex++) {
+            paddedInteger.append('0');
+        }
+        return paddedInteger.append(rawInteger).toString();
+    }
+}</code></pre><pre><code class="language-java">//on the property:
+@FieldBridge(impl = PaddedIntegerBridge.class,
+             params = @Parameter(name="padding", value="10")
+            )
+private Integer length;</code></pre></div></div><br class="example-break"/><p>The ParameterizedBridge interface can be implemented by StringBridge, TwoWayStringBridge,
+FieldBridge implementations.</p><p>All implementations have to be thread-safe, but the parameters are set during initialization and no
+special care is required at this stage.</p></div><div class="section" title="4.4.3.1.2. Type aware bridge"><div class="titlepage"><div><div><h5 class="title"><a id="_type_aware_bridge"/>4.4.3.1.2. Type aware bridge</h5></div></div></div><p>It is sometimes useful to get the type the bridge is applied on:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">the return type of the property for field/getter-level bridges</li><li class="listitem">the class type for class-level bridges</li></ul></div><p>An example is a bridge that deals with enums in a custom fashion but needs to access the actual enum
+type. Any bridge implementing AppliedOnTypeAwareBridge will get the type the bridge is applied on
+injected. Like parameters, the type injected needs no particular care with regard to thread-safety.</p></div><div class="section" title="4.4.3.1.3. Two-way bridge"><div class="titlepage"><div><div><h5 class="title"><a id="_two_way_bridge"/>4.4.3.1.3. Two-way bridge</h5></div></div></div><p>If you expect to use your bridge implementation on an id property (ie annotated with <code class="literal">@DocumentId</code>
+), you need to use a slightly extended version of <code class="literal">StringBridge</code> named TwoWayStringBridge. Hibernate
+Search needs to read the string representation of the identifier and generate the object out of it.
+There is no difference in the way the <code class="literal">@FieldBridge</code> annotation is used.</p><div class="example"><a id="d0e4152"/><p class="title"><strong>Example 4.22. Implementing a TwoWayStringBridge usable for id properties</strong></p><div class="example-contents"><pre><code class="language-java">public class PaddedIntegerBridge implements TwoWayStringBridge, ParameterizedBridge {
+
+    public static String PADDING_PROPERTY = "padding";
+    private int padding = 5; //default
+
+    public void setParameterValues(Map parameters) {
+        Object padding = parameters.get(PADDING_PROPERTY);
+        if (padding != null) this.padding = (Integer) padding;
+    }
+
+    public String objectToString(Object object) {
+        String rawInteger = ((Integer) object).toString();
+        if (rawInteger.length() &gt; padding)
+            throw new IllegalArgumentException("Number too big to be padded");
+        StringBuilder paddedInteger = new StringBuilder();
+        for (int padIndex = rawInteger.length(); padIndex &lt; padding ; padIndex++) {
+            paddedInteger.append('0');
+        }
+        return paddedInteger.append(rawInteger).toString();
+    }
+
+    public Object stringToObject(String stringValue) {
+        return new Integer(stringValue);
+    }
+}</code></pre><pre><code class="language-java">//On an id property:
+@DocumentId
+@FieldBridge(impl = PaddedIntegerBridge.class,
+             params = @Parameter(name="padding", value="10")
+private Integer id;</code></pre></div></div><br class="example-break"/><div class="important" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Important</h2><p>It is important for the two-way process to be idempotent
+(ie <code class="literal">object = stringToObject(objectToString( object ) )</code> ).</p></div></div></div><div class="section" title="4.4.3.2. FieldBridge"><div class="titlepage"><div><div><h4 class="title"><a id="section-filed-bridge"/>4.4.3.2. FieldBridge</h4></div></div></div><p>Some use cases require more than a simple object to string translation when mapping a property to a
+Lucene index. To give you the greatest possible flexibility you can also implement a bridge as a
+<code class="literal">FieldBridge</code>. This interface gives you a property value and let you map it the way you want in your
+Lucene <code class="literal">Document</code>. You can for example store a property in two different document fields. The
+interface is very similar in its concept to the Hibernate ORM <code class="literal">UserTypes</code>.</p><div class="example"><a id="example-field-bridge"/><p class="title"><strong>Example 4.23. Implementing the FieldBridge interface</strong></p><div class="example-contents"><pre><code class="language-java">/**
+ * Store the date in 3 different fields - year, month, day - to ease the creation of RangeQuery per
+ * year, month or day (eg get all the elements of December for the last 5 years).
+ * @author Emmanuel Bernard
+ */
+public class DateSplitBridge implements FieldBridge {
+    private final static TimeZone GMT = TimeZone.getTimeZone("GMT");
+
+    public void set(String name, Object value, Document document,
+                    LuceneOptions luceneOptions) {
+        Date date = (Date) value;
+        Calendar cal = GregorianCalendar.getInstance(GMT);
+        cal.setTime(date);
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH) + 1;
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+
+        // set year
+        luceneOptions.addFieldToDocument(
+            name + ".year",
+            String.valueOf( year ),
+            document );
+
+        // set month and pad it if needed
+        luceneOptions.addFieldToDocument(
+            name + ".month",
+            month &lt; 10 ? "0" : "" + String.valueOf( month ),
+            document );
+
+        // set day and pad it if needed
+        luceneOptions.addFieldToDocument(
+            name + ".day",
+            day &lt; 10 ? "0" : "" + String.valueOf( day ),
+            document );
+    }
+}</code></pre><pre><code class="language-java">//property
+@FieldBridge(impl = DateSplitBridge.class)
+private Date date;</code></pre></div></div><br class="example-break"/><p>In <a class="xref" href="ch04.html#example-field-bridge" title="Example 4.23. Implementing the FieldBridge interface">Example 4.23, “Implementing the FieldBridge interface”</a> the fields are not added directly to <code class="literal">Document</code>. Instead the addition is
+delegated to the <code class="literal">LuceneOptions</code> helper; this helper will apply the options you have selected on
+<code class="literal">@Field</code>, like <code class="literal">Store</code> or <code class="literal">TermVector</code>, or apply the chosen <code class="literal">@Boost</code> value. It is especially useful
+to encapsulate the complexity of <code class="literal">COMPRESS</code> implementations. Even though it is recommended to
+delegate to <code class="literal">LuceneOptions</code> to add fields to the <code class="literal">Document</code>, nothing stops you from editing the
+<code class="literal">Document</code> directly and ignore the LuceneOptions in case you need to.</p><div class="tip" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Tip</h2><p>Classes like LuceneOptions are created to shield your application from changes in Lucene API and
+simplify your code. Use them if you can, but if you need more flexibility you’re not required to.</p></div></div><div class="section" title="4.4.3.3. ClassBridge"><div class="titlepage"><div><div><h4 class="title"><a id="_classbridge"/>4.4.3.3. ClassBridge</h4></div></div></div><p>It is sometimes useful to combine more than one property of a given entity and index this
+combination in a specific way into the Lucene index. The @ClassBridge respectively @ClassBridges
+annotations can be defined at class level (as opposed to the property level). In this case the
+custom field bridge implementation receives the entity instance as the value parameter instead of a
+particular property. Though not shown in <a class="xref" href="ch04.html#example-class-bridge" title="Example 4.24. Implementing a class bridge">Example 4.24, “Implementing a class bridge”</a>, @ClassBridge supports the
+termVector attribute discussed in section <a class="xref" href="ch04.html#basic-mapping" title="4.1.1. Basic mapping">Section 4.1.1, “Basic mapping”</a>.</p><div class="example"><a id="example-class-bridge"/><p class="title"><strong>Example 4.24. Implementing a class bridge</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@Indexed
+@ClassBridge(name="branchnetwork",
+             store=Store.YES,
+             impl = CatFieldsClassBridge.class,
+             params = @Parameter( name="sepChar", value=" " ) )
+public class Department {
+    private int id;
+    private String network;
+    private String branchHead;
+    private String branch;
+    private Integer maxEmployees
+    // ...
+}</code></pre><pre><code class="language-java">public class CatFieldsClassBridge implements FieldBridge, ParameterizedBridge {
+    private String sepChar;
+
+    public void setParameterValues(Map parameters) {
+        this.sepChar = (String) parameters.get( "sepChar" );
+    }
+
+    public void set(
+        String name, Object value, Document document, LuceneOptions luceneOptions) {
+        // In this particular class the name of the new field was passed
+        // from the name field of the ClassBridge Annotation. This is not
+        // a requirement. It just works that way in this instance. The
+        // actual name could be supplied by hard coding it below.
+        Department dep = (Department) value;
+        String fieldValue1 = dep.getBranch();
+        if ( fieldValue1 == null ) {
+            fieldValue1 = "";
+        }
+        String fieldValue2 = dep.getNetwork();
+        if ( fieldValue2 == null ) {
+            fieldValue2 = "";
+        }
+        String fieldValue = fieldValue1 + sepChar + fieldValue2;
+        Field field = new Field( name, fieldValue, luceneOptions.getStore(),
+            luceneOptions.getIndex(), luceneOptions.getTermVector() );
+        field.setBoost( luceneOptions.getBoost() );
+        document.add( field );
+   }
+}</code></pre></div></div><br class="example-break"/><p>In this example, the particular CatFieldsClassBridge is applied to the <code class="literal">department</code> instance, the
+field bridge then concatenate both branch and network and index the concatenation.</p></div></div><div class="section" title="4.4.4. BridgeProvider: associate a bridge to a given return type"><div class="titlepage"><div><div><h3 class="title"><a id="_bridgeprovider_associate_a_bridge_to_a_given_return_type"/>4.4.4. BridgeProvider: associate a bridge to a given return type</h3></div></div></div><p>Custom field bridges are very flexible, but it can be tedious and error prone to apply the same
+custom @FieldBridge annotation every time a property of a given type is present in your domain
+model. That is what BridgeProviders are for.</p><p>Let’s imagine that you have a type Currency in your application and that you want to apply your very
+own CurrencyFieldBridge every time an indexed property returns Currency. You can do it the hard way:</p><div class="example"><a id="d0e4251"/><p class="title"><strong>Example 4.25. Applying the same @FieldBridge for a type the hard way</strong></p><div class="example-contents"><pre><code class="language-java">@Entity @Indexed
+public class User {
+    @FieldBridge(impl=CurrencyFieldBridge.class)
+    public Currency getDefaultCurrency();
+
+    // ...
+}
+
+@Entity @Indexed
+public class Account {
+    @FieldBridge(impl=CurrencyFieldBridge.class)
+    public Currency getCurrency();
+
+    // ...
+}
+
+// continue to add @FieldBridge(impl=CurrencyFieldBridge.class) everywhere Currency is</code></pre></div></div><br class="example-break"/><p>Or you can write your own BridgeProvider implementation for Currency.</p><div class="example"><a id="d0e4258"/><p class="title"><strong>Example 4.26. Writing a BridgeProvider</strong></p><div class="example-contents"><pre><code class="language-java">public class CurrencyBridgeProvider implements BridgeProvider {
+
+    //needs a default no-arg constructor
+
+    @Override
+    public FieldBridge provideFieldBridge(BridgeContext bridgeProviderContext) {
+        if ( bridgeProviderContext.getReturnType().equals( Currency.class ) ) {
+            return CurrencyFieldBridge.INSTANCE;
+        }
+        return null;
+    }
+}</code></pre><pre class="screen"># service file named META-INF/services/org.hibernate.search.bridge.spi.BridgeProvider
+com.acme.myapps.hibernatesearch.CurrencyBridgeProvider</pre></div></div><br class="example-break"/><p>You need to implement BridgeProvider and create a service file named
+<span class="emphasis"><em>META-INF/services/org.hibernate.search.bridge.spi.BridgeProvider</em></span>. This file must contain the fully
+qualified class name(s) of the BridgeProvider implementations. This is the classic Service Loader
+discovery mechanism.</p><p>Now, any indexed property of type Currency will use CurrencyFieldBridge automatically.</p><div class="example"><a id="d0e4272"/><p class="title"><strong>Example 4.27. An explicit @FieldBrige is no longer needed</strong></p><div class="example-contents"><pre><code class="language-java">@Entity @Indexed
+public class User {
+
+    @Field
+    public Currency getDefaultCurrency();
+
+    // ...
+}
+
+@Entity @Indexed
+public class Account {
+
+    @Field
+    public Currency getCurrency();
+
+    // ...
+}
+
+//CurrencyFieldBridge is applied automatically everywhere Currency is found on an indexed property</code></pre></div></div><br class="example-break"/><p>A few more things you need to know:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">a BridgeProvider must have a no-arg constructor</li><li class="listitem">if a BridgeProvider only returns FieldBridge instances if it is meaningful for the calling context.
+Null otherwise. In our example, the return type must be Currency to be meaningful to our provider.</li><li class="listitem">if two or more bridge providers return a FieldBridge instance for a given return type, an exception
+will be raised.</li></ul></div><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>What is a calling context</h2><p>A calling context is represented by the BridgeContext object and represents the environment for
+which we are looking for a bridge. BridgeContext gives access to the return type of the indexed
+property as well as the ServiceManager which gives access to the ClassLoaderService for everything
+class loader related.</p><pre><code class="language-java">ClassLoaderService classLoaderService = serviceManager.requestService( ClassLoaderService.class );
+//use the classLoaderService
+serviceManager.releaseService( ClassLoaderService.class );</code></pre></div></div></div><div class="section" title="4.5. Conditional indexing"><div class="titlepage"><div><div><h2 class="title"><a id="search-mapping-indexinginterceptor"/>4.5. Conditional indexing</h2></div></div></div><div class="important" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Important</h2><p>This feature is considered experimental. More operation types might be added in the future depending
+on user feedback.</p></div><p>In some situations, you want to index an entity only when it is in a given state, for example:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">only index blog entries marked as published</li><li class="listitem">no longer index invoices when they are marked archived</li></ul></div><p>This serves both functional and technical needs. You don’t want your blog readers to find your draft
+entries and filtering them off the query is a bit annoying. Very few of your entities are actually
+required to be indexed and you want to limit indexing overhead and keep indexes small and fast.</p><p>Hibernate Search lets you intercept entity indexing operations and override them. It is quite
+simple:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">Write an EntityIndexingInterceptor class with your entity state based logic</li><li class="listitem">Mark the entity as intercepted by this implementation</li></ul></div><p>Let’s look at the blog example at <a class="xref" href="ch04.html#example-search-mapping-indexinginterceptor-blog" title="Example 4.28. Index blog entries only when they are published and remove them when they are in a different state">Example 4.28, “Index blog entries only when they are published and remove them when they are in a different state”</a></p><div class="example"><a id="example-search-mapping-indexinginterceptor-blog"/><p class="title"><strong>Example 4.28. Index blog entries only when they are published and remove them when they are in a different state</strong></p><div class="example-contents"><pre><code class="language-java">/**
+ * Only index blog when it is in published state
+ *
+ * @author Emmanuel Bernard &lt;emmanuel@hibernate.org&gt;
+ */
+public class IndexWhenPublishedInterceptor implements EntityIndexingInterceptor&lt;Blog&gt; {
+    @Override
+    public IndexingOverride onAdd(Blog entity) {
+        if (entity.getStatus() == BlogStatus.PUBLISHED) {
+            return IndexingOverride.APPLY_DEFAULT;
+        }
+        return IndexingOverride.SKIP;
+    }
+
+    @Override
+    public IndexingOverride onUpdate(Blog entity) {
+        if (entity.getStatus() == BlogStatus.PUBLISHED) {
+            return IndexingOverride.UPDATE;
+        }
+        return IndexingOverride.REMOVE;
+    }
+
+    @Override
+    public IndexingOverride onDelete(Blog entity) {
+        return IndexingOverride.APPLY_DEFAULT;
+    }
+
+    @Override
+    public IndexingOverride onCollectionUpdate(Blog entity) {
+        return onUpdate(entity);
+    }
+}</code></pre><pre><code class="language-java">@Entity
+@Indexed(interceptor=IndexWhenPublishedInterceptor.class)
+public class Blog {
+    @Id
+    @GeneratedValue
+    public Integer getId() { return id; }
+    public void setId(Integer id) {  this.id = id; }
+    private Integer id;
+
+    @Field
+    public String getTitle() { return title; }
+    public void setTitle(String title) {  this.title = title; }
+    private String title;
+
+    public BlogStatus getStatus() { return status; }
+    public void setStatus(BlogStatus status) {  this.status = status; }
+    private BlogStatus status;
+
+    // ...
+}</code></pre></div></div><br class="example-break"/><p>We mark the Blog entity with @Indexed.interceptor. As you can see, IndexWhenPublishedInterceptor
+implements EntityIndexingInterceptor and accepts Blog entities (it could have accepted super classes
+as well - for example Object if you create a generic interceptor.</p><p>You can react to several planned indexing events:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">when an entity is added to your datastore</li><li class="listitem">when an entity is updated in your datastore</li><li class="listitem">when an entity is deleted from your datastore</li><li class="listitem">when a collection own by this entity is updated in your datastore</li></ul></div><p>For each occurring event you can respond with one of the following actions:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">APPLY_DEFAULT</code>: that’s the basic operation that lets Hibernate Search update the index as
+expected - creating, updating or removing the document</li><li class="listitem"><code class="literal">SKIP</code>: ask Hibernate Search to not do anything to the index for this event - data will not be
+created, updated or removed from the index in any way</li><li class="listitem"><code class="literal">REMOVE</code>: ask Hibernate Search to remove indexing data about this entity - you can safely ask
+for <code class="literal">REMOVE</code> even if the entity has not yet been indexed</li><li class="listitem"><code class="literal">UPDATE</code>: ask Hibernate Search to either index or update the index for this entity - it is safe
+to ask for <code class="literal">UPDATE</code> even if the entity has never been indexed</li></ul></div><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>Be careful, not every combination makes sense: for example, asking to <code class="literal">UPDATE</code> the index upon
+onDelete. Note that you could ask for <code class="literal">SKIP</code> in this situation if saving indexing time is critical
+for you. That’s rarely the case though.</p></div><p>By default, no interceptor is applied on an entity. You have to explicitly define an interceptor via
+the @Indexed annotation (see <a class="xref" href="ch04.html#indexed-annotation" title="4.1.1.1. @Indexed">Section 4.1.1.1, “@Indexed”</a>) or programmatically (see
+<a class="xref" href="ch04.html#hsearch-mapping-programmaticapi" title="4.7. Programmatic API">Section 4.7, “Programmatic API”</a>). This class and all its subclasses will then be intercepted.
+You can stop or change the interceptor used in a subclass by overriding @Indexed.interceptor.
+Hibernate Search provides DontInterceptEntityInterceptor which will explicitly not intercept any call.
+This is useful to reset interception within a class hierarchy.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>Dirty checking optimization is disabled when interceptors are used. Dirty checking optimization does
+check what has changed in an entity and only triggers an index update if indexed properties are
+changed. The reason is simple, your interceptor might depend on a non indexed property which would
+be ignored by this optimization.</p></div><div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Warning</h2><p>An <code class="literal">EntityIndexingInterceptor</code> can never override an explicit indexing operation such as <code class="literal">index(T)</code>,
+<code class="literal">purge(T, id)</code> or <code class="literal">purgeAll(class)</code>.</p></div></div><div class="section" title="4.6. Providing your own id"><div class="titlepage"><div><div><h2 class="title"><a id="provided-id"/>4.6. Providing your own id</h2></div></div></div><p>You can provide your own id for Hibernate Search if you are extending the internals. You will have
+to generate a unique value so it can be given to Lucene to be indexed. This will have to be given to
+Hibernate Search when you create an org.hibernate.search.Work object - the document id is required
+in the constructor.</p><div class="section" title="4.6.1. The ProvidedId annotation"><div class="titlepage"><div><div><h3 class="title"><a id="ProvidedId"/>4.6.1. The ProvidedId annotation</h3></div></div></div><p>Unlike @DocumentIdwhich is applied on field level, @ProvidedId is used on the class level.
+Optionally you can specify your own bridge implementation using the bridge property. Also, if you
+annotate a class with @ProvidedId, your subclasses will also get the annotation - but it is not done
+by using the java.lang.annotations.@Inherited. Be sure however, to <span class="emphasis"><em>not</em></span> use this annotation with
+@DocumentId as your system will break.</p><div class="example"><a id="d0e4424"/><p class="title"><strong>Example 4.29. Providing your own id</strong></p><div class="example-contents"><pre><code class="language-java">@ProvidedId(bridge = org.my.own.package.MyCustomBridge)
+@Indexed
+public class MyClass{
+    @Field
+    String MyString;
+    ...
+}</code></pre></div></div><br class="example-break"/></div></div><div class="section" title="4.7. Programmatic API"><div class="titlepage"><div><div><h2 class="title"><a id="hsearch-mapping-programmaticapi"/>4.7. Programmatic API</h2></div></div></div><p>Although the recommended approach for mapping indexed entities is to use annotations, it is
+sometimes more convenient to use a different approach:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">the same entity is mapped differently depending on deployment needs (customization for clients)</li><li class="listitem">some automation process requires the dynamic mapping of many entities sharing common traits</li></ul></div><p>While it has been a popular demand in the past, the Hibernate team never found the idea of an XML
+alternative to annotations appealing due to its heavy duplication, lack of code refactoring safety,
+because it did not cover all the use case spectrum and because we are in the 21st century :)</p><p>The idea of a programmatic API was much more appealing and has now become a reality. You can
+programmatically define your mapping using a programmatic API: you define entities and fields as
+indexable by using mapping classes which effectively mirror the annotation concepts in Hibernate
+Search. Note that fan(s) of XML approach can design their own schema and use the programmatic API to
+create the mapping while parsing the XML stream.</p><p>In order to use the programmatic model you must first construct a SearchMapping object which you can
+do in two ways:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">directly</li><li class="listitem">via a factory</li></ul></div><p>You can pass the SearchMapping object directly via the property key
+<code class="literal">hibernate.search.model_mapping</code> or the constant Environment.MODEL_MAPPING. Use the
+Configuration API or the Map passed to the JPA Persistence bootstrap methods.</p><div class="example"><a id="d0e4459"/><p class="title"><strong>Example 4.30. Programmatic mapping</strong></p><div class="example-contents"><pre><code class="language-java">SearchMapping mapping = new SearchMapping();
+// ... configure mapping
+Configuration config = new Configuration();
+config.getProperties().put( Environment.MODEL_MAPPING, mapping );
+SessionFactory sf = config.buildSessionFactory();</code></pre></div></div><br class="example-break"/><div class="example"><a id="d0e4464"/><p class="title"><strong>Example 4.31. Programmatic mapping with JPA</strong></p><div class="example-contents"><pre><code class="language-java">SearchMapping mapping = new SearchMapping();
+// ... configure mapping
+Map props = new HashMap();
+props.put( Environment.MODEL_MAPPING, mapping );
+EntityManagerFactory emf = Persistence.createEntityManagerFactory( "userPU", props );</code></pre></div></div><br class="example-break"/><p>Alternatively, you can create a factory class (ie hosting a method annotated with @Factory) whose
+factory method returns the SearchMapping object. The factory class must have a no-arg constructor
+and its fully qualified class name is passed to the property key
+<code class="literal">hibernate.search.model_mapping</code> or its type-safe representation Environment.MODEL_MAPPING. This
+approach is useful when you do not necessarily control the bootstrap process like in a Java EE, CDI
+or Spring Framework container.</p><div class="example"><a id="d0e4474"/><p class="title"><strong>Example 4.32. Use a mapping factory</strong></p><div class="example-contents"><pre><code class="language-java">public class MyAppSearchMappingFactory {
+    @Factory
+    public SearchMapping getSearchMapping() {
+        SearchMapping mapping = new SearchMapping();
+        mapping
+                .analyzerDef( "ngram", StandardTokenizerFactory.class )
+                    .filter( LowerCaseFilterFactory.class )
+                    .filter( NGramFilterFactory.class )
+                        .param( "minGramSize", "3" )
+                        .param( "maxGramSize", "3" );
+        return mapping;
+    }
+}</code></pre><pre><code class="language-xml">&lt;persistence ...&gt;
+    &lt;persistence-unit name="users"&gt;
+        ...
+        &lt;properties&gt;
+            &lt;property name="hibernate.search.model_mapping"
+                      value="com.acme.MyAppSearchMappingFactory"/&gt;
+        &lt;/properties&gt;
+    &lt;/persistence-unit&gt;
+&lt;/persistence&gt;</code></pre></div></div><br class="example-break"/><p>The SearchMapping is the root object which contains all the necessary indexable entities and fields.
+From there, the SearchMapping object exposes a fluent (and thus intuitive) API to express your
+mappings: it contextually exposes the relevant mapping options in a type-safe way. Just let your IDE
+auto-completion feature guide you through.</p><p>Today, the programmatic API cannot be used on a class annotated with Hibernate Search annotations,
+chose one approach or the other. Also note that the same default values apply in annotations and the
+programmatic API. For example, the @Field.name is defaulted to the property name and does not have
+to be set.</p><p>Each core concept of the programmatic API has a corresponding example to depict how the same
+definition would look using annotation. Therefore seeing an annotation example of the programmatic
+approach should give you a clear picture of what Hibernate Search will build with the marked
+entities and associated properties.</p><div class="section" title="4.7.1. Mapping an entity as indexable"><div class="titlepage"><div><div><h3 class="title"><a id="_mapping_an_entity_as_indexable"/>4.7.1. Mapping an entity as indexable</h3></div></div></div><p>The first concept of the programmatic API is to define an entity as indexable. Using the annotation
+approach a user would mark the entity as @Indexed, the following example demonstrates how to
+programmatically achieve this.</p><div class="example"><a id="d0e4492"/><p class="title"><strong>Example 4.33. Marking an entity indexable</strong></p><div class="example-contents"><pre><code class="language-java">SearchMapping mapping = new SearchMapping();
+
+mapping.entity(Address.class)
+           .indexed()
+               .indexName("Address_Index") //optional
+               .interceptor(IndexWhenPublishedInterceptor.class); //optional
+
+cfg.getProperties().put("hibernate.search.model_mapping", mapping);</code></pre></div></div><br class="example-break"/><p>As you can see you must first create a SearchMapping object which is the root object that is then
+passed to the Configuration object as property. You must declare an entity and if you wish to make
+that entity as indexable then you must call the indexed() method. The <code class="literal">indexed()</code> method has an
+optional <code class="literal">indexName(String indexName)</code> which can be used to change the default index name that is
+created by Hibernate Search. Likewise, an <code class="literal">interceptor(Class&lt;? extends EntityIndexedInterceptor&gt;)</code>
+is available. Using the annotation model the above can be achieved as:</p><div class="example"><a id="d0e4508"/><p class="title"><strong>Example 4.34. Annotation example of indexing entity</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@Indexed(index="Address_Index", interceptor=IndexWhenPublishedInterceptor.class)
+public class Address {
+   // ...
+}</code></pre></div></div><br class="example-break"/></div><div class="section" title="4.7.2. Adding DocumentId to indexed entity"><div class="titlepage"><div><div><h3 class="title"><a id="_adding_documentid_to_indexed_entity"/>4.7.2. Adding DocumentId to indexed entity</h3></div></div></div><p>To set a property as a document id:</p><div class="example"><a id="d0e4518"/><p class="title"><strong>Example 4.35. Enabling document id with programmatic model</strong></p><div class="example-contents"><pre><code class="language-java">SearchMapping mapping = new SearchMapping();
+
+mapping.entity(Address.class).indexed()
+           .property("addressId", ElementType.FIELD) //field access
+               .documentId()
+                   .name("id");
+
+cfg.getProperties().put( "hibernate.search.model_mapping", mapping);</code></pre></div></div><br class="example-break"/><p>The above is equivalent to annotating a property in the entity as @DocumentId as seen in the
+following example:</p><div class="example"><a id="d0e4525"/><p class="title"><strong>Example 4.36. DocumentId annotation definition</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@Indexed
+public class Address {
+ @Id
+ @GeneratedValue
+ @DocumentId(name="id")
+ private Long addressId;
+
+ // ...
+}</code></pre></div></div><br class="example-break"/></div><div class="section" title="4.7.3. Defining analyzers"><div class="titlepage"><div><div><h3 class="title"><a id="_defining_analyzers"/>4.7.3. Defining analyzers</h3></div></div></div><p>Analyzers can be programmatically defined using the
+<code class="literal">analyzerDef(String analyzerDef, Class&lt;? extends TokenizerFactory&gt; tokenizerFactory)</code> method. This
+method also enables you to define filters for the analyzer definition. Each filter that you define
+can optionally take in parameters as seen in the following example :</p><div class="example"><a id="d0e4538"/><p class="title"><strong>Example 4.37. Defining analyzers using programmatic model</strong></p><div class="example-contents"><pre><code class="language-java">SearchMapping mapping = new SearchMapping();
+
+mapping
+    .analyzerDef( "ngram", StandardTokenizerFactory.class )
+        .filter( LowerCaseFilterFactory.class )
+        .filter( NGramFilterFactory.class )
+            .param( "minGramSize", "3" )
+            .param( "maxGramSize", "3" )
+    .analyzerDef( "en", StandardTokenizerFactory.class )
+        .filter( LowerCaseFilterFactory.class )
+        .filter( EnglishPorterFilterFactory.class )
+    .analyzerDef( "de", StandardTokenizerFactory.class )
+        .filter( LowerCaseFilterFactory.class )
+        .filter( GermanStemFilterFactory.class )
+    .entity(Address.class).indexed()
+        .property("addressId", ElementType.METHOD) //getter access
+            .documentId()
+                .name("id");
+
+cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</code></pre></div></div><br class="example-break"/><p>The analyzer mapping defined above is equivalent to the annotation model using @AnalyzerDef in
+conjunction with @AnalyzerDefs:</p><div class="example"><a id="d0e4545"/><p class="title"><strong>Example 4.38. Analyzer definition using annotation</strong></p><div class="example-contents"><pre><code class="language-java">@Indexed
+@Entity
+@AnalyzerDefs({
+  @AnalyzerDef(name = "ngram",
+    tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+    filters = {
+      @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+      @TokenFilterDef(factory = NGramFilterFactory.class,
+        params = {
+          @Parameter(name = "minGramSize",value = "3"),
+          @Parameter(name = "maxGramSize",value = "3")
+       })
+   }),
+  @AnalyzerDef(name = "en",
+    tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+    filters = {
+      @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+      @TokenFilterDef(factory = EnglishPorterFilterFactory.class)
+   }),
+
+  @AnalyzerDef(name = "de",
+    tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+    filters = {
+      @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+      @TokenFilterDef(factory = GermanStemFilterFactory.class)
+  })
+
+})
+public class Address {
+   // ...
+}</code></pre></div></div><br class="example-break"/></div><div class="section" title="4.7.4. Defining full text filter definitions"><div class="titlepage"><div><div><h3 class="title"><a id="_defining_full_text_filter_definitions"/>4.7.4. Defining full text filter definitions</h3></div></div></div><p>The programmatic API provides easy mechanism for defining full text filter definitions which is
+available via @FullTextFilterDef and @FullTextFilterDefs (see <a class="xref" href="ch05.html#query-filter" title="5.3. Filters">Section 5.3, “Filters”</a>). The next example
+depicts the creation of full text filter definition using the <code class="literal">fullTextFilterDef</code> method.</p><div class="example"><a id="d0e4560"/><p class="title"><strong>Example 4.39. Defining full text definition programmatically</strong></p><div class="example-contents"><pre><code class="language-java">SearchMapping mapping = new SearchMapping();
+
+mapping
+    .analyzerDef( "en", StandardTokenizerFactory.class )
+        .filter( LowerCaseFilterFactory.class )
+        .filter( EnglishPorterFilterFactory.class )
+    .fullTextFilterDef("security", SecurityFilterFactory.class)
+            .cache(FilterCacheModeType.INSTANCE_ONLY)
+    .entity(Address.class)
+        .indexed()
+        .property("addressId", ElementType.METHOD)
+            .documentId()
+                .name("id")
+        .property("street1", ElementType.METHOD)
+            .field()
+                .analyzer("en")
+                .store(Store.YES)
+            .field()
+                .name("address_data")
+                .analyzer("en")
+                .store(Store.NO);
+
+cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</code></pre></div></div><br class="example-break"/><p>The previous example can effectively been seen as annotating your entity with @FullTextFilterDef
+like below:</p><div class="example"><a id="d0e4567"/><p class="title"><strong>Example 4.40. Using annotation to define full text filter definition</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@Indexed
+@AnalyzerDefs({
+  @AnalyzerDef(name = "en",
+    tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+    filters = {
+      @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+      @TokenFilterDef(factory = EnglishPorterFilterFactory.class)
+   })
+})
+@FullTextFilterDefs({
+ @FullTextFilterDef(name = "security", impl = SecurityFilterFactory.class, cache = FilterCacheModeType.INSTANCE_ONLY)
+})
+public class Address {
+
+ @Id
+ @GeneratedValue
+ @DocumentId(name="id")
+ public Long getAddressId() {...};
+
+ @Fields({
+      @Field(store=Store.YES, analyzer=@Analyzer(definition="en")),
+      @Field(name="address_data", analyzer=@Analyzer(definition="en"))
+ })
+ public String getAddress1() {...};
+
+ // ...
+
+}</code></pre></div></div><br class="example-break"/></div><div class="section" title="4.7.5. Defining fields for indexing"><div class="titlepage"><div><div><h3 class="title"><a id="_defining_fields_for_indexing"/>4.7.5. Defining fields for indexing</h3></div></div></div><p>When defining fields for indexing using the programmatic API, call <code class="literal">field()</code> on the
+<code class="literal">property(String propertyName, ElementType elementType)</code> method. From <code class="literal">field()</code> you can specify
+the name, index, store, bridge and analyzer definitions.</p><div class="example"><a id="d0e4586"/><p class="title"><strong>Example 4.41. Indexing fields using programmatic API</strong></p><div class="example-contents"><pre><code class="language-java">SearchMapping mapping = new SearchMapping();
+
+mapping
+    .analyzerDef( "en", StandardTokenizerFactory.class )
+        .filter( LowerCaseFilterFactory.class )
+        .filter( EnglishPorterFilterFactory.class )
+    .entity(Address.class).indexed()
+        .property("addressId", ElementType.METHOD)
+            .documentId()
+                .name("id")
+        .property("street1", ElementType.METHOD)
+            .field()
+                .analyzer("en")
+                .store(Store.YES)
+            .field()
+                .name("address_data")
+                .analyzer("en");
+
+cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</code></pre></div></div><br class="example-break"/><p>The above example of marking fields as indexable is equivalent to defining fields using @Field as
+seen below:</p><div class="example"><a id="d0e4593"/><p class="title"><strong>Example 4.42. Indexing fields using annotation</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@Indexed
+@AnalyzerDefs({
+  @AnalyzerDef(name = "en",
+    tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+    filters = {
+      @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+      @TokenFilterDef(factory = EnglishPorterFilterFactory.class)
+   })
+})
+public class Address {
+
+ @Id
+ @GeneratedValue
+ @DocumentId(name="id")
+ private Long getAddressId() {...};
+
+ @Fields({
+      @Field(store=Store.YES, analyzer=@Analyzer(definition="en")),
+      @Field(name="address_data", analyzer=@Analyzer(definition="en"))
+ })
+ public String getAddress1() {...}
+
+ // ...
+}</code></pre></div></div><br class="example-break"/><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>When using a programmatic mapping for a given type X, you can only refer to fields defined on X.
+Fields or methods inherited from a super type are not configurable. In case you need to configure a
+super class property, you need to either override the property in X or create a programmatic mapping
+for the super class. This mimics the usage of annotations where you cannot annotate a field or
+method of a super class either, unless it is redefined in the given type.</p></div></div><div class="section" title="4.7.6. Programmatically defining embedded entities"><div class="titlepage"><div><div><h3 class="title"><a id="_programmatically_defining_embedded_entities"/>4.7.6. Programmatically defining embedded entities</h3></div></div></div><p>In this section you will see how to programmatically define entities to be embedded into the indexed
+entity similar to using the @IndexedEmbedded model. In order to define this you must mark the
+property as indexEmbedded.There is the option to add a prefix to the embedded entity definition
+which can be done by calling prefix as seen in the example below:</p><div class="example"><a id="d0e4606"/><p class="title"><strong>Example 4.43. Programmatically defining embedded entities</strong></p><div class="example-contents"><pre><code class="language-java">SearchMapping mapping = new SearchMapping();
+
+mapping
+    .entity(ProductCatalog.class)
+        .indexed()
+        .property("catalogId", ElementType.METHOD)
+            .documentId()
+                .name("id")
+        .property("title", ElementType.METHOD)
+            .field()
+                .index(Index.YES)
+                .store(Store.NO)
+        .property("description", ElementType.METHOD)
+             .field()
+                 .index(Index.YES)
+                 .store(Store.NO)
+        .property("items", ElementType.METHOD)
+            .indexEmbedded()
+                .prefix("catalog.items"); //optional
+
+cfg.getProperties().put( "hibernate.search.model_mapping", mapping )</code></pre></div></div><br class="example-break"/><p>The next example shows the same definition using annotation (@IndexedEmbedded):</p><div class="example"><a id="d0e4613"/><p class="title"><strong>Example 4.44. Using @IndexedEmbedded</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@Indexed
+public class ProductCatalog {
+ @Id
+ @GeneratedValue
+ @DocumentId(name="id")
+ public Long getCatalogId() {...}
+
+ @Field
+ public String getTitle() {...}
+
+ @Field
+ public String getDescription();
+
+ @OneToMany(fetch = FetchType.LAZY)
+ @IndexColumn(name = "list_position")
+ @Cascade(org.hibernate.annotations.CascadeType.ALL)
+ @IndexedEmbedded(prefix="catalog.items")
+ public List&lt;Item&gt; getItems() {...}
+
+ // ...
+}</code></pre></div></div><br class="example-break"/></div><div class="section" title="4.7.7. Contained In definition"><div class="titlepage"><div><div><h3 class="title"><a id="_contained_in_definition"/>4.7.7. Contained In definition</h3></div></div></div><p>@ContainedIn can be defined as seen in the example below:</p><div class="example"><a id="d0e4623"/><p class="title"><strong>Example 4.45. Programmatically defining ContainedIn</strong></p><div class="example-contents"><pre><code class="language-java">SearchMapping mapping = new SearchMapping();
+
+mapping
+    .entity(ProductCatalog.class)
+        .indexed()
+        .property("catalogId", ElementType.METHOD)
+            .documentId()
+        .property("title", ElementType.METHOD)
+            .field()
+        .property("description", ElementType.METHOD)
+            .field()
+        .property("items", ElementType.METHOD)
+            .indexEmbedded()
+
+    .entity(Item.class)
+        .property("description", ElementType.METHOD)
+            .field()
+        .property("productCatalog", ElementType.METHOD)
+            .containedIn();
+
+cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</code></pre></div></div><br class="example-break"/><p>This is equivalent to defining @ContainedIn in your entity:</p><div class="example"><a id="d0e4630"/><p class="title"><strong>Example 4.46. Annotation approach for ContainedIn</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@Indexed
+public class ProductCatalog {
+
+ @Id
+ @GeneratedValue
+ @DocumentId
+ public Long getCatalogId() {...}
+
+ @Field
+ public String getTitle() {...}
+
+ @Field
+ public String getDescription() {...}
+
+ @OneToMany(fetch = FetchType.LAZY)
+ @IndexColumn(name = "list_position")
+ @Cascade(org.hibernate.annotations.CascadeType.ALL)
+ @IndexedEmbedded
+ private List&lt;Item&gt; getItems() {...}
+
+ // ...
+}</code></pre><pre><code class="language-java">@Entity
+public class Item {
+
+ @Id
+ @GeneratedValue
+ private Long itemId;
+
+ @Field
+ public String getDescription() {...}
+
+ @ManyToOne( cascade = { CascadeType.PERSIST, CascadeType.REMOVE } )
+ @ContainedIn
+ public ProductCatalog getProductCatalog() {...}
+
+ // ...
+}</code></pre></div></div><br class="example-break"/></div><div class="section" title="4.7.8. Date/Calendar Bridge"><div class="titlepage"><div><div><h3 class="title"><a id="_date_calendar_bridge"/>4.7.8. Date/Calendar Bridge</h3></div></div></div><p>In order to define a calendar or date bridge mapping, call the dateBridge(Resolution resolution) or
+calendarBridge(Resolution resolution) methods after you have defined a field() in the SearchMapping
+hierarchy.</p><div class="example"><a id="d0e4642"/><p class="title"><strong>Example 4.47. Programmatic model for defining calendar/date bridge</strong></p><div class="example-contents"><pre><code class="language-java">SearchMapping mapping = new SearchMapping();
+
+mapping
+    .entity(Address.class)
+        .indexed()
+        .property("addressId", ElementType.FIELD)
+            .documentId()
+    .property("street1", ElementType.FIELD()
+        .field()
+    .property("createdOn", ElementType.FIELD)
+        .field()
+        .dateBridge(Resolution.DAY)
+    .property("lastUpdated", ElementType.FIELD)
+        .calendarBridge(Resolution.DAY);
+
+cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</code></pre></div></div><br class="example-break"/><p>See below for defining the above using @CalendarBridge and @DateBridge:</p><div class="example"><a id="d0e4649"/><p class="title"><strong>Example 4.48. @CalendarBridge and @DateBridge definition</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@Indexed
+public class Address {
+
+ @Id
+ @GeneratedValue
+ @DocumentId
+ private Long addressId;
+
+ @Field
+ private String address1;
+
+ @Field
+ @DateBridge(resolution=Resolution.DAY)
+ private Date createdOn;
+
+ @CalendarBridge(resolution=Resolution.DAY)
+ private Calendar lastUpdated;
+
+ // ...
+}</code></pre></div></div><br class="example-break"/></div><div class="section" title="4.7.9. Declaring bridges"><div class="titlepage"><div><div><h3 class="title"><a id="_declaring_bridges"/>4.7.9. Declaring bridges</h3></div></div></div><p>It is possible to associate bridges to programmatically defined fields. When you define a <code class="literal">field()</code>
+programmatically you can use the <code class="literal">bridge(Class&lt;?&gt; impl)</code> to associate a FieldBridge implementation
+class. The bridge method also provides optional methods to include any parameters required for the
+bridge class. The below shows an example of programmatically defining a bridge:</p><div class="example"><a id="d0e4665"/><p class="title"><strong>Example 4.49. Declaring field bridges programmatically</strong></p><div class="example-contents"><pre><code class="language-java">SearchMapping mapping = new SearchMapping();
+
+mapping
+    .entity(Address.class)
+        .indexed()
+        .property("addressId", ElementType.FIELD)
+            .documentId()
+        .property("street1", ElementType.FIELD)
+            .field()
+            .field()
+                .name("street1_abridged")
+                .bridge( ConcatStringBridge.class )
+                    .param( "size", "4" );
+
+cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</code></pre></div></div><br class="example-break"/><p>The above can equally be defined using annotations, as seen in the next example.</p><div class="example"><a id="d0e4672"/><p class="title"><strong>Example 4.50. Declaring field bridges using annotation</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@Indexed
+public class Address {
+
+ @Id
+ @GeneratedValue
+ @DocumentId(name="id")
+ private Long addressId;
+
+ @Fields({
+      @Field,
+      @Field(name="street1_abridged",
+             bridge = @FieldBridge( impl = ConcatStringBridge.class,
+             params = @Parameter( name="size", value="4" ))
+ })
+ private String address1;
+
+ // ...
+}</code></pre></div></div><br class="example-break"/></div><div class="section" title="4.7.10. Mapping class bridge"><div class="titlepage"><div><div><h3 class="title"><a id="_mapping_class_bridge"/>4.7.10. Mapping class bridge</h3></div></div></div><p>You can define class bridges on entities programmatically. This is shown in the next example:</p><div class="example"><a id="d0e4682"/><p class="title"><strong>Example 4.51. Defining class bridges using API</strong></p><div class="example-contents"><pre><code class="language-java">SearchMapping mapping = new SearchMapping();
+
+mapping
+    .entity(Departments.class)
+      .classBridge(CatDeptsFieldsClassBridge.class)
+         .name("branchnetwork")
+         .index(Index.YES)
+         .store(Store.YES)
+         .param("sepChar", " ")
+      .classBridge(EquipmentType.class)
+         .name("equiptype")
+         .index(Index.YES)
+         .store(Store.YES)
+         .param("C", "Cisco")
+         .param("D", "D-Link")
+         .param("K", "Kingston")
+         .param("3", "3Com")
+      .indexed();
+
+cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</code></pre></div></div><br class="example-break"/><p>The above is similar to using @ClassBridge as seen in the next example:</p><div class="example"><a id="d0e4689"/><p class="title"><strong>Example 4.52. Using @ClassBridge</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@Indexed
+@ClassBridges ( {
+  @ClassBridge(name="branchnetwork",
+     store= Store.YES,
+     impl = CatDeptsFieldsClassBridge.class,
+     params = @Parameter( name="sepChar", value=" " ) ),
+  @ClassBridge(name="equiptype",
+     store= Store.YES,
+     impl = EquipmentType.class,
+     params = {@Parameter( name="C", value="Cisco" ),
+        @Parameter( name="D", value="D-Link" ),
+        @Parameter( name="K", value="Kingston" ),
+        @Parameter( name="3", value="3Com" )
+   })
+})
+public class Departments {
+   // ...
+}</code></pre></div></div><br class="example-break"/></div><div class="section" title="4.7.11. Mapping dynamic boost"><div class="titlepage"><div><div><h3 class="title"><a id="_mapping_dynamic_boost"/>4.7.11. Mapping dynamic boost</h3></div></div></div><p>You can apply a dynamic boost factor on either a field or a whole entity:</p><div class="example"><a id="d0e4699"/><p class="title"><strong>Example 4.53. DynamicBoost mapping using programmatic model</strong></p><div class="example-contents"><pre><code class="language-java">SearchMapping mapping = new SearchMapping();
+mapping
+  .entity(DynamicBoostedDescLibrary.class)
+   .indexed()
+   .dynamicBoost(CustomBoostStrategy.class)
+  .property("libraryId", ElementType.FIELD)
+    .documentId().name("id")
+  .property("name", ElementType.FIELD)
+    .dynamicBoost(CustomFieldBoostStrategy.class);
+    .field()
+      .store(Store.YES)
+
+cfg.getProperties().put( "hibernate.search.model_mapping", mapping );</code></pre></div></div><br class="example-break"/><p>The next example shows the equivalent mapping using the @DynamicBoost annotation:</p><div class="example"><a id="d0e4706"/><p class="title"><strong>Example 4.54. Using the @DynamicBoost</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@Indexed
+@DynamicBoost(impl = CustomBoostStrategy.class)
+public class DynamicBoostedDescriptionLibrary {
+
+ @Id
+ @GeneratedValue
+ @DocumentId
+ private int id;
+
+ private float dynScore;
+
+ @Field(store = Store.YES)
+ @DynamicBoost(impl = CustomFieldBoostStrategy.class)
+ private String name;
+
+ public DynamicBoostedDescriptionLibrary() {
+  dynScore = 1.0f;
+ }
+
+ // ...
+}</code></pre></div></div><br class="example-break"/></div></div></div><script xmlns="" xmlns:d="http://docbook.org/ns/docbook" type="text/javascript" src="highlight.js/highlight.pack.js"> </script><script xmlns="" xmlns:d="http://docbook.org/ns/docbook" type="text/javascript">hljs.initHighlightingOnLoad();</script><script type="text/javascript">
+dataLayer = [{'channel' : 'Hibernate', 'additional_tracking_code' : 'UA-45270411-3'}];
+(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NJWS5L');</script><noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-NJWS5L" height="0" width="0" style="display:none;visibility:hidden"> </iframe></noscript><hr xmlns="" xmlns:d="http://docbook.org/ns/docbook"/><a xmlns="" xmlns:d="http://docbook.org/ns/docbook" href="legalnotice.html"/><ul class="docnav"><li class="previous"><a accesskey="p" href="ch03.html"><strong>Prev</strong>Chapter 3. Configuration</a></li><li class="up"><a accesskey="u" href="#"><strong>Up</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Home</strong></a></li><li class="next"><a accesskey="n" href="ch05.html"><strong>Next</strong>Chapter 5. Querying</a></li></ul><!-- HibernateDoc.OutdatedContent --><script src="//code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script><script src="/hibernate/_outdated-content/outdated-content.js" type="text/javascript"></script><script type="text/javascript">var jQuery_3_1 = $.noConflict(true); jQuery_3_1(document).ready(function() { HibernateDoc.OutdatedContent.install("search"); });</script><!-- /HibernateDoc.OutdatedContent --></body></html>

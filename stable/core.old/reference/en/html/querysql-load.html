@@ -1,0 +1,92 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>16.4.&nbsp;Custom SQL for loading</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="querysql.html" title="Chapter&nbsp;16.&nbsp;Native SQL">
+      <link rel="prev" href="querysql-cud.html" title="16.3.&nbsp;Custom SQL for create, update and delete">
+      <link rel="next" href="filters.html" title="Chapter&nbsp;17.&nbsp;Filtering data">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">16.4.&nbsp;Custom SQL for loading</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="querysql-cud.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;16.&nbsp;Native SQL</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="filters.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="querysql-load"></a>16.4.&nbsp;Custom SQL for loading
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>You may also declare your own SQL (or HQL) queries for entity
+                loading:
+         </p><pre class="programlisting">&lt;sql-query name="person"&gt;
+    &lt;return alias="pers" class="Person" lock-mode="upgrade"/&gt;
+    SELECT NAME AS {pers.name}, ID AS {pers.id}
+    FROM PERSON
+    WHERE ID=?
+    FOR UPDATE
+&lt;/sql-query&gt;</pre><p>This is just a named query declaration, as discussed earlier. You
+                may reference this named query in a class mapping:
+         </p><pre class="programlisting">&lt;class name="Person"&gt;
+    &lt;id name="id"&gt;
+        &lt;generator class="increment"/&gt;
+    &lt;/id&gt;
+    &lt;property name="name" not-null="true"/&gt;
+    &lt;loader query-ref="person"/&gt;
+&lt;/class&gt;</pre><p>This even works with stored procedures.</p>
+         <p>You may even define a query for collection loading:</p><pre class="programlisting">&lt;set name="employments" inverse="true"&gt;
+    &lt;key/&gt;
+    &lt;one-to-many class="Employment"/&gt;
+    &lt;loader query-ref="employments"/&gt;
+&lt;/set&gt;</pre><pre class="programlisting">&lt;sql-query name="employments"&gt;
+    &lt;load-collection alias="emp" role="Person.employments"/&gt;
+    SELECT {emp.*}
+    FROM EMPLOYMENT emp
+    WHERE EMPLOYER = :id
+    ORDER BY STARTDATE ASC, EMPLOYEE ASC
+&lt;/sql-query&gt;</pre><p>You could even define an entity loader that loads a collection by
+                join fetching:
+         </p><pre class="programlisting">&lt;sql-query name="person"&gt;
+    &lt;return alias="pers" class="Person"/&gt;
+    &lt;return-join alias="emp" property="pers.employments"/&gt;
+    SELECT NAME AS {pers.*}, {emp.*}
+    FROM PERSON pers
+    LEFT OUTER JOIN EMPLOYMENT emp
+        ON pers.ID = emp.PERSON_ID
+    WHERE ID=?
+&lt;/sql-query&gt;</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="querysql-cud.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="querysql.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="filters.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">16.3.&nbsp;Custom SQL for create, update and delete&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;Chapter&nbsp;17.&nbsp;Filtering data</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

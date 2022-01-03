@@ -1,0 +1,247 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>Chapter&nbsp;2.&nbsp;Setup and configuration</title><link rel="stylesheet" href="../shared/css/html.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.65.1"><link rel="home" href="index.html" title="Hibernate EntityManager"><link rel="up" href="index.html" title="Hibernate EntityManager"><link rel="previous" href="architecture.html" title="Chapter&nbsp;1.&nbsp;Architecture"><link rel="next" href="objectstate.html" title="Chapter&nbsp;3.&nbsp;Working with objects"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter&nbsp;2.&nbsp;Setup and configuration</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="architecture.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="objectstate.html">Next</a></td></tr></table><hr></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="configuration"></a>Chapter&nbsp;2.&nbsp;Setup and configuration</h2></div></div><div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e176"></a>2.1.&nbsp;Setup</h2></div></div><div></div></div><p>The EJB 3.0 / JPA compatible Hibernate EntityManager is built on top
+    of Hibernate core and Hibernate Annotations. You have to use compatible
+    versions of each module. Please consult the compatibility matrix in the
+    hibernate.org download section. The following libraries have to be in your
+    classpath: hibernate3.jar, hibernate-annotations.jar,
+    hibernate-commons-annotations.jar, hibernate-entitymanager.jar and all
+    needed third party libraries for each package (incl.
+    ejb-persistence.jar).</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="setup-configuration"></a>2.2.&nbsp;Configuration and bootstrapping</h2></div></div><div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="setup-configuration-packaging"></a>2.2.1.&nbsp;Packaging</h3></div></div><div></div></div><p>The configuration for entity managers both inside an application
+      server and in a standalone application reside in a persistence archive.
+      A persistence archive is a JAR file which must define a
+      <tt class="literal">persistence.xml</tt> file that resides in the
+      <tt class="filename">META-INF</tt> folder. All properly annotated classes
+      included in the archive (ie having an <tt class="literal">@Entity</tt>
+      annotation), all annotated packages and all Hibernate hbm.xml files
+      included in the archive will be added to the persistence unit
+      configuration, so by default, your persistence.xml will be quite
+      minimalist:</p><pre class="programlisting">&lt;persistence xmlns="http://java.sun.com/xml/ns/persistence"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"
+   version="1.0"&gt;
+   &lt;persistence-unit name="sample"&gt;
+      &lt;jta-data-source&gt;java:/DefaultDS&lt;/jta-data-source&gt;
+      &lt;properties&gt;
+         &lt;property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect"/&gt;
+         &lt;property name="hibernate.hbm2ddl.auto" value="create-drop"/&gt;
+      &lt;/properties&gt;
+   &lt;/persistence-unit&gt;
+&lt;/persistence&gt;</pre><p>Here's a more complete example of a
+      <tt class="filename"><tt class="literal">persistence.xml</tt></tt> file</p><pre class="programlisting">&lt;persistence xmlns="http://java.sun.com/xml/ns/persistence"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"
+   version="1.0"&gt;
+   &lt;persistence-unit name="manager1" transaction-type="JTA"&gt;
+      &lt;provider&gt;org.hibernate.ejb.HibernatePersistence&lt;/provider&gt;
+      &lt;jta-data-source&gt;java:/DefaultDS&lt;/jta-data-source&gt;
+      &lt;mapping-file&gt;ormap.xml&lt;/mapping-file&gt;
+      &lt;jar-file&gt;MyApp.jar&lt;/jar-file&gt;
+      &lt;class&gt;org.acme.Employee&lt;/class&gt;
+      &lt;class&gt;org.acme.Person&lt;/class&gt;
+      &lt;class&gt;org.acme.Address&lt;/class&gt;
+      &lt;properties&gt;
+         &lt;property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect"/&gt;
+         &lt;property name="hibernate.hbm2ddl.auto" value="create-drop"/&gt;
+      &lt;/properties&gt;
+   &lt;/persistence-unit&gt;
+&lt;/persistence&gt;</pre><div class="variablelist"><dl><dt><span class="term"><tt class="code">name</tt></span></dt><dd><p>(attribute) Every entity manager must have a name.</p></dd><dt><span class="term"><tt class="code">transaction-type</tt></span></dt><dd><p>(attribute) Transaction type used. Either JTA or
+            RESOURCE_LOCAL (default to JTA in a JavaEE environment and to
+            RESOURCE_LOCAL in a JavaSE environment). When a jta-datasource is
+            used, the default is JTA, if non-jta-datasource is used,
+            RESOURCE_LOCAL is used.</p></dd><dt><span class="term"><tt class="code">provider</tt></span></dt><dd><p>The provider is a fully-qualified class name of the EJB
+            Persistence provider. You do not have to define it if you don't
+            work with several EJB3 implementations. This is needed when you
+            are using multiple vendor implementations of EJB
+            Persistence.</p></dd><dt><span class="term"><tt class="code">jta-data-source</tt>,
+          <tt class="code">non-jta-data-source</tt></span></dt><dd><p>This is the JNDI name of where the javax.sql.DataSource is
+            located. When running without a JNDI available Datasource, you
+            must specify JDBC connections with Hibernate specific properties
+            (see below).</p></dd><dt><span class="term"><tt class="code">mapping-file</tt></span></dt><dd><p>The class element specifies a EJB3 compliant XML mapping
+            file that you will map. The file has to be in the classpath. As
+            per the EJB3 specification, Hibernate EntityManager will try to
+            load the mapping file located in the jar file at
+            <tt class="literal">META_INF/orm.xml</tt>. Of course any explicit
+            mapping file will be loaded too. As a matter of fact, you can
+            provides any XML file in the mapping file element ie. either hbm
+            files or EJB3 deployment descriptor.</p></dd><dt><span class="term"><tt class="code">jar-file</tt></span></dt><dd><p>The jar-file elements specifies a jar to analyse. All
+            properly annotated classes, annotated packages and all hbm.xml
+            files part of this jar file will be added to the persistence unit
+            configuration. This element is mainly used in Java EE environment.
+            Use of this one in Java SE should be considered as non portable,
+            in this case a absolute url is needed. You can alternatively point
+            to a directory (This is especially useful when in your test
+            environment, the persistence.xml file is not under the same root
+            directory or jar than your domain model).</p><pre class="programlisting">        &lt;jar-file&gt;file:/home/turin/work/local/lab8/build/classes&lt;/jar-file&gt;</pre></dd><dt><span class="term"><tt class="code">exclude-unlisted-classes</tt></span></dt><dd><p>Do not check the main jar file for annotated classes. Only
+            explicit classes will be part of the persistence unit.</p></dd><dt><span class="term"><tt class="code">class</tt></span></dt><dd><p>The class element specifies a fully qualified class name
+            that you will map. By default all properly annotated classes and
+            all hbm.xml files found inside the archive are added to the
+            persistence unit configuration. You can add some external entity
+            through the class element though. As an extension to the
+            specification, you can add a package name in the
+            <tt class="literal">&lt;class&gt;</tt> element (eg
+            <tt class="code">&lt;class&gt;org.hibernate.eg&lt;/class&gt;</tt>).
+            Caution, the package will include the metadata defined at the
+            package level (ie in <tt class="filename">package-info.java</tt>), it
+            will not include all the classes of a given package.</p></dd><dt><span class="term"><tt class="code">properties</tt></span></dt><dd><p>The properties element is used to specify vendor specific
+            properties. This is where you will define your Hibernate specific
+            configurations. This is also where you will have to specify JDBC
+            connection information as well.</p></dd></dl></div><p>Be sure to define the grammar definition in the
+      <tt class="literal">persistence</tt> element since the EJB3 specification
+      requires the schema validation. If the systemId ends with
+      <tt class="literal">persistence_1_0.xsd</tt>, Hibernate entityManager will use
+      the version embedded in the hibernate-entitymanager.jar. No internet
+      access will be processed.</p><pre class="programlisting">&lt;persistence xmlns="http://java.sun.com/xml/ns/persistence"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"
+   version="1.0"&gt;</pre></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="setup-configuration-bootstrapping"></a>2.2.2.&nbsp;Bootstrapping</h3></div></div><div></div></div><p>The EJB3 specification defines a bootstrap procedure to access the
+      <tt class="classname">EntityManagerFactory</tt> and the
+      <tt class="classname">EntityManager</tt>. The bootstrap class is
+      <tt class="classname">javax.persistence.Persistence</tt>, e.g.</p><pre class="programlisting">EntityManagerFactory emf = Persistence.createEntityManagerFactory("manager1");
+//or
+Map configOverrides = new HashMap();
+configOverrides.put("hibernate.hbm2ddl.auto", "create-drop");
+EntityManagerFactory programmaticEmf =
+    Persistence.createEntityManagerFactory("manager1", configOverrides);</pre><p>The first version is equivalent to the second with an empty map.
+      The map version is a set of overrides that will take precedence over any
+      properties defined in your persistence.xml files. There are a couple of
+      EJB3 properties usable in the map:</p><div class="itemizedlist"><ul type="disc"><li><p>javax.persistence.provider to define the provider class
+          used</p></li><li><p>javax.persistence.transactionType to define the transaction
+          type used (either JTA or RESOURCE_LOCAL)</p></li><li><p>javax.persistence.jtaDataSource to define the JTA datasource
+          name in JNDI</p></li><li><p>javax.persistence.nonJtaDataSource to define the non JTA
+          datasource name in JNDI</p></li></ul></div><p>When <tt class="code">Persistence.createEntityManagerFactory()</tt> is
+      called, the persistence implementation will search your classpath for
+      any <tt class="code">META-INF/persistence.xml</tt> files using the
+      <tt class="code">ClassLoader.getResource("META-INF/persistence.xml")</tt> method.
+      Actually the <tt class="classname">Persistence</tt> class will look at all
+      the Persistence Providers available in the classpath and ask each of
+      them if they are responsible for the creation of the entity manager
+      factory <tt class="literal">manager1</tt>. Each provider, from this list of
+      resources, it will try to find an entity manager that matches the name
+      you specify in the command line with what is specified in the
+      persistence.xml file (of course the provider <tt class="literal">element</tt>
+      must match the current persistent provider). If no persistence.xml with
+      the correct name are found or if the expected persistence provider is
+      not found, a <tt class="classname">PersistenceException</tt> is
+      raised.</p><p>Apart from Hibernate system-level settings, all the properties
+      available in Hibernate can be set in <tt class="code">properties</tt> element of
+      the persistence.xml file or as an override in the map you pass to
+      <tt class="code">createEntityManagerFactory()</tt>. Please refer to the Hibernate
+      reference documentation for a complete listing. There are however a
+      couple of properties available in the EJB3 provider only.</p><p></p><div class="table"><a name="d0e362"></a><p class="title"><b>Table&nbsp;2.1.&nbsp;Hibernate Entity Manager specific properties</b></p><table summary="Hibernate Entity Manager specific properties" border="1"><colgroup><col align="left"><col></colgroup><thead><tr><th align="left">Property name</th><th>Description</th></tr></thead><tbody><tr><td align="left">hibernate.ejb.classcache.&lt;classname&gt;</td><td>class cache strategy [comma cache region] of the class
+              Default to no cache, and default region cache to
+              fully.qualified.classname (eg.
+              hibernate.ejb.classcache.com.acme.Cat read-write or
+              hibernate.ejb.classcache.com.acme.Cat read-write,
+              MyRegion).</td></tr><tr><td align="left">hibernate.ejb.collectioncache.&lt;collectionrole&gt;</td><td>collection cache strategy [comma cache region] of the
+              class Default to no cache, and default region cache to
+              fully.qualified.classname.role (eg.
+              hibernate.ejb.classcache.com.acme.Cat read-write or
+              hibernate.ejb.classcache.com.acme.Cat read-write,
+              MyRegion).</td></tr><tr><td align="left">hibernate.ejb.cfgfile</td><td>XML configuration file to use to configure Hibernate (eg.
+              <tt class="filename">/hibernate.cfg.xml</tt>).</td></tr><tr><td align="left">hibernate.archive.autodetection</td><td>Determine which element is auto discovered by Hibernate
+              Entity Manager while parsing the .par archive. (default to
+              <tt class="literal">class,hbm</tt>).</td></tr><tr><td align="left">hibernate.ejb.interceptor</td><td>An optional Hibernate interceptor. The interceptor
+              instance is shared by all <tt class="classname">Session</tt>
+              instances. This interceptor has to implement
+              <tt class="classname">org.hibernate.Interceptor</tt> and have a
+              no-arg constructor. This property can not be combined with
+              <tt class="literal">hibernate.ejb.interceptor.session_scoped</tt>.</td></tr><tr><td align="left">hibernate.ejb.interceptor.session_scoped</td><td>An optional Hibernate interceptor. The interceptor
+              instance is specific to a given <tt class="classname">Session</tt>
+              instance (and hence can be non thread-safe). This interceptor
+              has to implement
+              <tt class="classname">org.hibernate.Interceptor</tt> and have a
+              no-arg constructor. This property can not be combined with
+              <tt class="literal">hibernate.ejb.interceptor</tt>.</td></tr><tr><td align="left">hibernate.ejb.naming_strategy</td><td>An optional naming strategy. The default naming strategy
+              used is <tt class="classname">EJB3NamingStrategy</tt>. You also
+              might want to consider the
+              <tt class="classname">DefaultComponentSafeNamingStrategy</tt>.</td></tr><tr><td align="left">hibernate.ejb.event.&lt;eventtype&gt;</td><td>Event listener list for a given eventtype. The list of
+              event listeners is a comma separated fully qualified class name
+              list (eg. hibernate.ejb.event.pre-load
+              com.acme.SecurityListener, com.acme.AuditListener)</td></tr><tr><td align="left">hibernate.ejb.use_class_enhancer</td><td>Whether or not use Application server class enhancement
+              at deployment time (default to false)</td></tr><tr><td align="left">hibernate.ejb.discard_pc_on_close</td><td>If true, the persistence context will be discarded (think
+              clear() when the method is called. Otherwise the persistence
+              context will stay alive till the transaction completion: all
+              objects will remain managed, and any change will be sy,chronized
+              with the database (default to false, ie wait the transaction
+              completion)</td></tr></tbody></table></div><p>Note that you can mix XML <tt class="literal">&lt;class&gt;</tt>
+      declaration and <tt class="literal">hibernate.ejb.cfgfile</tt> usage in the
+      same configuration. Be aware of the potential clashed. The properties
+      set in <tt class="filename">persistence.xml</tt> will override the one in the
+      defined <tt class="filename">hibernate.cfg.xml</tt>.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>It is important that you do not override
+        <tt class="literal">hibernate.transaction.factory_class</tt>, Hibernate
+        EntityManager automatically set the appropriate transaction factory
+        depending on the EntityManager type (ie <tt class="literal">JTA</tt> versus
+        <tt class="literal">RESOURSE_LOCAL</tt>). If you are working in a Java EE
+        environment, you might want to set the
+        <tt class="literal">hibernate.transaction.manager_lookup_class</tt>
+        though.</p></div><p>Here is a typical configuration in a J2SE environment</p><pre class="programlisting">&lt;persistence&gt;
+   &lt;persistence-unit name="manager1" transaction-type="RESOURCE_LOCAL"&gt;
+      &lt;class&gt;org.hibernate.ejb.test.Cat&lt;/class&gt;
+      &lt;class&gt;org.hibernate.ejb.test.Distributor&lt;/class&gt;
+      &lt;class&gt;org.hibernate.ejb.test.Item&lt;/class&gt;
+      &lt;properties&gt;
+         &lt;property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect"/&gt;
+         &lt;property name="hibernate.connection.driver_class" value="org.hsqldb.jdbcDriver"/&gt;
+         &lt;property name="hibernate.connection.username" value="sa"/&gt;
+         &lt;property name="hibernate.connection.password" value=""/&gt;
+         &lt;property name="hibernate.connection.url" value="jdbc:hsqldb:."/&gt;
+         &lt;property name="hibernate.max_fetch_depth" value="3"/&gt;
+       
+         &lt;!-- cache configuration --&gt;
+         &lt;property name="hibernate.ejb.classcache.org.hibernate.ejb.test.Item" value="read-write"/&gt;
+         &lt;property name="hibernate.ejb.collectioncache.org.hibernate.ejb.test.Item.distributors" value="read-write, RegionName"/&gt;
+
+         &lt;!-- alternatively to &lt;class&gt; and &lt;property&gt; declarations, you can use a regular hibernate.cfg.xml file --&gt;
+         &lt;!-- property name="hibernate.ejb.cfgfile" value="/org/hibernate/ejb/test/hibernate.cfg.xml"/ --&gt;
+      &lt;/properties&gt;
+   &lt;/persistence-unit&gt;
+&lt;/persistence&gt;</pre><p>To ease the programmatic configuration, Hibernate Entity Manager
+      provide a proprietary API. This API is very similar to the
+      <tt class="classname">Configuration</tt> API and share the same concepts:
+      <tt class="classname">Ejb3Configuration</tt>. Refer to the JavaDoc and the
+      Hibernate reference guide for more detailed informations on how to use
+      it.</p><p>TODO: me more descriptive on some APIs like setDatasource()</p><pre class="programlisting">Ejb3Configuration cfg = new Ejb3Configuration();
+EntityManagerFactory emf = 
+  cfg.addProperties( properties ) //add some properties
+     .setInterceptor( myInterceptorImpl ) // set an interceptor
+     .addAnnotatedClass( MyAnnotatedClass.class ) //add a class to be mapped
+     .addClass( NonAnnotatedClass.class ) //add an hbm.xml file using the Hibernate convention
+     .addRerousce( "mypath/MyOtherCLass.hbm.xml ) //add an hbm.xml file
+     .addRerousce( "mypath/orm.xml ) //add an EJB3 deployment descriptor
+     .configure("/mypath/hibernate.cfg.xml") //add a regular hibernate.cfg.xml
+     .buildEntityManagerFactory(); //Create the entity manager factory</pre></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e500"></a>2.3.&nbsp;Event listeners</h2></div></div><div></div></div><p>Hibernate Entity Manager needs to enhance Hibernate core to
+    implements all the EJB3 semantics. It does that through the event listener
+    system of Hibernate. Be careful when you use the event system yourself,
+    you might override some of the EJB3 semantics. A safe way is to add your
+    event listeners to the list given below.</p><div class="table"><a name="d0e505"></a><p class="title"><b>Table&nbsp;2.2.&nbsp;Hibernate Entity Manager default event listeners</b></p><table summary="Hibernate Entity Manager default event listeners" border="1"><colgroup><col align="left"><col></colgroup><thead><tr><th align="left">Event</th><th>Listeners</th></tr></thead><tbody><tr><td align="left">flush</td><td>org.hibernate.ejb.event.EJB3FlushEventListener</td></tr><tr><td align="left">auto-flush</td><td>org.hibernate.ejb.event.EJB3AutoFlushEventListener</td></tr><tr><td align="left">delete</td><td>org.hibernate.ejb.event.EJB3DeleteEventListener</td></tr><tr><td align="left">flush-entity</td><td>org.hibernate.ejb.event.EJB3FlushEntityEventListener</td></tr><tr><td align="left">merge</td><td>org.hibernate.ejb.event.EJB3MergeEventListener</td></tr><tr><td align="left">create</td><td>org.hibernate.ejb.event.EJB3PersistEventListener</td></tr><tr><td align="left">create-onflush</td><td>org.hibernate.ejb.event.EJB3PersistOnFlushEventListener</td></tr><tr><td align="left">save</td><td>org.hibernate.ejb.event.EJB3SaveEventListener</td></tr><tr><td align="left">save-update</td><td>org.hibernate.ejb.event.EJB3SaveOrUpdateEventListener</td></tr><tr><td align="left">pre-insert</td><td>org.hibernate.secure.JACCPreInsertEventListener,
+            org.hibernate.valitator.event.ValidateEventListener</td></tr><tr><td align="left">pre-insert</td><td>org.hibernate.secure.JACCPreUpdateEventListener,
+            org.hibernate.valitator.event.ValidateEventListener</td></tr><tr><td align="left">pre-delete</td><td>org.hibernate.secure.JACCPreDeleteEventListener</td></tr><tr><td align="left">pre-load</td><td>org.hibernate.secure.JACCPreLoadEventListener</td></tr><tr><td align="left">post-delete</td><td>org.hibernate.ejb.event.EJB3PostDeleteEventListener</td></tr><tr><td align="left">post-insert</td><td>org.hibernate.ejb.event.EJB3PostInsertEventListener</td></tr><tr><td align="left">post-load</td><td>org.hibernate.ejb.event.EJB3PostLoadEventListener</td></tr><tr><td align="left">post-update</td><td>org.hibernate.ejb.event.EJB3PostUpdateEventListener</td></tr></tbody></table></div><p>Note that the JACC*EventListeners are removed if the security is not
+    enabled.</p><p>You can configure the event listeners either through the properties
+    (see <a href="configuration.html#setup-configuration">Configuration and bootstrapping</a>) or through the
+    <tt class="methodname">ejb3configuration.getEventListeners()</tt> API.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e612"></a>2.4.&nbsp;Obtaining an EntityManager in a Java SE environment</h2></div></div><div></div></div><p>An entity manager factory should be considered as an immutable
+    configuration holder, it is defined to point to a single datasource and to
+    map a defined set of entities. This is the entry point to create and
+    manage <tt class="classname">EntityManager</tt>s. The
+    <tt class="classname">Persistence</tt> class is bootstrap class to create an
+    entity manager factory.</p><pre class="programlisting">// Use persistence.xml configuration
+EntityManagerFactory emf = Persistence.createEntityManagerFactory("manager1")
+EntityManager em = emf.createEntityManager(); // Retrieve an application managed entity manager
+// Work with the EM
+em.close();
+...
+emf.close(); //close at application end</pre><p>An entity manager factory is typically create at application
+    initialization time and closed at application end. It's creation is an
+    expensive process. For those who are familiar with Hibernate, an entity
+    manager factory is very much like a session factory. Actually, an entity
+    manager factory is a wrapper on top of a session factory. Calls to the
+    entityManagerFactory are thread safe.</p><p>Thanks to the EntityManagerFactory, you can retrieve an extended
+    entity manager. The extended entity manager keep the same persistence
+    context for the lifetime of the entity manager: in other words, the
+    entities are still managed between two transactions (unless you call
+    entityManager.clear() in between). You can see an entity manager as a
+    small wrapper on top of an Hibernate session.</p><p>TODO explains emf.createEntityManager(Map)</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e631"></a>2.5.&nbsp;Various</h2></div></div><div></div></div><p>Hibernate Entity Manager comes with Hibernate Validator configured
+    out of the box. You don't have to override any event yourself. If you do
+    not use Hibernate Validator annotations in your domain model, there will
+    be no performance cost. For more information on Hibernate Validator,
+    please refer to the Hibernate Annotations reference guide.</p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="architecture.html">Prev</a>&nbsp;</td><td width="20%" align="center"><a accesskey="u" href="index.html">Up</a></td><td width="40%" align="right">&nbsp;<a accesskey="n" href="objectstate.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter&nbsp;1.&nbsp;Architecture&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;Chapter&nbsp;3.&nbsp;Working with objects</td></tr></table></div></body></html>

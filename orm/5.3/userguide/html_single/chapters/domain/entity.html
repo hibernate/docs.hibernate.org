@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 1.5.2">
+<title>Entity types</title>
+<link rel="stylesheet" href="./css/hibernate.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js"></script>
+<script>document.addEventListener('DOMContentLoaded', prettyPrint)</script>
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect2">
+<h3 id="entity">Entity types</h3>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="title">Usage of the word <em>entity</em></div>
+<div class="paragraph">
+<p>The entity type describes the mapping between the actual persistable domain model object and a database table row.
+To avoid any confusion with the annotation that marks a given entity type, the annotation will be further referred as <code>@Entity</code>.</p>
+</div>
+<div class="paragraph">
+<p>Throughout this chapter and thereafter, entity types will be simply referred as <em>entity</em>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="entity-pojo">POJO Models</h4>
+<div class="paragraph">
+<p>Section <em>2.1 The Entity Class</em> of the <em>JPA 2.1 specification</em> defines its requirements for an entity class.
+Applications that wish to remain portable across JPA providers should adhere to these requirements.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The entity class must be annotated with the <code>javax.persistence.Entity</code> annotation (or be denoted as such in XML mapping)</p>
+</li>
+<li>
+<p>The entity class must have a public or protected no-argument constructor. It may define additional constructors as well.</p>
+</li>
+<li>
+<p>The entity class must be a top-level class.</p>
+</li>
+<li>
+<p>An enum or interface may not be designated as an entity.</p>
+</li>
+<li>
+<p>The entity class must not be final. No methods or persistent instance variables of the entity class may be final.</p>
+</li>
+<li>
+<p>If an entity instance is to be used remotely as a detached object, the entity class must implement the <code>Serializable</code> interface.</p>
+</li>
+<li>
+<p>Both abstract and concrete classes can be entities. Entities may extend non-entity classes as well as entity classes, and non-entity classes may extend entity classes.</p>
+</li>
+<li>
+<p>The persistent state of an entity is represented by instance variables, which may correspond to JavaBean-style properties.
+An instance variable must be directly accessed only from within the methods of the entity by the entity instance itself.
+The state of the entity is available to clients only through the entity’s accessor methods (getter/setter methods) or other business methods.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Hibernate, however, is not as strict in its requirements. The differences from the list above include:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The entity class must have a no-argument constructor, which may be public, protected or package visibility. It may define additional constructors as well.</p>
+</li>
+<li>
+<p>The entity class <em>need not</em> be a top-level class.</p>
+</li>
+<li>
+<p>Technically Hibernate can persist final classes or classes with final persistent state accessor (getter/setter) methods.
+However, it is generally not a good idea as doing so will stop Hibernate from being able to generate proxies for lazy-loading the entity.</p>
+</li>
+<li>
+<p>Hibernate does not restrict the application developer from exposing instance variables and reference them from outside the entity class itself.
+The validity of such a paradigm, however, is debatable at best.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s look at each requirement in detail.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="entity-pojo-final">Prefer non-final classes</h4>
+<div class="paragraph">
+<p>A central feature of Hibernate is the ability to load lazily certain entity instance variables (attributes) via runtime proxies.
+This feature depends upon the entity class being non-final or else implementing an interface that declares all the attribute getters/setters.
+You can still persist final classes that do not implement such an interface with Hibernate,
+but you will not be able to use proxies for fetching lazy associations, therefore limiting your options for performance tuning.
+For the very same reason, you should also avoid declaring persistent attribute getters and setters as final.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Starting in 5.0 Hibernate offers a more robust version of bytecode enhancement as another means for handling lazy loading.
+Hibernate had some bytecode re-writing capabilities prior to 5.0 but they were very rudimentary.
+See the <a href="chapters/pc/BytecodeEnhancement.html#BytecodeEnhancement">BytecodeEnhancement</a> for additional information on fetching and on bytecode enhancement.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="entity-pojo-constructor">Implement a no-argument constructor</h4>
+<div class="paragraph">
+<p>The entity class should have a no-argument constructor. Both Hibernate and JPA require this.</p>
+</div>
+<div class="paragraph">
+<p>JPA requires that this constructor be defined as public or protected.
+Hibernate, for the most part, does not care about the constructor visibility, as long as the system SecurityManager allows overriding the visibility setting.
+That said, the constructor should be defined with at least package visibility if you wish to leverage runtime proxy generation.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="entity-pojo-accessors">Declare getters and setters for persistent attributes</h4>
+<div class="paragraph">
+<p>The JPA specification requires this, otherwise the model would prevent accessing the entity persistent state fields directly from outside the entity itself.</p>
+</div>
+<div class="paragraph">
+<p>Although Hibernate does not require it, it is recommended to follow the JavaBean conventions and define getters and setters for entity persistent attributes.
+Nevertheless, you can still tell Hibernate to directly access the entity fields.</p>
+</div>
+<div class="paragraph">
+<p>Attributes (whether fields or getters/setters) need not be declared public.
+Hibernate can deal with attributes declared with public, protected, package or private visibility.
+Again, if wanting to use runtime proxy generation for lazy loading, the getter/setter should grant access to at least package visibility.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="entity-pojo-identifier">Provide identifier attribute(s)</h4>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Historically this was considered optional.
+However, not defining identifier attribute(s) on the entity should be considered a deprecated feature that will be removed in an upcoming release.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The identifier attribute does not necessarily need to be mapped to the column(s) that physically define the primary key.
+However, it should map to column(s) that can uniquely identify each row.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>We recommend that you declare consistently-named identifier attributes on persistent classes and that you use a nullable (i.e., non-primitive) type.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The placement of the <code>@Id</code> annotation marks the <a href="chapters/domain/access.html#access">persistence state access strategy</a>.</p>
+</div>
+<div id="entity-pojo-identifier-mapping-example" class="exampleblock">
+<div class="title">Example 1. Identifier mapping</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Id
+private Long id;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Hibernate offers multiple identifier generation strategies, see the <a href="chapters/domain/identifiers.html#identifiers">Identifier Generators</a> chapter for more about this topic.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="entity-pojo-mapping">Mapping the entity</h4>
+<div class="paragraph">
+<p>The main piece in mapping the entity is the <code>javax.persistence.Entity</code> annotation.
+The <code>@Entity</code> annotation defines just one attribute <code>name</code> which is used to give a specific entity name for use in JPQL queries.
+By default, the entity name represents the unqualified name of the entity class itself.</p>
+</div>
+<div id="entity-pojo-mapping-example" class="exampleblock">
+<div class="title">Example 2. Simple <code>@Entity</code> mapping</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Entity(name = "Book")
+public static class Book {
+
+    @Id
+    private Long id;
+
+    private String title;
+
+    private String author;
+
+    //Getters and setters are omitted for brevity
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>An entity models a database table.
+The identifier uniquely identifies each row in that table.
+By default, the name of the table is assumed to be the same as the name of the entity.
+To explicitly give the name of the table or to specify other information about the table, we would use the <code>javax.persistence.Table</code> annotation.</p>
+</div>
+<div id="entity-pojo-table-mapping-example" class="exampleblock">
+<div class="title">Example 3. Simple <code>@Entity</code> with <code>@Table</code></div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Entity(name = "Book")
+@Table(
+    catalog = "public",
+    schema = "store",
+    name = "book"
+)
+public static class Book {
+
+    @Id
+    private Long id;
+
+    private String title;
+
+    private String author;
+
+    //Getters and setters are omitted for brevity
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="mapping-model-pojo-equalshashcode">Implementing <code>equals()</code> and <code>hashCode()</code></h4>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Much of the discussion in this section deals with the relation of an entity to a Hibernate Session, whether the entity is managed, transient or detached.
+If you are unfamiliar with these topics, they are explained in the <a href="chapters/pc/PersistenceContext.html#pc">Persistence Context</a> chapter.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Whether to implement <code>equals()</code> and <code>hashCode()</code> methods in your domain model, let alone how to implement them, is a surprisingly tricky discussion when it comes to ORM.</p>
+</div>
+<div class="paragraph">
+<p>There is really just one absolute case: a class that acts as an identifier must implement equals/hashCode based on the id value(s).
+Generally, this is pertinent for user-defined classes used as composite identifiers.
+Beyond this one very specific use case and few others we will discuss below, you may want to consider not implementing equals/hashCode altogether.</p>
+</div>
+<div class="paragraph">
+<p>So what&#8217;s all the fuss? Normally, most Java objects provide a built-in <code>equals()</code> and <code>hashCode()</code> based on the object&#8217;s identity, so each new object will be different from all others.
+This is generally what you want in ordinary Java programming.
+Conceptually however this starts to break down when you start to think about the possibility of multiple instances of a class representing the same data.</p>
+</div>
+<div class="paragraph">
+<p>This is, in fact, exactly the case when dealing with data coming from a database.
+Every time we load a specific <code>Person</code> from the database we would naturally get a unique instance.
+Hibernate, however, works hard to make sure that does not happen within a given <code>Session</code>.
+In fact, Hibernate guarantees equivalence of persistent identity (database row) and Java identity inside a particular session scope.
+So if we ask a Hibernate <code>Session</code> to load that specific Person multiple times we will actually get back the same <em>instance</em>:</p>
+</div>
+<div id="entity-pojo-identity-scope-example" class="exampleblock">
+<div class="title">Example 4. Scope of identity</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Book book1 = entityManager.find( Book.class, 1L );
+Book book2 = entityManager.find( Book.class, 1L );
+
+assertTrue( book1 == book2 );</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Consider we have a <code>Library</code> parent entity which contains a <code>java.util.Set</code> of <code>Book</code> entities:</p>
+</div>
+<div id="entity-pojo-set-mapping-example" class="paragraph">
+<p>Library entity mapping</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Entity(name = "Library")
+public static class Library {
+
+    @Id
+    private Long id;
+
+    private String name;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "book_id")
+    private Set&lt;Book&gt; books = new HashSet&lt;&gt;();
+
+    //Getters and setters are omitted for brevity
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div id="entity-pojo-set-identity-scope-example" class="exampleblock">
+<div class="title">Example 5. Set usage with Session-scoped identity</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Library library = entityManager.find( Library.class, 1L );
+
+Book book1 = entityManager.find( Book.class, 1L );
+Book book2 = entityManager.find( Book.class, 1L );
+
+library.getBooks().add( book1 );
+library.getBooks().add( book2 );
+
+assertEquals( 1, library.getBooks().size() );</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>However, the semantic changes when we mix instances loaded from different Sessions:</p>
+</div>
+<div id="entity-pojo-multi-session-identity-scope-example" class="exampleblock">
+<div class="title">Example 6. Mixed Sessions</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Book book1 = doInJPA( this::entityManagerFactory, entityManager -&gt; {
+    return entityManager.find( Book.class, 1L );
+} );
+
+Book book2 = doInJPA( this::entityManagerFactory, entityManager -&gt; {
+    return entityManager.find( Book.class, 1L );
+} );
+
+assertFalse( book1 == book2 );</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">doInJPA( this::entityManagerFactory, entityManager -&gt; {
+    Set&lt;Book&gt; books = new HashSet&lt;&gt;();
+
+    books.add( book1 );
+    books.add( book2 );
+
+    assertEquals( 2, books.size() );
+} );</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Specifically the outcome in this last example will depend on whether the <code>Book</code> class
+implemented equals/hashCode, and, if so, how.</p>
+</div>
+<div class="paragraph">
+<p>If the <code>Book</code> class did not override the default equals/hashCode,
+then the two <code>Book</code> object reference are not going to be equal since their references are different.</p>
+</div>
+<div class="paragraph">
+<p>Consider yet another case:</p>
+</div>
+<div id="entity-pojo-transient-set-identity-scope-example" class="exampleblock">
+<div class="title">Example 7. Sets with transient entities</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Library library = entityManager.find( Library.class, 1L );
+
+Book book1 = new Book();
+book1.setId( 100L );
+book1.setTitle( "High-Performance Java Persistence" );
+
+Book book2 = new Book();
+book2.setId( 101L );
+book2.setTitle( "Java Persistence with Hibernate" );
+
+library.getBooks().add( book1 );
+library.getBooks().add( book2 );
+
+assertEquals( 2, library.getBooks().size() );</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>In cases where you will be dealing with entities outside of a Session (whether they be transient or detached),
+especially in cases where you will be using them in Java collections,
+you should consider implementing equals/hashCode.</p>
+</div>
+<div class="paragraph">
+<p>A common initial approach is to use the entity&#8217;s identifier attribute as the basis for equals/hashCode calculations:</p>
+</div>
+<div id="entity-pojo-naive-equals-hashcode-example" class="exampleblock">
+<div class="title">Example 8. Naive equals/hashCode implementation</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Entity(name = "Library")
+public static class Library {
+
+    @Id
+    private Long id;
+
+    private String name;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "book_id")
+    private Set&lt;Book&gt; books = new HashSet&lt;&gt;();
+
+    //Getters and setters are omitted for brevity
+}
+
+@Entity(name = "Book")
+public static class Book {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    private String title;
+
+    private String author;
+
+    //Getters and setters are omitted for brevity
+
+    @Override
+    public boolean equals(Object o) {
+        if ( this == o ) {
+            return true;
+        }
+        if ( o == null || getClass() != o.getClass() ) {
+            return false;
+        }
+        Book book = (Book) o;
+        return Objects.equals( id, book.id );
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash( id );
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>It turns out that this still breaks when adding transient instance of <code>Book</code> to a set as we saw in the last example:</p>
+</div>
+<div id="entity-pojo-naive-equals-hashcode-example" class="exampleblock">
+<div class="title">Example 9. Auto-generated identifiers with Sets and naive equals/hashCode</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Book book1 = new Book();
+book1.setTitle( "High-Performance Java Persistence" );
+
+Book book2 = new Book();
+book2.setTitle( "Java Persistence with Hibernate" );
+
+Library library = doInJPA( this::entityManagerFactory, entityManager -&gt; {
+    Library _library = entityManager.find( Library.class, 1L );
+
+    _library.getBooks().add( book1 );
+    _library.getBooks().add( book2 );
+
+    return _library;
+} );
+
+assertFalse( library.getBooks().contains( book1 ) );
+assertFalse( library.getBooks().contains( book2 ) );</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>The issue here is a conflict between the use of generated identifier, the contract of <code>Set</code> and the equals/hashCode implementations.
+<code>Set</code> says that the equals/hashCode value for an object should not change while the object is part of the <code>Set</code>.
+But that is exactly what happened here because the equals/hasCode are based on the (generated) id, which was not set until the JPA transaction is committed.</p>
+</div>
+<div class="paragraph">
+<p>Note that this is just a concern when using generated identifiers.
+If you are using assigned identifiers this will not be a problem, assuming the identifier value is assigned prior to adding to the <code>Set</code>.</p>
+</div>
+<div class="paragraph">
+<p>Another option is to force the identifier to be generated and set prior to adding to the <code>Set</code>:</p>
+</div>
+<div id="entity-pojo-naive-equals-hashcode-persist-force-flush-example" class="exampleblock">
+<div class="title">Example 10. Forcing the flush before adding to the Set</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Book book1 = new Book();
+book1.setTitle( "High-Performance Java Persistence" );
+
+Book book2 = new Book();
+book2.setTitle( "Java Persistence with Hibernate" );
+
+Library library = doInJPA( this::entityManagerFactory, entityManager -&gt; {
+    Library _library = entityManager.find( Library.class, 1L );
+
+    entityManager.persist( book1 );
+    entityManager.persist( book2 );
+    entityManager.flush();
+
+    _library.getBooks().add( book1 );
+    _library.getBooks().add( book2 );
+
+    return _library;
+} );
+
+assertTrue( library.getBooks().contains( book1 ) );
+assertTrue( library.getBooks().contains( book2 ) );</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>But this is often not feasible.</p>
+</div>
+<div class="paragraph">
+<p>The final approach is to use a "better" equals/hashCode implementation, making use of a natural-id or business-key.</p>
+</div>
+<div id="entity-pojo-natural-id-equals-hashcode-example" class="exampleblock">
+<div class="title">Example 11. Natural Id equals/hashCode</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Entity(name = "Library")
+public static class Library {
+
+    @Id
+    private Long id;
+
+    private String name;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "book_id")
+    private Set&lt;Book&gt; books = new HashSet&lt;&gt;();
+
+    //Getters and setters are omitted for brevity
+}
+
+@Entity(name = "Book")
+public static class Book {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    private String title;
+
+    private String author;
+
+    @NaturalId
+    private String isbn;
+
+    //Getters and setters are omitted for brevity
+
+    @Override
+    public boolean equals(Object o) {
+        if ( this == o ) {
+            return true;
+        }
+        if ( o == null || getClass() != o.getClass() ) {
+            return false;
+        }
+        Book book = (Book) o;
+        return Objects.equals( isbn, book.isbn );
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash( isbn );
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>This time, when adding a <code>Book</code> to the <code>Library</code> <code>Set</code>, you can retrieve the <code>Book</code> even after it&#8217;s being persisted:</p>
+</div>
+<div id="entity-pojo-natural-id-equals-hashcode-persist-example" class="exampleblock">
+<div class="title">Example 12. Natural Id equals/hashCode persist example</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Book book1 = new Book();
+book1.setTitle( "High-Performance Java Persistence" );
+book1.setIsbn( "978-9730228236" );
+
+Library library = doInJPA( this::entityManagerFactory, entityManager -&gt; {
+    Library _library = entityManager.find( Library.class, 1L );
+
+    _library.getBooks().add( book1 );
+
+    return _library;
+} );
+
+assertTrue( library.getBooks().contains( book1 ) );</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>As you can see the question of equals/hashCode is not trivial, nor is there a one-size-fits-all solution.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Although using a natural-id is best for <code>equals</code> and <code>hashCode</code>, sometimes you only have the entity identifier that provides a unique constraint.</p>
+</div>
+<div class="paragraph">
+<p>It&#8217;s possible to use the entity identifier for equality check, but it needs a workaround:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>you need to provide a constant value for <code>hashCode</code> so that the hash code value does not change before and after the entity is flushed.</p>
+</li>
+<li>
+<p>you need to compare the entity identifier equality only for non-transient entities.</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>For details on mapping the identifier, see the <a href="chapters/domain/identifiers.html#identifiers">Identifiers</a> chapter.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="entity-sql-query-mapping">Mapping the entity to a SQL query</h4>
+<div class="paragraph">
+<p>You can map an entity to a SQL query using the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/annotations/Subselect.html"><code>@Subselect</code></a> annotation.</p>
+</div>
+<div id="mapping-Subselect-example" class="exampleblock">
+<div class="title">Example 13. <code>@Subselect</code> entity mapping</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Entity(name = "Client")
+@Table(name = "client")
+public static class Client {
+
+    @Id
+    private Long id;
+
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Column(name = "last_name")
+    private String lastName;
+
+    //Getters and setters omitted for brevity
+
+}
+
+@Entity(name = "Account")
+@Table(name = "account")
+public static class Account {
+
+    @Id
+    private Long id;
+
+    @ManyToOne
+    private Client client;
+
+    private String description;
+
+    //Getters and setters omitted for brevity
+
+}
+
+@Entity(name = "AccountTransaction")
+@Table(name = "account_transaction")
+public static class AccountTransaction {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    @ManyToOne
+    private Account account;
+
+    private Integer cents;
+
+    private String description;
+
+    //Getters and setters omitted for brevity
+
+}
+
+@Entity(name = "AccountSummary")
+@Subselect(
+    "select " +
+    "    a.id as id, " +
+    "    concat(concat(c.first_name, ' '), c.last_name) as clientName, " +
+    "    sum(at.cents) as balance " +
+    "from account a " +
+    "join client c on c.id = a.client_id " +
+    "join account_transaction at on a.id = at.account_id " +
+    "group by a.id, concat(concat(c.first_name, ' '), c.last_name)"
+)
+@Synchronize( {"client", "account", "account_transaction"} )
+public static class AccountSummary {
+
+    @Id
+    private Long id;
+
+    private String clientName;
+
+    private int balance;
+
+    //Getters and setters omitted for brevity
+
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>In the example above, the <code>Account</code> entity does not retain any balance since every account operation is registered as an <code>AccountTransaction</code>.
+To find the <code>Account</code> balance, we need to query the <code>AccountSummary</code> which shares the same identifier with the <code>Account</code> entity.</p>
+</div>
+<div class="paragraph">
+<p>However, the <code>AccountSummary</code> is not mapped to a physical table, but to an SQL query.</p>
+</div>
+<div class="paragraph">
+<p>So, if we have the following <code>AccountTransaction</code> record, the <code>AccountSummary</code> balance will mach the proper amount of money in this <code>Account</code>.</p>
+</div>
+<div id="mapping-Subselect-entity-find-example" class="exampleblock">
+<div class="title">Example 14. Finding a <code>@Subselect</code> entity</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">doInJPA( this::entityManagerFactory, entityManager -&gt; {
+    Client client = new Client();
+    client.setId( 1L );
+    client.setFirstName( "John" );
+    client.setLastName( "Doe" );
+    entityManager.persist( client );
+
+    Account account = new Account();
+    account.setId( 1L );
+    account.setClient( client );
+    account.setDescription( "Checking account" );
+    entityManager.persist( account );
+
+    AccountTransaction transaction = new AccountTransaction();
+    transaction.setAccount( account );
+    transaction.setDescription( "Salary" );
+    transaction.setCents( 100 * 7000 );
+    entityManager.persist( transaction );
+
+    AccountSummary summary = entityManager.createQuery(
+        "select s " +
+        "from AccountSummary s " +
+        "where s.id = :id", AccountSummary.class)
+    .setParameter( "id", account.getId() )
+    .getSingleResult();
+
+    assertEquals( "John Doe", summary.getClientName() );
+    assertEquals( 100 * 7000, summary.getBalance() );
+} );</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>If we add a new <code>AccountTransaction</code> entity and refresh the <code>AccountSummary</code> entity, the balance is updated accordingly:</p>
+</div>
+<div id="mapping-Subselect-refresh-find-example" class="exampleblock">
+<div class="title">Example 15. Refreshing a <code>@Subselect</code> entity</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">doInJPA( this::entityManagerFactory, entityManager -&gt; {
+    AccountSummary summary = entityManager.find( AccountSummary.class, 1L );
+    assertEquals( "John Doe", summary.getClientName() );
+    assertEquals( 100 * 7000, summary.getBalance() );
+
+    AccountTransaction transaction = new AccountTransaction();
+    transaction.setAccount( entityManager.getReference( Account.class, 1L ) );
+    transaction.setDescription( "Shopping" );
+    transaction.setCents( -100 * 2200 );
+    entityManager.persist( transaction );
+    entityManager.flush();
+
+    entityManager.refresh( summary );
+    assertEquals( 100 * 4800, summary.getBalance() );
+} );</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>The goal of the <code>@Synchronize</code> annotation in the <code>AccountSummary</code> entity mapping is to instruct Hibernate which database tables are needed by the
+underlying <code>@Subselect</code> SQL query. This way, when executing a HQL or JPQL which selects from the <code>AccountSummary</code> entity,
+Hibernate will trigger a Persistence Context flush if there are pending <code>Account</code>, <code>Client</code> or <code>AccountTransaction</code> entity state transitions.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="entity-proxy">Define a custom entity proxy</h4>
+<div class="paragraph">
+<p>By default, when it needs to use a proxy instead of the actual Pojo, Hibernate is going to use a Bytecode manipulation library like
+<a href="http://jboss-javassist.github.io/javassist/">Javassist</a> or
+<a href="http://bytebuddy.net/">Byte Buddy</a>.</p>
+</div>
+<div class="paragraph">
+<p>However, if the entity class is final, Javassist will not create a Proxy and you will get a Pojo even when you only need a Proxy reference.
+In this case, you could proxy an interface that this particular entity implements, as illustrated by the following example.</p>
+</div>
+<div id="entity-proxy-interface-mapping" class="exampleblock">
+<div class="title">Example 16. Final entity class implementing the <code>Identifiable</code> interface</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public interface Identifiable {
+
+    Long getId();
+
+    void setId(Long id);
+}
+
+@Entity( name = "Book" )
+@Proxy(proxyClass = Identifiable.class)
+public static final class Book implements Identifiable {
+
+    @Id
+    private Long id;
+
+    private String title;
+
+    private String author;
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    //Other getters and setters omitted for brevity
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>The <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/annotations/Proxy.html"><code>@Proxy</code></a>
+annotation is used to specify a custom Proxy implementation for the current annotated entity.</p>
+</div>
+<div class="paragraph">
+<p>When loading the <code>Book</code> entity proxy, Hibernate is going to proxy the <code>Identifiable</code> interface instead as illustrated by the following example:</p>
+</div>
+<div id="entity-proxy-persist-mapping" class="exampleblock">
+<div class="title">Example 17. Proxying the final entity class implementing the <code>Identifiable</code> interface</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">doInHibernate( this::sessionFactory, session -&gt; {
+    Book book = new Book();
+    book.setId( 1L );
+    book.setTitle( "High-Performance Java Persistence" );
+    book.setAuthor( "Vlad Mihalcea" );
+
+    session.persist( book );
+} );
+
+doInHibernate( this::sessionFactory, session -&gt; {
+    Identifiable book = session.getReference( Book.class, 1L );
+
+    assertTrue(
+        "Loaded entity is not an instance of the proxy interface",
+        Identifiable.class.isInstance( book )
+    );
+    assertFalse(
+        "Proxy class was not created",
+        Book.class.isInstance( book )
+    );
+} );</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-sql" data-lang="sql">insert
+into
+    Book
+    (author, title, id)
+values
+    (?, ?, ?)
+
+-- binding parameter [1] as [VARCHAR] - [Vlad Mihalcea]
+-- binding parameter [2] as [VARCHAR] - [High-Performance Java Persistence]
+-- binding parameter [3] as [BIGINT]  - [1]</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>As you can see in the associated SQL snippet, Hibernate issues no SQL SELECT query since the Proxy can be
+constructed without needing to fetch the actual entity Pojo.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="entity-tuplizer">Dynamic entity proxies using the @Tuplizer annotation</h4>
+<div class="paragraph">
+<p>It is possible to map your entities as dynamic proxies using
+the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/annotations/Tuplizer.html"><code>@Tuplizer</code></a> annotation.</p>
+</div>
+<div class="paragraph">
+<p>In the following entity mapping, both the embeddable and the entity are mapped as interfaces, not Pojos.</p>
+</div>
+<div id="entity-tuplizer-entity-mapping" class="exampleblock">
+<div class="title">Example 18. Dynamic entity proxy mapping</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Entity
+@Tuplizer(impl = DynamicEntityTuplizer.class)
+public interface Cuisine {
+
+    @Id
+    @GeneratedValue
+    Long getId();
+    void setId(Long id);
+
+    String getName();
+    void setName(String name);
+
+    @Tuplizer(impl = DynamicEmbeddableTuplizer.class)
+    Country getCountry();
+    void setCountry(Country country);
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Embeddable
+public interface Country {
+
+    @Column(name = "CountryName")
+    String getName();
+
+    void setName(String name);
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>@Tuplizer</code> instructs Hibernate to use the <code>DynamicEntityTuplizer</code> and <code>DynamicEmbeddableTuplizer</code> to handle
+the associated entity and embeddable object types.</p>
+</div>
+<div class="paragraph">
+<p>Both the <code>Cuisine</code> entity and the <code>Country</code> embeddable types are going to be instantiated as Java dynamic proxies,
+as you can see in the following <code>DynamicInstantiator</code> example:</p>
+</div>
+<div id="entity-tuplizer-instantiator" class="exampleblock">
+<div class="title">Example 19. Instantiating entities and embeddables as dynamic proxies</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public class DynamicEntityTuplizer extends PojoEntityTuplizer {
+
+    public DynamicEntityTuplizer(
+            EntityMetamodel entityMetamodel,
+            PersistentClass mappedEntity) {
+        super( entityMetamodel, mappedEntity );
+    }
+
+    @Override
+    protected Instantiator buildInstantiator(
+            EntityMetamodel entityMetamodel,
+            PersistentClass persistentClass) {
+        return new DynamicInstantiator(
+            persistentClass.getClassName()
+        );
+    }
+
+    @Override
+    protected ProxyFactory buildProxyFactory(
+            PersistentClass persistentClass,
+            Getter idGetter,
+            Setter idSetter) {
+        return super.buildProxyFactory(
+            persistentClass, idGetter,
+            idSetter
+        );
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public class DynamicEmbeddableTuplizer
+        extends PojoComponentTuplizer {
+
+    public DynamicEmbeddableTuplizer(Component embeddable) {
+        super( embeddable );
+    }
+
+    protected Instantiator buildInstantiator(Component embeddable) {
+        return new DynamicInstantiator(
+            embeddable.getComponentClassName()
+        );
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public class DynamicInstantiator
+        implements Instantiator {
+
+    private final Class targetClass;
+
+    public DynamicInstantiator(String targetClassName) {
+        try {
+            this.targetClass = Class.forName( targetClassName );
+        }
+        catch (ClassNotFoundException e) {
+            throw new HibernateException( e );
+        }
+    }
+
+    public Object instantiate(Serializable id) {
+        return ProxyHelper.newProxy( targetClass, id );
+    }
+
+    public Object instantiate() {
+        return instantiate( null );
+    }
+
+    public boolean isInstance(Object object) {
+        try {
+            return targetClass.isInstance( object );
+        }
+        catch( Throwable t ) {
+            throw new HibernateException(
+                "could not get handle to entity as interface : " + t
+            );
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public class ProxyHelper {
+
+    public static &lt;T&gt; T newProxy(Class&lt;T&gt; targetClass, Serializable id) {
+        return ( T ) Proxy.newProxyInstance(
+            targetClass.getClassLoader(),
+            new Class[] {
+                targetClass
+            },
+            new DataProxyHandler(
+                targetClass.getName(),
+                id
+            )
+        );
+    }
+
+    public static String extractEntityName(Object object) {
+        if ( Proxy.isProxyClass( object.getClass() ) ) {
+            InvocationHandler handler = Proxy.getInvocationHandler(
+                object
+            );
+            if ( DataProxyHandler.class.isAssignableFrom( handler.getClass() ) ) {
+                DataProxyHandler myHandler = (DataProxyHandler) handler;
+                return myHandler.getEntityName();
+            }
+        }
+        return null;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public final class DataProxyHandler implements InvocationHandler {
+
+    private String entityName;
+
+    private Map&lt;String, Object&gt; data = new HashMap&lt;&gt;();
+
+    public DataProxyHandler(String entityName, Serializable id) {
+        this.entityName = entityName;
+        data.put( "Id", id );
+    }
+
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        String methodName = method.getName();
+        if ( methodName.startsWith( "set" ) ) {
+            String propertyName = methodName.substring( 3 );
+            data.put( propertyName, args[0] );
+        }
+        else if ( methodName.startsWith( "get" ) ) {
+            String propertyName = methodName.substring( 3 );
+            return data.get( propertyName );
+        }
+        else if ( "toString".equals( methodName ) ) {
+            return entityName + "#" + data.get( "Id" );
+        }
+        else if ( "hashCode".equals( methodName ) ) {
+            return this.hashCode();
+        }
+        return null;
+    }
+
+    public String getEntityName() {
+        return entityName;
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>With the <code>DynamicInstantiator</code> in place, we can work with the dynamic proxy entities just like with Pojo entities.</p>
+</div>
+<div id="entity-tuplizer-dynamic-proxy-example" class="exampleblock">
+<div class="title">Example 20. Persisting entities and embeddables as dynamic proxies</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Cuisine _cuisine = doInHibernateSessionBuilder(
+        () -&gt; sessionFactory()
+                .withOptions()
+                .interceptor( new EntityNameInterceptor() ),
+        session -&gt; {
+    Cuisine cuisine = ProxyHelper.newProxy( Cuisine.class, null );
+    cuisine.setName( "Française" );
+
+    Country country = ProxyHelper.newProxy( Country.class, null );
+    country.setName( "France" );
+
+    cuisine.setCountry( country );
+    session.persist( cuisine );
+
+    return cuisine;
+} );
+
+doInHibernateSessionBuilder(
+        () -&gt; sessionFactory()
+                .withOptions()
+                .interceptor( new EntityNameInterceptor() ),
+        session -&gt; {
+    Cuisine cuisine = session.get( Cuisine.class, _cuisine.getId() );
+
+    assertEquals( "Française", cuisine.getName() );
+    assertEquals( "France", cuisine.getCountry().getName() );
+} );</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="entity-persister">Define a custom entity persister</h4>
+<div class="paragraph">
+<p>The <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/annotations/Persister.html"><code>@Persister</code></a> annotation is used to specify a custom entity or collection persister.</p>
+</div>
+<div class="paragraph">
+<p>For entities, the custom persister must implement the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/persister/entity/EntityPersister.html"><code>EntityPersister</code></a> interface.</p>
+</div>
+<div class="paragraph">
+<p>For collections, the custom persister must implement the <a href="https://docs.jboss.org/hibernate/orm/5.3/javadocs/org/hibernate/persister/collection/CollectionPersister.html"><code>CollectionPersister</code></a> interface.</p>
+</div>
+<div id="entity-persister-mapping" class="exampleblock">
+<div class="title">Example 21. Entity persister mapping</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Entity
+@Persister( impl = EntityPersister.class )
+public class Author {
+
+    @Id
+    public Integer id;
+
+    @OneToMany( mappedBy = "author" )
+    @Persister( impl = CollectionPersister.class )
+    public Set&lt;Book&gt; books = new HashSet&lt;&gt;();
+
+    //Getters and setters omitted for brevity
+    public void addBook(Book book) {
+        this.books.add( book );
+        book.setAuthor( this );
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Entity
+@Persister( impl = EntityPersister.class )
+public class Book {
+
+    @Id
+    public Integer id;
+
+    private String title;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    public Author author;
+
+    //Getters and setters omitted for brevity
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>By providing your own <code>EntityPersister</code> and <code>CollectionPersister</code> implementations,
+you can control how entities and collections are persisted in to the database.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2018-05-25 11:38:17 -04:00
+</div>
+</div>
+</body>
+</html>

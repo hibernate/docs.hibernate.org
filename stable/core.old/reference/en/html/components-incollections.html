@@ -1,0 +1,139 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>8.2.&nbsp;Collections of dependent objects</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="components.html" title="Chapter&nbsp;8.&nbsp;Component Mapping">
+      <link rel="prev" href="components.html" title="Chapter&nbsp;8.&nbsp;Component Mapping">
+      <link rel="next" href="components-asmapindex.html" title="8.3.&nbsp;Components as Map indices">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">8.2.&nbsp;Collections of dependent objects</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="components.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;8.&nbsp;Component Mapping</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="components-asmapindex.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="components-incollections"></a>8.2.&nbsp;Collections of dependent objects
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+                        Collections of components are supported (eg. an array of type
+                        <code class="literal">Name</code>). Declare your component collection by
+                        replacing the <code class="literal">&lt;element&gt;</code> tag with a
+                        <code class="literal">&lt;composite-element&gt;</code> tag.
+                    
+         </p><pre class="programlisting">&lt;set name="someNames" table="some_names" lazy="true"&gt;
+    &lt;key column="id"/&gt;
+    &lt;composite-element class="eg.Name"&gt; &lt;!-- class attribute required --&gt;
+        &lt;property name="initial"/&gt;
+        &lt;property name="first"/&gt;
+        &lt;property name="last"/&gt;
+    &lt;/composite-element&gt;
+&lt;/set&gt;</pre><p>
+                        Note: if you define a <code class="literal">Set</code> of composite elements, it is 
+                        very important to implement <code class="literal">equals()</code> and 
+                        <code class="literal">hashCode()</code> correctly.
+                    
+         </p>
+         <p>
+                        Composite elements may contain components but not collections. If your
+                        composite element itself contains 
+                        components, use the <code class="literal">&lt;nested-composite-element&gt;</code> 
+                        tag. This is a pretty exotic case - a collection of components which 
+                        themselves have components. By this stage you should be asking yourself 
+                        if a one-to-many association is more appropriate. Try remodelling the 
+                        composite element as an entity - but note that even though the Java model 
+                        is the same, the relational model and persistence semantics are still 
+                        slightly different.
+                    
+         </p>
+         <p>
+                        Please note that a composite element mapping doesn't support null-able properties
+                        if you're using a <code class="literal">&lt;set&gt;</code>. Hibernate
+                        has to use each columns value to identify a record when deleting objects
+                        (there is no separate primary key column in the composite element table),
+                        which is not possible with null values. You have to either use only
+                        not-null properties in a composite-element or choose a
+                        <code class="literal">&lt;list&gt;</code>, <code class="literal">&lt;map&gt;</code>,
+                        <code class="literal">&lt;bag&gt;</code> or <code class="literal">&lt;idbag&gt;</code>.
+                    
+         </p>
+         <p>
+                        A special case of a composite element is a composite element with a nested
+                        <code class="literal">&lt;many-to-one&gt;</code> element. A mapping like this allows
+                        you to map extra columns of a many-to-many association table to the
+                        composite element class. The following is a many-to-many association
+                        from <code class="literal">Order</code> to <code class="literal">Item</code> where 
+                        <code class="literal">purchaseDate</code>, <code class="literal">price</code> and
+                        <code class="literal">quantity</code> are properties of the association:
+                    
+         </p><pre class="programlisting">&lt;class name="eg.Order" .... &gt;
+    ....
+    &lt;set name="purchasedItems" table="purchase_items" lazy="true"&gt;
+        &lt;key column="order_id"&gt;
+        &lt;composite-element class="eg.Purchase"&gt;
+            &lt;property name="purchaseDate"/&gt;
+            &lt;property name="price"/&gt;
+            &lt;property name="quantity"/&gt;
+            &lt;many-to-one name="item" class="eg.Item"/&gt; &lt;!-- class attribute is optional --&gt;
+        &lt;/composite-element&gt;
+    &lt;/set&gt;
+&lt;/class&gt;</pre><p>
+                        Of course, there can't be a reference to the purchae on the other side, for
+                        bidirectional association navigation. Remember that components are value types and
+                        don't allow shared references. A single <code class="literal">Purchase</code> can be in the
+                        set of an <code class="literal">Order</code>, but it can't be referenced by the <code class="literal">Item</code>
+                        at the same time.
+                    
+         </p>
+         <p>Even ternary (or quaternary, etc) associations are possible:</p><pre class="programlisting">&lt;class name="eg.Order" .... &gt;
+    ....
+    &lt;set name="purchasedItems" table="purchase_items" lazy="true"&gt;
+        &lt;key column="order_id"&gt;
+        &lt;composite-element class="eg.OrderLine"&gt;
+            &lt;many-to-one name="purchaseDetails class="eg.Purchase"/&gt;
+            &lt;many-to-one name="item" class="eg.Item"/&gt;
+        &lt;/composite-element&gt;
+    &lt;/set&gt;
+&lt;/class&gt;</pre><p>
+                        Composite elements may appear in queries using the same syntax as
+                        associations to other entities.
+                    
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="components.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="components.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="components-asmapindex.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">Chapter&nbsp;8.&nbsp;Component Mapping&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;8.3.&nbsp;Components as Map indices</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

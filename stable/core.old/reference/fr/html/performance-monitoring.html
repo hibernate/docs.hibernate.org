@@ -1,0 +1,162 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>19.6.&nbsp;Moniteur de performance</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="performance.html" title="Chapitre&nbsp;19.&nbsp;Am&eacute;liorer les performances">
+      <link rel="prev" href="performance-collections.html" title="19.5.&nbsp;Comprendre les performances des Collections">
+      <link rel="next" href="toolsetguide.html" title="Chapitre&nbsp;20.&nbsp;Guide des outils">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">19.6.&nbsp;Moniteur de performance</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="performance-collections.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;19.&nbsp;Am&eacute;liorer les performances</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="toolsetguide.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="performance-monitoring"></a>19.6.&nbsp;Moniteur de performance
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>L'optimisation n'est pas d'un grand int&eacute;r&ecirc;t sans le suivi et l'acc&egrave;s aux donn&eacute;es de performance. Hibernate fournit toute une
+            panoplie de rapport sur ses op&eacute;rations internes. Les statistiques dans Hibernate sont fournies par <code class="literal">SessionFactory</code>. 
+         </p>
+         <div class="sect2" lang="fr-FR">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="performance-monitoring-sf"></a>19.6.1.&nbsp;Suivi d'une SessionFactory
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>Vous pouvez acc&eacute;der au m&eacute;triques d'une <code class="literal">SessionFactory</code> de deux mani&egrave;res. La premi&egrave;re option est d'appeler <code class="literal">sessionFactory.getStatistics()</code> et de lire ou d'afficher les <code class="literal">Statistics</code> vous m&ecirc;me. 
+            </p>
+            <p>Hibernate peut &eacute;galement utiliser JMX pour publier les m&eacute;triques si vous activez le MBean <code class="literal">StatisticsService</code>. Vous pouvez activer un seul MBean pour toutes vos <code class="literal">SessionFactory</code> ou un par factory. Voici un code qui montre un exemple de configuration minimaliste : 
+            </p><pre class="programlisting">// MBean service registration for a specific SessionFactory
+Hashtable tb = new Hashtable();
+tb.put("type", "statistics");
+tb.put("sessionFactory", "myFinancialApp");
+ObjectName on = new ObjectName("hibernate", tb); // MBean object name
+
+StatisticsService stats = new StatisticsService(); // MBean implementation
+stats.setSessionFactory(sessionFactory); // Bind the stats to a SessionFactory
+server.registerMBean(stats, on); // Register the Mbean on the server</pre><pre class="programlisting">// MBean service registration for all SessionFactory's
+Hashtable tb = new Hashtable();
+tb.put("type", "statistics");
+tb.put("sessionFactory", "all");
+ObjectName on = new ObjectName("hibernate", tb); // MBean object name
+
+StatisticsService stats = new StatisticsService(); // MBean implementation
+server.registerMBean(stats, on); // Register the MBean on the server</pre><p>TODO: Cela n'a pas de sens : dans le premier cs on r&eacute;cup&egrave;re et on utilise le MBean directement. Dans le second, on doit fournir
+               le nom JNDI sous lequel est retenu la fabrique de session avant de l'utiliser. Pour cela il faut utiliser <code class="literal">hibernateStatsBean.setSessionFactoryJNDIName("my/JNDI/Name")</code> 
+            </p>
+            <p>Vous pouvez (d&eacute;s)activer le suivi pour une <code class="literal">SessionFactory</code> 
+            </p>
+            <div class="itemizedlist">
+               <ul type="disc">
+                  <li>
+                     <p>au moment de la configuration en mettant <code class="literal">hibernate.generate_statistics</code> &agrave; <code class="literal">false</code> 
+                     </p>
+                  </li>
+               </ul>
+            </div>
+            <div class="itemizedlist">
+               <ul type="disc">
+                  <li>
+                     <p>&agrave; chaud avec <code class="literal">sf.getStatistics().setStatisticsEnabled(true)</code> ou <code class="literal">hibernateStatsBean.setStatisticsEnabled(true)</code> 
+                     </p>
+                  </li>
+               </ul>
+            </div>
+            <p>Statistics can be reset programmatically using the <code class="literal">clear()</code> method. A summary can be sent to a logger (info level) using the <code class="literal">logSummary()</code> method. 
+            </p>
+         </div>
+         <div class="sect2" lang="fr-FR">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="performance-monitoring-metrics"></a>19.6.2.&nbsp;M&eacute;triques
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>Hibernate fournit un certain nombre de m&eacute;triques, qui vont des informations tr&egrave;s basiques aux informations tr&egrave;s sp&eacute;cialis&eacute;es
+               qui ne sont appropri&eacute;es que dans certains scenarii. Tous les compteurs accessibles sont d&eacute;crits dans l'API de l'interface
+               <code class="literal">Statistics</code> dans trois cat&eacute;gories : 
+            </p>
+            <div class="itemizedlist">
+               <ul type="disc">
+                  <li>
+                     <p>Les m&eacute;triques relatives &agrave; l'usage g&eacute;n&eacute;ral de la <code class="literal">Session</code> comme le nombre de sessions ouvertes, le nombre de connexions JDBC r&eacute;cup&eacute;r&eacute;es, etc... 
+                     </p>
+                  </li>
+                  <li>
+                     <p>Les m&eacute;triques relatives aux entit&eacute;s, collections, requ&ecirc;tes et caches dans leur ensemble (m&eacute;triques globales), </p>
+                  </li>
+                  <li>
+                     <p>Les m&eacute;triques d&eacute;taill&eacute;es relatives &agrave; une entit&eacute;, une collection, une requ&ecirc;te ou une r&eacute;gion de cache particuli&egrave;re. </p>
+                  </li>
+               </ul>
+            </div>
+            <p>For example, you can check the cache hit, miss, and put ratio of entities, collections and queries, and the average time a
+               query needs. Beware that the number of milliseconds is subject to approximation in Java. Hibernate is tied to the JVM precision,
+               on some platforms this might even only be accurate to 10 seconds. 
+            </p>
+            <p>Des accesseurs simples sont utilis&eacute;s pour acc&eacute;der aux m&eacute;triques globales (e.g. celles qui ne sont pas li&eacute;es &agrave; une entit&eacute;,
+               collection ou r&eacute;gion de cache particuli&egrave;re). Vous pouvez acc&eacute;der aux m&eacute;triques d'une entit&eacute;, collection, r&eacute;gion de cache particuli&egrave;re
+               &agrave; l'aide de son nom et &agrave; l'aide de sa repr&eacute;sentation HQL ou SQL pour une requ&ecirc;te. R&eacute;f&eacute;rez vous &agrave; la javadoc des APIS <code class="literal">Statistics</code>, <code class="literal">EntityStatistics</code>, <code class="literal">CollectionStatistics</code>, <code class="literal">SecondLevelCacheStatistics</code>, and <code class="literal">QueryStatistics</code> pour plus d'informations. Le code ci-dessous montre un exemple simple : 
+            </p><pre class="programlisting">Statistics stats = HibernateUtil.sessionFactory.getStatistics();
+
+double queryCacheHitCount  = stats.getQueryCacheHitCount();
+double queryCacheMissCount = stats.getQueryCacheMissCount();
+double queryCacheHitRatio =
+  queryCacheHitCount / (queryCacheHitCount + queryCacheMissCount);
+
+log.info("Query Hit ratio:" + queryCacheHitRatio);
+
+EntityStatistics entityStats =
+  stats.getEntityStatistics( Cat.class.getName() );
+long changes =
+        entityStats.getInsertCount()
+        + entityStats.getUpdateCount()
+        + entityStats.getDeleteCount();
+log.info(Cat.class.getName() + " changed " + changes + "times"  );</pre><p>Pour travailler sur toutes les entit&eacute;s, collections, requ&ecirc;tes et r&eacute;gions de cache, vous pouvez r&eacute;cup&eacute;rer la liste des noms
+               des entit&eacute;s, collections, requ&ecirc;tes et r&eacute;gions de cache avec les m&eacute;thodes : <code class="literal">getQueries()</code>, <code class="literal">getEntityNames()</code>, <code class="literal">getCollectionRoleNames()</code>, et <code class="literal">getSecondLevelCacheRegionNames()</code>. 
+            </p>
+         </div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="performance-collections.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="performance.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="toolsetguide.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">19.5.&nbsp;Comprendre les performances des Collections&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;Chapitre&nbsp;20.&nbsp;Guide des outils</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

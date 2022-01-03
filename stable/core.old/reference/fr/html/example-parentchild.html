@@ -1,0 +1,99 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>Chapitre&nbsp;21.&nbsp;Exemple : P&egrave;re/Fils</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="prev" href="toolsetguide.html" title="Chapitre&nbsp;20.&nbsp;Guide des outils">
+      <link rel="next" href="example-parentchild-bidir.html" title="21.2.&nbsp;un-vers-plusieurs bidirectionnel">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">Chapitre&nbsp;21.&nbsp;Exemple : P&egrave;re/Fils</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="toolsetguide.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">&nbsp;</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="example-parentchild-bidir.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="chapter" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title"><a name="example-parentchild"></a>Chapitre&nbsp;21.&nbsp;Exemple : P&egrave;re/Fils
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>L'une des premi&egrave;res choses que les nouveaux utilisateurs essaient de faire avec Hibernate est de mod&eacute;liser une relation p&egrave;re/fils.
+            Il y a deux approches diff&eacute;rentes pour cela. Pour un certain nombre de raisons, la m&eacute;thode la plus courante, en particulier
+            pour les nouveaux utilisateurs, est de mod&eacute;liser les deux relations <code class="literal">P&egrave;re</code> et <code class="literal">Fils</code> comme des classes entit&eacute;s li&eacute;es par une association <code class="literal">&lt;one-to-many&gt;</code> du <code class="literal">P&egrave;re</code> vers le <code class="literal">Fils</code> (l'autre approche est de d&eacute;clarer le <code class="literal">Fils</code> comme un <code class="literal">&lt;composite-element&gt;</code>). Il est &eacute;vident que le sens de l'association un vers plusieurs (dans Hibernate) est bien moins proche du sens habituel d'une
+            relation p&egrave;re/fils que ne l'est celui d'un &eacute;l&eacute;ment cmposite. Nous allons vous expliquer comment utiliser une association <span class="emphasis"><em>un vers plusieurs bidirectionnelle avec cascade</em></span> afin de mod&eacute;liser efficacement et &eacute;l&eacute;gamment une relation p&egrave;re/fils, ce n'est vraiment pas difficile ! 
+         </p>
+         <div class="sect1" lang="fr-FR">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="example-parentchild-collections"></a>21.1.&nbsp;Une note &agrave; propos des collections
+                     </h2>
+                  </div>
+               </div>
+            </div>
+            <p>Les collections Hibernate sont consid&eacute;r&eacute;es comme &eacute;tant une partie logique de l'entit&eacute; dans laquelle elles sont contenues ;
+               jamais des entit&eacute;s qu'elle contient. C'est une distinction crutiale ! Les cons&eacute;quences sont les suivantes : 
+            </p>
+            <div class="itemizedlist">
+               <ul type="disc">
+                  <li>
+                     <p>Quand nous ajoutons / retirons un objet d'une collection, le num&eacute;ro de version du propri&eacute;taire de la collection est incr&eacute;ment&eacute;.
+                        
+                     </p>
+                  </li>
+                  <li>
+                     <p>Si un objet qui a &eacute;t&eacute; enlev&eacute; d'une collection est une instance de type valeur (ex : &eacute;l&eacute;ment composite), cet objet cessera
+                        d'&ecirc;tre persistant et son &eacute;tat sera compl&egrave;tement effac&eacute; de la base de donn&eacute;es. Par ailleurs, ajouter une instance de type valeur
+                        dans une collection aura pour cons&eacute;quence que son &eacute;tat sera imm&eacute;diatement persistant. 
+                     </p>
+                  </li>
+                  <li>
+                     <p>Si une entit&eacute; est enlev&eacute;e d'une collection (association un-vers-plusieurs ou plusieurs-vers-plusieurs), par d&eacute;faut, elle ne
+                        sera pas effac&eacute;e. Ce comportement est compl&egrave;tement logique - une modification de l'un des &eacute;tats internes d'une entit&eacute; ne doit
+                        pas causer la disparition de l'entit&eacute; associ&eacute;e ! De m&ecirc;me, l'ajout d'une entit&eacute; dans une collection n'engendre pas, par d&eacute;faut,
+                        la persistance de cette entit&eacute;. 
+                     </p>
+                  </li>
+               </ul>
+            </div>
+            <p>Le comportement par d&eacute;faut est donc que l'ajout d'une entit&eacute; dans une collection cr&eacute;&eacute; simplement le lien entre les deux entit&eacute;s,
+               et qu'effacer une entit&eacute; supprime ce lien. C'est le comportement le plus appropri&eacute; dans la plupart des cas. Ce comportement
+               n'est cependant pas appropri&eacute; lorsque la vie du fils est li&eacute;e au cycle de vie du p&egrave;re. 
+            </p>
+         </div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="toolsetguide.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center">&nbsp;</td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="example-parentchild-bidir.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">Chapitre&nbsp;20.&nbsp;Guide des outils&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;21.2.&nbsp;un-vers-plusieurs bidirectionnel</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

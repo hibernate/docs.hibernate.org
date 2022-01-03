@@ -1,0 +1,191 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>14.10.&nbsp;Expressions</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="queryhql.html" title="Chapitre&nbsp;14.&nbsp;HQL: Langage de requ&ecirc;tage d'Hibernate">
+      <link rel="prev" href="queryhql-where.html" title="14.9.&nbsp;La clause where">
+      <link rel="next" href="queryhql-ordering.html" title="14.11.&nbsp;La clause order by">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">14.10.&nbsp;Expressions</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="queryhql-where.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;14.&nbsp;HQL: Langage de requ&ecirc;tage d'Hibernate</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="queryhql-ordering.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="queryhql-expressions"></a>14.10.&nbsp;Expressions
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Les expressions permises dans la clause <code class="literal">where</code> incluent la plupart des choses que vous pouvez utiliser en SQL : 
+         </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p>op&eacute;rateurs math&eacute;matiques <code class="literal">+, -, *, /</code> 
+                  </p>
+               </li>
+               <li>
+                  <p>op&eacute;rateur de comparaison binaire <code class="literal">=, &gt;=, &lt;=, &lt;&gt;, !=, like</code> 
+                  </p>
+               </li>
+               <li>
+                  <p>op&eacute;rateurs logiques <code class="literal">and, or, not</code> 
+                  </p>
+               </li>
+               <li>
+                  <p>Parenth&egrave;ses <code class="literal">( )</code>, indiquant un regroupement 
+                  </p>
+               </li>
+               <li>
+                  <p><code class="literal">in</code>, <code class="literal">not in</code>, <code class="literal">between</code>, <code class="literal">is null</code>, <code class="literal">is not null</code>, <code class="literal">is empty</code>, <code class="literal">is not empty</code>, <code class="literal">member of</code> and <code class="literal">not member of</code> 
+                  </p>
+               </li>
+               <li>
+                  <p>"Simple" case, <code class="literal">case ... when ... then ... else ... end</code>, and "searched" case, <code class="literal">case when ... then ... else ... end</code> 
+                  </p>
+               </li>
+               <li>
+                  <p>concatenation de cha&icirc;ne de caract&egrave;res <code class="literal">...||...</code> ou <code class="literal">concat(...,...)</code> 
+                  </p>
+               </li>
+               <li>
+                  <p><code class="literal">current_date()</code>, <code class="literal">current_time()</code>, <code class="literal">current_timestamp()</code> 
+                  </p>
+               </li>
+               <li>
+                  <p><code class="literal">second(...)</code>, <code class="literal">minute(...)</code>, <code class="literal">hour(...)</code>, <code class="literal">day(...)</code>, <code class="literal">month(...)</code>, <code class="literal">year(...)</code>, 
+                  </p>
+               </li>
+               <li>
+                  <p>N'importe quel fonction ou op&eacute;rateur d&eacute;fini par EJB-QL 3.0 : <code class="literal">substring(), trim(), lower(), upper(), length(), locate(), abs(), sqrt(), bit_length(), mod()</code> 
+                  </p>
+               </li>
+               <li>
+                  <p><code class="literal">coalesce()</code> et <code class="literal">nullif()</code> 
+                  </p>
+               </li>
+               <li>
+                  <p><code class="literal">str()</code> pour convertir des valeurs num&eacute;riques ou temporelles vers une cha&icirc;ne de caract&egrave;res lisible 
+                  </p>
+               </li>
+               <li>
+                  <p><code class="literal">cast(... as ...)</code>, o&ugrave; le second argument est le nom d'un type Hibernate, et <code class="literal">extract(... from ...)</code> si le <code class="literal">cast()</code> ANSI et <code class="literal">extract()</code> sont support&eacute;s par la base de donn&eacute;es sous-jacente 
+                  </p>
+               </li>
+               <li>
+                  <p>La fonction HQL <code class="literal">index()</code>, qui s'applique aux alias d'une collection index&eacute;e jointe 
+                  </p>
+               </li>
+               <li>
+                  <p>Les fonctions HQL qui s'appliquent expressions repr&eacute;sentant des collections : <code class="literal">size(), minelement(), maxelement(), minindex(), maxindex()</code>, ainsi que les fonctions sp&eacute;ciales <code class="literal">elements()</code> et <code class="literal">indices</code> qui peuvent &ecirc;tre quantifi&eacute;es en utilisant <code class="literal">some, all, exists, any, in</code>. 
+                  </p>
+               </li>
+               <li>
+                  <p>N'importe quelle fonction scalaire support&eacute;e par la base de donn&eacute;es comme <code class="literal">sign()</code>, <code class="literal">trunc()</code>, <code class="literal">rtrim()</code>, <code class="literal">sin()</code> 
+                  </p>
+               </li>
+               <li>
+                  <p>Les param&egrave;tres positionnels de JDBC <code class="literal">?</code> 
+                  </p>
+               </li>
+               <li>
+                  <p>param&egrave;tres nomm&eacute;s <code class="literal">:name</code>, <code class="literal">:start_date</code>, <code class="literal">:x1</code> 
+                  </p>
+               </li>
+               <li>
+                  <p>litt&eacute;ral SQL <code class="literal">'foo'</code>, <code class="literal">69</code>, <code class="literal">'1970-01-01 10:00:01.0'</code> 
+                  </p>
+               </li>
+               <li>
+                  <p>Constantes Java <code class="literal">public static final</code><code class="literal">eg.Color.TABBY</code> 
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p><code class="literal">in</code> et <code class="literal">between</code> peuvent &ecirc;tre utilis&eacute;s comme suit : 
+         </p><pre class="programlisting">from DomesticCat cat where cat.name between 'A' and 'B'</pre><pre class="programlisting">from DomesticCat cat where cat.name in ( 'Foo', 'Bar', 'Baz' )</pre><p>et la forme n&eacute;gative peut &ecirc;tre &eacute;crite </p><pre class="programlisting">from DomesticCat cat where cat.name not between 'A' and 'B'</pre><pre class="programlisting">from DomesticCat cat where cat.name not in ( 'Foo', 'Bar', 'Baz' )</pre><p>De m&ecirc;me, <code class="literal">is null</code> et <code class="literal">is not null</code> peuvent &ecirc;tre utilis&eacute;s pour tester les valeurs nulle. 
+         </p>
+         <p>Les bool&eacute;ens peuvent &ecirc;tre facilement utilis&eacute;s en d&eacute;clarant les substitutions de requ&ecirc;tes dans la configuration Hibernate :
+            
+         </p><pre class="programlisting">&lt;property name="hibernate.query.substitutions"&gt;true 1, false 0&lt;/property&gt;</pre><p>Ce qui remplacera les mots cl&eacute;s <code class="literal">true</code> et <code class="literal">false</code> par <code class="literal">1</code> et <code class="literal">0</code> dans la traduction SQL du HQL suivant : 
+         </p><pre class="programlisting">from Cat cat where cat.alive = true</pre><p>Vous pouvez tester la taille d'une collection par la propri&eacute;t&eacute; sp&eacute;ciale <code class="literal">size</code>, ou la fonction sp&eacute;ciale <code class="literal">size()</code>. 
+         </p><pre class="programlisting">from Cat cat where cat.kittens.size &gt; 0</pre><pre class="programlisting">from Cat cat where size(cat.kittens) &gt; 0</pre><p>Pour les collections index&eacute;es, vous pouvez faire r&eacute;f&eacute;rence aux indices minimum et maximum en utilisant les fonctions <code class="literal">minindex</code> and <code class="literal">maxindex</code>. De mani&egrave;re similaire, vous pouvez faire r&eacute;f&eacute;rence aux &eacute;l&eacute;ments minimum et maximum d'une collection de type basiques en utilisant
+            les fonctions <code class="literal">minelement</code> et <code class="literal">maxelement</code>. 
+         </p><pre class="programlisting">from Calendar cal where maxelement(cal.holidays) &gt; current_date</pre><pre class="programlisting">from Order order where maxindex(order.items) &gt; 100</pre><pre class="programlisting">from Order order where minelement(order.items) &gt; 10000</pre><p>Les fonctions SQL <code class="literal">any, some, all, exists, in</code> supportent que leur soient pass&eacute;es l'&eacute;l&eacute;ment, l'index d'une collection (fonctions <code class="literal">elements</code> et <code class="literal">indices</code>) ou le r&eacute;sultat d'une sous requ&ecirc;te (voir ci dessous). 
+         </p><pre class="programlisting">select mother from Cat as mother, Cat as kit
+where kit in elements(foo.kittens)</pre><pre class="programlisting">select p from NameList list, Person p
+where p.name = some elements(list.names)</pre><pre class="programlisting">from Cat cat where exists elements(cat.kittens)</pre><pre class="programlisting">from Player p where 3 &gt; all elements(p.scores)</pre><pre class="programlisting">from Show show where 'fizard' in indices(show.acts)</pre><p>Notez que l'&eacute;criture de - <code class="literal">size</code>, <code class="literal">elements</code>, <code class="literal">indices</code>, <code class="literal">minindex</code>, <code class="literal">maxindex</code>, <code class="literal">minelement</code>, <code class="literal">maxelement</code> - peuvent seulement &ecirc;tre utilis&eacute;e dans la clause where dans Hibernate3. 
+         </p>
+         <p>Les &eacute;l&eacute;ments de collections index&eacute;es (arrays, lists, maps) peuvent &ecirc;tre r&eacute;f&eacute;renc&eacute;s via index (dans une clause where seulement)
+            : 
+         </p><pre class="programlisting">from Order order where order.items[0].id = 1234</pre><pre class="programlisting">select person from Person person, Calendar calendar
+where calendar.holidays['national day'] = person.birthDay
+    and person.nationality.calendar = calendar</pre><pre class="programlisting">select item from Item item, Order order
+where order.items[ order.deliveredItemIndices[0] ] = item and order.id = 11</pre><pre class="programlisting">select item from Item item, Order order
+where order.items[ maxindex(order.items) ] = item and order.id = 11</pre><p>L'expression entre <code class="literal">[]</code> peut m&ecirc;me &ecirc;tre une expression arithm&eacute;tique. 
+         </p><pre class="programlisting">select item from Item item, Order order
+where order.items[ size(order.items) - 1 ] = item</pre><p>HQL propose aussi une fonction <code class="literal">index()</code> interne, pour les &eacute;l&eacute;ments d'une association one-to-many ou d'une collections de valeurs. 
+         </p><pre class="programlisting">select item, index(item) from Order order
+    join order.items item
+where index(item) &lt; 5</pre><p>Les fonctions SQL scalaires support&eacute;es par la base de donn&eacute;es utilis&eacute;e peuvent &ecirc;tre utilis&eacute;es </p><pre class="programlisting">from DomesticCat cat where upper(cat.name) like 'FRI%'</pre><p>Si vous n'&ecirc;tes pas encore convaincu par tout cela, imaginez la taille et l'illisibilit&eacute; qui caract&eacute;riseraient la transformation
+            SQL de la requ&ecirc;te HQL suivante : 
+         </p><pre class="programlisting">select cust
+from Product prod,
+    Store store
+    inner join store.customers cust
+where prod.name = 'widget'
+    and store.location.name in ( 'Melbourne', 'Sydney' )
+    and prod = all elements(cust.currentOrder.lineItems)</pre><p><span class="emphasis"><em>Un indice :</em></span> cela donnerait quelque chose comme 
+         </p><pre class="programlisting">SELECT cust.name, cust.address, cust.phone, cust.id, cust.current_order
+FROM customers cust,
+    stores store,
+    locations loc,
+    store_customers sc,
+    product prod
+WHERE prod.name = 'widget'
+    AND store.loc_id = loc.id
+    AND loc.name IN ( 'Melbourne', 'Sydney' )
+    AND sc.store_id = store.id
+    AND sc.cust_id = cust.id
+    AND prod.id = ALL(
+        SELECT item.prod_id
+        FROM line_items item, orders o
+        WHERE item.order_id = o.id
+            AND cust.current_order = o.id
+    )</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="queryhql-where.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="queryhql.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="queryhql-ordering.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">14.9.&nbsp;La clause where&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;14.11.&nbsp;La clause order by</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

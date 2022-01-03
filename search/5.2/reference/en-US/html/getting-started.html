@@ -1,0 +1,441 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory">Chapter 1. Getting started</title><!-- HibernateDoc.Meta --><meta name="description" content="Hibernate Search, full text search for your entities - Reference Documentation" /><meta name="keywords" content="hibernate, search, hibernate search, full text, lucene" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://docs.jboss.org/hibernate/stable/search/reference/en-US/html_single/" /><!-- /HibernateDoc.Meta --><link rel="stylesheet" href="css/hibernate.css" type="text/css"/><meta xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" name="generator" content="DocBook XSL Stylesheets V1.72.0"/><link rel="start" href="index.html" title="Hibernate Search"/><link rel="up" href="index.html" title="Hibernate Search"/><link rel="prev" href="preface.html" title="Preface"/><link rel="next" href="search-architecture.html" title="Chapter 2. Architecture"/></head><body><p id="title"><a href="http://www.hibernate.org" class="site_href"><strong>Hibernate.org</strong></a><a href="http://hibernate.org/Documentation/DocumentationOverview" class="doc_href"><strong>Community Documentation</strong></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="preface.html"><strong>Prev</strong></a></li><li class="next"><a accesskey="n" href="search-architecture.html"><strong>Next</strong></a></li></ul><div class="chapter" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="getting-started"/>Chapter 1. Getting started</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="getting-started.html#_system_requirements">1.1. System Requirements</a></span></dt><dt><span class="section"><a href="getting-started.html#_migration_notes">1.2. Migration notes</a></span></dt><dt><span class="section"><a href="getting-started.html#_required_libraries">1.3. Required libraries</a></span></dt><dd><dl><dt><span class="section"><a href="getting-started.html#search-download-via-maven">1.3.1. Using Maven</a></span></dt><dt><span class="section"><a href="getting-started.html#_manual_library_management">1.3.2. Manual library management</a></span></dt></dl></dd><dt><span class="section"><a href="getting-started.html#_deploying_on_wildfly">1.4. Deploying on WildFly</a></span></dt><dt><span class="section"><a href="getting-started.html#_configuration">1.5. Configuration</a></span></dt><dt><span class="section"><a href="getting-started.html#_indexing">1.6. Indexing</a></span></dt><dt><span class="section"><a href="getting-started.html#_searching">1.7. Searching</a></span></dt><dt><span class="section"><a href="getting-started.html#_analyzer">1.8. Analyzer</a></span></dt><dt><span class="section"><a href="getting-started.html#_what_s_next">1.9. What’s next</a></span></dt></dl></div>
+
+<p>Welcome to Hibernate Search. The following chapter will guide you through the initial steps required
+to integrate Hibernate Search into an existing Hibernate ORM enabled application. In case you are a
+Hibernate new timer we recommend you start <a xmlns:xlink="http://www.w3.org/1999/xlink" href="http://hibernate.org/quick-start.html">here</a>.</p>
+<div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="_system_requirements"/>1.1. System Requirements</h2></div></div></div>
+
+<div class="table"><a id="d4e47"/><p class="title"><b>Table 1.1. System requirements</b></p><div class="table-contents">
+
+<table summary="System requirements" border="1"><colgroup><col/><col/></colgroup><tbody><tr><td align="left" valign="top"><p>Java Runtime</p></td><td align="left" valign="top"><p>Requires Java version <span class="emphasis"><em>7</em></span> or greater. You
+            can download a Java Runtime for Windows/Linux/Solaris <a xmlns:xlink="http://www.w3.org/1999/xlink" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">here</a>.</p></td></tr><tr><td align="left" valign="top"><p>Hibernate Search</p></td><td align="left" valign="top"><p><code class="literal">hibernate-search-5.2.1.Final.jar</code> and all
+            runtime dependencies. You can get the jar artifacts either from
+            the <code class="literal">dist/lib</code> directory of the <a xmlns:xlink="http://www.w3.org/1999/xlink" href="http://sourceforge.net/projects/hibernate/files/hibernate-search/">Hibernate Search distribution</a> or you can download them from the
+            <a xmlns:xlink="http://www.w3.org/1999/xlink" href="http://repository.jboss.org/nexus/content/groups/public-jboss/org/hibernate/">JBoss maven repository</a>.</p></td></tr><tr><td align="left" valign="top"><p>Hibernate Core</p></td><td align="left" valign="top"><p>You will need
+            <code class="literal">hibernate-core-4.3.9.Final.jar</code> and its
+            dependencies (either from the <a xmlns:xlink="http://www.w3.org/1999/xlink" href="http://sourceforge.net/projects/hibernate/files/hibernate4/">distribution bundle</a> or the maven repository).</p></td></tr><tr><td align="left" valign="top"><p>JPA 2.1</p></td><td align="left" valign="top"><p>Hibernate Search can be used without JPA but the following instructions will use JPA annotations for basic
+            entity configuration (<code class="literal">@Entity</code>, <code class="literal">@Id</code>, <code class="literal">@OneToMany</code>,…​).</p></td></tr></tbody></table>
+</div></div><br class="table-break"/>
+</div>
+<div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="_migration_notes"/>1.2. Migration notes</h2></div></div></div>
+
+<p>If you are upgrading an existing application from an earlier version of Hibernate Search to the latest release,
+make sure to check the out the <a xmlns:xlink="http://www.w3.org/1999/xlink" href="http://hibernate.org/search/documentation/migrate/5.0/">migration guide</a>.</p>
+</div>
+<div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="_required_libraries"/>1.3. Required libraries</h2></div></div></div>
+
+<p>The Hibernate Search library is split in several modules to allow you to pick the minimal set of
+dependencies you need.
+It requires Apache Lucene, Hibernate ORM and some standard APIs such as the Java Persistence API
+and the Java Transactions API. Other dependencies are optional, providing additional integration
+points.
+To get the correct jar files on your classpath we highly recommend to use a dependency manager such
+as <a xmlns:xlink="http://www.w3.org/1999/xlink" href="http://maven.apache.org/">Maven</a>, or similar tools such as <a xmlns:xlink="http://www.w3.org/1999/xlink" href="http://www.gradle.org/">Gradle</a> or
+<a xmlns:xlink="http://www.w3.org/1999/xlink" href="http://ant.apache.org/ivy/">Ivy</a>.
+These alternatives are also able to consume the artifacts from the <a href="getting-started.html#search-download-via-maven" title="1.3.1. Using Maven">Section 1.3.1, “Using Maven”</a> section.</p>
+<div class="section" lang="en-US"><div class="titlepage"><div><div><h3 class="title"><a id="search-download-via-maven"/>1.3.1. Using Maven</h3></div></div></div>
+
+<p>The Hibernate Search artifacts can be found in Maven’s <a xmlns:xlink="http://www.w3.org/1999/xlink" href="http://central.sonatype.org/">Central Repository</a>
+but are released first in the <a xmlns:xlink="http://www.w3.org/1999/xlink" href="http://repository.jboss.org/nexus/content/groups/public-jboss/">JBoss Maven Repository</a>.
+See also the <a xmlns:xlink="http://www.w3.org/1999/xlink" href="https://community.jboss.org/wiki/MavenGettingStarted-Users">Maven Getting Started wiki page</a> to use
+the JBoss repository.</p>
+<p>All you have to add to your pom.xml is:</p>
+<div class="example"><a id="d4e102"/><p class="title"><b>Example 1.1. Maven artifact identifier for Hibernate Search</b></p><div class="example-contents">
+
+<pre class="programlisting">&lt;dependency&gt;
+   &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
+   &lt;artifactId&gt;hibernate-search-orm&lt;/artifactId&gt;
+   &lt;version&gt;5.2.1.Final&lt;/version&gt;
+&lt;/dependency&gt;</pre>
+</div></div><br class="example-break"/>
+<div class="example"><a id="d4e105"/><p class="title"><b>Example 1.2. Optional Maven dependencies for Hibernate Search</b></p><div class="example-contents">
+
+<pre class="programlisting">&lt;dependency&gt;
+&lt;!-- If using JPA, add: --&gt;
+&lt;dependency&gt;
+   &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
+   &lt;artifactId&gt;hibernate-entitymanager&lt;/artifactId&gt;
+   &lt;version&gt;4.3.9.Final&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;!-- Infinispan integration: --&gt;
+&lt;dependency&gt;
+   &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
+   &lt;artifactId&gt;hibernate-search-infinispan&lt;/artifactId&gt;
+   &lt;version&gt;5.2.1.Final&lt;/version&gt;
+&lt;/dependency&gt;</pre>
+</div></div><br class="example-break"/>
+<p>Only the <span class="emphasis"><em>hibernate-search-orm</em></span> dependency is mandatory. <span class="emphasis"><em>hibernate-entitymanager</em></span> is only required
+if you want to use Hibernate Search in conjunction with JPA.</p>
+</div>
+<div class="section" lang="en-US"><div class="titlepage"><div><div><h3 class="title"><a id="_manual_library_management"/>1.3.2. Manual library management</h3></div></div></div>
+
+<p>You can download zip bundles from Sourcefroge containing all needed
+<a xmlns:xlink="http://www.w3.org/1999/xlink" href="http://sourceforge.net/projects/hibernate/files/hibernate-search/5.2.1.Final/">Hibernate Search</a>
+dependencies. This includes - among others - the latest compatible version of Hibernate ORM. However,
+only the essential parts you need to start experimenting with are included. You will probably need
+to combine this with downloads from the other projects, for example the
+<a xmlns:xlink="http://www.w3.org/1999/xlink" href="http://sourceforge.net/projects/hibernate/files/hibernate4/4.3.9.Final/">Hibernate ORM distribution on Sourceforge</a>
+also provides the modules to enable caching or use a connection pool.</p>
+</div>
+</div>
+<div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="_deploying_on_wildfly"/>1.4. Deploying on WildFly</h2></div></div></div>
+
+<p>If you are creating an application to be deployed on WildFly you’re lucky:
+Hibernate Search is included in the application server.
+This means that you don’t need to package it along with your application but remember that you need
+to activate the module, see <a href="search-configuration.html#search-configuration-deploy-on-wildfly" title="3.9. Hibernate Search as a WildFly module">Section 3.9, “Hibernate Search as a WildFly module”</a> for details.</p>
+<p>Due to he modular design of WildFly, you can also bundle a more recent version of
+Hibernate Search than the one included in the popular application server.
+This is also explained further in <a href="search-configuration.html#search-configuration-deploy-on-wildfly" title="3.9. Hibernate Search as a WildFly module">Section 3.9, “Hibernate Search as a WildFly module”</a>.</p>
+</div>
+<div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="_configuration"/>1.5. Configuration</h2></div></div></div>
+
+<p>Once you have added all required dependencies to your application you have to add a couple of
+properties to your Hibernate configuration file.
+If you are using Hibernate directly this can be done in <code class="literal">hibernate.properties</code> or <code class="literal">hibernate.cfg.xml</code>.
+If you are using Hibernate via JPA you can also add the properties to <code class="literal">persistence.xml</code>.
+The good news is that for standard use most properties offer a sensible default.
+An example <code class="literal">persistence.xml</code> configuration could look like this:</p>
+<div class="example"><a id="d4e129"/><p class="title"><b>Example 1.3. Basic configuration options to be added to <code class="literal">hibernate.properties</code>, <code class="literal">hibernate.cfg.xml</code> or <code class="literal">persistence.xml</code></b></p><div class="example-contents">
+
+<pre class="programlisting">...
+&lt;property name="hibernate.search.default.directory_provider"
+          value="filesystem"/&gt;
+
+&lt;property name="hibernate.search.default.indexBase"
+          value="/var/lucene/indexes"/&gt;
+...</pre>
+</div></div><br class="example-break"/>
+<p>First you have to tell Hibernate Search which <code class="literal">DirectoryProvider</code> to use. This can be achieved by
+setting the <code class="literal">hibernate.search.default.directory_provider</code> property. Apache Lucene has the notion
+of a <code class="literal">Directory</code> to store the index files. Hibernate Search handles the initialization and
+configuration of a Lucene <code class="literal">Directory</code> instance via a <code class="literal">DirectoryProvider</code>. In this tutorial we will
+use a a directory provider which stores the index on the file system. This will give us the ability to
+inspect the Lucene indexes created by Hibernate Search (eg via
+<a xmlns:xlink="http://www.w3.org/1999/xlink" href="https://github.com/DmitryKey/luke/">Luke</a>). Once you have a working configuration you can start
+experimenting with other directory providers (see <a href="search-configuration.html#search-configuration-directory" title="3.3. Directory configuration">Section 3.3, “Directory configuration”</a>).
+You also have to specify the default base directory for all indexes via
+<code class="literal">hibernate.search.default.indexBase</code>. This defines the path where indexes are stored.</p>
+<p>Let’s assume that your application contains the Hibernate managed classes <code class="literal">example.Book</code> and
+<code class="literal">example.Author</code> and you want to add free text search capabilities to your application in order to
+search the books contained in your database.</p>
+<div class="example"><a id="d4e147"/><p class="title"><b>Example 1.4. Example entities Book and Author before adding Hibernate Search specific annotations</b></p><div class="example-contents">
+
+<pre class="programlisting">package example;
+...
+@Entity
+public class Book {
+
+  @Id
+  @GeneratedValue
+  private Integer id;
+
+  private String title;
+
+  private String subtitle;
+
+  @ManyToMany
+  private Set&lt;Author&gt; authors = new HashSet&lt;Author&gt;();
+
+  private Date publicationDate;
+
+  public Book() {}
+
+  // standard getters/setters follow
+  ...
+}</pre>
+<pre class="programlisting">package example;
+...
+@Entity
+public class Author {
+
+  @Id
+  @GeneratedValue
+  private Integer id;
+
+  private String name;
+
+  public Author() {}
+
+  // standard getters/setters follow
+  ...
+}</pre>
+</div></div><br class="example-break"/>
+<p>To achieve this you have to add a few annotations to the <code class="literal">Book</code> and <code class="literal">Author</code> class. The first annotation
+<code class="literal">@Indexed</code> marks <code class="literal">Book</code> as indexable. By design Hibernate Search needs to store an <span class="emphasis"><em>untokenized</em></span> id in
+the index to ensure index uniqueness for a given entity (for now don’t worry if you don’t know what
+<span class="emphasis"><em>untokenized</em></span> means, it will soon be clear).</p>
+<p>Next you have to mark the fields you want to make searchable. Let’s start with <code class="literal">title</code> and
+<code class="literal">subtitle</code> and annotate both with <code class="literal">@Field</code>. The parameter <code class="literal">index=Index.YES</code> will ensure that the
+text will be indexed, while <code class="literal">analyze=Analyze.YES</code> ensures that the text will be analyzed using the
+default Lucene analyzer. Usually, analyzing or tokenizing means chunking a sentence into individual
+words and potentially excluding common words like "a" or "the". We will talk more about analyzers a
+little later on.
+The third parameter we specify is <code class="literal">store=Store.NO</code>, which ensures that the actual data
+will not be stored in the index.
+Whether data is stored in the index or not has nothing to do with the ability to search for it.
+It is not necessary to store fields in the index to allow Lucene to search for them: the benefit of
+storing them is the ability to retrieve them via projections (see <a href="search-query.html#projections" title="5.1.3.5. Projection">Section 5.1.3.5, “Projection”</a>).</p>
+<p>Without projections, Hibernate Search will per default execute a Lucene query in order to find the
+database identifiers of the entities matching the query criteria and use these identifiers to
+retrieve managed objects from the database. The decision for or against projection has to be made on
+a case by case basis.</p>
+<p>Note that <code class="literal">index=Index.YES</code>, <code class="literal">analyze=Analyze.YES</code> and <code class="literal">store=Store.NO</code> are the default values for
+these parameters and could be omitted.</p>
+<p>After this short look under the hood let’s go back to annotating the <code class="literal">Book</code> class. Another annotation
+we have not yet discussed is <code class="literal">@DateBridge</code>. This annotation is one of the built-in field bridges in
+Hibernate Search. The Lucene index is mostly string based, with special support for encoding numbers.
+Hibernate Search must convert the data types of the indexed fields to their respective Lucene
+encoding and vice versa. A range of predefined bridges is provided for this purpose, including the
+<code class="literal">DateBridge</code> which will convert a <code class="literal">java.util.Date</code> into a numeric value (a <code class="literal">long</code>) with the
+specified resolution. For more details see <a href="search-mapping.html#section-built-in-bridges" title="4.4.1. Built-in bridges">Section 4.4.1, “Built-in bridges”</a>.</p>
+<p>This leaves us with <code class="literal">@IndexedEmbedded</code>. This annotation is used to index associated entities
+(<code class="literal">@ManyToMany</code>, <code class="literal">@*ToOne</code>, <code class="literal">@Embedded</code> and <code class="literal">@ElementCollection</code>) as part of the owning entity.
+This is needed since a Lucene index document is a flat data structure which does not know anything
+about object relations.
+To ensure that the author names will be searchable you have to make sure that the names are indexed
+as part of the book itself. On top of <code class="literal">@IndexedEmbedded</code> you will also have to mark all fields of
+the associated entity you want to have included in the index with <code class="literal">@Indexed</code>.
+For more details see <a href="search-mapping.html#search-mapping-associated" title="4.1.3. Embedded and associated objects">Section 4.1.3, “Embedded and associated objects”</a>.</p>
+<p>These settings should be sufficient for now. For more details on entity mapping refer to
+<a href="search-mapping.html#search-mapping-entity" title="4.1. Mapping an entity">Section 4.1, “Mapping an entity”</a>.</p>
+<div class="example"><a id="d4e189"/><p class="title"><b>Example 1.5. Example entities after adding Hibernate Search annotations</b></p><div class="example-contents">
+
+<pre class="programlisting">package example;
+...
+@Entity
+@Indexed
+public class Book {
+
+  @Id
+  @GeneratedValue
+  private Integer id;
+
+  @Field(index=Index.YES, analyze=Analyze.YES, store=Store.NO)
+  private String title;
+
+  @Field(index=Index.YES, analyze=Analyze.YES, store=Store.NO)
+  private String subtitle;
+
+  @Field(index = Index.YES, analyze=Analyze.NO, store = Store.YES)
+  @DateBridge(resolution = Resolution.DAY)
+  private Date publicationDate;
+
+  @IndexedEmbedded
+  @ManyToMany
+  private Set&lt;Author&gt; authors = new HashSet&lt;Author&gt;();
+  public Book() {
+  }
+
+  // standard getters/setters follow here
+  ...
+}</pre>
+<pre class="programlisting">@Entity
+public class Author {
+
+  @Id
+  @GeneratedValue
+  private Integer id;
+
+  @Field
+  private String name;
+
+  public Author() {
+  }
+
+  // standard getters/setters follow here
+  ...
+}</pre>
+</div></div><br class="example-break"/>
+</div>
+<div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="_indexing"/>1.6. Indexing</h2></div></div></div>
+
+<p>Hibernate Search will transparently index every entity persisted, updated or removed through
+Hibernate ORM. However, you have to create an initial Lucene index for the data already present in
+your database. Once you have added the above properties and annotations it is time to trigger an
+initial batch index of your books. You can achieve this by using one of the following code snippets
+(see also <a href="manual-index-changes.html#search-batchindex" title="6.3. Rebuilding the whole index">Section 6.3, “Rebuilding the whole index”</a>):</p>
+<div class="example"><a id="d4e197"/><p class="title"><b>Example 1.6. Using Hibernate Session to index data</b></p><div class="example-contents">
+
+<pre class="programlisting">FullTextSession fullTextSession = Search.getFullTextSession(session);
+fullTextSession.createIndexer().startAndWait();</pre>
+</div></div><br class="example-break"/>
+<div class="example"><a id="d4e200"/><p class="title"><b>Example 1.7. Using JPA to index data</b></p><div class="example-contents">
+
+<pre class="programlisting">EntityManager em = entityManagerFactory.createEntityManager();
+FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(em);
+fullTextEntityManager.createIndexer().startAndWait();</pre>
+</div></div><br class="example-break"/>
+<p>After executing the above code, you should be able to see a Lucene index under <code class="literal">/var/lucene/indexes/example.Book</code>
+(or based on a different path depending how you configured the property <code class="literal">hibernate.search.default.directory_provider</code>).</p>
+<p>Go ahead an inspect this index with <a xmlns:xlink="http://www.w3.org/1999/xlink" href="https://github.com/DmitryKey/luke/">Luke</a>:
+it will help you to understand how Hibernate Search works.</p>
+</div>
+<div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="_searching"/>1.7. Searching</h2></div></div></div>
+
+<p>Now it is time to execute a first search. The general approach is to create a Lucene query, either
+via the Lucene API (<a href="search-query.html#search-query-lucene-api" title="5.1.1. Building a Lucene query using the Lucene API">Section 5.1.1, “Building a Lucene query using the Lucene API”</a>) or via the Hibernate Search query DSL
+(<a href="search-query.html#search-query-querydsl" title="5.1.2. Building a Lucene query with the Hibernate Search query DSL">Section 5.1.2, “Building a Lucene query with the Hibernate Search query DSL”</a>), and then wrap this query into a <code class="literal">org.hibernate.Query</code> in order to get all the
+functionality one is used to from the Hibernate API. The following code will prepare a query against
+the indexed fields, execute it and return a list of <code class="literal">Book</code> instances.</p>
+<div class="example"><a id="d4e215"/><p class="title"><b>Example 1.8. Using Hibernate Session to create and execute a search</b></p><div class="example-contents">
+
+<pre class="programlisting">FullTextSession fullTextSession = Search.getFullTextSession(session);
+Transaction tx = fullTextSession.beginTransaction();
+
+// create native Lucene query using the query DSL
+// alternatively you can write the Lucene query using the Lucene query parser
+// or the Lucene programmatic API. The Hibernate Search DSL is recommended though
+QueryBuilder qb = fullTextSession.getSearchFactory()
+  .buildQueryBuilder().forEntity(Book.class).get();
+org.apache.lucene.search.Query query = qb
+  .keyword()
+  .onFields("title", "subtitle", "authors.name")
+  .matching("Java rocks!")
+  .createQuery();
+
+// wrap Lucene query in a org.hibernate.Query
+org.hibernate.Query hibQuery =
+    fullTextSession.createFullTextQuery(query, Book.class);
+
+// execute search
+List result = hibQuery.list();
+
+tx.commit();
+session.close();</pre>
+</div></div><br class="example-break"/>
+<div class="example"><a id="d4e218"/><p class="title"><b>Example 1.9. Using JPA to create and execute a search</b></p><div class="example-contents">
+
+<pre class="programlisting">EntityManager em = entityManagerFactory.createEntityManager();
+FullTextEntityManager fullTextEntityManager =
+    org.hibernate.search.jpa.Search.getFullTextEntityManager(em);
+em.getTransaction().begin();
+
+// create native Lucene query using the query DSL
+// alternatively you can write the Lucene query using the Lucene query parser
+// or the Lucene programmatic API. The Hibernate Search DSL is recommended though
+QueryBuilder qb = fullTextEntityManager.getSearchFactory()
+    .buildQueryBuilder().forEntity(Book.class).get();
+org.apache.lucene.search.Query query = qb
+  .keyword()
+  .onFields("title", "subtitle", "authors.name")
+  .matching("Java rocks!")
+  .createQuery();
+
+// wrap Lucene query in a javax.persistence.Query
+javax.persistence.Query persistenceQuery =
+    fullTextEntityManager.createFullTextQuery(query, Book.class);
+
+// execute search
+List result = persistenceQuery.getResultList();
+
+em.getTransaction().commit();
+em.close();</pre>
+</div></div><br class="example-break"/>
+</div>
+<div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="_analyzer"/>1.8. Analyzer</h2></div></div></div>
+
+<p>Let’s make things a little more interesting now. Assume that one of your indexed book entities has
+the title "Refactoring: Improving the Design of Existing Code" and you want to get hits for all of
+the following queries: "refactor", "refactors", "refactored" and "refactoring". In Lucene this can
+be achieved by choosing an analyzer class which applies word stemming during the indexing <span class="strong"><strong>as well
+as</strong></span> the search process. Hibernate Search offers several ways to configure the analyzer to be used
+(see <a href="search-mapping.html#analyzer" title="4.3.1. Default analyzer and analyzer by class">Section 4.3.1, “Default analyzer and analyzer by class”</a>):</p>
+<div class="itemizedlist"><ul><li>
+Setting the <code class="literal">hibernate.search.analyzer</code> property in the configuration file.
+The specified class will then be the default analyzer.
+</li><li>
+Setting the <code class="literal">@Analyzer</code> annotation at the entity level.
+</li><li>
+Setting the <code class="literal">@Analyzer</code> annotation at the field level.
+</li></ul></div>
+<p>When using the <code class="literal">@Analyzer</code> annotation one can either specify the fully qualified classname of the
+analyzer to use or one can refer to an analyzer definition defined by the <code class="literal">@AnalyzerDef</code> annotation.
+In the latter case the analyzer framework with its factories approach is utilized.</p>
+<p>To find out more about the factory classes available
+you can either browse the Lucene JavaDoc or read the corresponding section on the
+<a xmlns:xlink="http://www.w3.org/1999/xlink" href="http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters">Solr Wiki</a>.</p>
+<p>You can use <code class="literal">@AnalyzerDef</code> or <code class="literal">@AnalyzerDefs</code> on any:
+*<code class="literal">@Indexed</code> entity regardless of where the analyzer is applied to;
+* parent class of an <code class="literal">@Indexed</code> entity;
+* package-info.java of a package containing an <code class="literal">@Indexed</code> entity.</p>
+<p>This implies that analyzer definitions are global and their names must be unique.</p>
+<div xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="note"><h2>Note</h2>
+<p>Why the reference to the Apache Solr wiki?</p>
+<p>Apache Solr was historically an indepedent sister project of Apache Lucene and the analyzer factory
+framework was originally created in Solr.
+Since then the Apache Lucene and Solr projects have merged, but the
+documentation for these additional analyzers can still be found in the Solr Wiki. You might find
+other documentation referring to the "Solr Analyzer Framework" - just remember you don’t need to
+depend on Apache Solr anymore to use it. The required classes are part of the core Lucene
+distribution.</p>
+</div>
+<p>In the example below a <code class="literal">StandardTokenizerFactory</code> is used followed by two filter factories,
+<code class="literal">LowerCaseFilterFactory</code> and <code class="literal">SnowballPorterFilterFactory</code>. The standard tokenizer splits words at
+punctuation characters and hyphens while keeping email addresses and internet hostnames intact. It
+is a good general purpose tokenizer.
+The lowercase filter converts to lowercase the letters in each token
+whereas the snowball filter finally applies language specific stemming.</p>
+<p>Generally, when using the Analyzer Framework you have to start with a tokenizer followed by an
+arbitrary number of filters.</p>
+<div class="example"><a id="d4e256"/><p class="title"><b>Example 1.10. Using <code class="literal">@AnalyzerDef</code> and the Analyzer Framework to define and use an analyzer</b></p><div class="example-contents">
+
+<pre class="programlisting">@Entity
+@Indexed
+@AnalyzerDef(name = "customanalyzer",
+  tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+  filters = {
+    @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+    @TokenFilterDef(factory = SnowballPorterFilterFactory.class, params = {
+      @Parameter(name = "language", value = "English")
+    })
+  })
+public class Book {
+
+  @Id
+  @GeneratedValue
+  @DocumentId
+  private Integer id;
+
+  @Field
+  @Analyzer(definition = "customanalyzer")
+  private String title;
+
+  @Field
+  @Analyzer(definition = "customanalyzer")
+  private String subtitle;
+
+  @IndexedEmbedded
+  @ManyToMany
+  private Set&lt;Author&gt; authors = new HashSet&lt;Author&gt;();
+
+  @Field(index = Index.YES, analyze = Analyze.NO, store = Store.YES)
+  @DateBridge(resolution = Resolution.DAY)
+  private Date publicationDate;
+
+  public Book() {
+  }
+
+  // standard getters/setters follow here
+  ...
+}</pre>
+</div></div><br class="example-break"/>
+<p>Using <code class="literal">@AnalyzerDef</code> only defines an Analyzer, you still have to apply it to entities and or
+properties using <code class="literal">@Analyzer</code>. Like in the above example the <code class="literal">customanalyzer</code> is defined but not
+applied on the entity: it’s applied on the <code class="literal">title</code> and <code class="literal">subtitle</code> properties only. An analyzer
+definition is global, so you can define it on any entity and reuse the definition on other entities.</p>
+</div>
+<div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="_what_s_next"/>1.9. What’s next</h2></div></div></div>
+
+<p>The above paragraphs helped you getting an overview of Hibernate Search. The next step after this
+tutorial is to get more familiar with the overall architecture of Hibernate Search
+(<a href="search-architecture.html" title="Chapter 2. Architecture">Chapter 2, <i xmlns:xlink="http://www.w3.org/1999/xlink">Architecture</i></a>) and explore the basic features in more detail. Two topics which were only briefly
+touched in this tutorial were analyzer configuration (<a href="search-mapping.html#analyzer" title="4.3.1. Default analyzer and analyzer by class">Section 4.3.1, “Default analyzer and analyzer by class”</a>) and field bridges
+(<a href="search-mapping.html#search-mapping-bridge" title="4.4. Bridges">Section 4.4, “Bridges”</a>). Both are important features required for more fine-grained indexing. More
+advanced topics cover clustering (<a href="search-configuration.html#jms-backend" title="3.4.1. JMS Master/Slave back end">Section 3.4.1, “JMS Master/Slave back end”</a>, <a href="search-configuration.html#infinispan-directories" title="3.3.1. Infinispan Directory configuration">Section 3.3.1, “Infinispan Directory configuration”</a>) and large index
+handling (<a href="search-lucene-native.html#advanced-features-sharding" title="10.4. Sharding indexes">Section 10.4, “Sharding indexes”</a>).</p>
+</div>
+</div><HR xmlns=""/><a xmlns="" href=""/><ul class="docnav"><li class="previous"><a accesskey="p" href="preface.html"><strong>Prev</strong>Preface</a></li><li class="up"><a accesskey="u" href="#"><strong>Top of page</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Front page</strong></a></li><li class="next"><a accesskey="n" href="search-architecture.html"><strong>Next</strong>Chapter 2. Architecture</a></li></ul><!-- HibernateDoc.OutdatedContent --><script src="//code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script><script src="/hibernate/_outdated-content/outdated-content.js" type="text/javascript"></script><script type="text/javascript">var jQuery_3_1 = $.noConflict(true); jQuery_3_1(document).ready(function() { HibernateDoc.OutdatedContent.install("search"); });</script><!-- /HibernateDoc.OutdatedContent --></body></html>

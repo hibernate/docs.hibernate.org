@@ -1,0 +1,95 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>10.9.&nbsp;R&eacute;plication d'objets entre deux entrep&ocirc;ts de donn&eacute;es</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="objectstate.html" title="Chapitre&nbsp;10.&nbsp;Travailler avec des objets">
+      <link rel="prev" href="objectstate-deleting.html" title="10.8.&nbsp;Suppression d'objets persistants">
+      <link rel="next" href="objectstate-flushing.html" title="10.10.&nbsp;Flush de la session">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">10.9.&nbsp;R&eacute;plication d'objets entre deux entrep&ocirc;ts de donn&eacute;es</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="objectstate-deleting.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;10.&nbsp;Travailler avec des objets</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="objectstate-flushing.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="objectstate-replicating"></a>10.9.&nbsp;R&eacute;plication d'objets entre deux entrep&ocirc;ts de donn&eacute;es
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Il est occasionnellement utile de pouvoir prendre un graphe d'instances persistantes et de les rendre persistantes dans un
+            entrep&ocirc;t diff&eacute;rent, sans reg&eacute;n&eacute;rer les valeurs des identifiants. 
+         </p><pre class="programlisting">//retrieve a cat from one database
+Session session1 = factory1.openSession();
+Transaction tx1 = session1.beginTransaction();
+Cat cat = session1.get(Cat.class, catId);
+tx1.commit();
+session1.close();
+
+//reconcile with a second database
+Session session2 = factory2.openSession();
+Transaction tx2 = session2.beginTransaction();
+session2.replicate(cat, ReplicationMode.LATEST_VERSION);
+tx2.commit();
+session2.close();</pre><p>Le <code class="literal">ReplicationMode</code> d&eacute;termine comment <code class="literal">replicate()</code> traitera les conflits avec les lignes existantes dans la base de donn&eacute;es. 
+         </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p><code class="literal">ReplicationMode.IGNORE</code> - ignore l'objet s'il y a une ligne existante dans la base de donn&eacute;es avec le m&ecirc;me identifiant 
+                  </p>
+               </li>
+               <li>
+                  <p><code class="literal">ReplicationMode.OVERWRITE</code> - &eacute;crase n'importe quelle ligne existante dans la base de donn&eacute;es avec le m&ecirc;me identifiant 
+                  </p>
+               </li>
+               <li>
+                  <p><code class="literal">ReplicationMode.EXCEPTION</code> - l&egrave;ve une exception s'il y une ligne dans la base de donn&eacute;es avec le m&ecirc;me identifiant 
+                  </p>
+               </li>
+               <li>
+                  <p><code class="literal">ReplicationMode.LATEST_VERSION</code> - &eacute;crase la ligne si son num&eacute;ro de version est plus petit que le num&eacute;ro de version de l'objet, ou ignore l'objet sinon 
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p>Les cas d'utilisation de cette fonctionnalit&eacute; incluent la r&eacute;conciliation de donn&eacute;es entr&eacute;es dans diff&eacute;rentes base de donn&eacute;es,
+            l'extension des informations de configuration du syst&egrave;me durant une mise &agrave; jour du produit, retour en arri&egrave;re sur les changements
+            effectu&eacute;s durant des transactions non-ACID, et plus. 
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="objectstate-deleting.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="objectstate.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="objectstate-flushing.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">10.8.&nbsp;Suppression d'objets persistants&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;10.10.&nbsp;Flush de la session</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

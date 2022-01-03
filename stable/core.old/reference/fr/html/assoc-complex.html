@@ -1,0 +1,85 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>7.6.&nbsp;Des mappings plus complexes</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="associations.html" title="Chapitre&nbsp;7.&nbsp;Mapper les associations">
+      <link rel="prev" href="assoc-bidirectional-join.html" title="7.5.&nbsp;Associations bidirectionnelles avec table de jointure">
+      <link rel="next" href="components.html" title="Chapitre&nbsp;8.&nbsp;Mapping de composants">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">7.6.&nbsp;Des mappings plus complexes</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="assoc-bidirectional-join.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;7.&nbsp;Mapper les associations</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="components.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="assoc-complex"></a>7.6.&nbsp;Des mappings plus complexes
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Des associations encore plus complexes sont <span class="emphasis"><em>extr&ecirc;mement</em></span> rares. Hibernate permet de g&eacute;rer des situations plus complexes en utilisant des parties SQL dans les fichiers de mapping.
+            Par exemple, si une table avec l'historiques des informations d'un compte d&eacute;finit les colonnes <code class="literal">accountNumber</code>, <code class="literal">effectiveEndDate</code> et <code class="literal">effectiveStartDate</code>, mapp&eacute;es de telle sorte: 
+         </p><pre class="programlisting">&lt;properties name="currentAccountKey"&gt;
+    &lt;property name="accountNumber" type="string" not-null="true"/&gt;
+    &lt;property name="currentAccount" type="boolean"&gt;
+        &lt;formula&gt;case when effectiveEndDate is null then 1 else 0 end&lt;/formula&gt;
+    &lt;/property&gt;
+&lt;/properties&gt;
+&lt;property name="effectiveEndDate" type="date"/&gt;
+&lt;property name="effectiveStateDate" type="date" not-null="true"/&gt;</pre><p>alors nous pouvons mapper une association &agrave; l'instance <span class="emphasis"><em>courante</em></span> (celle avec une <code class="literal">effectiveEndDate</code>) nulle en utilisant: 
+         </p><pre class="programlisting">&lt;many-to-one name="currentAccountInfo" 
+        property-ref="currentAccountKey"
+        class="AccountInfo"&gt;
+    &lt;column name="accountNumber"/&gt;
+    &lt;formula&gt;'1'&lt;/formula&gt;
+&lt;/many-to-one&gt;</pre><p>Dans un exemple plus complexe, imaginez qu'une association entre <code class="literal">Employee</code> et <code class="literal">Organization</code> est g&eacute;r&eacute;e dans une table <code class="literal">Employment</code> pleines de donn&eacute;es historiques. Dans ce cas, une association vers l'employeur <span class="emphasis"><em>le plus r&eacute;cent</em></span> (celui avec la <code class="literal">startDate</code> la plus r&eacute;cente) pourrait &ecirc;tre mapp&eacute;e comme cela: 
+         </p><pre class="programlisting">&lt;join&gt;
+    &lt;key column="employeeId"/&gt;
+    &lt;subselect&gt;
+        select employeeId, orgId 
+        from Employments 
+        group by orgId 
+        having startDate = max(startDate)
+    &lt;/subselect&gt;
+    &lt;many-to-one name="mostRecentEmployer" 
+            class="Organization" 
+            column="orgId"/&gt;
+&lt;/join&gt;</pre><p>Vous pouvez &ecirc;tre cr&eacute;atif grace &agrave; ces possibilit&eacute;s, mais il est g&eacute;n&eacute;ralement plus pratique d'utiliser des requ&ecirc;tes HQL ou criteria
+            dans ce genre de situation. 
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="assoc-bidirectional-join.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="associations.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="components.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">7.5.&nbsp;Associations bidirectionnelles avec table de jointure&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;Chapitre&nbsp;8.&nbsp;Mapping de composants</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

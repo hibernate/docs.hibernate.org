@@ -1,0 +1,100 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>2.2.&nbsp;Instance states</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="architecture.html" title="Chapter&nbsp;2.&nbsp;Architecture">
+      <link rel="prev" href="architecture.html" title="Chapter&nbsp;2.&nbsp;Architecture">
+      <link rel="next" href="architecture-jmx.html" title="2.3.&nbsp;JMX Integration">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">2.2.&nbsp;Instance states</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="architecture.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;2.&nbsp;Architecture</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="architecture-jmx.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="architecture-states"></a>2.2.&nbsp;Instance states
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+            An instance of a persistent classes may be in one of three different states,
+                        which are defined with respect to a <span class="emphasis"><em>persistence context</em></span>.
+                        The Hibernate <code class="literal">Session</code> object is the persistence context:
+                    
+         </p>
+         <div class="variablelist">
+            <dl>
+               <dt><span class="term">transient</span></dt>
+               <dd>
+                  <p>
+                                             The instance is not, and has never been associated with
+                                             any persistence context. It has no persistent identity
+                                             (primary key value).
+                                         
+                  </p>
+               </dd>
+               <dt><span class="term">persistent</span></dt>
+               <dd>
+                  <p>
+                                             The instance is currently associated with a persistence 
+                                             context. It has a persistent identity (primary key value)
+                                             and, perhaps, a corresponding row in the database. For a
+                                             particular persistence context, Hibernate 
+                                             <span class="emphasis"><em>guarantees</em></span> that persistent identity
+                                             is equivalent to Java identity (in-memory location of the
+                                             object).
+                                         
+                  </p>
+               </dd>
+               <dt><span class="term">detached</span></dt>
+               <dd>
+                  <p>
+                                             The instance was once associated with a persistence
+                                             context, but that context was closed, or the instance
+                                             was serialized to another process. It has a persistent 
+                                             identity and, perhaps, a corresponding row in the database.
+                                             For detached instances, Hibernate makes no guarantees 
+                                             about the relationship between persistent identity and
+                                             Java identity.
+                                         
+                  </p>
+               </dd>
+            </dl>
+         </div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="architecture.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="architecture.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="architecture-jmx.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">Chapter&nbsp;2.&nbsp;Architecture&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;2.3.&nbsp;JMX Integration</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

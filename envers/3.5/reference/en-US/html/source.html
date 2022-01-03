@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory">Chapter 8. Building from source and testing</title><link rel="stylesheet" href="css/hibernate.css" type="text/css"/><meta xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" name="generator" content="DocBook XSL Stylesheets V1.74.0"/><link rel="home" href="index.html" title="Hibernate Envers - Easy Entity Auditing"/><link rel="up" href="index.html" title="Hibernate Envers - Easy Entity Auditing"/><link rel="prev" href="tables.html" title="Chapter 7. Generated tables and their content"/><link rel="next" href="exceptions.html" title="Chapter 9. Mapping exceptions"/><link rel="copyright" href="Legal_Notice.html" title="Legal Notice"/></head><body><p id="title"><a href="http://www.hibernate.org" class="site_href"><strong>Hibernate.org</strong></a><a href="http://hibernate.org/Documentation/DocumentationOverview" class="doc_href"><strong>Community Documentation</strong></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="tables.html"><strong>Prev</strong></a></li><li class="next"><a accesskey="n" href="exceptions.html"><strong>Next</strong></a></li></ul><div class="chapter" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="source"/>Chapter 8. Building from source and testing</h2></div></div></div><p>
+        Envers, as a module of Hibernate, uses a standard Maven2 build. So all the usual
+        build targets (compile, test, install) will work.
+    </p><p>
+        You can check out the source code
+        <a class="ulink" href="http://anonsvn.jboss.org/repos/hibernate/core/trunk/">from SVN</a>,
+        or browse it using
+        <a class="ulink" href="http://fisheye.jboss.org/browse/Hibernate">FishEye</a>.
+    </p><p>
+        The tests use, by default, use a H2 in-memory database. The configuration
+        file can be found in <code class="literal">src/test/resources/hibernate.test.cfg.xml</code>.
+    </p><p>
+        The tests use TestNG, and can be found in the
+        <code class="literal">org.hibernate.envers.test.integration</code> package
+        (or rather, in subpackages of this package).
+        The tests aren't unit tests, as they don't test individual classes, but the behaviour
+        and interaction of many classes, hence the name of package.
+    </p><p>
+        A test normally consists of an entity (or two entities) that will be audited and extends the
+        <code class="literal">AbstractEntityTest</code> class, which has one abstract method:
+        <code class="literal">configure(Ejb3Configuration)</code>. The role of this method is to add the entities
+        that will be used in the test to the configuration.
+    </p><p>
+        The test data is in most cases created in the "initData" method (which is called once before
+        the tests from this class are executed), which normally creates a couple of revisions,
+        by persisting and updating entities. The tests first check if the revisions, in which
+        entities where modified are correct (the testRevisionCounts method), and if the historic
+        data is correct (the testHistoryOfXxx methods).
+    </p></div><HR xmlns=""/><a xmlns="" href="legalnotice.html"><p xmlns="http://www.w3.org/1999/xhtml" class="copyright">Copyright © 2004 Red Hat Inc.</p></a><ul class="docnav"><li class="previous"><a accesskey="p" href="tables.html"><strong>Prev</strong>Chapter 7. Generated tables and their content</a></li><li class="up"><a accesskey="u" href="#"><strong>Top of page</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Front page</strong></a></li><li class="next"><a accesskey="n" href="exceptions.html"><strong>Next</strong>Chapter 9. Mapping exceptions</a></li></ul></body></html>

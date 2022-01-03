@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory">Chapter 1. Introduction</title><link rel="stylesheet" href="css/hibernate.css" type="text/css"/><meta xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" name="generator" content="DocBook XSL Stylesheets V1.74.0"/><link rel="home" href="index.html" title="Hibernate JPA 2 Metamodel Generator"/><link rel="up" href="index.html" title="Hibernate JPA 2 Metamodel Generator"/><link rel="prev" href="index.html" title="Hibernate JPA 2 Metamodel Generator"/><link rel="next" href="chapter-usage.html" title="Chapter 2. Usage"/></head><body><p id="title"><a href="http://www.hibernate.org" class="site_href"><strong>Hibernate.org</strong></a><a href="http://hibernate.org/Documentation/DocumentationOverview" class="doc_href"><strong>Community Documentation</strong></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="index.html"><strong>Prev</strong></a></li><li class="next"><a accesskey="n" href="chapter-usage.html"><strong>Next</strong></a></li></ul><div class="chapter" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="introduction"/>Chapter 1. Introduction</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="introduction.html#whatisit">1.1. What is it about?</a></span></dt><dt><span class="section"><a href="introduction.html#d0e76">1.2. Canonical Metamodel</a></span></dt></dl></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="whatisit"/>1.1. What is it about?</h2></div></div></div><p>JPA 2 defines a new typesafe <code class="classname">Criteria</code> API
+      which allows criteria queries to be constructed in a strongly-typed
+      manner, using metamodel objects to provide type safety. For developers
+      it is important that the task of the metamodel generation can be
+      automated. Hibernate Static Metamodel Generator is an annotation
+      processor based on the [<span class="citation"><a class="xref" href="bi01.html#JSR_269" title="JSR 269: Pluggable Annotation Processing API"><abbr class="abbrev"/></a><a id="JSR_269_ABBREV"/><a class="xref" href="bi01.html#JSR_269" title="JSR 269: Pluggable Annotation Processing API"><abbr class="abbrev">Pluggable Annotation Processing API</abbr></a></span>] with the task of creating JPA 2
+      static metamodel classes. The following example show two JPA 2 entities
+      <code class="classname">Order</code> and <code class="classname">Item</code>, together
+      with the metamodel class <code class="classname">Order_</code> and a typesafe
+      query.</p><div class="example"><a id="jpa2-entity-example"/><p class="title"><b>Example 1.1. JPA 2 annotated entities <code class="classname">Order</code> and
+        <code class="classname">Item</code></b></p><div class="example-contents"><pre xmlns="" xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="JAVA"></span>
+<!--  --><br/><span class="java_plain">@</span><span class="java_type">Entity</span>
+<!--  --><br/><span class="java_keyword">public</span><span class="java_plain">&nbsp;</span><span class="java_keyword">class</span><span class="java_plain">&nbsp;</span><span class="java_type">Order</span><span class="java_plain">&nbsp;</span><span class="java_separator">{</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;&nbsp;@</span><span class="java_type">Id</span><span class="java_plain">&nbsp;</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;&nbsp;@</span><span class="java_type">GeneratedValue</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="java_type">Integer</span><span class="java_plain">&nbsp;id</span><span class="java_separator">;</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;&nbsp;@</span><span class="java_type">ManyToOne</span><span class="java_plain">&nbsp;</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="java_type">Customer</span><span class="java_plain">&nbsp;customer</span><span class="java_separator">;</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;&nbsp;@</span><span class="java_type">OneToMany</span><span class="java_plain">&nbsp;</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="java_type">Set</span><span class="java_operator">&lt;</span><span class="java_type">Item</span><span class="java_operator">&gt;</span><span class="java_plain">&nbsp;items</span><span class="java_separator">;</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="java_type">BigDecimal</span><span class="java_plain">&nbsp;totalCost</span><span class="java_separator">;</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="java_operator">//</span><span class="java_plain">&nbsp;standard&nbsp;setter</span><span class="java_operator">/</span><span class="java_plain">getter&nbsp;methods</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="java_separator">...</span>
+<!--  --><br/><span class="java_separator">}</span>
+</span>
+<!--  --><br/><span class="java_plain">@</span><span class="java_type">Entity</span><span class="java_plain">&nbsp;&nbsp;</span>
+<!--  --><br/><span class="java_keyword">public</span><span class="java_plain">&nbsp;</span><span class="java_keyword">class</span><span class="java_plain">&nbsp;</span><span class="java_type">Item</span><span class="java_plain">&nbsp;</span><span class="java_separator">{</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;&nbsp;@</span><span class="java_type">Id</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;&nbsp;@</span><span class="java_type">GeneratedValue</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="java_type">Integer</span><span class="java_plain">&nbsp;id</span><span class="java_separator">;</span>
+</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="java_type">int</span><span class="java_plain">&nbsp;quantity</span><span class="java_separator">;</span>
+</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;&nbsp;@</span><span class="java_type">ManyToOne</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="java_type">Order</span><span class="java_plain">&nbsp;order</span><span class="java_separator">;</span>
+</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="java_operator">//</span><span class="java_plain">&nbsp;standard&nbsp;setter</span><span class="java_operator">/</span><span class="java_plain">getter&nbsp;methods</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="java_separator">...</span>
+<!--  --><br/><span class="java_separator">}</span>
+</pre></div></div><br class="example-break"/><div class="example"><a id="metamodel-class-example"/><p class="title"><b>Example 1.2. Metamodel class <code class="classname">Order_</code></b></p><div class="example-contents"><pre xmlns="" xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="JAVA"></span>
+<!--  --><br/><span class="java_plain">@</span><span class="java_type">StaticMetamodel</span><span class="java_separator">(</span><span class="java_type">Order</span><span class="java_separator">.</span><span class="java_keyword">class</span><span class="java_separator">)</span>
+<!--  --><br/><span class="java_keyword">public</span><span class="java_plain">&nbsp;</span><span class="java_keyword">class</span><span class="java_plain">&nbsp;</span><span class="java_type">Order_</span><span class="java_plain">&nbsp;</span><span class="java_separator">{</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="java_keyword">public</span><span class="java_plain">&nbsp;</span><span class="java_keyword">static</span><span class="java_plain">&nbsp;</span><span class="java_keyword">volatile</span><span class="java_plain">&nbsp;</span><span class="java_type">SingularAttribute</span><span class="java_operator">&lt;</span><span class="java_type">Order</span><span class="java_separator">,</span><span class="java_plain">&nbsp;</span><span class="java_type">Integer</span><span class="java_operator">&gt;</span><span class="java_plain">&nbsp;id</span><span class="java_separator">;</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="java_keyword">public</span><span class="java_plain">&nbsp;</span><span class="java_keyword">static</span><span class="java_plain">&nbsp;</span><span class="java_keyword">volatile</span><span class="java_plain">&nbsp;</span><span class="java_type">SingularAttribute</span><span class="java_operator">&lt;</span><span class="java_type">Order</span><span class="java_separator">,</span><span class="java_plain">&nbsp;</span><span class="java_type">Customer</span><span class="java_operator">&gt;</span><span class="java_plain">&nbsp;customer</span><span class="java_separator">;</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="java_keyword">public</span><span class="java_plain">&nbsp;</span><span class="java_keyword">static</span><span class="java_plain">&nbsp;</span><span class="java_keyword">volatile</span><span class="java_plain">&nbsp;</span><span class="java_type">SetAttribute</span><span class="java_operator">&lt;</span><span class="java_type">Order</span><span class="java_separator">,</span><span class="java_plain">&nbsp;</span><span class="java_type">Item</span><span class="java_operator">&gt;</span><span class="java_plain">&nbsp;items</span><span class="java_separator">;</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="java_keyword">public</span><span class="java_plain">&nbsp;</span><span class="java_keyword">static</span><span class="java_plain">&nbsp;</span><span class="java_keyword">volatile</span><span class="java_plain">&nbsp;</span><span class="java_type">SingularAttribute</span><span class="java_operator">&lt;</span><span class="java_type">Order</span><span class="java_separator">,</span><span class="java_plain">&nbsp;</span><span class="java_type">BigDecimal</span><span class="java_operator">&gt;</span><span class="java_plain">&nbsp;totalCost</span><span class="java_separator">;</span>
+<!--  --><br/><span class="java_separator">}</span>
+<!--  --><br/><span class="java_plain">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></pre></div></div><br class="example-break"/><div class="example"><a id="criteria-example"/><p class="title"><b>Example 1.3. Typesafe citeria query</b></p><div class="example-contents"><pre xmlns="" xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="JAVA"></span>
+<!--  --><br/><span class="java_type">CriteriaBuilder</span><span class="java_plain">&nbsp;cb&nbsp;</span><span class="java_operator">=</span><span class="java_plain">&nbsp;entityManager</span><span class="java_separator">.</span><span class="java_plain">getCriteriaBuilder</span><span class="java_separator">();</span>
+<!--  --><br/><span class="java_type">CriteriaQuery</span><span class="java_operator">&lt;</span><span class="java_type">Order</span><span class="java_operator">&gt;</span><span class="java_plain">&nbsp;cq&nbsp;</span><span class="java_operator">=</span><span class="java_plain">&nbsp;cb</span><span class="java_separator">.</span><span class="java_plain">createQuery</span><span class="java_separator">(</span><span class="java_type">Order</span><span class="java_separator">.</span><span class="java_keyword">class</span><span class="java_separator">);</span>
+<!--  --><br/><span class="java_type">SetJoin</span><span class="java_operator">&lt;</span><span class="java_type">Order</span><span class="java_separator">,</span><span class="java_plain">&nbsp;</span><span class="java_type">Item</span><span class="java_operator">&gt;</span><span class="java_plain">&nbsp;itemNode&nbsp;</span><span class="java_operator">=</span><span class="java_plain">&nbsp;cq</span><span class="java_separator">.</span><span class="java_plain">from</span><span class="java_separator">(</span><span class="java_type">Order</span><span class="java_separator">.</span><span class="java_keyword">class</span><span class="java_separator">).</span><span class="java_plain">join</span><span class="java_separator">(</span><span class="java_type">Order_</span><span class="java_separator">.</span><span class="java_plain">items</span><span class="java_separator">);</span>
+<!--  --><br/><span class="java_plain">cq</span><span class="java_separator">.</span><span class="java_plain">where</span><span class="java_separator">(</span><span class="java_plain">&nbsp;cb</span><span class="java_separator">.</span><span class="java_plain">equal</span><span class="java_separator">(</span><span class="java_plain">itemNode</span><span class="java_separator">.</span><span class="java_plain">get</span><span class="java_separator">(</span><span class="java_type">Item_</span><span class="java_separator">.</span><span class="java_plain">id</span><span class="java_separator">),</span><span class="java_plain">&nbsp;</span><span class="java_literal">5</span><span class="java_plain">&nbsp;</span><span class="java_separator">)</span><span class="java_plain">&nbsp;</span><span class="java_separator">).</span><span class="java_plain">distinct</span><span class="java_separator">(</span><span class="java_literal">true</span><span class="java_separator">);</span>
+</pre></div></div><br class="example-break"/><div xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="tip"><h2>Tip</h2><p>The Metamodel Generator also takes into consideration xml
+        configuration specified in orm.xml or mapping files specified in
+        persistence.xml. However, if all configuration is in XML you need to
+        add in at least on of the mapping file the following persistence unit
+        metadata:</p><pre class="programlisting">&lt;persistence-unit-metadata&gt;
+  &lt;xml-mapping-metadata-complete/&gt;
+&lt;/persistence-unit-metadata&gt;</pre></div></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="d0e76"/>1.2. Canonical Metamodel</h2></div></div></div><p>The structure of the metamodel classes is described in the
+      [<span class="citation"><a class="xref" href="bi01.html#JPA2" title="JSR 317: Java Persistence API, Version 2.0"><abbr class="abbrev"/></a><a id="JPA2_ABBREV"/><a class="xref" href="bi01.html#JPA2" title="JSR 317: Java Persistence API, Version 2.0"><abbr class="abbrev">JPA 2 Specification</abbr></a></span>], but for completeness the definition is repeated in the
+      following paragraphs. Feel free to skip ahead to <a class="xref" href="chapter-usage.html" title="Chapter 2. Usage">Chapter 2, <i>Usage</i></a> if you are not interested into the gory
+      details.</p><p>The annotation processor produces for every managed class in the
+      persistence unit a metamodel class based on these rules:</p><div class="itemizedlist"><ul><li><p>For each managed class <code class="classname">X</code> in package
+            p, a metamodel class <code class="classname">X_</code> in package p is
+            created.</p></li><li><p>The name of the metamodel class is derived from the name of
+            the managed class by appending "_" to the name of the managed
+            class.</p></li><li><p>The metamodel class <code class="classname">X_</code> must be
+            annotated with the
+            <code class="classname">javax.persistence.StaticMetamodel</code>
+            annotation.</p></li><li><p>If class <code class="classname">X</code> extends another class
+            <code class="classname">S</code>, where <code class="classname">S</code> is the
+            most derived managed class (i.e., entity or mapped superclass)
+            extended by <code class="classname">X</code>, then class
+            <code class="classname">X_</code> must extend class
+            <code class="classname">S_</code>, where <code class="classname">S_</code> is the
+            metamodel class created for <code class="classname">S</code>.</p></li><li><p>For every persistent non-collection-valued attribute y
+            declared by class <code class="classname">X</code>, where the type of y is
+            <code class="classname">Y</code>, the metamodel class must contain a
+            declaration as follows:</p><pre class="programlisting">public static volatile SingularAttribute&lt;X, Y&gt; y;</pre></li><li><p>For every persistent collection-valued attribute z declared
+            by class <code class="classname">X</code>, where the element type of z is
+            <code class="classname">Z</code>, the metamodel class must contain a
+            declaration as follows:</p><div class="itemizedlist"><ul><li><p>if the collection type of z is java.util.Collection,
+                  then</p><pre class="programlisting">public static volatile CollectionAttribute&lt;X, Z&gt; z;</pre></li><li><p>if the collection type of z is java.util.Set,
+                  then</p><pre class="programlisting">public static volatile SetAttribute&lt;X, Z&gt; z;</pre></li><li><p>if the collection type of z is java.util.List,
+                  then</p><pre class="programlisting">public static volatile ListAttribute&lt;X, Z&gt; z;</pre></li><li><p>if the collection type of z is java.util.Map, then
+                  </p><pre class="programlisting">public static volatile MapAttribute&lt;X, K, Z&gt; z;</pre><p>
+                  where K is the type of the key of the map in class X</p></li></ul></div></li></ul></div><p>Import statements must be included for the needed
+      <code class="classname">javax.persistence.metamodel</code> types as appropriate
+      and all classes <code class="classname">X</code>, <code class="classname">Y</code>,
+      <code class="classname">Z</code>, and <code class="classname">K</code>.</p></div></div><HR xmlns=""/><a xmlns="" href=""><p xmlns="http://www.w3.org/1999/xhtml" class="copyright">Copyright © 2010 Red Hat Inc.</p></a><ul class="docnav"><li class="previous"><a accesskey="p" href="index.html"><strong>Prev</strong>Hibernate JPA 2 Metamodel Generator</a></li><li class="up"><a accesskey="u" href="#"><strong>Top of page</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Front page</strong></a></li><li class="next"><a accesskey="n" href="chapter-usage.html"><strong>Next</strong>Chapter 2. Usage</a></li></ul></body></html>

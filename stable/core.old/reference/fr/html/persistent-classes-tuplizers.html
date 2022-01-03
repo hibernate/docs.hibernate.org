@@ -1,0 +1,101 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>4.5.&nbsp;Tuplizers</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="persistent-classes.html" title="Chapitre&nbsp;4.&nbsp;Classes persistantes">
+      <link rel="prev" href="persistent-classes-dynamicmodels.html" title="4.4.&nbsp;Mod&egrave;les dynamiques">
+      <link rel="next" href="persistent-classes-extensions.html" title="4.6.&nbsp;Extentsions">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">4.5.&nbsp;Tuplizers</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="persistent-classes-dynamicmodels.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;4.&nbsp;Classes persistantes</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="persistent-classes-extensions.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="persistent-classes-tuplizers"></a>4.5.&nbsp;Tuplizers
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p><code class="literal">org.hibernate.tuple.Tuplizer</code>, et ses sous-interfaces, sont responsables de la gestion d'une repr&eacute;sentation particuli&egrave;re d'un morceau de donn&eacute;es, en fonction
+            du <code class="literal">org.hibernate.EntityMode</code> de r&eacute;pr&eacute;sentation. Si un morceau donn&eacute; de donn&eacute;es est pens&eacute; comme une structure de donn&eacute;es, alors un tuplizer est la chose
+            qui sait comment cr&eacute;er une telle structure de donn&eacute;es, comment extraire des valeurs et injecter des valeurs dans une telle
+            structure de donn&eacute;es. Par exemple, pour le mode d'entit&eacute; POJO, le tuplizer correspondant sait comment cr&eacute;er le POJO &agrave; travers
+            son constructeur et comment acc&eacute;der aux propri&eacute;t&eacute;s du POJO utilisant les accesseurs de la propri&eacute;t&eacute; d&eacute;finie. Il y a deux types
+            de Tuplizers haut niveau, repr&eacute;sent&eacute; par les interfaces <code class="literal">org.hibernate.tuple.EntityTuplizer</code> et <code class="literal">org.hibernate.tuple.ComponentTuplizer</code>. Les <code class="literal">EntityTuplizer</code>s sont responsables de la gestion des contrats mentionn&eacute;s ci-dessus pour les entit&eacute;s, alors que les <code class="literal">ComponentTuplizer</code>s s'occupent des composants. 
+         </p>
+         <p>Les utilisateurs peuvent aussi brancher leurs propres tuplizers. Peut-&ecirc;tre vous est-il n&eacute;cessaire qu'une impl&eacute;mentation de
+            <code class="literal">java.util.Map</code> autre que <code class="literal">java.util.HashMap</code> soit utilis&eacute;e dans le mode d'entit&eacute; dynamic-map ; ou peut-&ecirc;tre avez-vous besoin de d&eacute;finir une stat&eacute;gie de g&eacute;n&eacute;ration de
+            proxy diff&eacute;rente de celle utilis&eacute;e par d&eacute;faut. Les deux devraient &ecirc;tre effectu&eacute;es en d&eacute;finissant une impl&eacute;mentation de tuplizer
+            utilisateur. Les d&eacute;finitions de tuplizers sont attach&eacute;es au mapping de l'entit&eacute; ou du composant qu'ils sont cens&eacute;s g&eacute;rer.
+            Retour &agrave; l'exemple de notre entit&eacute; utilisateur : 
+         </p><pre class="programlisting">&lt;hibernate-mapping&gt;
+    &lt;class entity-name="Customer"&gt;
+        &lt;!--
+            Override the dynamic-map entity-mode
+            tuplizer for the customer entity
+        --&gt;
+        &lt;tuplizer entity-mode="dynamic-map"
+                class="CustomMapTuplizerImpl"/&gt;
+
+        &lt;id name="id" type="long" column="ID"&gt;
+            &lt;generator class="sequence"/&gt;
+        &lt;/id&gt;
+
+        &lt;!-- other properties --&gt;
+        ...
+    &lt;/class&gt;
+&lt;/hibernate-mapping&gt;
+
+
+public class CustomMapTuplizerImpl
+        extends org.hibernate.tuple.entity.DynamicMapEntityTuplizer {
+    // override the buildInstantiator() method to plug in our custom map...
+    protected final Instantiator buildInstantiator(
+            org.hibernate.mapping.PersistentClass mappingInfo) {
+        return new CustomMapInstantiator( mappingInfo );
+    }
+
+    private static final class CustomMapInstantiator
+            extends org.hibernate.tuple.DynamicMapInstantitor {
+        // override the generateMap() method to return our custom map...
+            protected final Map generateMap() {
+                    return new CustomMap();
+            }
+    }
+}</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="persistent-classes-dynamicmodels.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="persistent-classes.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="persistent-classes-extensions.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">4.4.&nbsp;Mod&egrave;les dynamiques&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;4.6.&nbsp;Extentsions</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

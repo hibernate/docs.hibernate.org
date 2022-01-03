@@ -1,0 +1,71 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>14.12.&nbsp;La clause group by</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="queryhql.html" title="Chapitre&nbsp;14.&nbsp;HQL: Langage de requ&ecirc;tage d'Hibernate">
+      <link rel="prev" href="queryhql-ordering.html" title="14.11.&nbsp;La clause order by">
+      <link rel="next" href="queryhql-subqueries.html" title="14.13.&nbsp;Sous-requ&ecirc;tes">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">14.12.&nbsp;La clause group by</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="queryhql-ordering.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;14.&nbsp;HQL: Langage de requ&ecirc;tage d'Hibernate</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="queryhql-subqueries.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="queryhql-grouping"></a>14.12.&nbsp;La clause group by
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Si la requ&ecirc;te retourne des valeurs aggr&eacute;g&eacute;es, celles ci peuvent &ecirc;tre group&eacute;es par propri&eacute;t&eacute; ou composant : </p><pre class="programlisting">select cat.color, sum(cat.weight), count(cat)
+from Cat cat
+group by cat.color</pre><pre class="programlisting">select foo.id, avg(name), max(name)
+from Foo foo join foo.names name
+group by foo.id</pre><p>Une clause <code class="literal">having</code> est aussi permise. 
+         </p><pre class="programlisting">select cat.color, sum(cat.weight), count(cat)
+from Cat cat
+group by cat.color
+having cat.color in (eg.Color.TABBY, eg.Color.BLACK)</pre><p>Les fonctions SQL et les fonctions d'aggr&eacute;gations sont permises dans les clauses <code class="literal">having</code> et <code class="literal">order by</code>, si elles sont support&eacute;es par la base de donn&eacute;es (ce que ne fait pas MySQL par exemple). 
+         </p><pre class="programlisting">select cat
+from Cat cat
+    join cat.kittens kitten
+group by cat.id, cat.name, cat.other, cat.properties
+having avg(kitten.weight) &gt; 100
+order by count(kitten) asc, sum(kitten.weight) desc</pre><p>Notez que ni la clause <code class="literal">group by</code> ni la clause <code class="literal">order by</code> ne peuvent contenir d'expressions arithm&eacute;tiques. 
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="queryhql-ordering.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="queryhql.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="queryhql-subqueries.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">14.11.&nbsp;La clause order by&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;14.13.&nbsp;Sous-requ&ecirc;tes</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

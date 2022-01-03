@@ -1,0 +1,99 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>Chapitre&nbsp;10.&nbsp;Travailler avec des objets</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="prev" href="inheritance-limitations.html" title="9.2.&nbsp;Limitations">
+      <link rel="next" href="objectstate-makingpersistent.html" title="10.2.&nbsp;Rendre des objets persistants">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">Chapitre&nbsp;10.&nbsp;Travailler avec des objets</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="inheritance-limitations.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">&nbsp;</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="objectstate-makingpersistent.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="chapter" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title"><a name="objectstate"></a>Chapitre&nbsp;10.&nbsp;Travailler avec des objets
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Hibernate est une solution de mapping objet/relationnel compl&egrave;te qui ne masque pas seulement au d&eacute;velopppeur les d&eacute;tails du
+            syst&egrave;me de gestion de base de donn&eacute;es sous-jacent, mais offre aussi <span class="emphasis"><em>la gestion d'&eacute;tat</em></span> des objets. C'est, contrairement &agrave; la gestion de <code class="literal">statements</code> SQL dans les couches de persistance habituelles JDBC/SQL, une vue orient&eacute;e objet tr&egrave;s naturelle de la persistance dans les
+            applications Java. 
+         </p>
+         <p>En d'autres mots, les d&eacute;veloppeurs d'applications Hibernate devrait toujours r&eacute;fl&eacute;chir &agrave; <span class="emphasis"><em>l'&eacute;tat</em></span> de leurs objets, et pas n&eacute;cessairement &agrave; l'ex&eacute;cution des expressions SQL. Cette part est prise en charge pas Hibernate et
+            seulement importante pour les d&eacute;veloppeurs d'applications lors du r&eacute;glage de la performance de leur syst&egrave;me. 
+         </p>
+         <div class="sect1" lang="fr-FR">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="objectstate-overview"></a>10.1.&nbsp;&Eacute;tats des objets Hibernate
+                     </h2>
+                  </div>
+               </div>
+            </div>
+            <p>Hibernate d&eacute;finit et comprend les &eacute;tats suivants : </p>
+            <div class="itemizedlist">
+               <ul type="disc">
+                  <li>
+                     <p><span class="emphasis"><em>&Eacute;ph&eacute;m&egrave;re</em></span> (NdT : transient) - un objet est &eacute;ph&eacute;m&egrave;re s'il a juste &eacute;t&eacute; instanci&eacute; en utilisant l'op&eacute;rateur <code class="literal">new</code>. Il n'a aucune repr&eacute;sentation persistante dans la base de donn&eacute;es et aucune valeur d'identifiant n'a &eacute;t&eacute; assign&eacute;e. Les instances
+                        &eacute;ph&eacute;m&egrave;res seront d&eacute;truites par le ramasse-miettes si l'application n'en conserve aucune r&eacute;f&eacute;rence. Utilisez la <code class="literal">Session</code> d'Hibernate pour rendre un objet persistant (et laisser Hibernate s'occuper des expressions SQL qui ont besoin d'&ecirc;tre ex&eacute;cut&eacute;es
+                        pour cette transistion). 
+                     </p>
+                  </li>
+                  <li>
+                     <p><span class="emphasis"><em>Persistant</em></span> - une instance persistante a une repr&eacute;sentation dans la base de donn&eacute;es et une valeur d'identifiant. Elle pourrait avoir
+                        juste &eacute;t&eacute; sauvegard&eacute;e ou charg&eacute;e, pourtant, elle est par d&eacute;finition dans la port&eacute;e d'une <code class="literal">Session</code>. Hibernate d&eacute;tectera n'importe quels changements effectu&eacute;s sur un objet dans l'&eacute;tat persistant et synchronisera l'&eacute;tat avec
+                        la base de donn&eacute;es lors de la fin l'unit&eacute; de travail. Les d&eacute;veloppeurs n'ex&eacute;cutent pas d'expressions <code class="literal">UPDATE</code> ou <code class="literal">DELETE</code> manuelles lorsqu'un objet devrait &ecirc;tre rendu &eacute;ph&eacute;m&egrave;re. 
+                     </p>
+                  </li>
+                  <li>
+                     <p><span class="emphasis"><em>D&eacute;tach&eacute;</em></span> - une instance d&eacute;tach&eacute;e est un objet qui a &eacute;t&eacute; persistant, mais dont sa <code class="literal">Session</code> a &eacute;t&eacute; ferm&eacute;e. La r&eacute;f&eacute;rence &agrave; l'objet est encore valide, bien s&ucirc;r, et l'instance d&eacute;tach&eacute;e pourrait m&ecirc;me &ecirc;tre modifi&eacute;e dans
+                        cet &eacute;tat. Une instance d&eacute;tach&eacute;e peut &ecirc;tre r&eacute;attach&eacute;e &agrave; une nouvelle <code class="literal">Session</code> plus tard dans le temps, la rendant (et toutes les modifications avec) de nouveau persistante. Cette fonctionnalit&eacute; rend
+                        possible un mod&egrave;le de programmation pour de longues unit&eacute;s de travail qui requi&egrave;rent un temps de r&eacute;flexion de l'utilisateur.
+                        Nous les appelons des <span class="emphasis"><em>conversations</em></span>, c'est-&agrave;-dire une unit&eacute; de travail du point de vue de l'utilisateur. 
+                     </p>
+                  </li>
+               </ul>
+            </div>
+            <p>Nous alons maintenant dicuster des &eacute;tats et des transitions d'&eacute;tat (et des m&eacute;thodes d'Hibernate qui d&eacute;clenchent une transition)
+               plus en d&eacute;tails. 
+            </p>
+         </div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="inheritance-limitations.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center">&nbsp;</td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="objectstate-makingpersistent.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">9.2.&nbsp;Limitations&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;10.2.&nbsp;Rendre des objets persistants</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

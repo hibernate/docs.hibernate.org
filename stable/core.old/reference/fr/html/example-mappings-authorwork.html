@@ -1,0 +1,142 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>23.2.&nbsp;Auteur/Travail (Author/Work)</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="example-mappings.html" title="Chapitre&nbsp;23.&nbsp;Exemple : quelques mappings">
+      <link rel="prev" href="example-mappings.html" title="Chapitre&nbsp;23.&nbsp;Exemple : quelques mappings">
+      <link rel="next" href="example-mappings-customerorderproduct.html" title="23.3.&nbsp;Client/Commande/Produit (Customer/Order/Product)">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">23.2.&nbsp;Auteur/Travail (Author/Work)</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="example-mappings.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;23.&nbsp;Exemple : quelques mappings</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="example-mappings-customerorderproduct.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="example-mappings-authorwork"></a>23.2.&nbsp;Auteur/Travail (Author/Work)
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Soit le mod&egrave;le de la relation entre <code class="literal">Work</code>, <code class="literal">Author</code> et <code class="literal">Person</code>. Nous repr&eacute;sentons la relation entre <code class="literal">Work</code> et <code class="literal">Author</code> comme une association plusieurs-vers-plusieurs. Nous avons choisi de repr&eacute;senter la relation entre <code class="literal">Author</code> et <code class="literal">Person</code> comme une association un-vers-un. Une autre possibilit&eacute; aurait &eacute;t&eacute; que <code class="literal">Author</code> h&eacute;rite de <code class="literal">Person</code>. 
+         </p>
+         <div class="mediaobject" align="center"><img src="images/AuthorWork.png" align="middle"></div>
+         <p>Le mapping suivant repr&eacute;sente exactement ces relations : </p><pre class="programlisting">&lt;hibernate-mapping&gt;
+
+    &lt;class name="Work" table="works" discriminator-value="W"&gt;
+
+        &lt;id name="id" column="id"&gt;
+            &lt;generator class="native"/&gt;
+        &lt;/id&gt;
+        &lt;discriminator column="type" type="character"/&gt;
+
+        &lt;property name="title"/&gt;
+        &lt;set name="authors" table="author_work"&gt;
+            &lt;key column name="work_id"/&gt;
+            &lt;many-to-many class="Author" column name="author_id"/&gt;
+        &lt;/set&gt;
+
+        &lt;subclass name="Book" discriminator-value="B"&gt;
+            &lt;property name="text"/&gt;
+        &lt;/subclass&gt;
+
+        &lt;subclass name="Song" discriminator-value="S"&gt;
+            &lt;property name="tempo"/&gt;
+            &lt;property name="genre"/&gt;
+        &lt;/subclass&gt;
+
+    &lt;/class&gt;
+
+    &lt;class name="Author" table="authors"&gt;
+
+        &lt;id name="id" column="id"&gt;
+            &lt;!-- The Author must have the same identifier as the Person --&gt;
+            &lt;generator class="assigned"/&gt; 
+        &lt;/id&gt;
+
+        &lt;property name="alias"/&gt;
+        &lt;one-to-one name="person" constrained="true"/&gt;
+
+        &lt;set name="works" table="author_work" inverse="true"&gt;
+            &lt;key column="author_id"/&gt;
+            &lt;many-to-many class="Work" column="work_id"/&gt;
+        &lt;/set&gt;
+
+    &lt;/class&gt;
+
+    &lt;class name="Person" table="persons"&gt;
+        &lt;id name="id" column="id"&gt;
+            &lt;generator class="native"/&gt;
+        &lt;/id&gt;
+        &lt;property name="name"/&gt;
+    &lt;/class&gt;
+
+&lt;/hibernate-mapping&gt;</pre><p>Il y a quatre tables dans ce mapping. <code class="literal">works</code>, <code class="literal">authors</code> et <code class="literal">persons</code> qui contiennent respectivement les donn&eacute;es de work, author et person. <code class="literal">author_work</code> est une table d'association qui lie authors &agrave; works. Voici le sch&eacute;ma de tables, g&eacute;n&eacute;r&eacute; par <code class="literal">SchemaExport</code>. 
+         </p><pre class="programlisting">create table works (
+    id BIGINT not null generated by default as identity, 
+    tempo FLOAT, 
+    genre VARCHAR(255), 
+    text INTEGER, 
+    title VARCHAR(255), 
+    type CHAR(1) not null, 
+    primary key (id)
+)
+
+create table author_work (
+    author_id BIGINT not null, 
+    work_id BIGINT not null, 
+    primary key (work_id, author_id)
+)
+
+create table authors (
+    id BIGINT not null generated by default as identity, 
+    alias VARCHAR(255), 
+    primary key (id)
+)
+
+create table persons (
+    id BIGINT not null generated by default as identity, 
+    name VARCHAR(255), 
+    primary key (id)
+)
+
+alter table authors 
+    add constraint authorsFK0 foreign key (id) references persons
+alter table author_work 
+    add constraint author_workFK0 foreign key (author_id) references authors
+alter table author_work
+    add constraint author_workFK1 foreign key (work_id) references works</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="example-mappings.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="example-mappings.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="example-mappings-customerorderproduct.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">Chapitre&nbsp;23.&nbsp;Exemple : quelques mappings&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;23.3.&nbsp;Client/Commande/Produit (Customer/Order/Product)</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

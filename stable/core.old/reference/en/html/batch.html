@@ -1,0 +1,121 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>Chapter&nbsp;13.&nbsp;Batch processing</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="prev" href="objectstate-decl-security.html" title="12.3.&nbsp;Hibernate declarative security">
+      <link rel="next" href="batch-update.html" title="13.2.&nbsp;Batch updates">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">Chapter&nbsp;13.&nbsp;Batch processing</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="objectstate-decl-security.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">&nbsp;</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="batch-update.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="chapter" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title"><a name="batch"></a>Chapter&nbsp;13.&nbsp;Batch processing
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+            A naive approach to inserting 100 000 rows in the database using Hibernate might 
+                    look like this:
+                
+         </p><pre class="programlisting">Session session = sessionFactory.openSession();
+Transaction tx = session.beginTransaction();
+for ( int i=0; i&lt;100000; i++ ) {
+    Customer customer = new Customer(.....);
+    session.save(customer);
+}
+tx.commit();
+session.close();</pre><p>
+                    This would fall over with an <code class="literal">OutOfMemoryException</code> somewhere 
+                    around the 50 000th row. That's because Hibernate caches all the newly inserted 
+                    <code class="literal">Customer</code> instances in the session-level cache. 
+                
+         </p>
+         <p>
+                    In this chapter we'll show you how to avoid this problem. First, however, if you
+                    are doing batch processing, it is absolutely critical that you enable the use of
+                    JDBC batching, if you intend to achieve reasonable performance. Set the JDBC batch 
+                    size to a reasonable number (say, 10-50):
+                
+         </p><pre class="programlisting">hibernate.jdbc.batch_size 20</pre><p><a name="disablebatching"></a>
+                    Note that Hibernate disables insert batching at the JDBC level transparently if you
+                    use an <code class="literal">identiy</code> identifier generator.
+                
+         </p>
+         <p>
+                    You also might like to do this kind of work in a process where interaction with 
+                    the second-level cache is completely disabled:
+                
+         </p><pre class="programlisting">hibernate.cache.use_second_level_cache false</pre><p>
+                    However, this is not absolutely necessary, since we can explicitly set the
+                    <code class="literal">CacheMode</code> to disable interaction with the second-level cache.
+                
+         </p>
+         <div class="sect1" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="batch-inserts"></a>13.1.&nbsp;Batch inserts
+                     </h2>
+                  </div>
+               </div>
+            </div>
+            <p>
+                           When making new objects persistent, you must <code class="literal">flush()</code> and 
+                           then <code class="literal">clear()</code> the session regularly, to control the size of
+                           the first-level cache.
+                       
+            </p><pre class="programlisting">Session session = sessionFactory.openSession();
+Transaction tx = session.beginTransaction();
+   
+for ( int i=0; i&lt;100000; i++ ) {
+    Customer customer = new Customer(.....);
+    session.save(customer);
+    if ( i % 20 == 0 ) { //20, same as the JDBC batch size
+        //flush a batch of inserts and release memory:
+        session.flush();
+        session.clear();
+    }
+}
+   
+tx.commit();
+session.close();</pre></div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="objectstate-decl-security.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center">&nbsp;</td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="batch-update.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">12.3.&nbsp;Hibernate declarative security&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;13.2.&nbsp;Batch updates</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

@@ -1,0 +1,344 @@
+<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml"><head><title>Chapter 11. Integration with Elasticsearch</title><!-- HibernateDoc.Meta --><meta name="description" content="Hibernate Search, full text search for your entities - Reference Documentation" /><meta name="keywords" content="hibernate, search, hibernate search, full text, lucene, elasticsearch" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://docs.jboss.org/hibernate/stable/search/reference/en-US/html_single/" /><!-- /HibernateDoc.Meta --><link rel="stylesheet" type="text/css" href="docbook.css"/><link rel="stylesheet" type="text/css" href="css/hibernate.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/><link rel="prev" href="ch10.html" title="Chapter 10. Advanced features"/><link rel="next" href="ch12.html" title="Chapter 12. Further reading"/><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/></head><body><header><p id="title"><a href="http://www.hibernate.org" class="site_href"><strong>Hibernate.org</strong></a><a href="http://hibernate.org/Documentation/DocumentationOverview" class="doc_href"><strong>Community Documentation</strong></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="ch10.html"><strong>Prev</strong></a></li><li class="next"><a accesskey="n" href="ch12.html"><strong>Next</strong></a></li></ul></header><section class="chapter" id="elasticsearch-integration"><div class="titlepage"><div><div><h1 class="title">Chapter 11. Integration with Elasticsearch</h1></div></div></div><div class="toc"><ul class="toc"><li><span class="section"><a href="ch11.html#_status">11.1. Status</a></span></li><li><span class="section"><a href="ch11.html#_goal_of_the_elasticsearch_integration">11.2. Goal of the Elasticsearch integration</a></span></li><li><span class="section"><a href="ch11.html#_getting_started_and_configuration">11.3. Getting started and configuration</a></span><ul><li><span class="section"><a href="ch11.html#_dependencies_in_your_java_application">11.3.1. Dependencies in your Java application</a></span></li><li><span class="section"><a href="ch11.html#__anchor_xml_id_elasticsearch_integration_server_configuration_xreflabel_elasticsearch_integration_server_configuration_elasticsearch_configuration">11.3.2.  Elasticsearch configuration</a></span></li><li><span class="section"><a href="ch11.html#__anchor_xml_id_elasticsearch_integration_configuration_xreflabel_elasticsearch_integration_configuration_hibernate_search_configuration">11.3.3.  Hibernate Search configuration</a></span></li></ul></li><li><span class="section"><a href="ch11.html#_mapping_and_indexing">11.4. Mapping and indexing</a></span><ul><li><span class="section"><a href="ch11.html#_annotation_specificities">11.4.1. Annotation specificities</a></span></li><li><span class="section"><a href="ch11.html#__anchor_xml_id_elasticsearch_mapping_analyzer_xreflabel_elasticsearch_mapping_analyzer_analyzers">11.4.2.  Analyzers</a></span></li><li><span class="section"><a href="ch11.html#_custom_field_bridges">11.4.3. Custom field bridges</a></span></li><li><span class="section"><a href="ch11.html#_tika_bridges">11.4.4. Tika bridges</a></span></li></ul></li><li><span class="section"><a href="ch11.html#_queries">11.5. Queries</a></span><ul><li><span class="section"><a href="ch11.html#__anchor_xml_id_elasticsearch_query_spatial_xreflabel_elasticsearch_query_spatial_spatial_queries">11.5.1.  Spatial queries</a></span></li><li><span class="section"><a href="ch11.html#__anchor_xml_id_elasticsearch_scrolling_xreflabel_elasticsearch_scrolling_paging_and_scrolling">11.5.2.  Paging and scrolling</a></span></li><li><span class="section"><a href="ch11.html#__anchor_xml_id_elasticsearch_query_sorting_xreflabel_elasticsearch_query_sorting_sorting">11.5.3. Sorting</a></span></li><li><span class="section"><a href="ch11.html#_projections">11.5.4. Projections</a></span></li><li><span class="section"><a href="ch11.html#_filters">11.5.5. Filters</a></span></li></ul></li><li><span class="section"><a href="ch11.html#_index_optimization">11.6. Index optimization</a></span></li><li><span class="section"><a href="ch11.html#__anchor_xml_id_elasticsearch_limitations_xreflabel_elasticsearch_limitations_limitations">11.7. Limitations</a></span></li><li><span class="section"><a href="ch11.html#_known_bugs_in_elasticsearch">11.8. Known bugs in Elasticsearch</a></span></li><li><span class="section"><a href="ch11.html#_acknowledgment">11.9. Acknowledgment</a></span></li></ul></div><section class="section" id="_status"><div class="titlepage"><div><div><h2 class="title">11.1. Status</h2></div></div></div><div style="margin-left: 0.5in; margin-right: 0.5in;" class="caution"><h2>Caution</h2><p>This feature is a work in progress.
+Make sure to read the <a class="link" href="ch11.html#elasticsearch-limitations">Limitations</a> section!</p></div><p>The integration with Elasticsearch is in development and should be considered experimental.
+We do think we have the basics covered and we are looking for feedback.</p><p>Patches can be sent as pull requests to the <a class="link" href="https://github.com/hibernate/hibernate-search">Github repository</a>,
+but also general feedback, suggestions and questions are very welcome.
+To get in touch or find other interesting links for contributors, see the <a class="link" href="http://hibernate.org/community/">Community page</a>
+of the Hibernate website.</p></section><section class="section" id="_goal_of_the_elasticsearch_integration"><div class="titlepage"><div><div><h2 class="title">11.2. Goal of the Elasticsearch integration</h2></div></div></div><p>The goal of integrating with Elasticsearch is to allow Hibernate Search users to benefit
+from the full-text capabilities integrated with Hibernate ORM
+but replacing the local Lucene based index with a remote Elasticsearch service.</p><p>There could be various reasons to prefer this over an "embedded Lucene" approach:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">wish to separate the service running your application from the Search service</li><li class="listitem">integrate with an existing Elasticsearch instance</li><li class="listitem">benefit from Elasticsearch’s out of the box horizontal scalability features</li><li class="listitem">explore the data updated by an Hibernate powered application using the Elasticsearch dashboard integrations such as Kibana</li></ul></div><p>There are a couple of drawbacks compared to the embedded Lucene approach though:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">incur a performance penalty of remote RPCs both for index updates and to run queries</li><li class="listitem">need to manage an additional service</li><li class="listitem">possibly need to buy and manage additional servers</li></ul></div><p>Which solution is best will depend on the specific needs of your system and your organization.</p><div style="margin-left: 0.5in; margin-right: 0.5in;" class="note"><h2>Why not use Elasticsearch directly</h2><p>The #1 reason is that Hibernate Search integrates perfectly with Hibernate ORM.
+All changes done to your objects will trigger the necessary index changes transparently.</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">it will honor the transaction boundary - i.e. not do the indexing work if the transaction ends up in rollback</li><li class="listitem">changes to cascaded objects are handled</li><li class="listitem">changes to nested object embedded in a root indexed entity are handled</li><li class="listitem">changes will be sent in bulk - i.e. optimized systematically for you</li><li class="listitem">etc.</li></ul></div><p>There is no more paradigm shift in your code.
+You are working on Hibernate ORM managed objects,
+doing your queries on object properties with a nice DSL.</p></div></section><section class="section" id="_getting_started_and_configuration"><div class="titlepage"><div><div><h2 class="title">11.3. Getting started and configuration</h2></div></div></div><p>To experiment with the Elasticsearch integration you will have to download Elasticsearch and run it:
+Hibernate Search connects to an Elasticsearch node but does not provide one.</p><p>One option is to use the <a class="link" href="https://hub.docker.com/r/library/elasticsearch/">Elasticsearch Docker image</a>.</p><p><span class="formalpara-title">Start an Elasticsearch node via Docker. </span>
+</p><pre><code class="language-bash">docker pull elasticsearch
+docker run -p 9200:9200 -d -v "$PWD/plugin_dir":/usr/share/elasticsearch/plugins \
+    -v "$PWD/config/elasticsearch.yml":/usr/share/elasticsearch/config/elasticsearch.yml \
+    elasticsearch</code></pre><p>
+</p><div style="margin-left: 0.5in; margin-right: 0.5in;" class="note"><h2>Elasticsearch version</h2><p>Hibernate Search expects an Elasticsearch node version 2.0 at least. 5.0 is not supported yet.
+Hibernate Search internal tests run against Elasticsearch 2.4.4.</p></div><section class="section" id="_dependencies_in_your_java_application"><div class="titlepage"><div><div><h3 class="title">11.3.1. Dependencies in your Java application</h3></div></div></div><p>In addition to the usual dependencies like Hibernate ORM and Hibernate Search,
+you will need the new <code class="literal">hibernate-search-elasticsearch</code> jar.</p><div class="example" id="d0e9208"><div class="example-title">Example 11.1. Maven dependencies for Hibernate Search with Elasticsearch</div><div class="example-contents"><pre><code class="language-xml">&lt;dependency&gt;
+   &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
+   &lt;artifactId&gt;hibernate-search-elasticsearch&lt;/artifactId&gt;
+   &lt;version&gt;5.6.6.Final&lt;/version&gt;
+&lt;/dependency&gt;</code></pre></div></div><br class="example-break"/></section><section class="section" id="__anchor_xml_id_elasticsearch_integration_server_configuration_xreflabel_elasticsearch_integration_server_configuration_elasticsearch_configuration"><div class="titlepage"><div><div><h3 class="title">11.3.2. <span id="elasticsearch-integration-server-configuration"/> Elasticsearch configuration</h3></div></div></div><p>Hibernate Search can work with an Elasticsearch server without altering its configuration.</p><p>However some features offered by Hibernate Search require specific configuration:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">if you want to be able to use the Hibernate Search <a class="link" href="ch06.html#search-batchindex-massindexer" title="6.3.2. Using a MassIndexer">MassIndexer</a>
+with <code class="literal">purgeAllOnStart</code> enabled - which is enabled by default -, or to use <code class="literal">FullTextSession.purge()</code> or <code class="literal">FullTextSession.purgeAll()</code>,
+  install the <a class="link" href="https://www.elastic.co/guide/en/elasticsearch/plugins/2.2/plugins-delete-by-query.html"><code class="literal">delete-by-query</code> plugin</a></li><li class="listitem">if you want to retrieve the distance in a geolocation query, enable the <code class="literal">lang-groovy</code> plugin,
+see <a class="link" href="ch11.html#elasticsearch-query-spatial">Elasticsearch Spatial queries</a></li><li class="listitem">if you want to use paging (as opposed to <a class="link" href="ch11.html#elasticsearch-scrolling">scrolling</a>) on result sets larger than 10000 elements
+(for instance access the 10001st result),
+you may increase the value of the <code class="literal">index.max_result_window</code> property (default is 10000).</li></ul></div></section><section class="section" id="__anchor_xml_id_elasticsearch_integration_configuration_xreflabel_elasticsearch_integration_configuration_hibernate_search_configuration"><div class="titlepage"><div><div><h3 class="title">11.3.3. <span id="elasticsearch-integration-configuration"/> Hibernate Search configuration</h3></div></div></div><p>Configuration is minimal.
+Add the configuration properties to your <code class="literal">persistence.xml</code> or where you put the rest of your Hibernate Search configuration.</p><div class="variablelist"><dl class="variablelist"><dt><span class="term">Select Elasticsearch as the backend</span></dt><dd><code class="literal">hibernate.search.default.indexmanager elasticsearch</code></dd><dt><span class="term">Hostname and port for Elasticsearch</span></dt><dd><p class="simpara"><code class="literal">hibernate.search.default.elasticsearch.host http://127.0.0.1:9200</code> (default)</p><p class="simpara">You may also select multiple hosts (separated by whitespace characters), so that they are assigned requests in turns (load balancing):</p><p class="simpara"><code class="literal">hibernate.search.default.elasticsearch.host http://es1.mycompany.com:9200 http://es2.mycompany.com:9200</code></p><p class="simpara">In the example above, the first request will go to <code class="literal">es1</code>, the second to <code class="literal">es2</code>, the third to <code class="literal">es1</code>, and so on.</p></dd><dt><span class="term">Username for Elasticsearch connection</span></dt><dd><code class="literal">hibernate.search.default.elasticsearch.username ironman</code> (default is empty, meaning anonymous access)</dd><dt><span class="term">Password for Elasticsearch connection</span></dt><dd><p class="simpara"><code class="literal">hibernate.search.default.elasticsearch.password j@rV1s</code> (default is empty)</p><div style="margin-left: 0.5in; margin-right: 0.5in;" class="caution"><h2>Caution</h2><p>If you used HTTP instead of HTTPS in any of the Elasticsearch host URLs (see above),
+your password will be transmitted in clear text over the network.</p></div></dd><dt><span class="term"><span id="elasticsearch-schema-management-strategy"/>Select the index creation strategy</span></dt><dd><p class="simpara"><code class="literal">hibernate.search.default.elasticsearch.index_schema_management_strategy CREATE</code> (default)</p><p class="simpara">Let’s see the options for the <code class="literal">index_schema_management_strategy</code> property:</p><div class="informaltable"><table style="border-collapse: collapse; border-top: 1px solid ; border-bottom: 1px solid ; border-left: 1px solid ; border-right: 1px solid ; "><colgroup><col style="width: 50*; " class="col_1"/><col style="width: 50*; " class="col_2"/></colgroup><thead><tr><th style="text-align: left; vertical-align: top; border-right: 1px  ; border-bottom: 1px  ; ">Value</th><th style="text-align: left; vertical-align: top; border-bottom: 1px  ; ">Definition</th></tr></thead><tbody><tr><td style="text-align: left; vertical-align: top; border-right: 1px  ; border-bottom: 1px  ; "><p><code class="literal">NONE</code></p></td><td style="text-align: left; vertical-align: top; border-bottom: 1px  ; "><p>The index, its mappings and the analyzer definitions will not be created, deleted nor altered.
+Hibernate Search will <span class="strong"><strong>not even check</strong></span> that the index already exists.</p></td></tr><tr><td style="text-align: left; vertical-align: top; border-right: 1px  ; border-bottom: 1px  ; "><p><code class="literal">VALIDATE</code></p></td><td style="text-align: left; vertical-align: top; border-bottom: 1px  ; "><p>The index, its mappings and analyzer definitions will be checked for conflicts with Hibernate Search’s metamodel.
+The index, its mappings and analyzer definitions will not be created, deleted nor altered.</p></td></tr><tr><td style="text-align: left; vertical-align: top; border-right: 1px  ; border-bottom: 1px  ; "><p><code class="literal">MERGE</code></p></td><td style="text-align: left; vertical-align: top; border-bottom: 1px  ; "><p>The index, its mappings and analyzer definitions will be created, existing mappings will be updated if there are no conflicts.
++
+Caution: if analyzer definitions have to be updated, the index will be closed automatically during the update.</p></td></tr><tr><td style="text-align: left; vertical-align: top; border-right: 1px  ; border-bottom: 1px  ; "><p><code class="literal">CREATE</code></p></td><td style="text-align: left; vertical-align: top; border-bottom: 1px  ; "><p><span class="strong"><strong>The default</strong></span>: an existing index will not be altered, a missing index will be created along with their mappings and analyzer definitions.</p></td></tr><tr><td style="text-align: left; vertical-align: top; border-right: 1px  ; border-bottom: 1px  ; "><p><code class="literal">RECREATE</code></p></td><td style="text-align: left; vertical-align: top; border-bottom: 1px  ; "><p>Indexes will be deleted if existing and then created along with their mappings and analyzer definitions.
+This will delete all content from the indexes!</p></td></tr><tr><td style="text-align: left; vertical-align: top; border-right: 1px  ; "><p><code class="literal">RECREATE_DELETE</code></p></td><td style="text-align: left; vertical-align: top; "><p>Similarly to <code class="literal">RECREATE</code> but will also delete the index at shutdown. Commonly used for tests.</p></td></tr></tbody></table></div><div style="margin-left: 0.5in; margin-right: 0.5in;" class="caution"><h2>Strategies in production environments</h2><p>It is strongly recommended to use either <code class="literal">NONE</code> or <code class="literal">VALIDATE</code> in a production environment. <code class="literal">RECREATE</code> and <code class="literal">RECREATE_DELETE</code> are obviously unsuitable in this context (unless you want to reindex everything upon every startup), and <code class="literal">MERGE</code> may leave your mapping half-merged in case of conflict.</p><p>To be precise, if your mapping changed in an incompatible way, such as a field having its type changed, merging may be impossible. In this case, the <code class="literal">MERGE</code> strategy will prevent Hibernate Search from starting, but it may already have successfully merged another index, making a rollback difficult at best.</p><p>Also, when updating analyzer definitions, Hibernate Search will stop the affected indexes during the update.
+This means the <code class="literal">MERGE</code> strategy should be used with caution when multiple clients use Elasticsearch indexes managed by Hibernate Search:
+those clients should be synchronized in such a way that while Hibernate Search is starting, no other client tries to use the index.</p><p>For these reasons, migrating your mapping should be considered a part of your deployment process and be planned cautiously.</p></div><div style="margin-left: 0.5in; margin-right: 0.5in;" class="note"><h2>Note</h2><p>Mapping validation is as permissive as possible. Fields or mappings that are unknown to Hibernate Search will be ignored, and settings that are more powerful than required (e.g. a field annotated with <code class="literal">@Field(index = Index.NO)</code> in Search but marked as <code class="literal">"index": analyzed</code> in Elasticsearch) will be deemed valid.</p><p>One exception should be noted, though: date formats must match exactly the formats specified by Hibernate Search, due to implementation constraints.</p></div></dd><dt><span class="term">Maximum time to wait for a connection to the Elasticsearch server before failing (in ms)</span></dt><dd><code class="literal">hibernate.search.default.elasticsearch.connection_timeout 3000</code> (default)</dd><dt><span class="term">Maximum time to wait for a response from the Elasticsearch server before failing (in ms)</span></dt><dd><code class="literal">hibernate.search.default.elasticsearch.read_timeout 60000</code> (default)</dd><dt><span class="term">Maximum number of simultaneous connections to the Elasticsearch cluster</span></dt><dd><code class="literal">hibernate.search.default.elasticsearch.max_total_connection 20</code> (default)</dd><dt><span class="term">Maximum number of simultaneous connections to a single Elasticsearch server</span></dt><dd><code class="literal">hibernate.search.default.elasticsearch.max_total_connection_per_route 2</code> (default)</dd><dt><span class="term">Whether to enable automatic discovery of servers in the Elasticsearch cluster (<code class="literal">true</code> or <code class="literal">false</code>)</span></dt><dd><p class="simpara"><code class="literal">hibernate.search.default.elasticsearch.discovery.enabled false</code> (default)</p><p class="simpara">When using automatic discovery, the Elasticsearch client will periodically probe for new nodes in the cluster,
+and will add those to the server list (see <code class="literal">host</code> above).
+Similarly, the client will periodically check whether registered servers still respond,
+and will remove them from the server list if they don’t.</p></dd><dt><span class="term">Time interval between two executions of the automatic discovery (in seconds)</span></dt><dd><p class="simpara"><code class="literal">hibernate.search.default.elasticsearch.discovery.refresh_interval 10</code> (default)</p><p class="simpara">This setting will only be taken into account if automatic discovery is enabled (see above).</p></dd><dt><span class="term">Scheme to use when connecting to automatically discovered nodes (<code class="literal">http</code> or <code class="literal">https</code>)</span></dt><dd><p class="simpara"><code class="literal">hibernate.search.default.elasticsearch.discovery.default_scheme http</code> (default)</p><p class="simpara">This setting will only be taken into account if automatic discovery is enabled (see above).</p></dd><dt><span class="term">Maximum time to wait for the indexes to become available before failing (in ms)</span></dt><dd><p class="simpara"><code class="literal">hibernate.search.default.elasticsearch.index_management_wait_timeout 10000</code> (default)</p><p class="simpara">This value must be lower than the read timeout (see above).</p></dd><dt><span class="term">Status an index must at least have in order for Hibernate Search to work with it (one of "green", "yellow" or "red")</span></dt><dd><p class="simpara"><code class="literal">hibernate.search.default.elasticsearch.required_index_status green</code> (default)</p><p class="simpara">Only operate if the index is at this level or safer.
+In development, set this value to <code class="literal">yellow</code> if the number of nodes started is below the number of expected replicas.</p></dd><dt><span class="term">Whether to perform an explicit refresh after a set of operations has been executed against a specific index (<code class="literal">true</code> or <code class="literal">false</code>)</span></dt><dd><p class="simpara"><code class="literal">hibernate.search.default.elasticsearch.refresh_after_write false</code> (default)</p><p class="simpara">This is useful in unit tests to ensure that a write is visible by a query immediately without delay.
+This keeps unit tests simpler and faster.
+But you should not rely on the synchronous behaviour for your production code.
+Leave at <code class="literal">false</code> for optimal performance of your Elasticsearch cluster.</p></dd><dt><span class="term">When <a class="link" href="ch11.html#elasticsearch-scrolling">scrolling</a>, the minimum number of previous results kept in memory at any time</span></dt><dd><code class="literal">hibernate.search.elasticsearch.scroll_backtracking_window_size 10000</code> (default)</dd><dt><span class="term">When <a class="link" href="ch11.html#elasticsearch-scrolling">scrolling</a>, the number of results fetched by each Elasticsearch call</span></dt><dd><code class="literal">hibernate.search.elasticsearch.scroll_fetch_size 1000</code> (default)</dd><dt><span class="term">When <a class="link" href="ch11.html#elasticsearch-scrolling">scrolling</a>, the maximum duration <code class="literal">ScrollableResults</code> will be usable if no other results are fetched from Elasticsearch, in seconds</span></dt><dd><code class="literal">hibernate.search.elasticsearch.scroll_timeout 60</code> (default)</dd></dl></div><div style="margin-left: 0.5in; margin-right: 0.5in;" class="note"><h2>Note</h2><p>Properties prefixed with <code class="literal">hibernate.search.default</code> can be given globally as shown above and/or be given for specific indexes:</p><p><code class="literal">hibernate.search.someindex.elasticsearch.index_schema_management_strategy MERGE</code></p><p>This excludes properties related to the internal Elasticsearch client, which at the moment is common to every index manager (but this will change in a future version).
+Excluded properties are <code class="literal">host</code>, <code class="literal">username</code>, <code class="literal">password</code>, <code class="literal">read_timeout</code>, <code class="literal">connection_timeout</code>, <code class="literal">max_total_connection</code>, <code class="literal">max_total_connection_per_route</code>, <code class="literal">discovery.enabled</code>, <code class="literal">discovery.refresh_interval</code> and <code class="literal">discovery.scheme</code>.</p></div></section></section><section class="section" id="_mapping_and_indexing"><div class="titlepage"><div><div><h2 class="title">11.4. Mapping and indexing</h2></div></div></div><p>Like in Lucene embedded mode, indexes are transparently updated when you create or update
+entities mapped to Hibernate Search.
+Simply use familiar annotations from <a class="xref" href="ch04.html" title="Chapter 4. Mapping entities to the index structure">Chapter 4, <em>Mapping entities to the index structure</em></a>.</p><p>The name of the index will be the lowercased name provided to <code class="literal">@Indexed</code> (non qualified class name by default).
+Hibernate Search will map the fully qualified class name to the Elasticsearch type.</p><section class="section" id="_annotation_specificities"><div class="titlepage"><div><div><h3 class="title">11.4.1. Annotation specificities</h3></div></div></div><section class="section" id="_field_indexnullas"><div class="titlepage"><div><div><h4 class="title">11.4.1.1. Field.indexNullAs</h4></div></div></div><p>The <code class="literal">org.hibernate.search.annotations.Field</code> annotation allows you to provide a replacement value for null properties through the <code class="literal">indexNullAs</code> attribute (see <a class="xref" href="ch04.html#field-annotation" title="4.1.1.2. @Field">Section 4.1.1.2, “@Field”</a>), but this value must be provided as a string.</p><p>In order for your value to be understood by Hibernate Search (and Elasticsearch), the provided string must follow one of those formats:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">For string values, no particular format is required.</li><li class="listitem">For numeric values, use formats accepted by <code class="literal">Double.parseDouble</code>, <code class="literal">Integer.parseInteger</code>, etc., depending on the actual type of your field.</li><li class="listitem">For booleans, use either <code class="literal">true</code> or <code class="literal">false</code>.</li><li class="listitem"><p class="simpara">For dates (<code class="literal">java.util.Calendar</code>, <code class="literal">java.util.Date</code>, <code class="literal">java.time.*</code>), use the ISO-8601 format.</p><p class="simpara">The full format is <code class="literal">yyyy-MM-dd’T’HH:mm:ss.nZ[ZZZ]</code> (for instance <code class="literal">2016-11-26T16:41:00.006+01:00[CET]</code>).
+Please keep in mind that part of this format must be left out depending on the type of your field, though.
+For a <code class="literal">java.time.LocalDateTime</code> field, for instance,
+the provided string must not include the zone offset (<code class="literal">+01:00</code>) or the zone ID (<code class="literal">[UTC]</code>), because those don’t make sense.</p><p class="simpara">Even when they make sense for the type of your field, the time and time zone may be omitted
+ (if omitted, the time zone will be interpreted as the default JVM time zone).</p></li></ul></div></section><section class="section" id="_dynamic_boosting"><div class="titlepage"><div><div><h4 class="title">11.4.1.2. Dynamic boosting</h4></div></div></div><p>The <code class="literal">org.hibernate.search.annotations.DynamicBoost</code> annotation is not (and cannot be) supported with Elasticsearch, because the platform lacks per-document, index-time boosting capabilities. Static boosts (<code class="literal">@Boost</code>) are, however, supported.</p></section></section><section class="section" id="__anchor_xml_id_elasticsearch_mapping_analyzer_xreflabel_elasticsearch_mapping_analyzer_analyzers"><div class="titlepage"><div><div><h3 class="title">11.4.2. <span id="elasticsearch-mapping-analyzer"/> Analyzers</h3></div></div></div><div style="margin-left: 0.5in; margin-right: 0.5in;" class="warning"><h2>Warning</h2><p>Analyzers are treated differently than in Lucene embedded mode.</p></div><section class="section" id="_built_in_or_server_defined_analyzers"><div class="titlepage"><div><div><h4 class="title">11.4.2.1. Built-in or server-defined analyzers</h4></div></div></div><p>Using the <code class="literal">definition</code> attribute in the <code class="literal">@Analyzer</code> annotation, you can refer to the name of the
+built-in Elasticsearch analyzer, or custom analyzers already registered on your Elasticsearch instances.</p><p>More information on analyzers, in particular those already built in Elasticsearch, can be found
+in <a class="link" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-analyzers.html">the Elasticsearch documentation</a>.</p><p><span class="formalpara-title">Example of custom analyzers defined in the elasticsearch.yml. </span>
+</p><pre><code class="language-yml"># Custom analyzer
+index.analysis:
+  analyzer.custom-analyzer:
+    type: custom
+    tokenizer: standard
+    filter: [custom-filter, lowercase]
+  filter.custom-filter:
+    type : stop
+    stopwords : [test1, close]</code></pre><p>
+</p><p>From there, you can use the custom analyzers by name in your entity mappings.</p><p><span class="formalpara-title">Example of mapping that refers to custom and built-in analyzers on Elasticsearch. </span>
+</p><pre><code class="language-java">@Entity
+@Indexed(index = "tweet")
+public class Tweet {
+
+    @Id
+    @GeneratedValue
+    private Integer id;
+
+    @Field
+    @Analyzer(definition = "english") // Elasticsearch built-in analyzer
+    private String englishTweet;
+
+    @Field
+    @Analyzer(definition = "whitespace") // Elasticsearch built-in analyzer
+    private String whitespaceTweet;
+
+    @Fields({
+        @Field(name = "tweetNotAnalyzed", analyzer = Analyze.NO, store = Store.YES),
+
+        // Custom analyzer
+        @Field(
+            name = "tweetWithCustom",
+            analyzer = @Analyzer(definition = "custom-analyzer")
+        )
+    })
+    private String multipleTweets;
+}</code></pre><p>
+</p><p>You may also reference a built-in Lucene analyzer implementation using the <code class="literal">@Analyzer.impl</code> attribute:
+Hibernate Search will translate the implementation to an equivalent Elasticsearch built-in type, if possible.</p><div style="margin-left: 0.5in; margin-right: 0.5in;" class="warning"><h2>Warning</h2><p>Using the <code class="literal">@Analyzer.impl</code> attribute is not recommended with Elasticsearch because it will
+never allow you to take full advantage of Elasticsearch analysis capabilities.
+You cannot, for instance, use custom analyzer implementations: only built-in Lucene implementations are supported.</p><p>It should only be used when migrating an application that already used Hibernate Search,
+moving from an embedded Lucene instance to an Elasticsearch cluster.</p></div><p><span class="formalpara-title">Example of mapping that refers to a built-in analyzer on Elasticsearch using a Lucene implementation class. </span>
+</p><pre><code class="language-java">@Entity
+@Indexed(index = "tweet")
+public class Tweet {
+
+    @Id
+    @GeneratedValue
+    private Integer id;
+
+    @Field
+    @Analyzer(impl = EnglishAnalyzer.class) // Elasticsearch built-in "english" analyzer
+    private String englishTweet;
+
+    @Field
+    @Analyzer(impl = WhitespaceAnalyzer.class) // Elasticsearch built-in "whitespace" analyzer
+    private String whitespaceTweet;
+
+}</code></pre><p>
+</p></section><section class="section" id="_custom_analyzers"><div class="titlepage"><div><div><h4 class="title">11.4.2.2. Custom analyzers</h4></div></div></div><p>You can also define analyzers within your Hibernate Search mapping using the <code class="literal">@AnalyzerDef</code> annotation,
+like you would <a class="link" href="ch04.html#section-named-analyzers" title="4.3.2. Named analyzers">do with an embedded Lucene instance</a>.
+When Hibernate Search creates the Elasticsearch indexes, the relevant definitions will then be automatically added as a
+<a class="link" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-custom-analyzer.html">custom analyzer</a>
+in  the index settings.</p><p>Two different approaches allow you to define your analyzers with Elasticsearch.</p><p>The first, recommended approach is to use the factories provided by the <code class="literal">hibernate-search-elasticsearch</code> module:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">org.hibernate.search.elasticsearch.analyzer.ElasticsearchCharFilterFactory</code></li><li class="listitem"><code class="literal">org.hibernate.search.elasticsearch.analyzer.ElasticsearchTokenFilterFactory</code></li><li class="listitem"><code class="literal">org.hibernate.search.elasticsearch.analyzer.ElasticsearchTokenizerFactory</code></li></ul></div><p>Those classes can be passed to the <code class="literal">factory</code> attribute of
+the <code class="literal">@CharFilterDef</code>, <code class="literal">@TokenFilterDef</code> and <code class="literal">@TokenizerDef</code> annotations.</p><p>The <code class="literal">params</code> attribute may be used to define the <code class="literal">type</code> parameter and any other parameter
+accepted by Elasticsearch for this type.</p><p>The parameter values will be interpreted as JSON. The parser is not strict, though:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">quotes around strings may be left out in some cases, as when a string only contains letters.</li><li class="listitem">when quotes <span class="strong"><strong>are</strong></span> required (e.g. your string may be interpreted as a number, and you don’t want that),
+you may use single quotes instead of double quotes (which are painful to write in Java).</li></ul></div><div style="margin-left: 0.5in; margin-right: 0.5in;" class="note"><h2>Note</h2><p>You may use the <code class="literal">name</code> attribute of the <code class="literal">@CharFilterDef</code>, <code class="literal">@TokenFilterDef</code> and <code class="literal">@TokenizerDef</code> annotations
+to define the exact name to give to that definition in the Elasticsearch settings.</p></div><p><span class="formalpara-title">Example of mapping that defines analyzers on Elasticsearch using the <code class="literal">Elasticsearch*Factory</code> types. </span>
+</p><pre><code class="language-java">@Entity
+@Indexed(index = "tweet")
+@AnalyzerDefs(
+	@AnalyzerDef(
+		name = "tweet_analyzer",
+		charFilters = {
+			@CharFilterDef(
+				name = "custom_html_strip",
+				factory = ElasticsearchCharFilterFactory.class,
+				params = {
+					@Parameter(name = "type", value = "'html_strip'"),
+					// One can use Json arrays
+					@Parameter(name = "escaped_tags", value = "['br', 'p']")
+				}
+			),
+			@CharFilterDef(
+				name = "p_br_as_space",
+				factory = ElasticsearchCharFilterFactory.class,
+				params = {
+					@Parameter(name = "type", value = "'pattern_replace'"),
+					@Parameter(name = "pattern", value = "'&lt;p/?&gt;|&lt;br/?&gt;'"),
+					@Parameter(name = "replacement", value = "' '"),
+					@Parameter(name = "tags", value = "'CASE_INSENSITIVE'")
+				}
+			)
+		},
+		tokenizer = @TokenizerDef(
+			factory = ElasticsearchTokenizerFactory.class,
+			params = {
+				@Parameter(name = "type", value = "'whitespace'"),
+			}
+		)
+	)
+)
+public class Tweet {
+
+    @Id
+    @GeneratedValue
+    private Integer id;
+
+    @Field
+    @Analyzer(definition = "tweet_analyzer")
+    private String content;
+}</code></pre><p>
+</p><p>The second approach is to configure everything as if you were using Lucene:
+use the Lucene factories, their parameter names, and format the parameter values as required in Lucene.
+Hibernate Search will automatically convert these definitions to the Elasticsearch equivalent.</p><div style="margin-left: 0.5in; margin-right: 0.5in;" class="warning"><h2>Warning</h2><p>Referencing Lucene factories is not recommended with Elasticsearch because it will
+never allow you to take full advantage of Elasticsearch analysis capabilities.</p><p>Here are the known limitations of the automatic translation:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">a few factories have unsupported parameters, because those have no equivalent in Elasticsearch.
+An exception will be raised on startup if a parameter is not supported.</li><li class="listitem">the <code class="literal">hyphenator</code> parameter for <code class="literal">HyphenatedWordsFilterFactory</code> must refer to
+a file on the Elasticsearch servers, on the contrary to other factories
+where the files are accessed by Hibernate Search directly.
+This is due to an Elasticsearch limitation
+(there is no way to forward the content of a local hyphenation pattern file).</li><li class="listitem">some built-in Lucene factories are not (and cannot) be translated, because of incompatible
+parameters between the Lucene factory and the Elasticsearch equivalent.
+This is in particular the case for <code class="literal">HunspellStemFilterFactory</code>.</li></ul></div><p>Therefore, Lucene factories should only be referenced within analyzer definitions
+when migrating an application that already used Hibernate Search,
+moving from an embedded Lucene instance to an Elasticsearch cluster.</p></div><p><span class="formalpara-title">Example of mapping that defines analyzers on Elasticsearch using Lucene factories. </span>
+</p><pre><code class="language-java">@Entity
+@Indexed(index = "tweet")
+@AnalyzerDefs(
+	@AnalyzerDef(
+		name = "tweet_analyzer",
+		charFilters = {
+			@CharFilterDef(
+				name = "custom_html_strip",
+				factory = HTMLStripCharFilterFactory.class,
+				params = {
+					@Parameter(name = "escapedTags", value = "br,p")
+				}
+			),
+			@CharFilterDef(
+				name = "p_br_as_space",
+				factory = PatternReplaceCharFilterFactory.class,
+				params = {
+					@Parameter(name = "pattern", value = "&lt;p/?&gt;|&lt;br/?&gt;"),
+					@Parameter(name = "replacement", value = " ")
+				}
+			)
+		},
+		tokenizer = @TokenizerDef(
+			factory = WhitespaceTokenizerFactory.class
+		)
+	)
+)
+public class Tweet {
+
+    @Id
+    @GeneratedValue
+    private Integer id;
+
+    @Field
+    @Analyzer(definition = "tweet_analyzer")
+    private String content;
+}</code></pre><p>
+</p></section></section><section class="section" id="_custom_field_bridges"><div class="titlepage"><div><div><h3 class="title">11.4.3. Custom field bridges</h3></div></div></div><p>You can write custom field bridges and class bridges.
+For class bridges and field bridges creating multiple fields,
+make sure to make your bridge implementation also implement the <code class="literal">MetadataProvidingFieldBridge</code> contract.</p><div style="margin-left: 0.5in; margin-right: 0.5in;" class="caution"><h2>Caution</h2><p>Creating sub-fields in custom field bridges is not supported.</p><p>You create a sub-field when your <code class="literal">MetadataProvidingFieldBridge</code> registers a field whose name is the name of an existing field, with a dot and another string appended, like <code class="literal">name + ".mySubField"</code>.</p><p>This lack of support is due to Elasticsearch not allowing a field to have multiple types. In the example above, the field would have both the <code class="literal">object</code> datatype and whatever datatype the original field has (<code class="literal">string</code> in the most common case).</p><p>As an alternative, you may append a suffix to the original field name in order to create a <span class="strong"><strong>sibling</strong></span> field, e.g. use <code class="literal">name + "_mySubField"</code> or <code class="literal">name + "_more.mySubField"</code> instead of <code class="literal">name + ".mySubField"</code>.</p><p>This limitation is true in particular for field bridges applied to the <code class="literal">@DocumentId</code>: fields added to the document must not be in the form <code class="literal">name + ".mySubField"</code>, in order to avoid mapping conflicts with the ID field.</p></div><pre><code class="language-java">/**
+ * Used as class-level bridge for creating the "firstName" and "middleName" document and doc value fields.
+ */
+public static class FirstAndMiddleNamesFieldBridge implements MetadataProvidingFieldBridge {
+
+    @Override
+    public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
+        Explorer explorer = (Explorer) value;
+
+        String firstName = explorer.getNameParts().get( "firstName" );
+        luceneOptions.addFieldToDocument( name + "_firstName", firstName, document );
+        document.add( new SortedDocValuesField( name + "_firstName", new BytesRef( firstName ) ) );
+
+        String middleName = explorer.getNameParts().get( "middleName" );
+        luceneOptions.addFieldToDocument( name + "_middleName", middleName, document );
+        document.add( new SortedDocValuesField( name + "_middleName", new BytesRef( middleName ) ) );
+    }
+
+    @Override
+    public void configureFieldMetadata(String name, FieldMetadataBuilder builder) {
+        builder
+            .field( name + "_firstName", FieldType.STRING )
+                .sortable( true )
+            .field( name + "_middleName", FieldType.STRING )
+                .sortable( true );
+    }
+}</code></pre><div style="margin-left: 0.5in; margin-right: 0.5in;" class="note"><h2>Note</h2><p>This interface and <code class="literal">FieldBridge</code> in general are likely going to evolve in the next major version of Hibernate Search
+to remove its adherence to Lucene specific classes like <code class="literal">Document</code>.</p></div></section><section class="section" id="_tika_bridges"><div class="titlepage"><div><div><h3 class="title">11.4.4. Tika bridges</h3></div></div></div><p>If your metadata processors create fields with a different name from the one passed as a parameter, make sure to make your processor also implement the <code class="literal">MetadataProvidingTikaMetadataProcessor</code> contract.</p></section></section><section class="section" id="_queries"><div class="titlepage"><div><div><h2 class="title">11.5. Queries</h2></div></div></div><p>You can write queries like you usually do in Hibernate Search: native Lucene queries and DSL queries (see <a class="xref" href="ch05.html" title="Chapter 5. Querying">Chapter 5, <em>Querying</em></a>).
+We do automatically translate the most common types of Apache Lucene queries
+and all queries generated by the Hibernate Search DSL except more like this (see below).</p><div style="margin-left: 0.5in; margin-right: 0.5in;" class="note"><h2>Unsupported Query DSL features</h2><p>Queries written via the DSL work.
+Open a JIRA otherwise.</p><p>The notable exception is more like this queries.
+Hibernate Search has a more advanced algorithm than Lucene (or Elasticsearch/Solr)
+which is not easily portable with what Elasticsearch exposes.</p><p>If you need this feature, contact us.</p></div><p>On top of translating Lucene queries,
+you can directly create Elasticsearch queries by using either its String format or a JSON format:</p><div class="example" id="d0e10010"><div class="example-title">Example 11.2. Creating an Elasticsearch native query from a string</div><div class="example-contents"><pre><code class="language-java">FullTextSession fullTextSession = Search.getFullTextSession(session);
+QueryDescriptor query = ElasticsearchQueries.fromQueryString("title:tales");
+List&lt;?&gt; result = fullTextSession.createFullTextQuery(query, ComicBook.class).list();</code></pre></div></div><br class="example-break"/><div class="example" id="d0e10015"><div class="example-title">Example 11.3. Creating an Elasticsearch native query from JSON</div><div class="example-contents"><pre><code class="language-java">FullTextSession fullTextSession = Search.getFullTextSession(session);
+QueryDescriptor query = ElasticsearchQueries.fromJson(
+      "{ 'query': { 'match' : { 'lastName' : 'Brand' } } }");
+List&lt;?&gt; result = session.createFullTextQuery(query, GolfPlayer.class).list();</code></pre></div></div><br class="example-break"/><div style="margin-left: 0.5in; margin-right: 0.5in;" class="caution"><h2>Date/time in native Elasticsearch queries</h2><p>By default Elasticsearch interprets the date/time strings lacking the time zone as if they were represented using the UTC time zone. If overlooked, this can cause your native Elasticsearch queries to be completely off.</p><p>The simplest way to avoid issues is to always explicitly provide time zones IDs or offsets when building native Elasticsearch queries. This may be achieved either by directly adding the time zone ID or offset in date strings, or by using the <code class="literal">time_zone</code> parameter (range queries only). See Elasticsearch documentation for more information.</p></div><section class="section" id="__anchor_xml_id_elasticsearch_query_spatial_xreflabel_elasticsearch_query_spatial_spatial_queries"><div class="titlepage"><div><div><h3 class="title">11.5.1. <span id="elasticsearch-query-spatial"/> Spatial queries</h3></div></div></div><p>The Elasticsearch integration supports spatial queries by using either the DSL or native Elasticsearch queries.</p><p>For regular usage, there are no particular requirements for spatial support.</p><p>However, if you want to calculate the distance from your entities to a point without sorting by the distance to this point,
+you need to enable the Groovy plugin by adding the following snippet to your Elasticsearch configuration:</p><p><span class="formalpara-title">Enabling Groovy support in your elasticsearch.yml. </span>
+</p><pre class="screen">script.engine.groovy.inline.search: on</pre><p>
+</p></section><section class="section" id="__anchor_xml_id_elasticsearch_scrolling_xreflabel_elasticsearch_scrolling_paging_and_scrolling"><div class="titlepage"><div><div><h3 class="title">11.5.2. <span id="elasticsearch-scrolling"/> Paging and scrolling</h3></div></div></div><p>You may handle large result sets in two different ways, with different limitations.</p><p>For (relatively) smaller result sets, you may use the traditional offset/limit querying provided by the <code class="literal">FullTextQuery</code> interfaces: <code class="literal">setFirstResult(int)</code> and <code class="literal">setMaxResults(int)</code>.
+Limitations:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">This will only get you as far as the 10000 first documents, i.e. when requesting a window that includes documents beyond the 10000th result, Elasticsearch will return an error. If you want to raise this limit, see the <code class="literal">index.max_result_window</code> property in <a class="link" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html#dynamic-index-settings">Elasticsearch’s settings</a>.</li></ul></div><p>If your result set is bigger, you may take advantage of scrolling by using the <code class="literal">scroll</code> method on <code class="literal">org.hibernate.search.FullTextQuery</code>.
+Limitations:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">This method is not available in <code class="literal">org.hibernate.search.jpa.FullTextQuery</code>.</li><li class="listitem">The Elasticsearch implementation has poor performance when an offset has been defined (i.e. <code class="literal">setFirstResult(int)</code> has been called on the query before calling <code class="literal">scroll()</code>).
+This is because Elasticsearch does not provide such feature, thus Hibernate Search has to scroll through every previous result under the hood.</li><li class="listitem">The Elasticsearch implementation allows only limited backtracking. Calling <code class="literal">scrollableResults.setRowNumber(4)</code> when currently positioned at index <code class="literal">1006</code>,
+for example, may result in a <code class="literal">SearchException</code> being thrown, because only 1000 previous elements had been kept in memory.
+You may work this around by tweaking the property: <code class="literal">hibernate.search.elasticsearch.scroll_backtracking_window_size</code> (see <a class="link" href="ch11.html#elasticsearch-integration-configuration">Elasticsearch integration configuration</a>).</li><li class="listitem">The <code class="literal">ScrollableResults</code> will become stale and unusable after a given period of time spent without fetching results from Elasticsearch.
+You may work this around by tweaking two properties: <code class="literal">hibernate.search.elasticsearch.scroll_timeout</code> and <code class="literal">hibernate.search.elasticsearch.scroll_fetch_size</code> (see <a class="link" href="ch11.html#elasticsearch-integration-configuration">Elasticsearch integration configuration</a>).
+Typically, you will solve timeout issues by reducing the fetch size and/or increasing the timeout limit, but this will also increase the performance hit on Elasticsearch.</li></ul></div></section><section class="section" id="__anchor_xml_id_elasticsearch_query_sorting_xreflabel_elasticsearch_query_sorting_sorting"><div class="titlepage"><div><div><h3 class="title">11.5.3. <span id="elasticsearch-query-sorting"/>Sorting</h3></div></div></div><p>Sorting is performed the same way as <a class="link" href="ch05.html#query-sorting">with the Lucene backend</a>.</p><p>If you happen to need an advanced Elasticsearch sorting feature that is not natively supported in <code class="literal">SortField</code> or in Hibernate Search sort DSL, you may still create a sort from JSON, and even mix it with DSL-defined sorts:</p><div class="example" id="d0e10146"><div class="example-title">Example 11.4. Mixing DSL-defined sorts with native Elasticsearch JSON sorts</div><div class="example-contents"><pre><code class="language-java">QueryBuilder qb = fullTextSession.getSearchFactory()
+    .buildQueryBuilder().forEntity(Book.class).get();
+Query luceneQuery = /* ... */;
+FullTextQuery query = s.createFullTextQuery( luceneQuery, Book.class );
+Sort sort = qb.sort()
+        .byNative( "authors.name", "{'order':'asc', 'mode': 'min'}" )
+        .andByField("title")
+        .createSort();
+query.setSort(sort);
+List results = query.list();</code></pre></div></div><br class="example-break"/></section><section class="section" id="_projections"><div class="titlepage"><div><div><h3 class="title">11.5.4. Projections</h3></div></div></div><p>All fields are stored by Elasticsearch in the JSON document it indexes,
+there is no specific need to mark fields as stored when you want to project them.
+The downside is that to project a field, Elasticsearch needs to read the whole JSON document.
+If you want to avoid that, use the <code class="literal">Store.YES</code> marker.</p><p>You can also retrieve the full JSON document by using <code class="literal">org.hibernate.search.elasticsearch.ElasticsearchProjectionConstants.SOURCE</code>.</p><pre><code class="language-java">query = ftem.createFullTextQuery(
+                    qb.keyword()
+                    .onField( "tags" )
+                    .matching( "round-based" )
+                    .createQuery(),
+                    VideoGame.class
+            )
+            .setProjection( ElasticsearchProjectionConstants.SCORE, ElasticsearchProjectionConstants.SOURCE );
+
+projection = (Object[]) query.getSingleResult();</code></pre><p>If you’re looking for information about execution time, you may also use <code class="literal">org.hibernate.search.elasticsearch.ElasticsearchProjectionConstants.TOOK</code> and <code class="literal">org.hibernate.search.elasticsearch.ElasticsearchProjectionConstants.TIMED_OUT</code>:</p><pre><code class="language-java">query = ftem.createFullTextQuery(
+                    qb.keyword()
+                    .onField( "tags" )
+                    .matching( "round-based" )
+                    .createQuery(),
+                    VideoGame.class
+            )
+            .setProjection(
+                    ElasticsearchProjectionConstants.SOURCE,
+                    ElasticsearchProjectionConstants.TOOK,
+                    ElasticsearchProjectionConstants.TIMED_OUT
+            );
+
+projection = (Object[]) query.getSingleResult();
+Integer took = (Integer) projection[1]; // Execution time (milliseconds)
+Boolean timedOut = (Boolean) projection[2]; // Whether the query timed out</code></pre></section><section class="section" id="_filters"><div class="titlepage"><div><div><h3 class="title">11.5.5. Filters</h3></div></div></div><p>The Elasticsearch integration supports the definition of full text filters.</p><p>Your filters need to implement the <code class="literal">ElasticsearchFilter</code> interface.</p><pre><code class="language-java">public class DriversMatchingNameElasticsearchFilter implements ElasticsearchFilter {
+
+    private String name;
+
+    public DriversMatchingNameElasticsearchFilter() {
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getJsonFilter() {
+        return "{ 'term': { 'name': '" + name + "' } }";
+    }
+
+}</code></pre><p>You can then declare the filter in your entity.</p><pre><code class="language-java">@Entity
+@Indexed
+@FullTextFilterDefs({
+        @FullTextFilterDef(name = "namedDriver",
+                impl = DriversMatchingNameElasticsearchFilter.class)
+})
+public class Driver {
+    @Id
+    @DocumentId
+    private int id;
+
+    @Field(analyze = Analyze.YES)
+    private String name;
+
+    ...
+}</code></pre><p>From then you can use it as usual.</p><pre><code class="language-java">ftQuery.enableFullTextFilter( "namedDriver" ).setParameter( "name", "liz" );</code></pre><p>For static filters, you can simply extend the <code class="literal">SimpleElasticsearchFilter</code> and provide an Elasticsearch filter in JSON form.</p></section></section><section class="section" id="_index_optimization"><div class="titlepage"><div><div><h2 class="title">11.6. Index optimization</h2></div></div></div><p>The optimization features documented in <a class="xref" href="ch07.html" title="Chapter 7. Index Optimization">Chapter 7, <em>Index Optimization</em></a> are only partially implemented. That kind of optimization is rarely needed with recent versions of Lucene (on which Elasticsearch is based), but some of it is still provided for the very specific case of indexes meant to stay read-only for a long period of time:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">The automatic optimization is not implemented and most probably never will be.</li><li class="listitem">The manual optimization (<code class="literal">searchFactory.optimize()</code>) is implemented.</li></ul></div></section><section class="section" id="__anchor_xml_id_elasticsearch_limitations_xreflabel_elasticsearch_limitations_limitations"><div class="titlepage"><div><div><h2 class="title">11.7. <span id="elasticsearch-limitations"/>Limitations</h2></div></div></div><p>Not everything is implemented yet.
+Here is a list of known limitations.</p><p>Please check with JIRA and the mailing lists for updates, but at the time of writing this at least the following features are known to not work yet:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">Query timeouts: <a class="link" href="https://hibernate.atlassian.net/browse/HSEARCH-2399">HSEARCH-2399</a></li><li class="listitem">MoreLikeThis queries: <a class="link" href="https://hibernate.atlassian.net/browse/HSEARCH-2395">HSEARCH-2395</a></li><li class="listitem"><code class="literal">@IndexedEmbedded.indexNullAs</code>: <a class="link" href="https://hibernate.atlassian.net/browse/HSEARCH-2389">HSEARCH-2389</a></li><li class="listitem"><a class="link" href="ch08.html" title="Chapter 8. Monitoring">Statistics</a>: <a class="link" href="https://hibernate.atlassian.net/browse/HSEARCH-2421">HSEARCH-2421</a></li><li class="listitem"><code class="literal">@AnalyzerDiscriminator</code>: <a class="link" href="https://hibernate.atlassian.net/browse/HSEARCH-2428">HSEARCH-2428</a></li><li class="listitem">Mixing Lucene based indexes and Elasticsearch based indexes (partial support is here though)</li><li class="listitem">Hibernate Search does not make use of nested objects nor parent child relationship mapping <a class="link" href="https://hibernate.atlassian.net/browse/HSEARCH-2263">HSEARCH-2263</a>.
+This is largely mitigated by the fact that Hibernate Search does the denormalization itself and maintain data consistency when nested objects are updated.</li><li class="listitem">There is room for improvements in the performances of the MassIndexer implementation</li><li class="listitem">There is no failover to the next host when multiple hosts are configured and one host happens to fail: <a class="link" href="https://hibernate.atlassian.net/browse/HSEARCH-2469">HSEARCH-2469</a></li><li class="listitem">Our new Elasticsearch integration module does not work in OSGi environments. If you need this, please vote for: <a class="link" href="https://hibernate.atlassian.net/browse/HSEARCH-2524">HSEARCH-2524</a>.</li></ul></div></section><section class="section" id="_known_bugs_in_elasticsearch"><div class="titlepage"><div><div><h2 class="title">11.8. Known bugs in Elasticsearch</h2></div></div></div><p>Depending on the Elasticsearch version you use, you may encounter bugs that are specific to that version.
+Here is a list of known Elasticsearch bugs, and what to do about it.</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><p class="simpara">Mapping <code class="literal">java.time.ZonedDateTime</code> won’t work with Elasticsearch 2.4.1 because of <a class="link" href="https://github.com/elastic/elasticsearch/issues/20911">a JodaTime bug affecting Elasticsearch</a>: <a class="link" href="https://hibernate.atlassian.net/browse/HSEARCH-2414">HSEARCH-2414</a>.</p><p class="simpara"><span class="strong"><strong>Fix:</strong></span> Upgrade to Elasticsearch 2.4.2.</p></li></ul></div></section><section class="section" id="_acknowledgment"><div class="titlepage"><div><div><h2 class="title">11.9. Acknowledgment</h2></div></div></div><p>More information about Elasticsearch can be found on the <a class="link" href="https://www.elastic.co/products/elasticsearch">Elasticsearch website</a>
+and its <a class="link" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html">reference documentation</a>.</p><p>Hibernate Search uses <a class="link" href="https://github.com/searchbox-io/Jest">Jest</a> to communicate with Elasticsearch.</p></section></section><script type="text/javascript" src="highlight.js/highlight.pack.js"> </script><script type="text/javascript">hljs.initHighlightingOnLoad();</script><script type="text/javascript">
+dataLayer = [{'channel' : 'Hibernate', 'additional_tracking_code' : 'UA-45270411-3'}];
+(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NJWS5L');</script><noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-NJWS5L" height="0" width="0" style="display:none;visibility:hidden"> </iframe></noscript><hr/><footer><ul class="docnav"><li class="previous"><a accesskey="p" href="ch10.html"><strong>Prev</strong>Chapter 10. Advanced features</a></li><li class="up"><a accesskey="u" href="#"><strong>Up</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Home</strong></a></li><li class="next"><a accesskey="n" href="ch12.html"><strong>Next</strong>Chapter 12. Further reading</a></li></ul></footer><!-- HibernateDoc.OutdatedContent --><script src="//code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script><script src="/hibernate/_outdated-content/outdated-content.js" type="text/javascript"></script><script type="text/javascript">var jQuery_3_1 = $.noConflict(true); jQuery_3_1(document).ready(function() { HibernateDoc.OutdatedContent.install("search"); });</script><!-- /HibernateDoc.OutdatedContent --></body></html>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory">Capítulo 12. Interceptores y eventos</title><link rel="stylesheet" href="css/hibernate.css" type="text/css"/><meta xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" name="generator" content="DocBook XSL Stylesheets V1.72.0"/><link rel="start" href="index.html" title="HIBERNATE - Persistencia Relacional para Java Idiomático"/><link rel="up" href="index.html" title="HIBERNATE - Persistencia Relacional para Java Idiomático"/><link rel="prev" href="transactions.html" title="Capítulo 11. Transactions and Concurrency"/><link rel="next" href="batch.html" title="Capítulo 13. Procesamiento por lotes"/><link rel="copyright" href="ln-Legal_Notice.html" title="Legal Notice"/></head><body><p id="title"><a href="http://www.hibernate.org" class="site_href"><strong>Hibernate.org</strong></a><a href="http://hibernate.org/Documentation/DocumentationOverview" class="doc_href"><strong>Community Documentation</strong></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="transactions.html"><strong>Anterior</strong></a></li><li class="next"><a accesskey="n" href="batch.html"><strong>Siguiente</strong></a></li></ul><div class="chapter" lang="es-ES"><div class="titlepage"><div><div><h2 class="title"><a id="events"/>Capítulo 12. Interceptores y eventos</h2></div></div></div><div class="toc"><dl><dt><span class="sect1"><a href="events.html#objectstate-interceptors">12.1. Interceptores</a></span></dt><dt><span class="sect1"><a href="events.html#objectstate-events">12.2. Sistema de eventos</a></span></dt><dt><span class="sect1"><a href="events.html#objectstate-decl-security">12.3. Seguridad declarativa de Hibernate</a></span></dt></dl></div><p>It is useful for the application to react to certain events that occur inside Hibernate. This allows for the implementation of generic functionality and the extension of Hibernate functionality. </p><div class="sect1" lang="es-ES"><div class="titlepage"><div><div><h2 class="title"><a id="objectstate-interceptors"/>12.1. Interceptores</h2></div></div></div><p>The <code class="literal">Interceptor</code> interface provides callbacks from the session to the application, allowing the application to inspect and/or manipulate properties of a persistent object before it is saved, updated, deleted or loaded. One possible use for this is to track auditing information. For example, the following <code class="literal">Interceptor</code> automatically sets the <code class="literal">createTimestamp</code> when an <code class="literal">Auditable</code> is created and updates the <code class="literal">lastUpdateTimestamp</code> property when an <code class="literal">Auditable</code> is updated. </p><p>You can either implement <code class="literal">Interceptor</code> directly or extend <code class="literal">EmptyInterceptor</code>. </p><pre class="programlisting">package org.hibernate.test;
+
+import java.io.Serializable;
+import java.util.Date;
+import java.util.Iterator;
+
+import org.hibernate.Interceptor;
+import org.hibernate.type.Type;
+
+public class AuditInterceptor implements Interceptor, Serializable {
+
+    private int updates;
+    private int creates;
+
+    public void onDelete(Object entity,
+                         Serializable id,
+                         Object[] state,
+                         String[] propertyNames,
+                         Type[] types) {
+        // do nothing
+    }
+
+    public boolean onFlushDirty(Object entity,
+                                Serializable id,
+                                Object[] currentState,
+                                Object[] previousState,
+                                String[] propertyNames,
+                                Type[] types) {
+
+        if ( entity instanceof Auditable ) {
+            updates++;
+            for ( int i=0; i &lt; propertyNames.length; i++ ) {
+                if ( "lastUpdateTimestamp".equals( propertyNames[i] ) ) {
+                    currentState[i] = new Date();
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean onLoad(Object entity,
+                          Serializable id,
+                          Object[] state,
+                          String[] propertyNames,
+                          Type[] types) {
+        return false;
+    }
+
+    public boolean onSave(Object entity,
+                          Serializable id,
+                          Object[] state,
+                          String[] propertyNames,
+                          Type[] types) {
+
+        if ( entity instanceof Auditable ) {
+            creates++;
+            for ( int i=0; i&lt;propertyNames.length; i++ ) {
+                if ( "createTimestamp".equals( propertyNames[i] ) ) {
+                    state[i] = new Date();
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public void postFlush(Iterator entities) {
+        System.out.println("Creations: " + creates + ", Updates: " + updates);
+    }
+
+    public void preFlush(Iterator entities) {
+        updates=0;
+        creates=0;
+    }
+
+    ...
+
+}</pre><p>There are two kinds of inteceptors: <code class="literal">Session</code>-scoped and <code class="literal">SessionFactory</code>-scoped. </p><p>UNTRANSLATED! A <code class="literal">Session</code>-scoped interceptor is specified when a session is opened using one of the overloaded SessionFactory.openSession() methods accepting an <code class="literal">Interceptor</code>. </p><pre class="programlisting">Session session = sf.openSession( new AuditInterceptor() );</pre><p>A <code class="literal">SessionFactory</code>-scoped interceptor is registered with the <code class="literal">Configuration</code> object prior to building the <code class="literal">SessionFactory</code>. Unless a session is opened explicitly specifying the interceptor to use, the supplied interceptor will be applied to all sessions opened from that <code class="literal">SessionFactory</code>. <code class="literal">SessionFactory</code>-scoped interceptors must be thread safe. Ensure that you do not store session-specific states, since multiple sessions will use this interceptor potentially concurrently. </p><pre class="programlisting">new Configuration().setInterceptor( new AuditInterceptor() );</pre></div><div class="sect1" lang="es-ES"><div class="titlepage"><div><div><h2 class="title"><a id="objectstate-events"/>12.2. Sistema de eventos</h2></div></div></div><p>If you have to react to particular events in your persistence layer, you can also use the Hibernate3 <span class="emphasis"><em>event</em></span> architecture. The event system can be used in addition, or as a replacement, for interceptors. </p><p>All the methods of the <code class="literal">Session</code> interface correlate to an event. You have a <code class="literal">LoadEvent</code>, a <code class="literal">FlushEvent</code>, etc. Consult the XML configuration-file DTD or the <code class="literal">org.hibernate.event</code> package for the full list of defined event types. When a request is made of one of these methods, the Hibernate <code class="literal">Session</code> generates an appropriate event and passes it to the configured event listeners for that type. Out-of-the-box, these listeners implement the same processing in which those methods always resulted. However, you are free to implement a customization of one of the listener interfaces (i.e., the <code class="literal">LoadEvent</code> is processed by the registered implementation of the <code class="literal">LoadEventListener</code> interface), in which case their implementation would be responsible for processing any <code class="literal">load()</code> requests made of the <code class="literal">Session</code>. </p><p>The listeners should be considered singletons. This means they are shared between requests, and should not save any state as instance variables. </p><p>A custom listener implements the appropriate interface for the event it wants to process and/or extend one of the convenience base classes (or even the default event listeners used by Hibernate out-of-the-box as these are declared non-final for this purpose). Custom listeners can either be registered programmatically through the <code class="literal">Configuration</code> object, or specified in the Hibernate configuration XML. Declarative configuration through the properties file is not supported. Here is an example of a custom load event listener: </p><pre class="programlisting">public class MyLoadListener extends DefaultLoadEventListener {
+    // this is the single method defined by the LoadEventListener interface
+    public Object onLoad(LoadEvent event, LoadEventListener.LoadType loadType)
+            throws HibernateException {
+        if ( !MySecurity.isAuthorized( event.getEntityClassName(), event.getEntityId() ) ) {
+            throw MySecurityException("Unauthorized access");
+        }
+        return super.onLoad(event, loadType);
+    }
+}</pre><p>Necesitas además una entrada de configuración diciéndole a Hibernate que use el oyente en vez del oyente por defecto: </p><pre class="programlisting">&lt;hibernate-configuration&gt;
+    &lt;session-factory&gt;
+        ...
+        &lt;listener type="load" class="MyLoadListener"/&gt;
+    &lt;/session-factory&gt;
+&lt;/hibernate-configuration
+&gt;</pre><p>Instead, you can register it programmatically: </p><pre class="programlisting">Configuration cfg = new Configuration();
+cfg.getSessionEventListenerConfig().setLoadEventListener( new MyLoadListener() );</pre><p>Listeners registered declaratively cannot share instances. If the same class name is used in multiple <code class="literal">&lt;listener/&gt;</code> elements, each reference will result in a separate instance of that class. If you need to share listener instances between listener types you must use the programmatic registration approach. </p><p>Why implement an interface and define the specific type during configuration? A listener implementation could implement multiple event listener interfaces. Having the type additionally defined during registration makes it easier to turn custom listeners on or off during configuration. </p></div><div class="sect1" lang="es-ES"><div class="titlepage"><div><div><h2 class="title"><a id="objectstate-decl-security"/>12.3. Seguridad declarativa de Hibernate</h2></div></div></div><p>Usually, declarative security in Hibernate applications is managed in a session facade layer. Hibernate3 allows certain actions to be permissioned via JACC, and authorized via JAAS. This is an optional functionality that is built on top of the event architecture. </p><p>Primero, debes configurar los oyentes de eventos apropiados, para habilitar el uso de autorización JAAS. </p><pre class="programlisting">&lt;listener type="pre-delete" class="org.hibernate.secure.JACCPreDeleteEventListener"/&gt;
+&lt;listener type="pre-update" class="org.hibernate.secure.JACCPreUpdateEventListener"/&gt;
+&lt;listener type="pre-insert" class="org.hibernate.secure.JACCPreInsertEventListener"/&gt;
+&lt;listener type="pre-load" class="org.hibernate.secure.JACCPreLoadEventListener"/&gt;</pre><p>Note that <code class="literal">&lt;listener type="..." class="..."/&gt;</code> is shorthand for <code class="literal">&lt;event type="..."&gt;&lt;listener class="..."/&gt;&lt;/event&gt;</code> when there is exactly one listener for a particular event type. </p><p>Next, while still in <code class="literal">hibernate.cfg.xml</code>, bind the permissions to roles: </p><pre class="programlisting">&lt;grant role="admin" entity-name="User" actions="insert,update,read"/&gt;
+&lt;grant role="su" entity-name="User" actions="*"/&gt;</pre><p>Los nombres de role son los roles entendidos por tu proveedor de JACC. </p></div></div><HR xmlns=""/><a xmlns="" href="legalnotice.html"><p xmlns="http://www.w3.org/1999/xhtml" class="copyright">Copyright © 2004 Red Hat Middleware, LLC.</p></a><ul class="docnav"><li class="previous"><a accesskey="p" href="transactions.html"><strong>Anterior</strong>Capítulo 11. Transactions and Concurrency</a></li><li class="up"><a accesskey="u" href="#"><strong>Subir</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Inicio</strong></a></li><li class="next"><a accesskey="n" href="batch.html"><strong>Siguiente</strong>Capítulo 13. Procesamiento por lotes</a></li></ul></body></html>

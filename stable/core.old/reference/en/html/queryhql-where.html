@@ -1,0 +1,136 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>14.9.&nbsp;The where clause</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="queryhql.html" title="Chapter&nbsp;14.&nbsp;HQL: The Hibernate Query Language">
+      <link rel="prev" href="queryhql-polymorphism.html" title="14.8.&nbsp;Polymorphic queries">
+      <link rel="next" href="queryhql-expressions.html" title="14.10.&nbsp;Expressions">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">14.9.&nbsp;The where clause</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="queryhql-polymorphism.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;14.&nbsp;HQL: The Hibernate Query Language</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="queryhql-expressions.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="queryhql-where"></a>14.9.&nbsp;The where clause
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+                        The <code class="literal">where</code> clause allows you to narrow the list of instances returned.
+                        If no alias exists, you may refer to properties by name:
+                    
+         </p><pre class="programlisting">from Cat where name='Fritz'</pre><p>
+                    	If there is an alias, use a qualified property name:
+                    
+         </p><pre class="programlisting">from Cat as cat where cat.name='Fritz'</pre><p>
+                        returns instances of <code class="literal">Cat</code> named 'Fritz'.
+                    
+         </p><pre class="programlisting">select foo
+from Foo foo, Bar bar
+where foo.startDate = bar.date</pre><p>
+                        will return all instances of <code class="literal">Foo</code> for which
+                        there exists an instance of <code class="literal">bar</code> with a
+                        <code class="literal">date</code> property equal to the
+                        <code class="literal">startDate</code> property of the
+                        <code class="literal">Foo</code>. Compound path expressions make the
+                        <code class="literal">where</code> clause extremely powerful. Consider:
+                    
+         </p><pre class="programlisting">from Cat cat where cat.mate.name is not null</pre><p>
+                        This query translates to an SQL query with a table (inner) join. If you were to write
+                        something like
+                    
+         </p><pre class="programlisting">from Foo foo
+where foo.bar.baz.customer.address.city is not null</pre><p>
+                        you would end up with a query that would require four table joins in SQL.
+                    
+         </p>
+         <p>
+                        The <code class="literal">=</code> operator may be used to compare not only properties, but also
+                        instances:
+                    
+         </p><pre class="programlisting">from Cat cat, Cat rival where cat.mate = rival.mate</pre><pre class="programlisting">select cat, mate
+from Cat cat, Cat mate
+where cat.mate = mate</pre><p>
+                        The special property (lowercase) <code class="literal">id</code> may be used to reference the
+                        unique identifier of an object. See <a href="queryhql-identifier-property.html" title="14.5.&nbsp;Refering to identifier property">Section&nbsp;14.5, &#8220;Refering to identifier property&#8221;</a>
+                        for more information.
+                    
+         </p><pre class="programlisting">from Cat as cat where cat.id = 123
+
+from Cat as cat where cat.mate.id = 69</pre><p>
+                        The second query is efficient. No table join is required!
+                    
+         </p>
+         <p>
+                        Properties of composite identifiers may also be used. Suppose <code class="literal">Person</code>
+                        has a composite identifier consisting of <code class="literal">country</code> and
+                        <code class="literal">medicareNumber</code>.  Again, see <a href="queryhql-identifier-property.html" title="14.5.&nbsp;Refering to identifier property">Section&nbsp;14.5, &#8220;Refering to identifier property&#8221;</a>
+                        for more information regarding referencing identifier properties.
+                    
+         </p><pre class="programlisting">from bank.Person person
+where person.id.country = 'AU'
+    and person.id.medicareNumber = 123456</pre><pre class="programlisting">from bank.Account account
+where account.owner.id.country = 'AU'
+    and account.owner.id.medicareNumber = 123456</pre><p>
+                        Once again, the second query requires no table join.
+                    
+         </p>
+         <p>
+                        Likewise, the special property <code class="literal">class</code> accesses the discriminator value
+                        of an instance in the case of polymorphic persistence. A Java class name embedded in the
+                        where clause will be translated to its discriminator value.
+                    
+         </p><pre class="programlisting">from Cat cat where cat.class = DomesticCat</pre><p>
+                        You may also use components or composite user types, or properties of said
+                        component types. See <a href="queryhql-components.html" title="14.17.&nbsp;Components">Section&nbsp;14.17, &#8220;Components&#8221;</a> for more details.
+                    
+         </p>
+         <p>
+                        An "any" type has the special properties <code class="literal">id</code> and <code class="literal">class</code>,
+                        allowing us to express a join in the following way (where <code class="literal">AuditLog.item</code>
+                        is a property mapped with <code class="literal">&lt;any&gt;</code>).
+                    
+         </p><pre class="programlisting">from AuditLog log, Payment payment
+where log.item.class = 'Payment' and log.item.id = payment.id</pre><p>
+                        Notice that <code class="literal">log.item.class</code> and <code class="literal">payment.class</code>
+                        would refer to the values of completely different database columns in the above query.
+                    
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="queryhql-polymorphism.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="queryhql.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="queryhql-expressions.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">14.8.&nbsp;Polymorphic queries&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;14.10.&nbsp;Expressions</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

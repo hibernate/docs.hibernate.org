@@ -1,0 +1,71 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>8.5.&nbsp;Dynamic components</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="components.html" title="Chapter&nbsp;8.&nbsp;Component Mapping">
+      <link rel="prev" href="components-compositeid.html" title="8.4.&nbsp;Components as composite identifiers">
+      <link rel="next" href="inheritance.html" title="Chapter&nbsp;9.&nbsp;Inheritance Mapping">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">8.5.&nbsp;Dynamic components</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="components-compositeid.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;8.&nbsp;Component Mapping</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="inheritance.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="components-dynamic"></a>8.5.&nbsp;Dynamic components
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+                        You may even map a property of type <code class="literal">Map</code>:
+                    
+         </p><pre class="programlisting">&lt;dynamic-component name="userAttributes"&gt;
+    &lt;property name="foo" column="FOO" type="string"/&gt;
+    &lt;property name="bar" column="BAR" type="integer"/&gt;
+    &lt;many-to-one name="baz" class="Baz" column="BAZ_ID"/&gt;
+&lt;/dynamic-component&gt;</pre><p>
+                        The semantics of a <code class="literal">&lt;dynamic-component&gt;</code> mapping are identical
+                        to <code class="literal">&lt;component&gt;</code>. The advantage of this kind of mapping is 
+                        the ability to determine the actual properties of the bean at deployment time, just
+                        by editing the mapping document. Runtime manipulation of the mapping document is 
+                        also possible, using a DOM parser. Even better, you can access (and change) Hibernate's
+                        configuration-time metamodel via the <code class="literal">Configuration</code> object.
+                    
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="components-compositeid.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="components.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="inheritance.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">8.4.&nbsp;Components as composite identifiers&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;Chapter&nbsp;9.&nbsp;Inheritance Mapping</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

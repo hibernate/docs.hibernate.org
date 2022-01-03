@@ -1,0 +1,111 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>Chapter&nbsp;1.&nbsp;Setting up an annotations project</title><link rel="stylesheet" href="../shared/css/html.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.65.1"><link rel="home" href="index.html" title="Hibernate Annotations"><link rel="up" href="index.html" title="Hibernate Annotations"><link rel="previous" href="preface.html" title="Preface"><link rel="next" href="entity.html" title="Chapter&nbsp;2.&nbsp;Entity Beans"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter&nbsp;1.&nbsp;Setting up an annotations project</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="preface.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="entity.html">Next</a></td></tr></table><hr></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="d0e41"></a>Chapter&nbsp;1.&nbsp;Setting up an annotations project</h2></div></div><div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="setup-requirements"></a>1.1.&nbsp;Requirements</h2></div></div><div></div></div><div class="itemizedlist"><ul type="disc"><li><p><a href="http://www.hibernate.org/6.html" target="_top">Download</a>
+        and unpack the Hibernate Annotations distribution from the Hibernate
+        website.</p></li><li><p><span class="emphasis"><em>This release requires Hibernate Core 3.3 and
+        above.</em></span></p></li><li><p>This release is known to work on Hibernate Core 3.3.0.SP1</p></li><li><p>Make sure you have JDK 5.0 installed or above. You can of course
+        continue using XDoclet and get some of the benefits of
+        annotation-based metadata with older JDK versions. Note that this
+        document only describes JDK 5.0 annotations and you have to refer to
+        the XDoclet documentation for more information.</p></li></ul></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="setup-configuration"></a>1.2.&nbsp;Configuration</h2></div></div><div></div></div><p>First, set up your classpath (after you have created a new project
+    in your favorite IDE): </p><div class="itemizedlist"><ul type="disc"><li><p>Copy all Hibernate3 core and required 3rd party library files
+          (see lib/README.txt in Hibernate).</p></li><li><p>Copy <tt class="filename">hibernate-annotations.jar</tt>,
+          <tt class="filename">lib/hibernate-comons-annotations.jar</tt> and
+          <tt class="filename">lib/ejb3-persistence.jar</tt> from the Hibernate
+          Annotations distribution to your classpath as well.</p></li></ul></div><p>If you wish to use <a href="http://validator.hibernate.org" target="_top">Hibernate Validator</a>, download
+    it from the Hibernate website and add
+    <tt class="filename">hibernate-validator.jar</tt> in your classpath.</p><p>If you wish to use <a href="http://search.hibernate.org" target="_top">Hibernate Search</a>, download it
+    from the Hibernate website and add
+    <tt class="filename">hibernate-search.jar</tt> and
+    <tt class="filename">lucene-core-x.y.z.jar</tt> in your classpath.</p><p>We also recommend a small wrapper class to startup Hibernate in a
+    static initializer block, known as <tt class="classname">HibernateUtil</tt>.
+    You might have seen this class in various forms in other areas of the
+    Hibernate documentation. For Annotation support you have to enhance this
+    helper class as follows: </p><pre class="programlisting">package hello;
+
+import org.hibernate.*;
+import org.hibernate.cfg.*;
+import test.*;
+import test.animals.Dog;
+
+public class HibernateUtil {
+
+private static final SessionFactory sessionFactory;
+
+    static {
+        try {
+
+            sessionFactory = new <span class="bold"><b>AnnotationConfiguration()</b></span>
+                    configure().buildSessionFactory();
+        } catch (Throwable ex) {
+            // Log exception!
+            throw new ExceptionInInitializerError(ex);
+        }
+    }
+
+    public static Session getSession()
+            throws HibernateException {
+        return sessionFactory.openSession();
+    }
+}
+            </pre><p>Interesting here is the use of
+    <tt class="classname">AnnotationConfiguration</tt>. The packages and annotated
+    classes are declared in your regular XML configuration file (usually
+    <tt class="filename">hibernate.cfg.xml</tt>). Here is the equivalent of the
+    above declaration:</p><pre class="programlisting">&lt;!DOCTYPE hibernate-configuration PUBLIC
+    "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd"&gt;
+
+        &lt;hibernate-configuration&gt;
+          &lt;session-factory&gt;
+            <span class="bold"><b>&lt;mapping package="test.animals"/&gt;
+            &lt;mapping class="test.Flight"/&gt;
+            &lt;mapping class="test.Sky"/&gt;
+            &lt;mapping class="test.Person"/&gt;
+            &lt;mapping class="test.animals.Dog"/&gt;</b></span>
+<span class="bold"><b>            &lt;mapping resource="test/animals/orm.xml"/&gt;</b></span>
+          &lt;/session-factory&gt;
+        &lt;/hibernate-configuration&gt;
+        </pre><p>Note that you can mix the hbm.xml use and the new annotation one.
+    The resource element can be either an hbm file or an EJB3 XML deployment
+    descriptor. The distinction is transparent for your configuration
+    process.</p><p>Alternatively, you can define the annotated classes and packages
+    using the programmatic API</p><pre class="programlisting">            sessionFactory = new <span class="bold"><b>AnnotationConfiguration()
+                    .addPackage("test.animals") //the fully qualified package name
+                    .addAnnotatedClass(Flight.class)
+                    .addAnnotatedClass(Sky.class)
+                    .addAnnotatedClass(Person.class)
+                    .addAnnotatedClass(Dog.class)</b></span>
+<span class="bold"><b>                    .addResource("test/animals/orm.xml")</b></span>
+                    configure()..buildSessionFactory();</pre><p>You can also use the Hibernate EntityManager which has its own
+    configuration mechanism. Please refer to this project documentation for
+    more details.</p><p>There is no other difference in the way you use Hibernate APIs with
+    annotations, except for this startup routine change or in the
+    configuration file. You can use your favorite configuration method for
+    other properties ( <tt class="filename">hibernate.properties</tt>,
+    <tt class="filename">hibernate.cfg.xml</tt>, programmatic APIs, etc). You can
+    even mix annotated persistent classes and classic
+    <tt class="filename">hbm.cfg.xml</tt> declarations with the same
+    <tt class="classname">SessionFactory</tt>. You can however not declare a class
+    several times (whether annotated or through hbm.xml). You cannot mix
+    configuration strategies (hbm vs annotations) in a mapped entity hierarchy
+    either.</p><p>To ease the migration process from hbm files to annotations, the
+    configuration mechanism detects the mapping duplication between
+    annotations and hbm files. HBM files are then prioritized over annotated
+    metadata on a class to class basis. You can change the priority using
+    <tt class="literal">hibernate.mapping.precedence</tt> property. The default is
+    <tt class="literal">hbm, class</tt>, changing it to <tt class="literal">class,
+    hbm</tt> will prioritize the annotated classes over hbm files when a
+    conflict occurs.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e168"></a>1.3.&nbsp;Properties</h2></div></div><div></div></div><p>Asides from the Hibernate core properties, Hibernate Annotations
+    reacts to the following one</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e173"></a>1.4.&nbsp;Logging</h2></div></div><div></div></div><p>Hibernate Annotations utilizes <a href="http://www.slf4j.org/" target="_top">Simple Logging Facade for Java</a> (SLF4J)
+    in order to log various system events. SLF4J can direct your logging
+    output to several logging frameworks (NOP, Simple, log4j version 1.2, JDK
+    1.4 logging, JCL or logback) depending on your chosen binding. In order to
+    setup logging properly you will need <tt class="filename">slf4j-api.jar</tt> in
+    your classpath together with the jar file for your preferred binding -
+    <tt class="filename">slf4j-log4j12.jar</tt> in the case of Log4J. See the SLF4J
+    <a href="http://www.slf4j.org/manual.html" target="_top">documentation</a> for more
+    detail.</p><p>The logging categories interesting for Hibernate Annotations
+    are:</p><div class="table"><a name="d0e192"></a><p class="title"><b>Table&nbsp;1.1.&nbsp;Hibernate Annotations Log Categories</b></p><table summary="Hibernate Annotations Log Categories" border="1"><colgroup><col><col></colgroup><thead><tr><th align="center">Category</th><th align="center">Function</th></tr></thead><tbody><tr><td><span class="emphasis"><em>org.hibernate.cfg</em></span></td><td>Log all configuration related events (not only
+            annotations).</td></tr></tbody></table></div><p>For further category configuration refer to the <a href="http://www.hibernate.org/hib_docs/v3/reference/en/html_single/#configuration-logging" target="_top">Logging</a>
+    in the Hibernate Core documentation.</p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="preface.html">Prev</a>&nbsp;</td><td width="20%" align="center"><a accesskey="u" href="index.html">Up</a></td><td width="40%" align="right">&nbsp;<a accesskey="n" href="entity.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Preface&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;Chapter&nbsp;2.&nbsp;Entity Beans</td></tr></table></div></body></html>

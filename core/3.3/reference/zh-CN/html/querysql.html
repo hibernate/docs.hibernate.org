@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory">第 16 章 Native SQL查询</title><link rel="stylesheet" href="css/hibernate.css" type="text/css"/><meta xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" name="generator" content="DocBook XSL Stylesheets V1.72.0"/><link rel="start" href="index.html" title="HIBERNATE - 符合Java习惯的关系数据库持久化"/><link rel="up" href="index.html" title="HIBERNATE - 符合Java习惯的关系数据库持久化"/><link rel="prev" href="querycriteria.html" title="第 15 章 条件查询(Criteria Queries)"/><link rel="next" href="filters.html" title="第 17 章 过滤数据"/><link rel="copyright" href="ln-Legal_Notice.html" title="Legal Notice"/></head><body><p id="title"><a href="http://www.hibernate.org" class="site_href"><strong>Hibernate.org</strong></a><a href="http://hibernate.org/Documentation/DocumentationOverview" class="doc_href"><strong>Community Documentation</strong></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="querycriteria.html"><strong>上一页</strong></a></li><li class="next"><a accesskey="n" href="filters.html"><strong>下一页</strong></a></li></ul><div class="chapter" lang="zh-CN"><div class="titlepage"><div><div><h2 class="title"><a id="querysql"/>第 16 章 Native SQL查询</h2></div></div></div><div class="toc"><dl><dt><span class="sect1"><a href="querysql.html#querysql-creating">16.1. 使用<code class="literal">SQLQuery</code></a></span></dt><dd><dl><dt><span class="sect2"><a href="querysql.html#d0e13376">16.1.1. 标量查询（Scalar queries）</a></span></dt><dt><span class="sect2"><a href="querysql.html#d0e13426">16.1.2. 实体查询(Entity queries)</a></span></dt><dt><span class="sect2"><a href="querysql.html#d0e13462">16.1.3. 处理关联和集合类(Handling associations and collections)</a></span></dt><dt><span class="sect2"><a href="querysql.html#d0e13493">16.1.4. 返回多个实体(Returning multiple entities)</a></span></dt><dt><span class="sect2"><a href="querysql.html#d0e13634">16.1.5. 返回非受管实体(Returning non-managed entities)</a></span></dt><dt><span class="sect2"><a href="querysql.html#d0e13655">16.1.6. 处理继承（Handling inheritance）</a></span></dt><dt><span class="sect2"><a href="querysql.html#d0e13660">16.1.7. 参数（Parameters）</a></span></dt></dl></dd><dt><span class="sect1"><a href="querysql.html#querysql-namedqueries">16.2. 命名SQL查询</a></span></dt><dd><dl><dt><span class="sect2"><a href="querysql.html#propertyresults">16.2.1. 使用return-property来明确地指定字段/别名</a></span></dt><dt><span class="sect2"><a href="querysql.html#sp_query">16.2.2. 使用存储过程来查询</a></span></dt></dl></dd><dt><span class="sect1"><a href="querysql.html#querysql-cud">16.3. 定制SQL用来create，update和delete</a></span></dt><dt><span class="sect1"><a href="querysql.html#querysql-load">16.4. 定制装载SQL</a></span></dt></dl></div><p>You can also express queries in the native SQL dialect of your database. This is useful if you want to utilize database-specific features such as query hints or the <code class="literal">CONNECT</code> keyword in Oracle. It also provides a clean migration path from a direct SQL/JDBC based application to Hibernate.</p><p>Hibernate3 allows you to specify handwritten SQL, including stored procedures, for all create, update, delete, and load operations.</p><div class="sect1" lang="zh-CN"><div class="titlepage"><div><div><h2 class="title"><a id="querysql-creating"/>16.1. 使用<code class="literal">SQLQuery</code></h2></div></div></div><p>Execution of native SQL queries is controlled via the <code class="literal">SQLQuery</code> interface, which is obtained by calling <code class="literal">Session.createSQLQuery()</code>. The following sections describe how to use this API for querying.</p><div class="sect2" lang="zh-CN"><div class="titlepage"><div><div><h3 class="title"><a id="d0e13376"/>16.1.1. 标量查询（Scalar queries）</h3></div></div></div><p>最基本的SQL查询就是获得一个标量（数值）的列表。</p><pre class="programlisting">sess.createSQLQuery("SELECT * FROM CATS").list();
+sess.createSQLQuery("SELECT ID, NAME, BIRTHDATE FROM CATS").list();
+</pre><p>These will return a List of Object arrays (Object[]) with scalar values for each column in the CATS table. Hibernate will use ResultSetMetadata to deduce the actual order and types of the returned scalar values.</p><p>To avoid the overhead of using <code class="literal">ResultSetMetadata</code>, or simply to be more explicit in what is returned, one can use <code class="literal">addScalar()</code>:</p><pre class="programlisting">sess.createSQLQuery("SELECT * FROM CATS")
+ .addScalar("ID", Hibernate.LONG)
+ .addScalar("NAME", Hibernate.STRING)
+ .addScalar("BIRTHDATE", Hibernate.DATE)
+</pre><p>This query specified:</p><div class="itemizedlist"><ul><li><p>SQL查询字符串</p></li><li><p>要返回的字段和类型</p></li></ul></div><p>This will return Object arrays, but now it will not use <code class="literal">ResultSetMetadata</code> but will instead explicitly get the ID, NAME and BIRTHDATE column as respectively a Long, String and a Short from the underlying resultset. This also means that only these three columns will be returned, even though the query is using <code class="literal">*</code> and could return more than the three listed columns.</p><p>对全部或者部分的标量值不设置类型信息也是可以的。</p><pre class="programlisting">sess.createSQLQuery("SELECT * FROM CATS")
+ .addScalar("ID", Hibernate.LONG)
+ .addScalar("NAME")
+ .addScalar("BIRTHDATE")
+</pre><p>This is essentially the same query as before, but now <code class="literal">ResultSetMetaData</code> is used to determine the type of NAME and BIRTHDATE, where as the type of ID is explicitly specified.</p><p>How the java.sql.Types returned from ResultSetMetaData is mapped to Hibernate types is controlled by the Dialect. If a specific type is not mapped, or does not result in the expected type, it is possible to customize it via calls to <code class="literal">registerHibernateType</code> in the Dialect.</p></div><div class="sect2" lang="zh-CN"><div class="titlepage"><div><div><h3 class="title"><a id="d0e13426"/>16.1.2. 实体查询(Entity queries)</h3></div></div></div><p>上面的查询都是返回标量值的，也就是从resultset中返回的“裸”数据。下面展示如何通过<code class="literal">addEntity()</code>让原生查询返回实体对象。</p><pre class="programlisting">sess.createSQLQuery("SELECT * FROM CATS").addEntity(Cat.class);
+sess.createSQLQuery("SELECT ID, NAME, BIRTHDATE FROM CATS").addEntity(Cat.class);
+</pre><p>This query specified:</p><div class="itemizedlist"><ul><li><p>SQL查询字符串</p></li><li><p>要返回的实体</p></li></ul></div><p>假设Cat被映射为拥有ID,NAME和BIRTHDATE三个字段的类，以上的两个查询都返回一个List，每个元素都是一个Cat实体。</p><p>假若实体在映射时有一个<code class="literal">many-to-one</code>的关联指向另外一个实体，在查询时必须也返回那个实体，否则会导致发生一个"column not found"的数据库错误。这些附加的字段可以使用*标注来自动返回，但我们希望还是明确指明，看下面这个具有指向<code class="literal">Dog</code>的<code class="literal">many-to-one</code>的例子：</p><pre class="programlisting">sess.createSQLQuery("SELECT ID, NAME, BIRTHDATE, DOG_ID FROM CATS").addEntity(Cat.class);
+</pre><p>这样cat.getDog()就能正常运作。</p></div><div class="sect2" lang="zh-CN"><div class="titlepage"><div><div><h3 class="title"><a id="d0e13462"/>16.1.3. 处理关联和集合类(Handling associations and collections)</h3></div></div></div><p>通过提前抓取将<code class="literal">Dog</code>连接获得，而避免初始化proxy带来的额外开销也是可能的。这是通过<code class="literal">addJoin()</code>方法进行的，这个方法可以让你将关联或集合连接进来。</p><pre class="programlisting">sess.createSQLQuery("SELECT c.ID, NAME, BIRTHDATE, DOG_ID, D_ID, D_NAME FROM CATS c, DOGS d WHERE c.DOG_ID = d.D_ID")
+ .addEntity("cat", Cat.class)
+ .addJoin("cat.dog");
+</pre><p>In this example, the returned <code class="literal">Cat</code>'s will have their <code class="literal">dog</code> property fully initialized without any extra roundtrip to the database. Notice that you added an alias name ("cat") to be able to specify the target property path of the join. It is possible to do the same eager joining for collections, e.g. if the <code class="literal">Cat</code> had a one-to-many to <code class="literal">Dog</code> instead.</p><pre class="programlisting">sess.createSQLQuery("SELECT ID, NAME, BIRTHDATE, D_ID, D_NAME, CAT_ID FROM CATS c, DOGS d WHERE c.ID = d.CAT_ID")
+ .addEntity("cat", Cat.class)
+ .addJoin("cat.dogs");
+</pre><p>At this stage you are reaching the limits of what is possible with native queries, without starting to enhance the sql queries to make them usable in Hibernate. Problems can arise when returning multiple entities of the same type or when the default alias/column names are not enough. </p></div><div class="sect2" lang="zh-CN"><div class="titlepage"><div><div><h3 class="title"><a id="d0e13493"/>16.1.4. 返回多个实体(Returning multiple entities)</h3></div></div></div><p>Until now, the result set column names are assumed to be the same as the column names specified in the mapping document. This can be problematic for SQL queries that join multiple tables, since the same column names can appear in more than one table.</p><p>下面的查询中需要使用字段别名注射（这个例子本身会失败）：</p><pre class="programlisting">sess.createSQLQuery("SELECT c.*, m.*  FROM CATS c, CATS m WHERE c.MOTHER_ID = c.ID")
+ .addEntity("cat", Cat.class)
+ .addEntity("mother", Cat.class)
+</pre><p>The query was intended to return two Cat instances per row: a cat and its mother. The query will, however, fail because there is a conflict of names; the instances are mapped to the same column names. Also, on some databases the returned column aliases will most likely be on the form "c.ID", "c.NAME", etc. which are not equal to the columns specified in the mappings ("ID" and "NAME"). </p><p>下面的形式可以解决字段名重复：</p><pre class="programlisting">sess.createSQLQuery("SELECT {cat.*}, {mother.*}  FROM CATS c, CATS m WHERE c.MOTHER_ID = c.ID")
+ .addEntity("cat", Cat.class)
+ .addEntity("mother", Cat.class)
+</pre><p>This query specified:</p><div class="itemizedlist"><ul><li><p>SQL查询语句，其中包含占位附来让Hibernate注射字段别名</p></li><li><p>查询返回的实体</p></li></ul></div><p>The {cat.*} and {mother.*} notation used above is a shorthand for "all properties". Alternatively, you can list the columns explicitly, but even in this case Hibernate injects the SQL column aliases for each property. The placeholder for a column alias is just the property name qualified by the table alias. In the following example, you retrieve Cats and their mothers from a different table (cat_log) to the one declared in the mapping metadata. You can even use the property aliases in the where clause.</p><pre class="programlisting">String sql = "SELECT ID as {c.id}, NAME as {c.name}, " + 
+         "BIRTHDATE as {c.birthDate}, MOTHER_ID as {c.mother}, {mother.*} " +
+         "FROM CAT_LOG c, CAT_LOG m WHERE {c.mother} = c.ID";
+
+List loggedCats = sess.createSQLQuery(sql)
+        .addEntity("cat", Cat.class)
+        .addEntity("mother", Cat.class).list()
+</pre><div class="sect3" lang="zh-CN"><div class="titlepage"><div><div><h4 class="title"><a id="querysql-aliasreferences"/>16.1.4.1. 别名和属性引用(Alias and property references)</h4></div></div></div><p>In most cases the above alias injection is needed. For queries relating to more complex mappings, like composite properties, inheritance discriminators, collections etc., you can use specific aliases that allow Hibernate to inject the proper aliases.</p><p>The following table shows the different ways you can use the alias injection. Please note that the alias names in the result are simply examples; each alias will have a unique and probably different name when used.</p><div class="table"><a id="aliasinjection-summary"/><p class="title"><b>表 16.1. 别名注射(alias injection names)</b></p><div class="table-contents"><table summary="别名注射(alias injection names)" border="1"><colgroup><col/><col/><col/></colgroup><thead><tr><th>描述</th><th>语法</th><th>示例</th></tr></thead><tbody><tr><td>简单属性</td><td><code class="literal">{[aliasname].[propertyname]</code></td><td><code class="literal">A_NAME as {item.name}</code></td></tr><tr><td>复合属性</td><td><code class="literal">{[aliasname].[componentname].[propertyname]}</code></td><td><code class="literal">CURRENCY as {item.amount.currency}, VALUE as {item.amount.value}</code></td></tr><tr><td>实体辨别器(Discriminator of an entity)</td><td><code class="literal">{[aliasname].class}</code></td><td><code class="literal">DISC as {item.class}</code></td></tr><tr><td>实体的所有属性</td><td><code class="literal">{[aliasname].*}</code></td><td><code class="literal">{item.*}</code></td></tr><tr><td>集合键(collection key)</td><td><code class="literal">{[aliasname].key}</code></td><td><code class="literal">ORGID as {coll.key}</code></td></tr><tr><td>集合id</td><td><code class="literal">{[aliasname].id}</code></td><td><code class="literal">EMPID as {coll.id}</code></td></tr><tr><td>集合元素</td><td><code class="literal">{[aliasname].element}</code></td><td><code class="literal">XID as {coll.element}</code></td></tr><tr><td>property of the element in the collection</td><td><code class="literal">{[aliasname].element.[propertyname]}</code></td><td><code class="literal">NAME as {coll.element.name}</code></td></tr><tr><td>集合元素的所有属性</td><td><code class="literal">{[aliasname].element.*}</code></td><td><code class="literal">{coll.element.*}</code></td></tr><tr><td>集合的所有属性</td><td><code class="literal">{[aliasname].*}</code></td><td><code class="literal">{coll.*}</code></td></tr></tbody></table></div></div><br class="table-break"/></div></div><div class="sect2" lang="zh-CN"><div class="titlepage"><div><div><h3 class="title"><a id="d0e13634"/>16.1.5. 返回非受管实体(Returning non-managed entities)</h3></div></div></div><p>It is possible to apply a ResultTransformer to native SQL queries, allowing it to return non-managed entities.</p><pre class="programlisting">sess.createSQLQuery("SELECT NAME, BIRTHDATE FROM CATS")
+        .setResultTransformer(Transformers.aliasToBean(CatDTO.class))</pre><p>This query specified:</p><div class="itemizedlist"><ul><li><p>SQL查询字符串</p></li><li><p>结果转换器(result transformer)</p></li></ul></div><p>上面的查询将会返回<code class="literal">CatDTO</code>的列表,它将被实例化并且将NAME和BIRTHDAY的值注射入对应的属性或者字段。 </p></div><div class="sect2" lang="zh-CN"><div class="titlepage"><div><div><h3 class="title"><a id="d0e13655"/>16.1.6. 处理继承（Handling inheritance）</h3></div></div></div><p>Native SQL queries which query for entities that are mapped as part of an inheritance must include all properties for the baseclass and all its subclasses.</p></div><div class="sect2" lang="zh-CN"><div class="titlepage"><div><div><h3 class="title"><a id="d0e13660"/>16.1.7. 参数（Parameters）</h3></div></div></div><p>Native SQL queries support positional as well as named parameters:</p><pre class="programlisting">Query query = sess.createSQLQuery("SELECT * FROM CATS WHERE NAME like ?").addEntity(Cat.class);
+List pusList = query.setString(0, "Pus%").list();
+     
+query = sess.createSQLQuery("SELECT * FROM CATS WHERE NAME like :name").addEntity(Cat.class);
+List pusList = query.setString("name", "Pus%").list();          </pre></div></div><div class="sect1" lang="zh-CN"><div class="titlepage"><div><div><h2 class="title"><a id="querysql-namedqueries"/>16.2. 命名SQL查询</h2></div></div></div><p>Named SQL queries can be defined in the mapping document and called in exactly the same way as a named HQL query. In this case, you do <span class="emphasis"><em>not</em></span> need to call <code class="literal">addEntity()</code>.</p><pre class="programlisting">&lt;sql-query name="persons"&gt;
+    &lt;return alias="person" class="eg.Person"/&gt;
+    SELECT person.NAME AS {person.name},
+           person.AGE AS {person.age},
+           person.SEX AS {person.sex}
+    FROM PERSON person
+    WHERE person.NAME LIKE :namePattern
+&lt;/sql-query&gt;</pre><pre class="programlisting">List people = sess.getNamedQuery("persons")
+    .setString("namePattern", namePattern)
+    .setMaxResults(50)
+    .list();</pre><p>The <code class="literal">&lt;return-join&gt;</code> element is use to join associations and the <code class="literal">&lt;load-collection&gt;</code> element is used to define queries which initialize collections, </p><pre class="programlisting">&lt;sql-query name="personsWith"&gt;
+    &lt;return alias="person" class="eg.Person"/&gt;
+    &lt;return-join alias="address" property="person.mailingAddress"/&gt;
+    SELECT person.NAME AS {person.name},
+           person.AGE AS {person.age},
+           person.SEX AS {person.sex},
+           address.STREET AS {address.street},
+           address.CITY AS {address.city},
+           address.STATE AS {address.state},
+           address.ZIP AS {address.zip}
+    FROM PERSON person
+    JOIN ADDRESS address
+        ON person.ID = address.PERSON_ID AND address.TYPE='MAILING'
+    WHERE person.NAME LIKE :namePattern
+&lt;/sql-query&gt;</pre><p>一个命名查询可能会返回一个标量值.你必须使用<code class="literal">&lt;return-scalar&gt;</code>元素来指定字段的别名和 Hibernate类型</p><pre class="programlisting">&lt;sql-query name="mySqlQuery"&gt;
+    &lt;return-scalar column="name" type="string"/&gt;
+    &lt;return-scalar column="age" type="long"/&gt;
+    SELECT p.NAME AS name,
+           p.AGE AS age,
+    FROM PERSON p WHERE p.NAME LIKE 'Hiber%'
+&lt;/sql-query&gt;</pre><p>You can externalize the resultset mapping information in a <code class="literal">&lt;resultset&gt;</code> element which will allow you to either reuse them across several named queries or through the <code class="literal">setResultSetMapping()</code> API.</p><pre class="programlisting">&lt;resultset name="personAddress"&gt;
+    &lt;return alias="person" class="eg.Person"/&gt;
+    &lt;return-join alias="address" property="person.mailingAddress"/&gt;
+&lt;/resultset&gt;
+
+&lt;sql-query name="personsWith" resultset-ref="personAddress"&gt;
+    SELECT person.NAME AS {person.name},
+           person.AGE AS {person.age},
+           person.SEX AS {person.sex},
+           address.STREET AS {address.street},
+           address.CITY AS {address.city},
+           address.STATE AS {address.state},
+           address.ZIP AS {address.zip}
+    FROM PERSON person
+    JOIN ADDRESS address
+        ON person.ID = address.PERSON_ID AND address.TYPE='MAILING'
+    WHERE person.NAME LIKE :namePattern
+&lt;/sql-query&gt;</pre><p>You can, alternatively, use the resultset mapping information in your hbm files directly in java code.</p><pre class="programlisting">List cats = sess.createSQLQuery(
+        "select {cat.*}, {kitten.*} from cats cat, cats kitten where kitten.mother = cat.id"
+    )
+    .setResultSetMapping("catAndKitten")
+    .list();</pre><div class="sect2" lang="zh-CN"><div class="titlepage"><div><div><h3 class="title"><a id="propertyresults"/>16.2.1. 使用return-property来明确地指定字段/别名</h3></div></div></div><p>You can explicitly tell Hibernate what column aliases to use with <code class="literal">&lt;return-property&gt;</code>, instead of using the <code class="literal">{}</code>-syntax to let Hibernate inject its own aliases.For example:</p><pre class="programlisting">&lt;sql-query name="mySqlQuery"&gt;
+    &lt;return alias="person" class="eg.Person"&gt;
+        &lt;return-property name="name" column="myName"/&gt;
+        &lt;return-property name="age" column="myAge"/&gt;
+        &lt;return-property name="sex" column="mySex"/&gt;
+    &lt;/return&gt;
+    SELECT person.NAME AS myName,
+           person.AGE AS myAge,
+           person.SEX AS mySex,
+    FROM PERSON person WHERE person.NAME LIKE :name
+&lt;/sql-query&gt;
+</pre><p><code class="literal">&lt;return-property&gt;</code> also works with multiple columns. This solves a limitation with the <code class="literal">{}</code>-syntax which cannot allow fine grained control of multi-column properties.</p><pre class="programlisting">&lt;sql-query name="organizationCurrentEmployments"&gt;
+    &lt;return alias="emp" class="Employment"&gt;
+        &lt;return-property name="salary"&gt;
+            &lt;return-column name="VALUE"/&gt;
+            &lt;return-column name="CURRENCY"/&gt;
+        &lt;/return-property&gt;
+        &lt;return-property name="endDate" column="myEndDate"/&gt;
+    &lt;/return&gt;
+        SELECT EMPLOYEE AS {emp.employee}, EMPLOYER AS {emp.employer},
+        STARTDATE AS {emp.startDate}, ENDDATE AS {emp.endDate},
+        REGIONCODE as {emp.regionCode}, EID AS {emp.id}, VALUE, CURRENCY
+        FROM EMPLOYMENT
+        WHERE EMPLOYER = :id AND ENDDATE IS NULL
+        ORDER BY STARTDATE ASC
+&lt;/sql-query&gt;</pre><p>In this example <code class="literal">&lt;return-property&gt;</code> was used in combination with the <code class="literal">{}</code>-syntax for injection. This allows users to choose how they want to refer column and properties.</p><p>如果你映射一个识别器(discriminator),你必须使用<code class="literal">&lt;return-discriminator&gt;</code> 来指定识别器字段</p></div><div class="sect2" lang="zh-CN"><div class="titlepage"><div><div><h3 class="title"><a id="sp_query"/>16.2.2. 使用存储过程来查询</h3></div></div></div><p>Hibernate3 provides support for queries via stored procedures and functions. Most of the following documentation is equivalent for both. The stored procedure/function must return a resultset as the first out-parameter to be able to work with Hibernate. An example of such a stored function in Oracle 9 and higher is as follows:</p><pre class="programlisting">CREATE OR REPLACE FUNCTION selectAllEmployments
+    RETURN SYS_REFCURSOR
+AS
+    st_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN st_cursor FOR
+ SELECT EMPLOYEE, EMPLOYER,
+ STARTDATE, ENDDATE,
+ REGIONCODE, EID, VALUE, CURRENCY
+ FROM EMPLOYMENT;
+      RETURN  st_cursor;
+ END;</pre><p>在Hibernate里要要使用这个查询,你需要通过命名查询来映射它.</p><pre class="programlisting">&lt;sql-query name="selectAllEmployees_SP" callable="true"&gt;
+    &lt;return alias="emp" class="Employment"&gt;
+        &lt;return-property name="employee" column="EMPLOYEE"/&gt;
+        &lt;return-property name="employer" column="EMPLOYER"/&gt;
+        &lt;return-property name="startDate" column="STARTDATE"/&gt;
+        &lt;return-property name="endDate" column="ENDDATE"/&gt;
+        &lt;return-property name="regionCode" column="REGIONCODE"/&gt;
+        &lt;return-property name="id" column="EID"/&gt;
+        &lt;return-property name="salary"&gt;
+            &lt;return-column name="VALUE"/&gt;
+            &lt;return-column name="CURRENCY"/&gt;
+        &lt;/return-property&gt;
+    &lt;/return&gt;
+    { ? = call selectAllEmployments() }
+&lt;/sql-query&gt;</pre><p>Stored procedures currently only return scalars and entities. <code class="literal">&lt;return-join&gt;</code> and <code class="literal">&lt;load-collection&gt;</code> are not supported.</p><div class="sect3" lang="zh-CN"><div class="titlepage"><div><div><h4 class="title"><a id="querysql-limits-storedprocedures"/>16.2.2.1. 使用存储过程的规则和限制</h4></div></div></div><p>You cannot use stored procedures with Hibernate unless you follow some procedure/function rules. If they do not follow those rules they are not usable with Hibernate. If you still want to use these procedures you have to execute them via <code class="literal">session.connection()</code>. The rules are different for each database, since database vendors have different stored procedure semantics/syntax.</p><p>Stored procedure queries cannot be paged with <code class="literal">setFirstResult()/setMaxResults()</code>.</p><p>The recommended call form is standard SQL92: <code class="literal">{ ? = call functionName(&lt;parameters&gt;) }</code> or <code class="literal">{ ? = call procedureName(&lt;parameters&gt;}</code>. Native call syntax is not supported.</p><p>对于Oracle有如下规则:</p><div class="itemizedlist"><ul compact="compact"><li><p>A function must return a result set. The first parameter of a procedure must be an <code class="literal">OUT</code> that returns a result set. This is done by using a <code class="literal">SYS_REFCURSOR</code> type in Oracle 9 or 10. In Oracle you need to define a <code class="literal">REF CURSOR</code> type. See Oracle literature for further information.</p></li></ul></div><p>对于Sybase或者MS SQL server有如下规则:</p><div class="itemizedlist"><ul compact="compact"><li><p>The procedure must return a result set. Note that since these servers can return multiple result sets and update counts, Hibernate will iterate the results and take the first result that is a result set as its return value. Everything else will be discarded.</p></li><li><p>如果你能够在存储过程里设定<code class="literal">SET NOCOUNT ON</code>，这可能会效率更高，但这不是必需的。</p></li></ul></div></div></div></div><div class="sect1" lang="zh-CN"><div class="titlepage"><div><div><h2 class="title"><a id="querysql-cud"/>16.3. 定制SQL用来create，update和delete</h2></div></div></div><p>Hibernate3能够使用定制的SQL语句来执行create,update和delete操作。在Hibernate中，持久化的类和集合已经 包含了一套配置期产生的语句(insertsql, deletesql, updatesql等等)，这些映射标记 <code class="literal">&lt;sql-insert&gt;</code>, <code class="literal">&lt;sql-delete&gt;</code>, and <code class="literal">&lt;sql-update&gt;</code>重载了 这些语句。</p><pre class="programlisting">&lt;class name="Person"&gt;
+    &lt;id name="id"&gt;
+        &lt;generator class="increment"/&gt;
+    &lt;/id&gt;
+    &lt;property name="name" not-null="true"/&gt;
+    &lt;sql-insert&gt;INSERT INTO PERSON (NAME, ID) VALUES ( UPPER(?), ? )&lt;/sql-insert&gt;
+    &lt;sql-update&gt;UPDATE PERSON SET NAME=UPPER(?) WHERE ID=?&lt;/sql-update&gt;
+    &lt;sql-delete&gt;DELETE FROM PERSON WHERE ID=?&lt;/sql-delete&gt;
+&lt;/class&gt;</pre><p>The SQL is directly executed in your database, so you can use any dialect you like. This will reduce the portability of your mapping if you use database specific SQL.</p><p>如果设定<code class="literal">callable</code>，则能够支持存储过程了。</p><pre class="programlisting">&lt;class name="Person"&gt;
+    &lt;id name="id"&gt;
+        &lt;generator class="increment"/&gt;
+    &lt;/id&gt;
+    &lt;property name="name" not-null="true"/&gt;
+    &lt;sql-insert callable="true"&gt;{call createPerson (?, ?)}&lt;/sql-insert&gt;
+    &lt;sql-delete callable="true"&gt;{? = call deletePerson (?)}&lt;/sql-delete&gt;
+    &lt;sql-update callable="true"&gt;{? = call updatePerson (?, ?)}&lt;/sql-update&gt;
+&lt;/class&gt;</pre><p>The order of the positional parameters is vital, as they must be in the same sequence as Hibernate expects them.</p><p>You can view the expected order by enabling debug logging for the <code class="literal">org.hibernate.persister.entity</code> level. With this level enabled, Hibernate will print out the static SQL that is used to create, update, delete etc. entities. To view the expected sequence, do not include your custom SQL in the mapping files, as this will override the Hibernate generated static SQL.</p><p>The stored procedures are in most cases required to return the number of rows inserted, updated and deleted, as Hibernate has some runtime checks for the success of the statement. Hibernate always registers the first statement parameter as a numeric output parameter for the CUD operations:</p><pre class="programlisting">CREATE OR REPLACE FUNCTION updatePerson (uid IN NUMBER, uname IN VARCHAR2)
+    RETURN NUMBER IS
+BEGIN
+
+    update PERSON
+    set
+        NAME = uname,
+    where
+        ID = uid;
+
+    return SQL%ROWCOUNT;
+
+END updatePerson;</pre></div><div class="sect1" lang="zh-CN"><div class="titlepage"><div><div><h2 class="title"><a id="querysql-load"/>16.4. 定制装载SQL</h2></div></div></div><p>You can also declare your own SQL (or HQL) queries for entity loading:</p><pre class="programlisting">&lt;sql-query name="person"&gt;
+    &lt;return alias="pers" class="Person" lock-mode="upgrade"/&gt;
+    SELECT NAME AS {pers.name}, ID AS {pers.id}
+    FROM PERSON
+    WHERE ID=?
+    FOR UPDATE
+&lt;/sql-query&gt;</pre><p>This is just a named query declaration, as discussed earlier. You can reference this named query in a class mapping:</p><pre class="programlisting">&lt;class name="Person"&gt;
+    &lt;id name="id"&gt;
+        &lt;generator class="increment"/&gt;
+    &lt;/id&gt;
+    &lt;property name="name" not-null="true"/&gt;
+    &lt;loader query-ref="person"/&gt;
+&lt;/class&gt;</pre><p>这也可以用于存储过程</p><p>You can even define a query for collection loading:</p><pre class="programlisting">&lt;set name="employments" inverse="true"&gt;
+    &lt;key/&gt;
+    &lt;one-to-many class="Employment"/&gt;
+    &lt;loader query-ref="employments"/&gt;
+&lt;/set&gt;</pre><pre class="programlisting">&lt;sql-query name="employments"&gt;
+    &lt;load-collection alias="emp" role="Person.employments"/&gt;
+    SELECT {emp.*}
+    FROM EMPLOYMENT emp
+    WHERE EMPLOYER = :id
+    ORDER BY STARTDATE ASC, EMPLOYEE ASC
+&lt;/sql-query&gt;</pre><p>You can also define an entity loader that loads a collection by join fetching:</p><pre class="programlisting">&lt;sql-query name="person"&gt;
+    &lt;return alias="pers" class="Person"/&gt;
+    &lt;return-join alias="emp" property="pers.employments"/&gt;
+    SELECT NAME AS {pers.*}, {emp.*}
+    FROM PERSON pers
+    LEFT OUTER JOIN EMPLOYMENT emp
+        ON pers.ID = emp.PERSON_ID
+    WHERE ID=?
+&lt;/sql-query&gt;</pre></div></div><HR xmlns=""/><a xmlns="" href="legalnotice.html"><p xmlns="http://www.w3.org/1999/xhtml" class="copyright">版权 © 2004 Red Hat Middleware, LLC.</p></a><ul class="docnav"><li class="previous"><a accesskey="p" href="querycriteria.html"><strong>上一页</strong>第 15 章 条件查询(Criteria Queries)</a></li><li class="up"><a accesskey="u" href="#"><strong>上一级</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>起始页</strong></a></li><li class="next"><a accesskey="n" href="filters.html"><strong>下一页</strong>第 17 章 过滤数据</a></li></ul></body></html>

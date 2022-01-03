@@ -1,0 +1,75 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>10.12.&nbsp;Utilisation des m&eacute;ta-donn&eacute;es</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="objectstate.html" title="Chapitre&nbsp;10.&nbsp;Travailler avec des objets">
+      <link rel="prev" href="objectstate-transitive.html" title="10.11.&nbsp;Persistance transitive">
+      <link rel="next" href="transactions.html" title="Chapitre&nbsp;11.&nbsp;Transactions et acc&egrave;s concurrents">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">10.12.&nbsp;Utilisation des m&eacute;ta-donn&eacute;es</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="objectstate-transitive.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;10.&nbsp;Travailler avec des objets</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="transactions.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="objectstate-metadata"></a>10.12.&nbsp;Utilisation des m&eacute;ta-donn&eacute;es
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Hibernate requiert un mod&egrave;le de m&eacute;ta-niveau tr&egrave;s riche de toutes les entit&eacute;s et types valu&eacute;s. De temps en temps, ce mod&egrave;le
+            est tr&egrave;s utile &agrave; l'application elle m&ecirc;me. Par exemple, l'application pourrait utiliser les m&eacute;ta-donn&eacute;es d'Hibernate pour impl&eacute;menter
+            un algorithme de copie en profondeur "intelligent" qui comprendrait quels objets devraient copi&eacute;s (par exemple les types de
+            valeur mutables) et lesquels ne devraient pas l'&ecirc;tre (par exemple les types de valeurs immutables et, possiblement, les entit&eacute;s
+            associ&eacute;es). 
+         </p>
+         <p>Hibernate expose les m&eacute;ta-donn&eacute;es via les interfaces <code class="literal">ClassMetadata</code> et <code class="literal">CollectionMetadata</code> et la hi&eacute;rarchie <code class="literal">Type</code>. Les instances des interfaces de m&eacute;ta-donn&eacute;es peuvent &ecirc;tre obtenues &agrave; partir de la <code class="literal">SessionFactory</code>. 
+         </p><pre class="programlisting">Cat fritz = ......;
+ClassMetadata catMeta = sessionfactory.getClassMetadata(Cat.class);
+
+Object[] propertyValues = catMeta.getPropertyValues(fritz);
+String[] propertyNames = catMeta.getPropertyNames();
+Type[] propertyTypes = catMeta.getPropertyTypes();
+
+// get a Map of all properties which are not collections or associations
+Map namedValues = new HashMap();
+for ( int i=0; i&lt;propertyNames.length; i++ ) {
+    if ( !propertyTypes[i].isEntityType() &amp;&amp; !propertyTypes[i].isCollectionType() ) {
+        namedValues.put( propertyNames[i], propertyValues[i] );
+    }
+}</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="objectstate-transitive.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="objectstate.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="transactions.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">10.11.&nbsp;Persistance transitive&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;Chapitre&nbsp;11.&nbsp;Transactions et acc&egrave;s concurrents</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

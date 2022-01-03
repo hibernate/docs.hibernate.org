@@ -1,0 +1,265 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>19.5.&nbsp;Understanding Collection performance</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="performance.html" title="Chapter&nbsp;19.&nbsp;Improving performance">
+      <link rel="prev" href="performance-querycache.html" title="19.4.&nbsp;The Query Cache">
+      <link rel="next" href="performance-monitoring.html" title="19.6.&nbsp;Monitoring performance">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">19.5.&nbsp;Understanding Collection performance</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="performance-querycache.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;19.&nbsp;Improving performance</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="performance-monitoring.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="performance-collections"></a>19.5.&nbsp;Understanding Collection performance
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+            We've already spent quite some time talking about collections.
+                        In this section we will highlight a couple more issues about
+                        how collections behave at runtime.
+                    
+         </p>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="performance-collections-taxonomy"></a>19.5.1.&nbsp;Taxonomy
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>Hibernate defines three basic kinds of collections:</p>
+            <div class="itemizedlist">
+               <ul type="disc">
+                  <li>
+                     <p>collections of values</p>
+                  </li>
+                  <li>
+                     <p>one to many associations</p>
+                  </li>
+                  <li>
+                     <p>many to many associations</p>
+                  </li>
+               </ul>
+            </div>
+            <p>
+                             This classification distinguishes the various table and foreign key
+                               relationships but does not tell us quite everything we need to know
+                               about the relational model. To fully understand the relational structure
+                               and performance characteristics, we must also consider the structure of
+                               the primary key that is used by Hibernate to update or delete collection
+                               rows. This suggests the following classification:
+                           
+            </p>
+            <div class="itemizedlist">
+               <ul type="disc">
+                  <li>
+                     <p>indexed collections</p>
+                  </li>
+                  <li>
+                     <p>sets</p>
+                  </li>
+                  <li>
+                     <p>bags</p>
+                  </li>
+               </ul>
+            </div>
+            <p>
+                               All indexed collections (maps, lists, arrays) have a primary key consisting
+                               of the <code class="literal">&lt;key&gt;</code> and <code class="literal">&lt;index&gt;</code>
+                               columns. In this case collection updates are usually extremely efficient -
+                               the primary key may be efficiently indexed and a particular row may be efficiently
+                               located when Hibernate tries to update or delete it.
+                           
+            </p>
+            <p>
+                               Sets have a primary key consisting of <code class="literal">&lt;key&gt;</code> and element
+                               columns. This may be less efficient for some types of collection element, particularly
+                               composite elements or large text or binary fields; the database may not be able to index
+                               a complex primary key as efficiently.  On the other hand, for one to many or many to many
+                               associations, particularly in the case of synthetic identifiers, it is likely to be just
+                               as efficient. (Side-note: if you want <code class="literal">SchemaExport</code> to actually create
+                               the primary key of a <code class="literal">&lt;set&gt;</code> for you, you must declare all columns
+                               as <code class="literal">not-null="true"</code>.)
+                           
+            </p>
+            <p>
+                               <code class="literal">&lt;idbag&gt;</code> mappings define a surrogate key, so they are
+                               always very efficient to update. In fact, they are the best case.
+                           
+            </p>
+            <p>
+                               Bags are the worst case. Since a bag permits duplicate element values and has no
+                               index column, no primary key may be defined. Hibernate has no way of distinguishing
+                               between duplicate rows. Hibernate resolves this problem by completely removing
+                               (in a single <code class="literal">DELETE</code>) and recreating the collection whenever it
+                               changes. This might be very inefficient.
+                           
+            </p>
+            <p>
+                               Note that for a one-to-many association, the "primary key" may not be the physical
+                               primary key of the database table - but even in this case, the above classification
+                               is still useful. (It still reflects how Hibernate "locates" individual rows of the
+                               collection.)
+                           
+            </p>
+         </div>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="performance-collections-mostefficientupdate"></a>19.5.2.&nbsp;Lists, maps, idbags and sets are the most efficient collections to update
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                               From the discussion above, it should be clear that indexed collections
+                               and (usually) sets allow the most efficient operation in terms of adding,
+                               removing and updating elements.
+                           
+            </p>
+            <p>
+                               There is, arguably, one more advantage that indexed collections have over sets for
+                               many to many associations or collections of values. Because of the structure of a
+                               <code class="literal">Set</code>, Hibernate doesn't ever <code class="literal">UPDATE</code> a row when
+                               an element is "changed". Changes to a <code class="literal">Set</code> always work via
+                               <code class="literal">INSERT</code> and <code class="literal">DELETE</code> (of individual rows). Once
+                               again, this consideration does not apply to one to many associations.
+                           
+            </p>
+            <p>
+                               After observing that arrays cannot be lazy, we would conclude that lists, maps and 
+                               idbags are the most performant (non-inverse) collection types, with sets not far 
+                               behind. Sets are expected to be the most common kind of collection in Hibernate 
+                               applications. This is because the "set" semantics are most natural in the relational
+                               model.
+                           
+            </p>
+            <p>
+                               However, in well-designed Hibernate domain models, we usually see that most collections
+                               are in fact one-to-many associations with <code class="literal">inverse="true"</code>. For these
+                               associations, the update is handled by the many-to-one end of the association, and so
+                               considerations of collection update performance simply do not apply.
+                           
+            </p>
+         </div>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="performance-collections-mostefficentinverse"></a>19.5.3.&nbsp;Bags and lists are the most efficient inverse collections
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                               Just before you ditch bags forever, there is a particular case in which bags (and also lists)
+                               are much more performant than sets. For a collection with <code class="literal">inverse="true"</code>
+                               (the standard bidirectional one-to-many relationship idiom, for example) we can add elements
+                               to a bag or list without needing to initialize (fetch) the bag elements! This is because
+                               <code class="literal">Collection.add()</code> or <code class="literal">Collection.addAll()</code> must always
+                               return true for a bag or <code class="literal">List</code> (unlike a <code class="literal">Set</code>). This can
+                               make the following common code much faster.
+                           
+            </p><pre class="programlisting">Parent p = (Parent) sess.load(Parent.class, id);
+Child c = new Child();
+c.setParent(p);
+p.getChildren().add(c);  //no need to fetch the collection!
+sess.flush();</pre></div>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="performance-collections-oneshotdelete"></a>19.5.4.&nbsp;One shot delete
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                               Occasionally, deleting collection elements one by one can be extremely inefficient. Hibernate
+                               isn't completely stupid, so it knows not to do that in the case of an newly-empty collection
+                               (if you called <code class="literal">list.clear()</code>, for example). In this case, Hibernate will
+                               issue a single <code class="literal">DELETE</code> and we are done!
+                           
+            </p>
+            <p>
+                               Suppose we add a single element to a collection of size twenty and then remove two elements.
+                               Hibernate will issue one <code class="literal">INSERT</code> statement and two <code class="literal">DELETE</code>
+                               statements (unless the collection is a bag). This is certainly desirable.
+                           
+            </p>
+            <p>
+                               However, suppose that we remove eighteen elements, leaving two and then add thee new elements.
+                               There are two possible ways to proceed
+                           
+            </p>
+            <div class="itemizedlist">
+               <ul type="disc">
+                  <li>
+                     <p>delete eighteen rows one by one and then insert three rows</p>
+                  </li>
+                  <li>
+                     <p>remove the whole collection (in one SQL <code class="literal">DELETE</code>) and insert
+                                        all five current elements (one by one)
+                     </p>
+                  </li>
+               </ul>
+            </div>
+            <p>
+                               Hibernate isn't smart enough to know that the second option is probably quicker in this case.
+                               (And it would probably be undesirable for Hibernate to be that smart; such behaviour might
+                               confuse database triggers, etc.)
+                           
+            </p>
+            <p>
+                               Fortunately, you can force this behaviour (ie. the second strategy) at any time by discarding
+                               (ie. dereferencing) the original collection and returning a newly instantiated collection with
+                               all the current elements. This can be very useful and powerful from time to time.
+                           
+            </p>
+            <p>
+                               Of course, one-shot-delete does not apply to collections mapped <code class="literal">inverse="true"</code>.
+                           
+            </p>
+         </div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="performance-querycache.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="performance.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="performance-monitoring.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">19.4.&nbsp;The Query Cache&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;19.6.&nbsp;Monitoring performance</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

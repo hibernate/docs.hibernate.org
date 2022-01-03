@@ -1,0 +1,88 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>18.3.&nbsp;Manipuler des donn&eacute;es XML</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="xml.html" title="Chapitre&nbsp;18.&nbsp;Mapping XML">
+      <link rel="prev" href="xml-mapping.html" title="18.2.&nbsp;M&eacute;tadonn&eacute;es du mapping XML">
+      <link rel="next" href="performance.html" title="Chapitre&nbsp;19.&nbsp;Am&eacute;liorer les performances">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">18.3.&nbsp;Manipuler des donn&eacute;es XML</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="xml-mapping.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;18.&nbsp;Mapping XML</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="performance.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="xml-manipulation"></a>18.3.&nbsp;Manipuler des donn&eacute;es XML
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Relisons et mettons &agrave; jour des documents XML dans l'application. Nous faisons &ccedil;a en obtenant une session dom4j : </p><pre class="programlisting">Document doc = ....;
+       
+Session session = factory.openSession();
+Session dom4jSession = session.getSession(EntityMode.DOM4J);
+Transaction tx = session.beginTransaction();
+
+List results = dom4jSession
+    .createQuery("from Customer c left join fetch c.accounts where c.lastName like :lastName")
+    .list();
+for ( int i=0; i&lt;results.size(); i++ ) {
+    //add the customer data to the XML document
+    Element customer = (Element) results.get(i);
+    doc.add(customer);
+}
+
+tx.commit();
+session.close();</pre><pre class="programlisting">Session session = factory.openSession();
+Session dom4jSession = session.getSession(EntityMode.DOM4J);
+Transaction tx = session.beginTransaction();
+
+Element cust = (Element) dom4jSession.get("Customer", customerId);
+for ( int i=0; i&lt;results.size(); i++ ) {
+    Element customer = (Element) results.get(i);
+    //change the customer name in the XML and database
+    Element name = customer.element("name");
+    name.element("first-name").setText(firstName);
+    name.element("initial").setText(initial);
+    name.element("last-name").setText(lastName);
+}
+
+tx.commit();
+session.close();</pre><p>Il est extr&ecirc;mement utile de combiner cette fonctionnalit&eacute; avec l'op&eacute;ration <code class="literal">replicate()</code> d'Hibernate pour impl&eacute;menter des imports/exports de donn&eacute;es XML. 
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="xml-mapping.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="xml.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="performance.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">18.2.&nbsp;M&eacute;tadonn&eacute;es du mapping XML&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;Chapitre&nbsp;19.&nbsp;Am&eacute;liorer les performances</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

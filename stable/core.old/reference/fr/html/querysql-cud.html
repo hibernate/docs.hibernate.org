@@ -1,0 +1,98 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>16.3.&nbsp;SQL personnalis&eacute; pour cr&eacute;er, mettre &agrave; jour et effacer</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="querysql.html" title="Chapitre&nbsp;16.&nbsp;SQL natif">
+      <link rel="prev" href="querysql-namedqueries.html" title="16.2.&nbsp;Requ&ecirc;tes SQL nomm&eacute;es">
+      <link rel="next" href="querysql-load.html" title="16.4.&nbsp;SQL personnalis&eacute; pour le chargement">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">16.3.&nbsp;SQL personnalis&eacute; pour cr&eacute;er, mettre &agrave; jour et effacer</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="querysql-namedqueries.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;16.&nbsp;SQL natif</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="querysql-load.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="querysql-cud"></a>16.3.&nbsp;SQL personnalis&eacute; pour cr&eacute;er, mettre &agrave; jour et effacer
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Hibernate3 peut utiliser des expression SQL personnalis&eacute;es pour des op&eacute;rations de cr&eacute;ation, de mise &agrave; jour, et de suppression.
+            Les objets persistants les classes et les collections dans Hibernate contiennent d&eacute;j&agrave; un ensemble de cha&icirc;nes de caract&egrave;res
+            g&eacute;n&eacute;r&eacute;es lors de la configuration (insertsql, deletesql, updatesql, etc). Les tages de mapping <code class="literal">&lt;sql-insert&gt;</code>, <code class="literal">&lt;sql-delete&gt;</code>, et <code class="literal">&lt;sql-update&gt;</code> surchargent ces cha&icirc;nes de caract&egrave;res :
+         </p><pre class="programlisting">&lt;class name="Person"&gt;
+    &lt;id name="id"&gt;
+        &lt;generator class="increment"/&gt;
+    &lt;/id&gt;
+    &lt;property name="name" not-null="true"/&gt;
+    &lt;sql-insert&gt;INSERT INTO PERSON (NAME, ID) VALUES ( UPPER(?), ? )&lt;/sql-insert&gt;
+    &lt;sql-update&gt;UPDATE PERSON SET NAME=UPPER(?) WHERE ID=?&lt;/sql-update&gt;
+    &lt;sql-delete&gt;DELETE FROM PERSON WHERE ID=?&lt;/sql-delete&gt;
+&lt;/class&gt;</pre><p>Le SQL est directement ex&eacute;cut&eacute; dans votre base de donn&eacute;es, donc vous &ecirc;tes libre d'utiliser le dialecte que vous souhaitez.
+            Cela r&eacute;duira bien s&ucirc;r la portabilit&eacute; de votre mapping si vous utilisez du SQL sp&eacute;cifique &agrave; votre base de donn&eacute;es.
+         </p>
+         <p>Les proc&eacute;dures stock&eacute;es sont support&eacute;es si l'attribut <code class="literal">callable</code> est param&eacute;tr&eacute; :
+         </p><pre class="programlisting">&lt;class name="Person"&gt;
+    &lt;id name="id"&gt;
+        &lt;generator class="increment"/&gt;
+    &lt;/id&gt;
+    &lt;property name="name" not-null="true"/&gt;
+    &lt;sql-insert callable="true"&gt;{call createPerson (?, ?)}&lt;/sql-insert&gt;
+    &lt;sql-delete callable="true"&gt;{? = call deletePerson (?)}&lt;/sql-delete&gt;
+    &lt;sql-update callable="true"&gt;{? = call updatePerson (?, ?)}&lt;/sql-update&gt;
+&lt;/class&gt;</pre><p>L'ordre des param&egrave;tres positionnels est actuellement vital, car ils doivent &ecirc;tre dans la m&ecirc;me s&eacute;quence qu'Hibernate les attend.</p>
+         <p>Vous pouvez voir l'ordre attendu en activant les journaux de debug pour le niveau <code class="literal">org.hibernate.persister.entity</code> level. Avec ce niveau activ&eacute;, Hibernate imprimera le SQL statique qui est utilis&eacute; pour cr&eacute;er, mettre &agrave; jour, supprimer, etc.
+            des entit&eacute;s. (Pour voir la s&eacute;quence attendue, rappelez-vous de ne pas inclure votre SQL personnalis&eacute; dans les fichiers de
+            mapping de mani&egrave;re &agrave; surcharger le SQL statique g&eacute;n&eacute;r&eacute; par Hibernate.)
+         </p>
+         <p>Les proc&eacute;dures stock&eacute;es sont dans la plupart des cas (lire : il vaut mieux le faire) requises pour retourner le nombre de
+            lignes ins&eacute;r&eacute;es/mises &agrave; jour/supprim&eacute;es, puisque Hibernate fait quelques v&eacute;rifications de succ&egrave;s lors de l'ex&eacute;cution de l'expression.
+            Hibernate inscrit toujours la premi&egrave;re expression comme un param&egrave;tre de sortie num&eacute;rique pour les op&eacute;rations CUD :
+         </p><pre class="programlisting">CREATE OR REPLACE FUNCTION updatePerson (uid IN NUMBER, uname IN VARCHAR2)
+    RETURN NUMBER IS
+BEGIN
+
+    update PERSON
+    set
+        NAME = uname,
+    where
+        ID = uid;
+
+    return SQL%ROWCOUNT;
+
+END updatePerson;</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="querysql-namedqueries.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="querysql.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="querysql-load.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">16.2.&nbsp;Requ&ecirc;tes SQL nomm&eacute;es&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;16.4.&nbsp;SQL personnalis&eacute; pour le chargement</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

@@ -1,0 +1,135 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>4.3.&nbsp;Implementing equals() and hashCode()</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="persistent-classes.html" title="Chapter&nbsp;4.&nbsp;Persistent Classes">
+      <link rel="prev" href="persistent-classes-inheritance.html" title="4.2.&nbsp;Implementing inheritance">
+      <link rel="next" href="persistent-classes-dynamicmodels.html" title="4.4.&nbsp;Dynamic models">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">4.3.&nbsp;Implementing <code class="literal">equals()</code> and <code class="literal">hashCode()</code></th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="persistent-classes-inheritance.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;4.&nbsp;Persistent Classes</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="persistent-classes-dynamicmodels.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="persistent-classes-equalshashcode"></a>4.3.&nbsp;Implementing <code class="literal">equals()</code> and <code class="literal">hashCode()</code></h2>
+               </div>
+            </div>
+         </div>
+         <p>
+                        You have to override the <code class="literal">equals()</code> and <code class="literal">hashCode()</code>
+                        methods if you 
+                    
+         </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p>
+                                         intend to put instances of persistent classes in a <code class="literal">Set</code>
+                                         (the recommended way to represent many-valued associations) 
+                                         <span class="emphasis"><em>and</em></span>
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         intend to use reattachment of detached instances
+                                     
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p>
+                        Hibernate guarantees equivalence of persistent identity (database row) and Java identity
+                        only inside a particular session scope. So as soon as we mix instances retrieved in
+                        different sessions, we must implement <code class="literal">equals()</code> and
+                        <code class="literal">hashCode()</code> if we wish to have meaningful semantics for
+                        <code class="literal">Set</code>s.
+                    
+         </p>
+         <p>
+                        The most obvious way is to implement <code class="literal">equals()</code>/<code class="literal">hashCode()</code>
+                        by comparing the identifier value of both objects. If the value is the same, both must
+                        be the same database row, they are therefore equal (if both are added to a <code class="literal">Set</code>,
+                        we will only have one element in the <code class="literal">Set</code>). Unfortunately, we can't use that
+                        approach with generated identifiers! Hibernate will only assign identifier values to objects 
+                        that are persistent, a newly created instance will not have any identifier value! Furthermore,
+                        if an instance is unsaved and currently in a <code class="literal">Set</code>, saving it will assign
+                        an identifier value to the object. If <code class="literal">equals()</code> and <code class="literal">hashCode()</code>
+                        are based on the identifier value, the hash code would change, breaking the contract of the
+                        <code class="literal">Set</code>. See the Hibernate website for a full discussion of this problem. Note
+                        that this is not a Hibernate issue, but normal Java semantics of object identity and equality.
+                    
+         </p>
+         <p>
+                        We recommend  implementing <code class="literal">equals()</code> and <code class="literal">hashCode()</code>
+                        using <span class="emphasis"><em>Business key equality</em></span>. Business key equality means that the
+                        <code class="literal">equals()</code> method compares only the properties that form the business
+                        key, a key that would identify our instance in the real world (a
+                        <span class="emphasis"><em>natural</em></span> candidate key):
+                    
+         </p><pre class="programlisting">public class Cat {
+
+    ...
+    public boolean equals(Object other) {
+        if (this == other) return true;
+        if ( !(other instanceof Cat) ) return false;
+
+        final Cat cat = (Cat) other;
+
+        if ( !cat.getLitterId().equals( getLitterId() ) ) return false;
+        if ( !cat.getMother().equals( getMother() ) ) return false;
+
+        return true;
+    }
+
+    public int hashCode() {
+        int result;
+        result = getMother().hashCode();
+        result = 29 * result + getLitterId();
+        return result;
+    }
+
+}</pre><p>
+                        Note that a business key does not have to be as solid as a database
+                        primary key candidate (see <a href="transactions.html#transactions-basics-identity" title="11.1.3.&nbsp;Considering object identity">Section&nbsp;11.1.3, &#8220;Considering object identity&#8221;</a>).
+                        Immutable or unique properties are usually good
+                        candidates for a business key.
+                    
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="persistent-classes-inheritance.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="persistent-classes.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="persistent-classes-dynamicmodels.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">4.2.&nbsp;Implementing inheritance&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;4.4.&nbsp;Dynamic models</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

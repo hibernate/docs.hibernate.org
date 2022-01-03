@@ -1,0 +1,133 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>Chapter&nbsp;10.&nbsp;Working with objects</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="prev" href="inheritance-limitations.html" title="9.2.&nbsp;Limitations">
+      <link rel="next" href="objectstate-makingpersistent.html" title="10.2.&nbsp;Making objects persistent">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">Chapter&nbsp;10.&nbsp;Working with objects</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="inheritance-limitations.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">&nbsp;</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="objectstate-makingpersistent.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="chapter" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title"><a name="objectstate"></a>Chapter&nbsp;10.&nbsp;Working with objects
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+            Hibernate is a full object/relational mapping solution that not only shields
+                  the developer from the details of the underlying database management
+                    system, but also offers <span class="emphasis"><em>state management</em></span> of objects. This is,
+                    contrary to the management of SQL <code class="literal">statements</code> in common JDBC/SQL
+                    persistence layers, a very natural object-oriented view of persistence in Java
+                    applications.
+                
+         </p>
+         <p>
+                    In other words, Hibernate application developers should always think about the
+                    <span class="emphasis"><em>state</em></span> of their objects, and not necessarily about the
+                    execution of SQL statements. This part is taken care of by Hibernate and is only
+                    relevant for the application developer when tuning the performance of the system.
+                
+         </p>
+         <div class="sect1" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="objectstate-overview"></a>10.1.&nbsp;Hibernate object states
+                     </h2>
+                  </div>
+               </div>
+            </div>
+            <p>
+                           Hibernate defines and supports the following object states:
+                       
+            </p>
+            <div class="itemizedlist">
+               <ul type="disc">
+                  <li>
+                     <p>
+                                            <span class="emphasis"><em>Transient</em></span> - an object is transient if it has just
+                                            been instantiated using the <code class="literal">new</code> operator, and it
+                                            is not associated with a Hibernate <code class="literal">Session</code>. It has no
+                                            persistent representation in the database and no identifier value has been
+                                            assigned. Transient instances will be destroyed by the garbage collector if
+                                            the application doesn't hold a reference anymore. Use the Hibernate
+                                            <code class="literal">Session</code> to make an object persistent (and let Hibernate
+                                            take care of the SQL statements that need to be executed for this transition).
+                                        
+                     </p>
+                  </li>
+                  <li>
+                     <p>
+                                            <span class="emphasis"><em>Persistent</em></span> - a persistent instance has a representation
+                                            in the database and an identifier value. It might just have been saved or loaded,
+                                            however, it is by definition in the scope of a <code class="literal">Session</code>.
+                                            Hibernate will detect any changes made to an object in persistent state and
+                                            synchronize the state with the database when the unit of work completes.
+                                            Developers don't execute manual <code class="literal">UPDATE</code> statements, or
+                                            <code class="literal">DELETE</code> statements when an object should be made transient.
+                                        
+                     </p>
+                  </li>
+                  <li>
+                     <p>
+                                            <span class="emphasis"><em>Detached</em></span> - a detached instance is an object that has been
+                                            persistent, but its <code class="literal">Session</code> has been closed. The reference
+                                            to the object is still valid, of course, and the detached instance might even
+                                            be modified in this state. A detached instance can be reattached to a new
+                                            <code class="literal">Session</code> at a later point in time, making it (and all the
+                                            modifications) persistent again. This feature enables a programming model for
+                                            long running units of work that require user think-time. We call them
+                                            <span class="emphasis"><em>application transactions</em></span>, i.e. a unit of work from the
+                                            point of view of the user.
+                                        
+                     </p>
+                  </li>
+               </ul>
+            </div>
+            <p>
+                           We'll now discuss the states and state transitions (and the Hibernate methods that
+                           trigger a transition) in more detail.
+                       
+            </p>
+         </div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="inheritance-limitations.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center">&nbsp;</td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="objectstate-makingpersistent.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">9.2.&nbsp;Limitations&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;10.2.&nbsp;Making objects persistent</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

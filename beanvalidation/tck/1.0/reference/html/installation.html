@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory">Chapter 3. Installation</title><link rel="stylesheet" href="css/hibernate.css" type="text/css"/><meta xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" name="generator" content="DocBook XSL Stylesheets V1.74.0"/><link rel="home" href="index.html" title="Technology Compatibility Kit Reference Guide for JSR-303: Bean Validation"/><link rel="up" href="pt01.html" title="Part I. Getting Acquainted with the TCK"/><link rel="prev" href="appeals-process.html" title="Chapter 2. Appeals Process"/><link rel="next" href="configuration.html" title="Chapter 4. Configuration"/></head><body><p id="title"><a href="http://www.hibernate.org" class="site_href"><strong>Hibernate.org</strong></a><a href="http://hibernate.org/Documentation/DocumentationOverview" class="doc_href"><strong>Community Documentation</strong></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="appeals-process.html"><strong>Prev</strong></a></li><li class="next"><a accesskey="n" href="configuration.html"><strong>Next</strong></a></li></ul><div class="chapter" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="installation"/>Chapter 3. Installation</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="installation.html#d0e308">3.1. Obtaining the Software</a></span></dt><dt><span class="section"><a href="installation.html#tck-environment">3.2. The TCK Environment</a></span></dt></dl></div><p>This chapter explains how to obtain the TCK and supporting software
+  and provides recommendations for how to install/extract it on your
+  system.</p><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="d0e308"/>3.1. Obtaining the Software</h2></div></div></div><p>You can obtain a release of the Bean Validation TCK project via the
+    official <a class="ulink" href="http://beanvalidation.org/1.0/">Bean Validation home
+    page</a>. The Bean Validation TCK is distributed as a ZIP file, which
+    contains the TCK artifacts (the test suite binary and source, the test
+    suite descriptor, the audit source and report), the TCK library
+    dependencies in <code class="code">/lib</code> and documentation in
+    <code class="code">/doc</code>.</p><p>You can also download the current source code from Github - <a class="ulink" href="https://github.com/beanvalidation/beanvalidation-tck">https://github.com/beanvalidation/beanvalidation-tck</a>.</p><p>The TCK project is available in the JBoss Maven 2 repository as
+    org.hibernate.jsr303.tck<code class="code">:</code>org.hibernate.jsr303.tck; the POM
+    defines all dependencies required to run the TCK.</p><p>Executing the TCK requires a Java EE 5 or better runtime environment
+    (i.e., application server), to which the test artifacts are deployed and
+    the individual tests are invoked. The TCK does not depend on any
+    particular Java EE implementation.</p><p>The JSR-303: Bean Validation reference implementation (RI) project
+    is named Hibernate Validator. You can obtain the latest Hibernate
+    Validator release from the <a class="ulink" href="http://www.hibernate.org/subprojects/validator/download">download
+    page</a> on Hibernate website.</p><div xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="note"><h2>Note</h2><p>Hibernate Validator is not required for running the Bean
+      Validation TCK, but it can be used as a reference for familiarizing
+      yourself with the TCK before testing your own Bean Validation
+      implementation.</p></div></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="tck-environment"/>3.2. The TCK Environment</h2></div></div></div><p>The TCK requires the following two Java runtime environments:</p><div class="itemizedlist"><ul><li><p>Java 5 or better</p></li><li><p>Java EE 5 or better (e.g., JBoss AS 5.x or GlassFish V3)</p></li></ul></div><p>You should refer to vendor instructions for how to install the
+    runtime.</p><p>The rest of the TCK software can simply be extracted. It's
+    recommended that you create a folder named jsr303 to hold all of the
+    jsr303-related projects. Then, extract the TCK distribution into a
+    subfolder named tck. You can also check out the full Hibernate Validator
+    source into a subfolder ri. This will allow you to run the TCK against
+    Hibernate Validator.</p><pre class="programlisting">git clone git://github.com/hibernate/hibernate-validator.git ri
+git checkout 4.2.0.Final</pre><p>If you have downloaded the Hibernate Validator distribution, extract
+    it into a sibling folder named hibernate-validator. The resulting folder
+    structure is shown here:</p><pre class="programlisting">jsr303/
+   ri/
+   tck/</pre><p>Each test class is treated as an individual artifact (hence the
+    <code class="literal">@Artifact(artifactType = ArtifactType.JSR303)</code>
+    annotation on the class). All test methods (i.e., methods annotated with
+    <code class="literal">@Test</code>) in the test class are run.</p><div xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="note"><h2>Note</h2><p>Using <code class="literal">ArtifactType.JSR303</code> is an additional
+      artifact type to the standard WAR and EAR types offered by the JBoss
+      Test Harness. It is basically a normal WAR file with a
+      <code class="filename">validation.xml</code> file at the root of the classpath.
+      The <code class="filename">validation.xml</code> file can be specified with the
+      <code class="classname">@ValidationXml </code>annotation. Using
+      <code class="literal">ArtifactType.JSR303</code> together with
+      <code class="classname">@ValidationXml</code> also allows to have test with
+      custom validation.xml files running in standalone mode. This is possible
+      by modifying the classloader in standalone mode as shown in
+      <code class="classname">org.hibernate.jsr303.tck.util.StandaloneContainersImpl</code>.
+      This container implementation is also the default for sandalone
+      mode.</p></div><div xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="tip"><a id="tck-in-jboss-as"/><h2>Running the TCK against the Bean Validation RI (Hibernate
+      Validator) and JBoss AS 7</h2><div class="itemizedlist"><ul><li><p>First, you should download the latest JBoss AS 7 release from
+          the JBoss AS <a class="ulink" href="http://jboss.org/jbossas/downloads">project
+          page</a>.</p></li><li><p>Set the <code class="literal">JBOSS_HOME</code> environment variable to
+          the location of the JBoss AS software.</p></li><li><p>Change to the
+          <code class="filename">ri/hibernate-validator-tck-runner</code>
+          directory.</p></li><li><p>You need to install Maven. You can find documention on how to
+          install Maven 2 in the <a class="ulink" href="http://www.sonatype.com/books/maven-book/reference/installation-sect-maven-install.html">Maven:
+          The Definitive Guide</a> book published by Sonatype. Web Beans
+          bundles a copy of Maven in the <code class="code">lib/maven</code>
+          directory.</p></li><li><p>Next, instruct Maven to run the TCK:</p><pre class="programlisting">mvn test -Dincontainer</pre></li><li><p>TestNG will report, via Maven, the outcome of the run, and
+          report any failures on the console. Details can be found in
+          <code class="code">target/surefire-reports/TestSuite.txt</code>.</p></li></ul></div></div></div></div><HR xmlns=""/><a xmlns="" href=""><p xmlns="http://www.w3.org/1999/xhtml" class="copyright">Copyright © 2009 - 2011 Red Hat, Inc.</p></a><ul class="docnav"><li class="previous"><a accesskey="p" href="appeals-process.html"><strong>Prev</strong>Chapter 2. Appeals Process</a></li><li class="up"><a accesskey="u" href="#"><strong>Top of page</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Front page</strong></a></li><li class="next"><a accesskey="n" href="configuration.html"><strong>Next</strong>Chapter 4. Configuration</a></li></ul></body></html>

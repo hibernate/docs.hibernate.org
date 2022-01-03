@@ -1,0 +1,281 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>Chapitre&nbsp;4.&nbsp;Hibernate Validator</title><link rel="stylesheet" href="../shared/css/html.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.65.1"><link rel="home" href="index.html" title="Hibernate Annotations"><link rel="up" href="index.html" title="Hibernate Annotations"><link rel="previous" href="xml-overriding.html" title="Chapitre&nbsp;3.&nbsp;Surcharger des m&eacute;ta-donn&eacute;es &agrave; travers du XML"><link rel="next" href="lucene.html" title="Chapitre&nbsp;5.&nbsp;Int&eacute;gration de Lucene avec Hibernate"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapitre&nbsp;4.&nbsp;Hibernate Validator</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="xml-overriding.html">Pr&eacute;c&eacute;dent</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="lucene.html">Suivant</a></td></tr></table><hr></div><div class="chapter" lang="fr"><div class="titlepage"><div><div><h2 class="title"><a name="validator"></a>Chapitre&nbsp;4.&nbsp;Hibernate Validator</h2></div></div><div></div></div><p>Les annotations sont une mani&egrave;re tr&egrave;s commode et &eacute;l&eacute;gante pour sp&eacute;cifier
+  des contraintes invariantes sur un mod&egrave;le de donn&eacute;es. Vous pouvez, par
+  exemple, indiquer qu'une propri&eacute;t&eacute; ne devrait pas &ecirc;tre nulle, que le solde
+  d'un compte devrait &ecirc;tre strictement positif, etc. Ces contraintes de mod&egrave;le
+  de donn&eacute;es sont d&eacute;clar&eacute;es dans le bean lui-m&ecirc;me en annotant ses propri&eacute;t&eacute;s.
+  Un validateur peut alors les lire et v&eacute;rifier les violations de contraintes.
+  Le m&eacute;canisme de validation peut &ecirc;tre ex&eacute;cut&eacute; dans diff&eacute;rentes couches de
+  votre application (pr&eacute;sentation, acc&egrave;s aux donn&eacute;es) sans devoir dupliquer
+  ces r&egrave;gles. Hibernate Validator a &eacute;t&eacute; con&ccedil;u dans ce but.</p><p>Hibernate Validator fonctionne sur deux niveaux. D'abord, il est capable
+  de v&eacute;rifier des violations de contraintes sur les instances d'une classe en
+  m&eacute;moire. Ensuite, il peut appliquer les contraintes au m&eacute;ta-mod&egrave;le d'Hibernate
+  et les incorporer au sch&eacute;ma de base de donn&eacute;es g&eacute;n&eacute;r&eacute;.</p><p>Chaque annotation de contrainte est associ&eacute;e &agrave; l'impl&eacute;mentation du
+  validateur responsable de v&eacute;rifier la contrainte sur l'instance de l'entit&eacute;.
+  Un validateur peut aussi (optionnellement) appliquer la contrainte au
+  m&eacute;ta-mod&egrave;le d'Hibernate, permettant &agrave; Hibernate de g&eacute;n&eacute;rer le DDL qui
+  exprime la contrainte. Avec le listener d'&eacute;v&eacute;nements appropri&eacute;, vous pouvez
+  ex&eacute;cuter l'op&eacute;ration de v&eacute;rification lors des insertions et des mises &agrave; jour
+  effectu&eacute;es par Hibernate. Hibernate Validator n'est pas limit&eacute; &agrave; Hibernate.
+  Vous pouvez facilement l'utiliser n'importe o&ugrave; dans votre application.</p><p>Lors de la v&eacute;rification des instances &agrave; l'ex&eacute;cution, Hibernate Validator
+  retourne des informations &agrave; propos des violations de contraintes dans un
+  tableau de <tt class="classname">InvalidValue</tt>s. Parmi d'autres informations,
+  <tt class="classname">InvalidValue</tt> contient un message de description
+  d'erreur qui peut inclure les valeurs des param&egrave;tres associ&eacute;s &agrave; l'annotation
+  (p. ex. la limite de taille), et des cha&icirc;nes de caract&egrave;res qui peuvent &ecirc;tre
+  externalis&eacute;es avec un <tt class="classname">ResourceBundle</tt>.</p><div class="sect1" lang="fr"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="validator-constraints"></a>4.1.&nbsp;Contraintes</h2></div></div><div></div></div><div class="sect2" lang="fr"><div class="titlepage"><div><div><h3 class="title"><a name="d0e3017"></a>4.1.1.&nbsp;Qu'est-ce qu'une contrainte ?</h3></div></div><div></div></div><p>Une contrainte est repr&eacute;sent&eacute;e par une annotation. Une contrainte a
+      g&eacute;n&eacute;ralement des attributs utilis&eacute;s pour param&eacute;trer les limites des
+      contraintes. La contrainte s'applique &agrave; l'&eacute;l&eacute;ment annot&eacute;.</p></div><div class="sect2" lang="fr"><div class="titlepage"><div><div><h3 class="title"><a name="d0e3022"></a>4.1.2.&nbsp;Contraintes int&eacute;gr&eacute;es</h3></div></div><div></div></div><p>Hibernate Validator arrive avec des contraintes int&eacute;gr&eacute;es,
+      lesquelles couvrent la plupart des v&eacute;rifications de donn&eacute;es de base. Comme
+      nous le verrons plus tard, vous n'&ecirc;tes pas limit&eacute; &agrave; celles-ci, vous pouvez
+      &eacute;crire vos propres contraintes en une minute.</p><div class="table"><a name="d0e3027"></a><p class="title"><b>Tableau&nbsp;4.1.&nbsp;Contraintes int&eacute;gr&eacute;es</b></p><table summary="Contraintes int&eacute;gr&eacute;es" border="1"><colgroup><col align="center"><col><col><col></colgroup><thead><tr><th align="center">Annotation</th><th>S'applique &agrave;</th><th>V&eacute;rification &agrave; l'ex&eacute;cution</th><th>Impact sur les m&eacute;ta-donn&eacute;es d'Hibernate</th></tr></thead><tbody><tr><td align="center">@Length(min=, max=)</td><td>propri&eacute;t&eacute; (String)</td><td>v&eacute;rifie si la longueur de la cha&icirc;ne de caract&egrave;res est
+              comprise dans l'intervalle</td><td>la longueur de la colonne sera positionn&eacute;e &agrave; max</td></tr><tr><td align="center">@Max(value=)</td><td>propri&eacute;t&eacute; (nombre ou cha&icirc;ne de caract&egrave;res repr&eacute;sentant un
+              nombre)</td><td>v&eacute;rifie si la valeur est inf&eacute;rieure ou &eacute;gale &agrave; max</td><td>ajoute une contrainte de v&eacute;rification sur la
+              colonne</td></tr><tr><td align="center">@Min(value=)</td><td>propri&eacute;t&eacute; (nombre ou cha&icirc;ne de caract&egrave;res repr&eacute;sentant un
+              nombre)</td><td>v&eacute;rifie si la valeur est sup&eacute;rieure ou &eacute;gale &agrave; max</td><td>ajoute une contrainte de v&eacute;rification sur la
+              colonne</td></tr><tr><td align="center">@NotNull</td><td>propri&eacute;t&eacute;</td><td>v&eacute;rifie si la valeur n'est pas nulle</td><td>les colonnes sont marqu&eacute;es "not null"</td></tr><tr><td align="center">@Past</td><td>propri&eacute;t&eacute; (Date ou Calendar)</td><td>v&eacute;rifie si la date est dans le pass&eacute;</td><td>ajoute une contrainte de v&eacute;rification sur la
+              colonne</td></tr><tr><td align="center">@Future</td><td>propri&eacute;t&eacute; (Date ou Calendar)</td><td>v&eacute;rifie si la date est dans le futur</td><td>aucun</td></tr><tr><td align="center">@Pattern(regex="regexp", flag=)</td><td>propri&eacute;t&eacute; (String)</td><td>v&eacute;rifie si la propri&eacute;t&eacute; correspond &agrave; l'expression
+              rationnelle donn&eacute;e (pour "flag", voir
+              <tt class="classname"> java.util.regex.Pattern</tt>)</td><td>aucun</td></tr><tr><td align="center">@Range(min=, max=)</td><td>propri&eacute;t&eacute; (nombre ou cha&icirc;ne de caract&egrave;res repr&eacute;sentant un
+              nombre)</td><td>v&eacute;rifie si la valeur est comprise entre min et max
+              (inclus)</td><td>ajoute une contrainte de v&eacute;rification sur la
+              colonne</td></tr><tr><td align="center">@Size(min=, max=)</td><td>propri&eacute;t&eacute; (tableau, collection, map)</td><td>v&eacute;rifie si la taille de l'&eacute;l&eacute;ment est comprise entre min et
+              max (inclus)</td><td>aucun</td></tr><tr><td align="center">@AssertFalse</td><td>propri&eacute;t&eacute;</td><td>v&eacute;rifie que la m&eacute;thode est &eacute;valu&eacute;e &agrave; faux (utile pour les
+              contraintes exprim&eacute;es dans le code plut&ocirc;t que dans les
+              annotations)</td><td>aucun</td></tr><tr><td align="center">@AssertTrue</td><td>propri&eacute;t&eacute;</td><td>v&eacute;rifie que la m&eacute;thode est &eacute;valu&eacute;e &agrave; vrai (utile pour les
+              contraintes exprim&eacute;es dans le code plut&ocirc;t que dans les
+              annotations)</td><td>aucun</td></tr><tr><td align="center">@Valid</td><td>propri&eacute;t&eacute; (objet)</td><td>ex&eacute;cute la validation r&eacute;cursivement sur l'objet associ&eacute;.
+              Si l'objet est une Collection ou un tableau, les &eacute;l&eacute;ments sont
+              valid&eacute;s r&eacute;cursivement. Si l'objet est une Map, les &eacute;l&eacute;ments
+              valeur sont valid&eacute;s r&eacute;cursivement.</td><td>aucun</td></tr><tr><td align="center">@Email</td><td>propri&eacute;t&eacute; (String)</td><td>v&eacute;rifie si la cha&icirc;ne de caract&egrave;res est conforme &agrave; la
+              sp&eacute;cification d'une adresse e-mail</td><td>aucun</td></tr></tbody></table></div></div><div class="sect2" lang="fr"><div class="titlepage"><div><div><h3 class="title"><a name="validator-constraints-error"></a>4.1.3.&nbsp;Messages d'erreur</h3></div></div><div></div></div><p>Hibernate Validator arrive avec un ensemble de messages d'erreur par
+      d&eacute;faut traduits dans environ dix langues (si la v&ocirc;tre n'en fait pas
+      partie, veuillez nous envoyer un patch). Vous pouvez surcharger ces
+      messages en cr&eacute;ant un <tt class="filename">ValidatorMessages.properties</tt>
+      (ou <tt class="filename">ValidatorMessages_loc.properties</tt>) et en
+      surchargeant les clefs dont vous avez besoin. Vous pouvez m&ecirc;me ajouter
+      votre propre ensemble de messages suppl&eacute;mentaire lorsque vous &eacute;crivez
+      vos annotations de validation. Si Hibernate Validator ne peut pas trouver
+      une clef &agrave; partir de votre resourceBundle ou de votre ValidatorMessage,
+      il se repliera sur les valeurs int&eacute;gr&eacute;es par d&eacute;faut.</p><p>Alternativement vous pouvez fournir un
+      <tt class="classname">ResourceBundle</tt> pendant la v&eacute;rification par
+      programmation des r&egrave;gles de validation sur un bean, ou si vous voulez un
+      m&eacute;canisme d'interpolation compl&egrave;tement diff&eacute;rent, vous pouvez fournir une
+      impl&eacute;mentation de
+      <tt class="literal">org.hibernate.validator.MessageInterpolator</tt> (lisez la
+      JavaDoc pour plus d'informations).</p></div><div class="sect2" lang="fr"><div class="titlepage"><div><div><h3 class="title"><a name="d0e3182"></a>4.1.4.&nbsp;Ecrire vos propres contraintes</h3></div></div><div></div></div><p>Etendre l'ensemble de contraintes int&eacute;gr&eacute;es est extr&ecirc;ment facile.
+      N'importe quelle contrainte est constitu&eacute;e deux morceaux : le
+      <span class="emphasis"><em>descripteur</em></span> de contrainte (l'annotation) et le
+      <span class="emphasis"><em>validateur</em></span> de contrainte (la classe
+      d'impl&eacute;mentation). Voici un simple descripteur personnalis&eacute; :</p><pre class="programlisting">@ValidatorClass(CapitalizedValidator.class)
+@Target(METHOD)
+@Retention(RUNTIME)
+@Documented
+public @interface Capitalized {
+    CapitalizeType type() default Capitalize.FIRST;
+    String message() default "has incorrect capitalization";
+}</pre><p><tt class="literal">type</tt> est un param&egrave;tre d&eacute;crivant comment la
+      propri&eacute;t&eacute; devrait &ecirc;tre mise en majuscule. Ceci est un param&egrave;tre
+      utilisateur compl&egrave;tement d&eacute;pendant du fonctionnement de
+      l'annotation.</p><p><tt class="literal">message</tt> est la cha&icirc;ne de caract&egrave;res par d&eacute;faut
+      utilis&eacute;e pour d&eacute;crire la violation de contrainte et est obligatoire. Vous
+      pouvez mettre la cha&icirc;ne de caract&egrave;res dans le code ou bien l'externaliser
+      en partie ou compl&egrave;tement avec le m&eacute;canisme ResourceBundle Java. Les
+      valeurs des param&egrave;tres sont inject&eacute;es &agrave; l'int&eacute;rieur du message quand
+      la cha&icirc;ne de caract&egrave;res <tt class="literal">{parameter}</tt> est trouv&eacute;e (dans
+      notre exemple <tt class="literal">Capitalization is not {type}</tt> g&eacute;n&eacute;rerait
+      <tt class="literal">Capitalization is not FIRST</tt>), externaliser toute la
+      cha&icirc;ne dans <tt class="filename">ValidatorMessages.properties</tt> est
+      consid&eacute;r&eacute; comme une bonne pratique. Voir <a href="validator.html#validator-constraints-error">Messages d'erreur</a>.</p><pre class="programlisting">@ValidatorClass(CapitalizedValidator.class)
+@Target(METHOD)
+@Retention(RUNTIME)
+@Documented
+public @interface Capitalized {
+    CapitalizeType type() default Capitalize.FIRST;
+    String message() default "{validator.capitalized}";
+}
+
+...
+#in ValidatorMessages.properties
+validator.capitalized=<tt class="literal">Capitalization is not {type}</tt></pre><p>Comme vous pouvez le voir la notation {} est r&eacute;cursive.</p><p>Pour lier un descripteur &agrave; l'impl&eacute;mentation de son validateur, nous
+      utilisons la m&eacute;ta-annotation <tt class="literal">@ValidatorClass</tt>. Le
+      param&egrave;tre de la classe du validateur doit nommer une classe qui impl&eacute;mente
+      <tt class="literal">Validator&lt;ConstraintAnnotation&gt;</tt>.</p><p>Nous devons maintenant impl&eacute;menter le validateur (ie
+      l'impl&eacute;mentation v&eacute;rifiant la r&egrave;gle). Une impl&eacute;mentation de validation
+      peut v&eacute;rifier la valeur d'une propri&eacute;t&eacute; (en impl&eacute;mentant
+      <tt class="literal">PropertyConstraint</tt>) et/ou peut modifier les
+      m&eacute;ta-donn&eacute;es de mapping d'Hibernate pour exprimer la contrainte au niveau
+      de la base de donn&eacute;es (en impl&eacute;mentant
+      <tt class="literal">PersistentClassConstraint</tt>).</p><pre class="programlisting">public class CapitalizedValidator
+        implements Validator&lt;Capitalized&gt;, PropertyConstraint {
+    private CapitalizeType type;
+
+    // partie du contrat de Validator&lt;Annotation&gt;,
+    // permet d'obtenir et d'utiliser les valeurs de l'annotation
+    public void initialize(Capitalized parameters) {
+        type = parameters.type();
+    }
+
+    // partie du contrat de la contrainte de la propri&eacute;t&eacute;
+    public boolean isValid(Object value) {
+        if (value==null) return true;
+        if ( !(value instanceof String) ) return false;
+        String string = (String) value;
+        if (type == CapitalizeType.ALL) {
+            return string.equals( string.toUpperCase() );
+        }
+        else {
+            String first = string.substring(0,1);
+            return first.equals( first.toUpperCase();
+        }
+    }
+}</pre><p>La m&eacute;thode <tt class="literal">isValid()</tt> devrait retourner false si
+      la contrainte a &eacute;t&eacute; viol&eacute;e. Pour plus d'exemples, r&eacute;f&eacute;rez-vous aux
+      impl&eacute;mentations int&eacute;gr&eacute;es du validateur.</p><p>Nous avons seulement vu la validation au niveau propri&eacute;t&eacute;, mais vous
+      pouvez &eacute;crire une annotation de validation au niveau d'un bean. Plut&ocirc;t
+      que de recevoir l'instance de retour d'une propri&eacute;t&eacute;, le bean lui-m&ecirc;me
+      sera pass&eacute; au validateur. Pour activer la v&eacute;rification de validation,
+      annotez juste le bean lui-m&ecirc;me. Un petit exemple peut &ecirc;tre trouv&eacute; dans la
+      suite de tests unitaires.</p></div><div class="sect2" lang="fr"><div class="titlepage"><div><div><h3 class="title"><a name="d0e3248"></a>4.1.5.&nbsp;Annoter votre mod&egrave;le de donn&eacute;es</h3></div></div><div></div></div><p>Maintenant que vous vous &ecirc;tes familiaris&eacute;s avec les annotations, la
+      syntaxe devrait &ecirc;tre connue.</p><pre class="programlisting">public class Address {
+    private String line1;
+    private String line2;
+    private String zip;
+    private String state;
+    private String country;
+    private long id;
+
+    // une cha&icirc;ne non nulle de 20 caract&egrave;res maximum
+    @Length(max=20)
+    @NotNull
+    public String getCountry() {
+        return country;
+    }
+
+    // une cha&icirc;ne de caract&egrave;res non nulle
+    @NotNull
+    public String getLine1() {
+        return line1;
+    }
+
+    // pas de contrainte
+    public String getLine2() {
+        return line2;
+    }
+
+    // une cha&icirc;ne non nulle de 3 caract&egrave;res maximum
+    @Length(max=3) @NotNull
+    public String getState() {
+        return state;
+    }
+
+    // une cha&icirc;ne non nulle de 5 caract&egrave;res maximum repr&eacute;sentant un nombre
+    // si la cha&icirc;ne de caract&egrave;res est plus longue, le message sera recherch&eacute;
+    // dans le resource bundle avec la clef 'long'
+    @Length(max=5, message="{long}")
+    @Pattern(regex="[0-9]+")
+    @NotNull
+    public String getZip() {
+        return zip;
+    }
+
+    // devrait toujours &ecirc;tre vrai
+    @AssertTrue
+    public boolean isValid() {
+        return true;
+    }
+
+    // un nombre entre 1 et 2000
+    @Id @Min(1)
+    @Range(max=2000)
+    public long getId() {
+        return id;
+    }
+}</pre><p>Bien que l'exemple montre seulement la validation de propri&eacute;t&eacute;s
+      publiques, vous pouvez aussi annoter des champs avec n'importe quelle
+      visibilit&eacute;.</p><pre class="programlisting">@MyBeanConstraint(max=45)
+public class Dog {
+    @AssertTrue private boolean isMale;
+    @NotNull protected String getName() { ... };
+    ...
+}</pre><p>Vous pouvez aussi annoter des inferfaces. Hibernate Validator
+      v&eacute;rifiera toutes les classes parentes et les interfaces h&eacute;rit&eacute;es ou
+      impl&eacute;ment&eacute;es par un bean donn&eacute; pour lire les annotations appropri&eacute;es du
+      validateur.</p><pre class="programlisting">public interface Named {
+    @NotNull String getName();
+    ...
+}
+
+public class Dog implements Named {
+
+    @AssertTrue private boolean isMale;
+
+    public String getName() { ... };
+
+}</pre><p>La propri&eacute;t&eacute; "name" sera v&eacute;rifi&eacute;e pour la nullit&eacute; lorsque le bean
+      Dog sera valid&eacute;.</p></div></div><div class="sect1" lang="fr"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e3265"></a>4.2.&nbsp;Utiliser le framework Validator</h2></div></div><div></div></div><p>Hibernate Validator est destin&eacute; &agrave; &ecirc;tre utilis&eacute; pour impl&eacute;menter une
+    validation de donn&eacute;es &agrave; plusieurs couches, o&ugrave; nous exprimons des contraintes
+    &agrave; un seul endroit (le mod&egrave;le de donn&eacute;es annot&eacute;) et les appliquons aux
+    diff&eacute;rents niveaux de l'application.</p><div class="sect2" lang="fr"><div class="titlepage"><div><div><h3 class="title"><a name="d0e3270"></a>4.2.1.&nbsp;Validation au niveau du sch&eacute;ma de la base de donn&eacute;es</h3></div></div><div></div></div><p>Par d&eacute;faut, Hibernate Annotations traduira les contraintes que vous
+      avez d&eacute;finies sur vos entit&eacute;s en m&eacute;ta-donn&eacute;es de mapping. Par exemple, si
+      une propri&eacute;t&eacute; de votre entit&eacute; est annot&eacute;e avec
+      <tt class="literal">@NotNull</tt>, ses colonnes seront d&eacute;clar&eacute;es comme
+      <tt class="literal">not null</tt> dans le sch&eacute;ma DDL g&eacute;n&eacute;r&eacute; par
+      Hibernate.</p></div><div class="sect2" lang="fr"><div class="titlepage"><div><div><h3 class="title"><a name="d0e3281"></a>4.2.2.&nbsp;La validation bas&eacute;e sur les &eacute;v&eacute;nements Hibernate</h3></div></div><div></div></div><p>Hibernate Validator a deux listeners d'&eacute;v&eacute;nements Hibernate
+      int&eacute;gr&eacute;s. Quand un <tt class="literal">PreInsertEvent</tt> ou un
+      <tt class="literal">PreUpdateEvent</tt> survient, les listeners v&eacute;rifieront
+      toutes les contraintes de l'instance de l'entit&eacute; et l&egrave;veront une exception
+      si une contrainte est viol&eacute;e. Fondamentalement, les objets seront v&eacute;rifi&eacute;s
+      avant les insertions et avant les mises &agrave; jour effectu&eacute;es par Hibernate.
+      C'est le plus commode et la mani&egrave;re la plus simple d'activer le processus
+      de validation. Sur une violation de contrainte, l'&eacute;v&eacute;nement l&egrave;vera une
+      exception d'ex&eacute;cution <tt class="classname">InvalidStateException</tt> (NdT :
+      c'est une RuntimeException) laquelle contient un tableau
+      d'<tt class="literal">InvalidValue</tt>s d&eacute;crivant chaque &eacute;chec.</p><pre class="programlisting">&lt;hibernate-configuration&gt;
+    ...
+    &lt;event type="pre-update"&gt;
+        &lt;listener
+          class="org.hibernate.validator.event.ValidatePreUpdateEventListener"/&gt;
+    &lt;/event&gt;
+    &lt;event type="pre-insert"&gt;
+        &lt;listener
+          class="org.hibernate.validator.event.ValidatePreInsertEventListener"/&gt;
+    &lt;/event&gt;
+&lt;/hibernate-configuration&gt;</pre><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>Lors de l'utilisation d'Hibernate Entity Manager, le framework
+        Validation est activ&eacute; par d&eacute;faut. Si les beans ne sont pas annot&eacute;s avec
+        des annotations de validation, il n'y a pas de co&ucirc;t en terme de
+        performance.</p></div></div><div class="sect2" lang="fr"><div class="titlepage"><div><div><h3 class="title"><a name="d0e3303"></a>4.2.3.&nbsp;La validation au niveau applicatif</h3></div></div><div></div></div><p>Hibernate Validator peut &ecirc;tre utilis&eacute; n'importe o&ugrave; dans le code de
+      votre application.</p><pre class="programlisting">ClassValidator personValidator = new ClassValidator( Person.class );
+ClassValidator addressValidator = new ClassValidator( Address.class, ResourceBundle.getBundle("messages", Locale.ENGLISH) );
+
+InvalidValue[] validationMessages = addressValidator.getInvalidValues(address);</pre><p>Les deux premi&egrave;res lignes pr&eacute;parent Hibernate Validator pour la
+      v&eacute;rification de classes. La premi&egrave;re s'appuie sur les messages d'erreur
+      int&eacute;gr&eacute;s &agrave; Hibernate Validator (voir
+      <a href="validator.html#validator-constraints-error">Messages d'erreur</a>), la seconde utilise un
+      resource bundle pour ses messages. Il est consid&eacute;r&eacute; comme une bonne
+      pratique d'ex&eacute;cuter ces lignes une fois et de cacher les instances de
+      validateur.</p><p>La troisi&egrave;me ligne valide en fait l'instance
+      <tt class="literal">Address</tt> et retourne un tableau
+      d'<tt class="literal">InvalidValue</tt>s. Votre logique applicative sera alors
+      capable de r&eacute;agir aux &eacute;checs.</p><p>Vous pouvez aussi v&eacute;rifier une propri&eacute;t&eacute; particuli&egrave;re plut&ocirc;t que
+      tout le bean. Ceci pourrait &ecirc;tre utile lors d'interactions avec
+      l'utilisateur propri&eacute;t&eacute; par propri&eacute;t&eacute;.</p><pre class="programlisting">ClassValidator addressValidator = new ClassValidator( Address.class, ResourceBundle.getBundle("messages", Locale.ENGLISH) );
+
+// r&eacute;cup&egrave;re seulement les valeurs invalides de la propri&eacute;t&eacute; "city"
+InvalidValue[] validationMessages = addressValidator.getInvalidValues(address, "city");
+
+// r&eacute;cup&egrave;re seulement les valeurs potentielles invalides de la propri&eacute;t&eacute; "city"
+InvalidValue[] validationMessages = addressValidator.getPotentialInvalidValues("city", "Paris")</pre></div><div class="sect2" lang="fr"><div class="titlepage"><div><div><h3 class="title"><a name="d0e3326"></a>4.2.4.&nbsp;Informations de validation</h3></div></div><div></div></div><p>Comme un transporteur d'informations de validation, Hibernate
+      fournit un tableau d'<tt class="classname">InvalidValue</tt>s. Chaque
+      <tt class="literal">InvalidValue</tt> a un groupe de m&eacute;thodes d&eacute;crivant les
+      probl&egrave;mes individuels.</p><p><tt class="methodname">getBeanClass()</tt> r&eacute;cup&egrave;re le type du bean
+      ayant &eacute;chou&eacute;.</p><p><tt class="methodname">getBean()</tt> r&eacute;cup&egrave;re l'instance du bean ayant
+      &eacute;chou&eacute; (s'il y en a, c'est-&agrave;-dire pas lors de l'utilisation de
+      <tt class="methodname">getPotentianInvalidValues()</tt>).</p><p><tt class="methodname">getValue()</tt> r&eacute;cup&egrave;re la valeur ayant
+      &eacute;chou&eacute;e.</p><p><tt class="methodname">getMessage()</tt> r&eacute;cup&egrave;re le message d'erreur
+      internationalis&eacute;.</p><p><tt class="methodname">getRootBean()</tt> r&eacute;cup&egrave;re l'instance du bean
+      racine ayant g&eacute;n&eacute;r&eacute; le probl&egrave;me (utile en conjonction avec
+      <tt class="literal">@Valid</tt>), est nulle si getPotentianInvalidValues() est
+      utilis&eacute;e.</p><p><tt class="literal">getPropertyPath()</tt> r&eacute;cup&egrave;re le chemin (s&eacute;par&eacute; par
+      des points) de la propri&eacute;t&eacute; ayant &eacute;chou&eacute;e &agrave; partir du bean racine.</p></div></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="xml-overriding.html">Pr&eacute;c&eacute;dent</a>&nbsp;</td><td width="20%" align="center"><a accesskey="u" href="index.html">Niveau sup&eacute;rieur</a></td><td width="40%" align="right">&nbsp;<a accesskey="n" href="lucene.html">Suivant</a></td></tr><tr><td width="40%" align="left" valign="top">Chapitre&nbsp;3.&nbsp;Surcharger des m&eacute;ta-donn&eacute;es &agrave; travers du XML&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td><td width="40%" align="right" valign="top">&nbsp;Chapitre&nbsp;5.&nbsp;Int&eacute;gration de Lucene avec Hibernate</td></tr></table></div></body></html>

@@ -1,0 +1,96 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>5.7.&nbsp;Auxiliary Database Objects</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="mapping.html" title="Chapter&nbsp;5.&nbsp;Basic O/R Mapping">
+      <link rel="prev" href="mapping-generated.html" title="5.6.&nbsp;Generated Properties">
+      <link rel="next" href="collections.html" title="Chapter&nbsp;6.&nbsp;Collection Mapping">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">5.7.&nbsp;Auxiliary Database Objects</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="mapping-generated.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;5.&nbsp;Basic O/R Mapping</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="collections.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="mapping-database-object"></a>5.7.&nbsp;Auxiliary Database Objects
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+            Allows CREATE and DROP of arbitrary database objects, in conjunction with
+            Hibernate's schema evolution tools, to provide the ability to fully define
+            a user schema within the Hibernate mapping files.  Although designed specifically
+                 for creating and dropping things like triggers or stored procedures, really any
+                        SQL command that can be run via a <code class="literal">java.sql.Statement.execute()</code>
+                        method is valid here (ALTERs, INSERTS, etc).  There are essentially two modes for
+                        defining auxiliary database objects...
+                    
+         </p>
+         <p>
+                        The first mode is to explicitly list the CREATE and DROP commands out in the mapping
+                        file:
+                    
+         </p><pre class="programlisting">&lt;hibernate-mapping&gt;
+    ...
+    &lt;database-object&gt;
+        &lt;create&gt;CREATE TRIGGER my_trigger ...&lt;/create&gt;
+        &lt;drop&gt;DROP TRIGGER my_trigger&lt;/drop&gt;
+    &lt;/database-object&gt;
+&lt;/hibernate-mapping&gt;</pre><p>
+                        The second mode is to supply a custom class which knows how to construct the
+                        CREATE and DROP commands.  This custom class must implement the
+                        <code class="literal">org.hibernate.mapping.AuxiliaryDatabaseObject</code> interface.
+                    
+         </p><pre class="programlisting">&lt;hibernate-mapping&gt;
+    ...
+    &lt;database-object&gt;
+        &lt;definition class="MyTriggerDefinition"/&gt;
+    &lt;/database-object&gt;
+&lt;/hibernate-mapping&gt;</pre><p>
+                        Additionally, these database objects can be optionally scoped such that they only
+                        apply when certain dialects are used.
+                    
+         </p><pre class="programlisting">&lt;hibernate-mapping&gt;
+    ...
+    &lt;database-object&gt;
+        &lt;definition class="MyTriggerDefinition"/&gt;
+        &lt;dialect-scope name="org.hibernate.dialect.Oracle9Dialect"/&gt;
+        &lt;dialect-scope name="org.hibernate.dialect.OracleDialect"/&gt;
+    &lt;/database-object&gt;
+&lt;/hibernate-mapping&gt;</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="mapping-generated.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="mapping.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="collections.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">5.6.&nbsp;Generated Properties&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;Chapter&nbsp;6.&nbsp;Collection Mapping</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

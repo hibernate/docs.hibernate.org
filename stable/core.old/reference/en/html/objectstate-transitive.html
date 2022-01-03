@@ -1,0 +1,209 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>10.11.&nbsp;Transitive persistence</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="objectstate.html" title="Chapter&nbsp;10.&nbsp;Working with objects">
+      <link rel="prev" href="objectstate-flushing.html" title="10.10.&nbsp;Flushing the Session">
+      <link rel="next" href="objectstate-metadata.html" title="10.12.&nbsp;Using metadata">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">10.11.&nbsp;Transitive persistence</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="objectstate-flushing.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;10.&nbsp;Working with objects</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="objectstate-metadata.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="objectstate-transitive"></a>10.11.&nbsp;Transitive persistence
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+            It is quite cumbersome to save, delete, or reattach individual objects,
+            especially if you deal with a graph of associated objects. A common case is
+                        a parent/child relationship. Consider the following example:
+                    
+         </p>
+         <p>
+            If the children in a parent/child relationship would be value typed (e.g. a collection
+            of addresses or strings), their life cycle would depend on the parent and no
+            further action would be required for convenient "cascading" of state changes.
+            When the parent is saved, the value-typed child objects are saved as
+                        well, when the parent is deleted, the children will be deleted, etc. This
+                        even works for operations such as the removal of a child from the collection;
+                        Hibernate will detect this and, since value-typed objects can't have shared
+                        references, delete the child from the database.
+                    
+         </p>
+         <p>
+                        Now consider the same scenario with parent and child objects being entities,
+                        not value-types (e.g. categories and items, or parent and child cats). Entities
+                        have their own life cycle, support shared references (so removing an entity from
+                        the collection does not mean it can be deleted), and there is by default no
+                        cascading of state from one entity to any other associated entities. Hibernate
+                        does not implement <span class="emphasis"><em>persistence by reachability</em></span> by default.
+                    
+         </p>
+         <p>
+                        For each basic operation of the Hibernate session - including <code class="literal">persist(), merge(),
+                           saveOrUpdate(), delete(), lock(), refresh(), evict(), replicate()</code> - there is a 
+                        corresponding cascade style. Respectively, the cascade styles are named <code class="literal">create, 
+                           merge, save-update, delete, lock, refresh, evict, replicate</code>. If you want an 
+                        operation to be cascaded along an association, you must indicate that in the mapping
+                        document. For example:
+                    
+         </p><pre class="programlisting">&lt;one-to-one name="person" cascade="persist"/&gt;</pre><p>
+                        Cascade styles my be combined:
+                    
+         </p><pre class="programlisting">&lt;one-to-one name="person" cascade="persist,delete,lock"/&gt;</pre><p>
+                        You may even use <code class="literal">cascade="all"</code> to specify that <span class="emphasis"><em>all</em></span>
+                        operations should be cascaded along the association. The default <code class="literal">cascade="none"</code>
+                        specifies that no operations are to be cascaded.
+                    
+         </p>
+         <p>
+                        A special cascade style, <code class="literal">delete-orphan</code>, applies only to one-to-many
+                        associations, and indicates that the <code class="literal">delete()</code> operation should
+                        be applied to any child object that is removed from the association.
+                    
+         </p>
+         <p>
+                        Recommendations:
+                    
+         </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p>
+                                         It doesn't usually make sense to enable cascade on a <code class="literal">&lt;many-to-one&gt;</code>
+                                         or <code class="literal">&lt;many-to-many&gt;</code> association. Cascade is often useful for 
+                                         <code class="literal">&lt;one-to-one&gt;</code> and <code class="literal">&lt;one-to-many&gt;</code>
+                                         associations.
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         If the child object's lifespan is bounded by the lifespan of the parent
+                                         object, make it a <span class="emphasis"><em>life cycle object</em></span> by specifying
+                                         <code class="literal">cascade="all,delete-orphan"</code>.
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         Otherwise, you might not need cascade at all. But if you think that you will often be
+                                         working with the parent and children together in the same transaction, and you want to save 
+                                         yourself some typing, consider using <code class="literal">cascade="persist,merge,save-update"</code>.
+                                     
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p>
+                        Mapping an association (either a single valued association, or a collection) with 
+                        <code class="literal">cascade="all"</code> marks the association as a 
+                        <span class="emphasis"><em>parent/child</em></span> style relationship where save/update/delete of the 
+                        parent results in save/update/delete of the child or children.
+                    
+         </p>
+         <p>
+                        Futhermore, a mere reference to a child from a persistent parent will result in 
+                        save/update of the child. This metaphor is incomplete, however. A child which becomes 
+                        unreferenced by its parent is <span class="emphasis"><em>not</em></span> automatically deleted, except 
+                        in the case of a <code class="literal">&lt;one-to-many&gt;</code> association mapped with
+                        <code class="literal">cascade="delete-orphan"</code>. The precise semantics of cascading 
+                        operations for a parent/child relationship are as follows:
+                    
+         </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p>
+                                         If a parent is passed to <code class="literal">persist()</code>, all children are passed to 
+                                         <code class="literal">persist()</code>
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         If a parent is passed to <code class="literal">merge()</code>, all children are passed to 
+                                         <code class="literal">merge()</code>
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         If a parent is passed to <code class="literal">save()</code>, <code class="literal">update()</code> or 
+                                         <code class="literal">saveOrUpdate()</code>, all children are passed to <code class="literal">saveOrUpdate()</code>
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         If a transient or detached child becomes referenced by a persistent parent, 
+                                         it is passed to <code class="literal">saveOrUpdate()</code>
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         If a parent is deleted, all children are passed to <code class="literal">delete()</code>
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         If a child is dereferenced by a persistent parent, <span class="emphasis"><em>nothing
+                                               special happens</em></span> - the application should explicitly delete 
+                                         the child if necessary - unless <code class="literal">cascade="delete-orphan"</code>, 
+                                         in which case the "orphaned" child is deleted.
+                                     
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p>
+                        Finally, note that cascading of operations can be applied to an object graph at
+                        <span class="emphasis"><em>call time</em></span> or at <span class="emphasis"><em>flush time</em></span>. All operations,
+                        if enabled, are cascaded to associated entities reachable when the operation is
+                        executed. However, <code class="literal">save-upate</code> and <code class="literal">delete-orphan</code>
+                        are transitive for all associated entities reachable during flush of the
+                        <code class="literal">Session</code>.
+                    
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="objectstate-flushing.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="objectstate.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="objectstate-metadata.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">10.10.&nbsp;Flushing the Session&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;10.12.&nbsp;Using metadata</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

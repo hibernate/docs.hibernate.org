@@ -1,0 +1,83 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>13.2.&nbsp;L'interface StatelessSession</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="batch.html" title="Chapitre&nbsp;13.&nbsp;Traitement par paquet">
+      <link rel="prev" href="batch.html" title="Chapitre&nbsp;13.&nbsp;Traitement par paquet">
+      <link rel="next" href="batch-statelesssession.html" title="13.3.&nbsp;Notez que dans le code de l'exemple, les intances de Customer retourn&Atilde;&copy;es par la requ&Atilde;&ordf;te sont imm&Atilde;&copy;diatement d&Atilde;&copy;tach&Atilde;&copy;es. Elles ne sont jamais associ&Atilde;&copy;es &Atilde;&nbsp; un contexte de persistance.">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">13.2.&nbsp;L'interface StatelessSession</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="batch.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;13.&nbsp;Traitement par paquet</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="batch-statelesssession.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="batch-update"></a>13.2.&nbsp;L'interface StatelessSession
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Alternativement, Hibernate fournit une API orient&Atilde;&copy;e commande qui peut &Atilde;&ordf;tre utilis&Atilde;&copy;e avec des flux de donn&Atilde;&copy;es pour et en
+            provenance de la base de donn&Atilde;&copy;es sous la forme d'objets d&Atilde;&copy;tach&Atilde;&copy;s. Une <code class="literal">StatelessSession</code> n'a pas de contexte de persistance associ&Atilde;&copy; et ne fournit pas beaucoup de s&Atilde;&copy;mantique de dur&Atilde;&copy;e de vie de haut niveau. En
+            particulier, une session sans &Atilde;&copy;tat n'impl&Atilde;&copy;mente pas de cache de premier niveau et n'interagit pas non plus avec un cache
+            de seconde niveau ou un cache de requ&Atilde;&ordf;tes. Elle n'impl&Atilde;&copy;mente pas les transactions ou la v&Atilde;&copy;rification sale automatique (NdT
+            : automatic dirty checking). Les op&Atilde;&copy;rations r&Atilde;&copy;alis&Atilde;&copy;es avec une session sans &Atilde;&copy;tat ne sont jamais r&Atilde;&copy;percut&Atilde;&copy;es en cascade
+            sur les instances associ&Atilde;&copy;es. Les collections sont ignor&Atilde;&copy;es par une session sans &Atilde;&copy;tat. Les op&Atilde;&copy;rations ex&Atilde;&copy;cut&Atilde;&copy;es via une
+            session sans &Atilde;&copy;tat outrepasse le mod&Atilde;&uml;le d'&Atilde;&copy;v&Atilde;&copy;nements d'Hibernate et les intercepteurs. Les sessions sans &Atilde;&copy;tat sont vuln&Atilde;&copy;rables
+            aux effets de modification des donn&Atilde;&copy;es, ceci est d&Atilde;&raquo; au manque de cache de premier niveau. Une session sans &Atilde;&copy;tat est une
+            abstraction bas niveau, plus proche de la couche JDBC sous-jacente. 
+         </p><pre class="programlisting">Session session = sessionFactory.openSession();
+Transaction tx = session.beginTransaction();
+   
+ScrollableResults customers = session.getNamedQuery("GetCustomers")
+    .setCacheMode(CacheMode.IGNORE)
+    .scroll(ScrollMode.FORWARD_ONLY);
+int count=0;
+while ( customers.next() ) {
+    Customer customer = (Customer) customers.get(0);
+    customer.updateStuff(...);
+    if ( ++count % 20 == 0 ) {
+        //flush a batch of updates and release memory:
+        session.flush();
+        session.clear();
+    }
+}
+   
+tx.commit();
+session.close();</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="batch.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="batch.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="batch-statelesssession.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">Chapitre&nbsp;13.&nbsp;Traitement par paquet&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;13.3.&nbsp;Notez que dans le code de l'exemple, les intances de <code class="literal">Customer</code> retourn&Atilde;&copy;es par la requ&Atilde;&ordf;te sont imm&Atilde;&copy;diatement d&Atilde;&copy;tach&Atilde;&copy;es. Elles ne sont jamais associ&Atilde;&copy;es &Atilde;&nbsp; un contexte de persistance.
+               </td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

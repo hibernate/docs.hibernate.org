@@ -1,0 +1,220 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>3.3.&nbsp;Connexions JDBC</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="session-configuration.html" title="Chapitre&nbsp;3.&nbsp;Configuration">
+      <link rel="prev" href="configuration-sessionfactory.html" title="3.2.&nbsp;Obtenir une SessionFactory">
+      <link rel="next" href="configuration-optional.html" title="3.4.&nbsp;Propri&eacute;t&eacute;s de configuration optionnelles">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">3.3.&nbsp;Connexions JDBC</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="configuration-sessionfactory.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;3.&nbsp;Configuration</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="configuration-optional.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="configuration-hibernatejdbc"></a>3.3.&nbsp;Connexions JDBC
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Usually, you want to have the <code class="interfacename">org.hibernate.SessionFactory</code> create and pool JDBC connections for you. If you take this approach, opening a <code class="interfacename">org.hibernate.Session</code> is as simple as: 
+         </p><pre class="programlisting">Session session = sessions.openSession(); // open a new Session</pre><p>D&egrave;s que vous ferez quelquechose qui requiert un acc&egrave;s &agrave; la base de donn&eacute;es, une connexion JDBC sera r&eacute;cup&eacute;r&eacute;e dans le pool.
+            
+         </p>
+         <p>For this to work, we need to pass some JDBC connection properties to Hibernate. All Hibernate property names and semantics
+            are defined on the class <code class="classname">org.hibernate.cfg.Environment</code>. We will now describe the most important settings for JDBC connection configuration. 
+         </p>
+         <p>Hibernate will obtain (and pool) connections using <code class="classname">java.sql.DriverManager</code> if you set the following properties: 
+         </p>
+         <div class="table"><a name="d0e1696"></a><p class="title"><b>Tableau&nbsp;3.1.&nbsp;Propri&eacute;t&eacute;s JDBC d'Hibernate</b></p>
+            <div class="table-contents">
+               <table summary="Propri&eacute;t&eacute;s JDBC d'Hibernate" border="1">
+                  <colgroup>
+                     <col>
+                     <col>
+                  </colgroup>
+                  <thead>
+                     <tr>
+                        <th>Property name</th>
+                        <th>Purpose</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     <tr>
+                        <td>
+                                               <span class="property">hibernate.connection.driver_class</span>
+                                           
+                        </td>
+                        <td>
+                                               <span class="emphasis"><em>Classe du driver jdbc</em></span>
+                                           
+                        </td>
+                     </tr>
+                     <tr>
+                        <td>
+                                               <span class="property">hibernate.connection.url</span>
+                                           
+                        </td>
+                        <td>
+                                               <span class="emphasis"><em>URL jdbc</em></span>
+                                           
+                        </td>
+                     </tr>
+                     <tr>
+                        <td>
+                                               <span class="property">hibernate.connection.username</span>
+                                           
+                        </td>
+                        <td>
+                                               <span class="emphasis"><em>utilisateur de la base de donn&eacute;es</em></span>
+                                           
+                        </td>
+                     </tr>
+                     <tr>
+                        <td>
+                                               <span class="property">hibernate.connection.password</span>
+                                           
+                        </td>
+                        <td>
+                                               <span class="emphasis"><em>mot de passe de la base de donn&eacute;es</em></span>
+                                           
+                        </td>
+                     </tr>
+                     <tr>
+                        <td>
+                                               <span class="property">hibernate.connection.pool_size</span>
+                                           
+                        </td>
+                        <td>
+                                               <span class="emphasis"><em>nombre maximum de connexions dans le pool</em></span>
+                                           
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+         </div><br class="table-break"><p>Hibernate's own connection pooling algorithm is however quite rudimentary. It is intended to help you get started and is <span class="emphasis"><em>not intended for use in a production system</em></span> or even for performance testing. You should use a third party pool for best performance and stability. Just replace the <span class="property">hibernate.connection.pool_size</span> property with connection pool specific settings. This will turn off Hibernate's internal pool. For example, you might like
+            to use C3P0. 
+         </p>
+         <p>C3P0 is an open source JDBC connection pool distributed along with Hibernate in the <code class="filename">lib</code> directory. Hibernate will use its <code class="classname">org.hibernate.connection.C3P0ConnectionProvider</code> for connection pooling if you set <span class="property">hibernate.c3p0.*</span> properties. If you'd like to use Proxool refer to the packaged <code class="filename">hibernate.properties</code> and the Hibernate web site for more information. 
+         </p>
+         <p>Here is an example <code class="filename">hibernate.properties</code> file for C3P0: 
+         </p><a name="c3p0-configuration"></a><pre class="programlisting">hibernate.connection.driver_class = org.postgresql.Driver
+hibernate.connection.url = jdbc:postgresql://localhost/mydatabase
+hibernate.connection.username = myuser
+hibernate.connection.password = secret
+hibernate.c3p0.min_size=5
+hibernate.c3p0.max_size=20
+hibernate.c3p0.timeout=1800
+hibernate.c3p0.max_statements=50
+hibernate.dialect = org.hibernate.dialect.PostgreSQLDialect</pre><p>For use inside an application server, you should almost always configure Hibernate to obtain connections from an application
+            server <code class="interfacename">javax.sql.Datasource</code> registered in JNDI. You'll need to set at least one of the following properties: 
+         </p>
+         <div class="table"><a name="d0e1798"></a><p class="title"><b>Tableau&nbsp;3.2.&nbsp;Propri&eacute;t&eacute; d'une Datasource Hibernate</b></p>
+            <div class="table-contents">
+               <table summary="Propri&eacute;t&eacute; d'une Datasource Hibernate" border="1">
+                  <colgroup>
+                     <col>
+                     <col>
+                  </colgroup>
+                  <thead>
+                     <tr>
+                        <th>Property name</th>
+                        <th>Purpose</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     <tr>
+                        <td>
+                                               <span class="property">hibernate.connection.datasource</span>
+                                           
+                        </td>
+                        <td>
+                                               <span class="emphasis"><em>Nom JNDI de la datasource</em></span>
+                                           
+                        </td>
+                     </tr>
+                     <tr>
+                        <td>
+                                               <span class="property">hibernate.jndi.url</span>
+                                           
+                        </td>
+                        <td><span class="emphasis"><em>URL of the JNDI provider</em></span> (optional) 
+                        </td>
+                     </tr>
+                     <tr>
+                        <td>
+                                               <span class="property">hibernate.jndi.class</span>
+                                           
+                        </td>
+                        <td><span class="emphasis"><em>class of the JNDI <code class="literal">InitialContextFactory</code></em></span> (optional) 
+                        </td>
+                     </tr>
+                     <tr>
+                        <td>
+                                               <span class="property">hibernate.connection.username</span>
+                                           
+                        </td>
+                        <td><span class="emphasis"><em>database user</em></span> (optional) 
+                        </td>
+                     </tr>
+                     <tr>
+                        <td>
+                                               <span class="property">hibernate.connection.password</span>
+                                           
+                        </td>
+                        <td><span class="emphasis"><em>database user password</em></span> (optional) 
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+         </div><br class="table-break"><p>Here's an example <code class="filename">hibernate.properties</code> file for an application server provided JNDI datasource: 
+         </p><pre class="programlisting">hibernate.connection.datasource = java:/comp/env/jdbc/test
+hibernate.transaction.factory_class = \
+    org.hibernate.transaction.JTATransactionFactory
+hibernate.transaction.manager_lookup_class = \
+    org.hibernate.transaction.JBossTransactionManagerLookup
+hibernate.dialect = org.hibernate.dialect.PostgreSQLDialect</pre><p>Les connexions JDBC obtenues &agrave; partir d'une datasource JNDI participeront automatiquement aux transactions g&eacute;r&eacute;es par le conteneur
+            du serveur d'applications. 
+         </p>
+         <p>Arbitrary connection properties may be given by prepending "<code class="literal">hibernate.connection</code>" to the connection property name. For example, you may specify a <span class="property">charSet</span> connection property using <span class="property">hibernate.connection.charSet</span>. 
+         </p>
+         <p>You may define your own plugin strategy for obtaining JDBC connections by implementing the interface <code class="interfacename">org.hibernate.connection.ConnectionProvider</code>, and specifying your custom implementation via the <span class="property">hibernate.connection.provider_class</span> property. 
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="configuration-sessionfactory.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="session-configuration.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="configuration-optional.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">3.2.&nbsp;Obtenir une SessionFactory&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;3.4.&nbsp;Propri&eacute;t&eacute;s de configuration optionnelles</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

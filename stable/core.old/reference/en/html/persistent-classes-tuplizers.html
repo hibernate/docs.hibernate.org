@@ -1,0 +1,112 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>4.5.&nbsp;Tuplizers</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="persistent-classes.html" title="Chapter&nbsp;4.&nbsp;Persistent Classes">
+      <link rel="prev" href="persistent-classes-dynamicmodels.html" title="4.4.&nbsp;Dynamic models">
+      <link rel="next" href="persistent-classes-extensions.html" title="4.6.&nbsp;Extentsions">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">4.5.&nbsp;Tuplizers</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="persistent-classes-dynamicmodels.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;4.&nbsp;Persistent Classes</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="persistent-classes-extensions.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="persistent-classes-tuplizers"></a>4.5.&nbsp;Tuplizers
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+                        <code class="literal">org.hibernate.tuple.Tuplizer</code>, and its sub-interfaces, are responsible
+                        for managing a particular representation of a piece of data, given that representation's
+                        <code class="literal">org.hibernate.EntityMode</code>.  If a given piece of data is thought of as
+            a data structure, then a tuplizer is the thing which knows how to create such a data structure
+            and how to extract values from and inject values into such a data structure.  For example,
+                        for the POJO entity mode, the correpsonding tuplizer knows how create the POJO through its
+                        constructor and how to access the POJO properties using the defined property accessors.
+                        There are two high-level types of Tuplizers, represented by the
+                        <code class="literal">org.hibernate.tuple.entity.EntityTuplizer</code> and <code class="literal">org.hibernate.tuple.component.ComponentTuplizer</code>
+                        interfaces.  <code class="literal">EntityTuplizer</code>s are responsible for managing the above mentioned
+                        contracts in regards to entities, while <code class="literal">ComponentTuplizer</code>s do the same for
+                        components.
+                    
+         </p>
+         <p>
+                        Users may also plug in their own tuplizers.  Perhaps you require that a <code class="literal">java.util.Map</code>
+                        implementation other than <code class="literal">java.util.HashMap</code> be used while in the
+                        dynamic-map entity-mode; or perhaps you need to define a different proxy generation strategy
+                        than the one used by default.  Both would be achieved by defining a custom tuplizer
+                        implementation.  Tuplizers definitions are attached to the entity or component mapping they
+                        are meant to manage.  Going back to the example of our customer entity:
+                    
+         </p><pre class="programlisting">&lt;hibernate-mapping&gt;
+    &lt;class entity-name="Customer"&gt;
+        &lt;!--
+            Override the dynamic-map entity-mode
+            tuplizer for the customer entity
+        --&gt;
+        &lt;tuplizer entity-mode="dynamic-map"
+                class="CustomMapTuplizerImpl"/&gt;
+
+        &lt;id name="id" type="long" column="ID"&gt;
+            &lt;generator class="sequence"/&gt;
+        &lt;/id&gt;
+
+        &lt;!-- other properties --&gt;
+        ...
+    &lt;/class&gt;
+&lt;/hibernate-mapping&gt;
+
+
+public class CustomMapTuplizerImpl
+        extends org.hibernate.tuple.entity.DynamicMapEntityTuplizer {
+    // override the buildInstantiator() method to plug in our custom map...
+    protected final Instantiator buildInstantiator(
+            org.hibernate.mapping.PersistentClass mappingInfo) {
+        return new CustomMapInstantiator( mappingInfo );
+    }
+
+    private static final class CustomMapInstantiator
+            extends org.hibernate.tuple.DynamicMapInstantitor {
+        // override the generateMap() method to return our custom map...
+	    protected final Map generateMap() {
+		    return new CustomMap();
+	    }
+    }
+}</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="persistent-classes-dynamicmodels.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="persistent-classes.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="persistent-classes-extensions.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">4.4.&nbsp;Dynamic models&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;4.6.&nbsp;Extentsions</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

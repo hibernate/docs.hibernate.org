@@ -1,0 +1,91 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>10.2.&nbsp;Rendre des objets persistants</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="objectstate.html" title="Chapitre&nbsp;10.&nbsp;Travailler avec des objets">
+      <link rel="prev" href="objectstate.html" title="Chapitre&nbsp;10.&nbsp;Travailler avec des objets">
+      <link rel="next" href="objectstate-loading.html" title="10.3.&nbsp;Chargement d'un objet">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">10.2.&nbsp;Rendre des objets persistants</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="objectstate.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;10.&nbsp;Travailler avec des objets</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="objectstate-loading.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="objectstate-makingpersistent"></a>10.2.&nbsp;Rendre des objets persistants
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Les instances nouvellement instanci&eacute;es d'une classe persistante sont consid&eacute;r&eacute;es <span class="emphasis"><em>&eacute;ph&eacute;m&egrave;res</em></span> par Hibernate. Nous pouvons rendre une instance &eacute;ph&eacute;m&egrave;re <span class="emphasis"><em>persistante</em></span> en l'associant avec une session : 
+         </p><pre class="programlisting">DomesticCat fritz = new DomesticCat();
+fritz.setColor(Color.GINGER);
+fritz.setSex('M');
+fritz.setName("Fritz");
+Long generatedId = (Long) sess.save(fritz);</pre><p>Si <code class="literal">Cat</code> a un identifiant g&eacute;n&eacute;r&eacute;, l'identifiant est g&eacute;n&eacute;r&eacute; et assign&eacute; au <code class="literal">cat</code> lorsque <code class="literal">save()</code> est appel&eacute;e. Si <code class="literal">Cat</code> a un identifiant <code class="literal">assigned</code>, ou une clef compos&eacute;e, l'identifiant devrait &ecirc;tre assign&eacute; &agrave; l'instance de <code class="literal">cat</code> avant d'appeler <code class="literal">save()</code>. Vous pouvez aussi utiliser <code class="literal">persist()</code> &agrave; la place de<code class="literal">save()</code>, avec la s&eacute;mantique d&eacute;finie plus t&ocirc;t dans le brouillon d'EJB3. 
+         </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p><code class="literal">persist()</code> makes a transient instance persistent. However, it doesn't guarantee that the identifier value will be assigned to the persistent
+                     instance immediately, the assignment might happen at flush time. <code class="literal">persist()</code> also guarantees that it will not execute an <code class="literal">INSERT</code> statement if it is called outside of transaction boundaries. This is useful in long-running conversations with an extended
+                     Session/persistence context. 
+                  </p>
+               </li>
+               <li>
+                  <p><code class="literal">save()</code> does guarantee to return an identifier. If an INSERT has to be executed to get the identifier ( e.g. "identity" generator,
+                     not "sequence"), this INSERT happens immediately, no matter if you are inside or outside of a transaction. This is problematic
+                     in a long-running conversation with an extended Session/persistence context. 
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p>Alternativement, vous pouvez assigner l'identifiant en utilisant une version surcharg&eacute;e de <code class="literal">save()</code>. 
+         </p><pre class="programlisting">DomesticCat pk = new DomesticCat();
+pk.setColor(Color.TABBY);
+pk.setSex('F');
+pk.setName("PK");
+pk.setKittens( new HashSet() );
+pk.addKitten(fritz);
+sess.save( pk, new Long(1234) );</pre><p>Si l'objet que vous rendez persistant a des objets associ&eacute;s (par exemple, la collection <code class="literal">kittens</code> dans l'exemple pr&eacute;c&eacute;dent), ces objets peuvent &ecirc;tre rendus persistants dans n'importe quel ordre que vous souhaitez &agrave; moins
+            que vous ayez une contrainte <code class="literal">NOT NULL</code> sur la colonne de la clef &eacute;trang&egrave;re. Il n'y a jamais de risque de violer une contrainte de clef &eacute;trang&egrave;re. Cependant, vous
+            pourriez violer une contrainte <code class="literal">NOT NULL</code> si vous appeliez <code class="literal">save()</code> sur les objets dans le mauvais ordre. 
+         </p>
+         <p>Habituellement, vous ne vous pr&eacute;occupez pas de ce d&eacute;tail, puisque vous utiliserez tr&egrave;s probablement la fonctionnalit&eacute; de <span class="emphasis"><em>persistance transitive</em></span> d'Hibernate pour sauvegarder les objets associ&eacute;s automatiquement. Alors, m&ecirc;me les violations de contrainte <code class="literal">NOT NULL</code> n'ont plus lieu - Hibernate prendra soin de tout. La persistance transitive est trait&eacute;e plus loin dans ce chapitre. 
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="objectstate.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="objectstate.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="objectstate-loading.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">Chapitre&nbsp;10.&nbsp;Travailler avec des objets&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;10.3.&nbsp;Chargement d'un objet</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

@@ -1,0 +1,144 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>14.3.&nbsp;Associations and joins</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="queryhql.html" title="Chapter&nbsp;14.&nbsp;HQL: The Hibernate Query Language">
+      <link rel="prev" href="queryhql-from.html" title="14.2.&nbsp;The from clause">
+      <link rel="next" href="queryhql-joins-forms.html" title="14.4.&nbsp;Forms of join syntax">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">14.3.&nbsp;Associations and joins</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="queryhql-from.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;14.&nbsp;HQL: The Hibernate Query Language</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="queryhql-joins-forms.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="queryhql-joins"></a>14.3.&nbsp;Associations and joins
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+                        We may also assign aliases to associated entities, or even to elements of a
+                        collection of values, using a <code class="literal">join</code>.
+                    
+         </p><pre class="programlisting">from Cat as cat
+    inner join cat.mate as mate
+    left outer join cat.kittens as kitten</pre><pre class="programlisting">from Cat as cat left join cat.mate.kittens as kittens</pre><pre class="programlisting">from Formula form full join form.parameter param</pre><p>
+                        The supported join types are borrowed from ANSI SQL
+                    
+         </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p>
+                                         <code class="literal">inner join</code>
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         <code class="literal">left outer join</code>
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         <code class="literal">right outer join</code>
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         <code class="literal">full join</code> (not usually useful)
+                                     
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p>
+                        The <code class="literal">inner join</code>, <code class="literal">left outer join</code> and
+                        <code class="literal">right outer join</code> constructs may be abbreviated.
+                    
+         </p><pre class="programlisting">from Cat as cat
+    join cat.mate as mate
+    left join cat.kittens as kitten</pre><p>
+                        You may supply extra join conditions using the HQL <code class="literal">with</code>
+                        keyword.
+                    
+         </p><pre class="programlisting">from Cat as cat
+    left join cat.kittens as kitten
+        with kitten.bodyWeight &gt; 10.0</pre><p>
+                        In addition, a "fetch" join allows associations or collections of values to be
+                        initialized along with their parent objects, using a single select. This is particularly
+                        useful in the case of a collection. It effectively overrides the outer join and
+                        lazy declarations of the mapping file for associations and collections. See
+                        <a href="performance.html#performance-fetching" title="19.1.&nbsp;Fetching strategies">Section&nbsp;19.1, &#8220;Fetching strategies&#8221;</a> for more information.
+                    
+         </p><pre class="programlisting">from Cat as cat
+    inner join fetch cat.mate
+    left join fetch cat.kittens</pre><p>
+                        A fetch join does not usually need to assign an alias, because the associated objects
+                        should not be used in the <code class="literal">where</code> clause (or any other clause). Also,
+                        the associated objects are not returned directly in the query results. Instead, they may
+                        be accessed via the parent object. The only reason we might need an alias is if we are
+                        recursively join fetching a further collection:
+                    
+         </p><pre class="programlisting">from Cat as cat
+    inner join fetch cat.mate
+    left join fetch cat.kittens child
+    left join fetch child.kittens</pre><p>
+                        Note that the <code class="literal">fetch</code> construct may not be used in queries called using
+                        <code class="literal">iterate()</code> (though <code class="literal">scroll()</code> can be used). Nor should
+                        <code class="literal">fetch</code> be used together with <code class="literal">setMaxResults()</code> or
+                        <code class="literal">setFirstResult()</code> as these operations are based on the result rows, which
+                        usually contain duplicates for eager collection fetching, hence, the number of rows is not what
+                        you'd expect.
+                        Nor may <code class="literal">fetch</code> be used together with an ad hoc <code class="literal">with</code> condition.
+                        It is possible to create a cartesian product by join fetching more than one collection in a
+                        query, so take care in this case. Join fetching multiple collection roles also sometimes gives
+                        unexpected results for bag mappings, so be careful about how you formulate your queries in this
+                        case. Finally, note that <code class="literal">full join fetch</code> and <code class="literal">right join fetch</code>
+                        are not meaningful.
+                    
+         </p>
+         <p>
+                        If you are using property-level lazy fetching (with bytecode instrumentation), it is
+                        possible to force Hibernate to fetch the lazy properties immediately (in the first
+                        query) using <code class="literal">fetch all properties</code>.
+                    
+         </p><pre class="programlisting">from Document fetch all properties order by name</pre><pre class="programlisting">from Document doc fetch all properties where lower(doc.name) like '%cats%'</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="queryhql-from.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="queryhql.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="queryhql-joins-forms.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">14.2.&nbsp;The from clause&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;14.4.&nbsp;Forms of join syntax</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

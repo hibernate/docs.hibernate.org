@@ -1,0 +1,129 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>10.2.&nbsp;Making objects persistent</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="objectstate.html" title="Chapter&nbsp;10.&nbsp;Working with objects">
+      <link rel="prev" href="objectstate.html" title="Chapter&nbsp;10.&nbsp;Working with objects">
+      <link rel="next" href="objectstate-loading.html" title="10.3.&nbsp;Loading an object">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">10.2.&nbsp;Making objects persistent</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="objectstate.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;10.&nbsp;Working with objects</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="objectstate-loading.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="objectstate-makingpersistent"></a>10.2.&nbsp;Making objects persistent
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+                        Newly instantiated instances of a a persistent class are considered 
+                        <span class="emphasis"><em>transient</em></span> by Hibernate. We can make a transient 
+                        instance <span class="emphasis"><em>persistent</em></span> by associating it with a 
+                        session:
+                    
+         </p><pre class="programlisting">DomesticCat fritz = new DomesticCat();
+fritz.setColor(Color.GINGER);
+fritz.setSex('M');
+fritz.setName("Fritz");
+Long generatedId = (Long) sess.save(fritz);</pre><p>
+                        If <code class="literal">Cat</code> has a generated identifier, the identifier is
+                        generated and assigned to the <code class="literal">cat</code> when <code class="literal">save()</code> 
+                        is called. If <code class="literal">Cat</code> has an <code class="literal">assigned</code>
+                        identifier, or a composite key, the identifier should be assigned to 
+                        the <code class="literal">cat</code> instance before calling <code class="literal">save()</code>.
+                        You may also use <code class="literal">persist()</code> instead of <code class="literal">save()</code>,
+                        with the semantics defined in the EJB3 early draft.
+                    
+         </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p>
+                                         <code class="literal">persist()</code> makes a transient instance persistent. 
+                                         However, it doesn't guarantee that the identifier value will be assigned to 
+                                         the persistent instance immediately, the assignment might happen at flush time. 
+                                         <code class="literal">persist()</code> also guarantees that it will not execute an 
+                                         <code class="literal">INSERT</code> statement if it is called outside of transaction 
+                                         boundaries. This is useful in long-running conversations with an extended 
+                                         Session/persistence context.
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         <code class="literal">save()</code> does guarantee to return an identifier. If an INSERT 
+                                         has to be executed to get the identifier ( e.g. "identity" generator, not 
+                                         "sequence"), this INSERT happens immediately, no matter if you are inside or 
+                                         outside of a transaction. This is problematic in a long-running conversation  
+                                         with an extended Session/persistence context.
+                                     
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p>
+                        Alternatively, you may assign the identifier using an overloaded version
+                        of <code class="literal">save()</code>.
+                    
+         </p><pre class="programlisting">DomesticCat pk = new DomesticCat();
+pk.setColor(Color.TABBY);
+pk.setSex('F');
+pk.setName("PK");
+pk.setKittens( new HashSet() );
+pk.addKitten(fritz);
+sess.save( pk, new Long(1234) );</pre><p>
+                        If the object you make persistent has associated objects (e.g. the
+                        <code class="literal">kittens</code> collection in the previous example),
+                        these objects may be made persistent in any order you like unless you
+                        have a <code class="literal">NOT NULL</code> constraint upon a foreign key column.
+                        There is never a risk of violating foreign key constraints. However, you 
+                        might violate a <code class="literal">NOT NULL</code> constraint if you
+                        <code class="literal">save()</code> the objects in the wrong order.
+                    
+         </p>
+         <p>
+                        Usually you don't bother with this detail, as you'll very likely use Hibernate's
+                        <span class="emphasis"><em>transitive persistence</em></span> feature to save the associated
+                        objects automatically. Then, even <code class="literal">NOT NULL</code>
+                        constraint violations don't occur - Hibernate will take care of everything.
+                        Transitive persistence is discussed later in this chapter.
+                    
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="objectstate.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="objectstate.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="objectstate-loading.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">Chapter&nbsp;10.&nbsp;Working with objects&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;10.3.&nbsp;Loading an object</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

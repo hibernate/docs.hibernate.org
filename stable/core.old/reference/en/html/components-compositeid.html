@@ -1,0 +1,170 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>8.4.&nbsp;Components as composite identifiers</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="components.html" title="Chapter&nbsp;8.&nbsp;Component Mapping">
+      <link rel="prev" href="components-asmapindex.html" title="8.3.&nbsp;Components as Map indices">
+      <link rel="next" href="components-dynamic.html" title="8.5.&nbsp;Dynamic components">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">8.4.&nbsp;Components as composite identifiers</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="components-asmapindex.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;8.&nbsp;Component Mapping</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="components-dynamic.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="components-compositeid"></a>8.4.&nbsp;Components as composite identifiers
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+                        You may use a component as an identifier of an entity class. Your component
+                        class must satisfy certain requirements:
+                    
+         </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p>
+                                         It must implement <code class="literal">java.io.Serializable</code>.
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         It must re-implement <code class="literal">equals()</code> and
+                                         <code class="literal">hashCode()</code>, consistently with the database's 
+                                         notion of composite key equality.
+                                     
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p>
+                        <span class="emphasis"><em>Note: in Hibernate3, the second requirement is not an absolutely hard
+                              requirement of Hibernate. But do it anyway.</em></span>
+                    
+         </p>
+         <p>
+                        You can't use an <code class="literal">IdentifierGenerator</code> to generate composite keys.
+                        Instead the application must assign its own identifiers.
+                    
+         </p>
+         <p>
+                        Use the <code class="literal">&lt;composite-id&gt;</code> tag (with nested 
+                        <code class="literal">&lt;key-property&gt;</code> elements) in place of the usual 
+                        <code class="literal">&lt;id&gt;</code> declaration. For example, the
+                        <code class="literal">OrderLine</code> class has a primary key that depends upon
+                        the (composite) primary key of <code class="literal">Order</code>.
+                    
+         </p><pre class="programlisting">&lt;class name="OrderLine"&gt;
+    
+    &lt;composite-id name="id" class="OrderLineId"&gt;
+        &lt;key-property name="lineId"/&gt;
+        &lt;key-property name="orderId"/&gt;
+        &lt;key-property name="customerId"/&gt;
+    &lt;/composite-id&gt;
+    
+    &lt;property name="name"/&gt;
+    
+    &lt;many-to-one name="order" class="Order"
+            insert="false" update="false"&gt;
+        &lt;column name="orderId"/&gt;
+        &lt;column name="customerId"/&gt;
+    &lt;/many-to-one&gt;
+    ....
+    
+&lt;/class&gt;</pre><p>
+                        Now, any foreign keys referencing the <code class="literal">OrderLine</code> table are also 
+                        composite. You must declare this in your mappings for other classes. An association 
+                        to <code class="literal">OrderLine</code> would be mapped like this:
+                    
+         </p><pre class="programlisting">&lt;many-to-one name="orderLine" class="OrderLine"&gt;
+&lt;!-- the "class" attribute is optional, as usual --&gt;
+    &lt;column name="lineId"/&gt;
+    &lt;column name="orderId"/&gt;
+    &lt;column name="customerId"/&gt;
+&lt;/many-to-one&gt;</pre><p>
+                        (Note that the <code class="literal">&lt;column&gt;</code> tag is an alternative to the 
+                        <code class="literal">column</code> attribute everywhere.) 
+                    
+         </p>
+         <p>
+                        A <code class="literal">many-to-many</code> association to <code class="literal">OrderLine</code> also
+                        uses the composite foreign key:
+                    
+         </p><pre class="programlisting">&lt;set name="undeliveredOrderLines"&gt;
+    &lt;key column name="warehouseId"/&gt;
+    &lt;many-to-many class="OrderLine"&gt;
+        &lt;column name="lineId"/&gt;
+        &lt;column name="orderId"/&gt;
+        &lt;column name="customerId"/&gt;
+    &lt;/many-to-many&gt;
+&lt;/set&gt;</pre><p>
+                        The collection of <code class="literal">OrderLine</code>s in <code class="literal">Order</code> would 
+                        use:
+                    
+         </p><pre class="programlisting">&lt;set name="orderLines" inverse="true"&gt;
+    &lt;key&gt;
+        &lt;column name="orderId"/&gt;
+        &lt;column name="customerId"/&gt;
+    &lt;/key&gt;
+    &lt;one-to-many class="OrderLine"/&gt;
+&lt;/set&gt;</pre><p>
+                        (The <code class="literal">&lt;one-to-many&gt;</code> element, as usual, declares no columns.)
+                    
+         </p>
+         <p>
+                        If <code class="literal">OrderLine</code> itself owns a collection, it also has a composite 
+                        foreign key.
+                    
+         </p><pre class="programlisting">&lt;class name="OrderLine"&gt;
+    ....
+    ....
+    &lt;list name="deliveryAttempts"&gt;
+        &lt;key&gt;   &lt;!-- a collection inherits the composite key type --&gt;
+            &lt;column name="lineId"/&gt;
+            &lt;column name="orderId"/&gt;
+            &lt;column name="customerId"/&gt;
+        &lt;/key&gt;
+        &lt;list-index column="attemptId" base="1"/&gt;
+        &lt;composite-element class="DeliveryAttempt"&gt;
+            ...
+        &lt;/composite-element&gt;
+    &lt;/set&gt;
+&lt;/class&gt;</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="components-asmapindex.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="components.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="components-dynamic.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">8.3.&nbsp;Components as Map indices&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;8.5.&nbsp;Dynamic components</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

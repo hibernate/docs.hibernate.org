@@ -1,0 +1,80 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>13.3.&nbsp;Notez que dans le code de l'exemple, les intances de Customer retourn&Atilde;&copy;es par la requ&Atilde;&ordf;te sont imm&Atilde;&copy;diatement d&Atilde;&copy;tach&Atilde;&copy;es.
+         Elles ne sont jamais associ&Atilde;&copy;es &Atilde;&nbsp; un contexte de persistance.
+      </title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="batch.html" title="Chapitre&nbsp;13.&nbsp;Traitement par paquet">
+      <link rel="prev" href="batch-update.html" title="13.2.&nbsp;L'interface StatelessSession">
+      <link rel="next" href="batch-direct.html" title="13.4.&nbsp;La pseudo-syntaxe pour les expressions UPDATE et DELETE est : ( UPDATE | DELETE ) FROM? EntityName (WHERE where_conditions)?. Certains points sont &Atilde;&nbsp; noter :">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">13.3.&nbsp;Notez que dans le code de l'exemple, les intances de <code class="literal">Customer</code> retourn&Atilde;&copy;es par la requ&Atilde;&ordf;te sont imm&Atilde;&copy;diatement d&Atilde;&copy;tach&Atilde;&copy;es. Elles ne sont jamais associ&Atilde;&copy;es &Atilde;&nbsp; un contexte de persistance.
+               </th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="batch-update.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;13.&nbsp;Traitement par paquet</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="batch-direct.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="batch-statelesssession"></a>13.3.&nbsp;Notez que dans le code de l'exemple, les intances de <code class="literal">Customer</code> retourn&Atilde;&copy;es par la requ&Atilde;&ordf;te sont imm&Atilde;&copy;diatement d&Atilde;&copy;tach&Atilde;&copy;es. Elles ne sont jamais associ&Atilde;&copy;es &Atilde;&nbsp; un contexte de persistance.
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Les op&Atilde;&copy;rations <code class="literal">insert()</code>, <code class="literal">update()</code> et <code class="literal">delete()</code> d&Atilde;&copy;finies par l'interface <code class="literal">StatelessSession</code> sont consid&Atilde;&copy;r&Atilde;&copy;es comme des op&Atilde;&copy;rations d'acc&Atilde;&uml;s direct aux lignes de la base de donn&Atilde;&copy;es, ce qui r&Atilde;&copy;sulte en une ex&Atilde;&copy;cution
+            imm&Atilde;&copy;diate du SQL <code class="literal">INSERT</code>, <code class="literal">UPDATE</code> ou <code class="literal">DELETE</code> respectif. De l&Atilde;&nbsp;, elles ont des s&Atilde;&copy;mantiques tres diff&Atilde;&copy;rentes des op&Atilde;&copy;rations <code class="literal">save()</code>, <code class="literal">saveOrUpdate()</code> et <code class="literal">delete()</code> d&Atilde;&copy;finies par l'interface <code class="literal">Session</code>. 
+         </p><pre class="programlisting">StatelessSession session = sessionFactory.openStatelessSession();
+Transaction tx = session.beginTransaction();
+   
+ScrollableResults customers = session.getNamedQuery("GetCustomers")
+    .scroll(ScrollMode.FORWARD_ONLY);
+while ( customers.next() ) {
+    Customer customer = (Customer) customers.get(0);
+    customer.updateStuff(...);
+    session.update(customer);
+}
+   
+tx.commit();
+session.close();</pre><p>Op&Atilde;&copy;rations de style DML </p>
+         <p>Comme d&Atilde;&copy;j&Atilde;&nbsp; discut&Atilde;&copy; avant, le mapping objet/relationnel automatique et transparent est int&Atilde;&copy;ress&Atilde;&copy; par la gestion de l'&Atilde;&copy;tat
+            de l'objet. Ceci implique que l'&Atilde;&copy;tat de l'objet est disponible en m&Atilde;&copy;moire, d'o&Atilde;&sup1; manipuler (en utilisant des expressions
+            du langage de manipulation de donn&Atilde;&copy;es - <code class="literal">Data Manipulation Language</code> (DML) - SQL) les donn&Atilde;&copy;es directement dans la base n'affectera pas l'&Atilde;&copy;tat en m&Atilde;&copy;moire. Pourtant, Hibernate fournit des m&Atilde;&copy;thodes
+            pour l'ex&Atilde;&copy;cution d'expression DML de style SQL lesquelles sont r&Atilde;&copy;alis&Atilde;&copy;es &Atilde;&nbsp; travers le langage de requ&Atilde;&ordf;te d'Hibernate
+            (<a href="queryhql.html" title="Chapitre&nbsp;14.&nbsp;HQL: Langage de requ&ecirc;tage d'Hibernate">Chapitre&nbsp;14, <i xmlns:xlink="http://www.w3.org/1999/xlink">HQL: Langage de requ&ecirc;tage d'Hibernate</i></a>). 
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="batch-update.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="batch.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="batch-direct.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">13.2.&nbsp;L'interface StatelessSession&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;13.4.&nbsp;La pseudo-syntaxe pour les expressions <code class="literal">UPDATE</code> et <code class="literal">DELETE</code> est : <code class="literal">( UPDATE | DELETE ) FROM? EntityName (WHERE where_conditions)?</code>. Certains points sont &Atilde;&nbsp; noter :
+               </td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

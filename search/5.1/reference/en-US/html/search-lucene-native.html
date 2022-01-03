@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory">Chapter 10. Advanced features</title><!-- HibernateDoc.Meta --><meta name="description" content="Hibernate Search, full text search for your entities - Reference Documentation" /><meta name="keywords" content="hibernate, search, hibernate search, full text, lucene" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://docs.jboss.org/hibernate/stable/search/reference/en-US/html_single/" /><!-- /HibernateDoc.Meta --><link rel="stylesheet" href="css/hibernate.css" type="text/css"/><meta xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" name="generator" content="DocBook XSL Stylesheets V1.72.0"/><link rel="start" href="index.html" title="Hibernate Search"/><link rel="up" href="index.html" title="Hibernate Search"/><link rel="prev" href="spatial.html" title="Chapter 9. Spatial"/><link rel="next" href="_further_reading.html" title="Chapter 11. Further reading"/></head><body><p id="title"><a href="http://www.hibernate.org" class="site_href"><strong>Hibernate.org</strong></a><a href="http://hibernate.org/Documentation/DocumentationOverview" class="doc_href"><strong>Community Documentation</strong></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="spatial.html"><strong>Prev</strong></a></li><li class="next"><a accesskey="n" href="_further_reading.html"><strong>Next</strong></a></li></ul><div class="chapter" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="search-lucene-native"/>Chapter 10. Advanced features</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="search-lucene-native.html#_accessing_the_searchfactory">10.1. Accessing the SearchFactory</a></span></dt><dt><span class="section"><a href="search-lucene-native.html#IndexReaders">10.2. Using an IndexReader</a></span></dt><dt><span class="section"><a href="search-lucene-native.html#_accessing_a_lucene_directory">10.3. Accessing a Lucene Directory</a></span></dt><dt><span class="section"><a href="search-lucene-native.html#advanced-features-sharding">10.4. Sharding indexes</a></span></dt><dd><dl><dt><span class="section"><a href="search-lucene-native.html#_static_sharding">10.4.1. Static sharding</a></span></dt><dt><span class="section"><a href="search-lucene-native.html#advanced-features-dynamic-sharding">10.4.2. Dynamic sharding</a></span></dt></dl></dd><dt><span class="section"><a href="search-lucene-native.html#section-sharing-indexes">10.5. Sharing indexes</a></span></dt><dt><span class="section"><a href="search-lucene-native.html#section-services">10.6. Using external services</a></span></dt><dd><dl><dt><span class="section"><a href="search-lucene-native.html#_using_a_service">10.6.1. Using a Service</a></span></dt><dt><span class="section"><a href="search-lucene-native.html#_implementing_a_service">10.6.2. Implementing a Service</a></span></dt></dl></dd><dt><span class="section"><a href="search-lucene-native.html#_customizing_lucene_s_scoring_formula">10.7. Customizing Lucene’s scoring formula</a></span></dt></dl></div>
+
+<p>In this final chapter we are offering a smörgåsbord of tips and tricks which might become useful as
+you dive deeper and deeper into Hibernate Search.</p>
+<div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="_accessing_the_searchfactory"/>10.1. Accessing the SearchFactory</h2></div></div></div>
+
+<p>The SearchFactory object keeps track of the underlying Lucene resources for Hibernate Search. It is
+a convenient way to access Lucene natively. The <code class="literal">SearchFactory</code> can be accessed from a
+FullTextSession:</p>
+<div class="example"><a id="d4e3847"/><p class="title"><b>Example 10.1. Accessing the SearchFactory</b></p><div class="example-contents">
+
+<pre class="programlisting">FullTextSession fullTextSession = Search.getFullTextSession(regularSession);
+SearchFactory searchFactory = fullTextSession.getSearchFactory();</pre>
+</div></div><br class="example-break"/>
+</div>
+<div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="IndexReaders"/>10.2. Using an IndexReader</h2></div></div></div>
+
+<p>Queries in Lucene are executed on an IndexReader. Hibernate Search caches index readers to maximize
+performance and implements other strategies to retrieve updated IndexReaders in order to minimize IO
+operations. Your code can access these cached resources, but you have to follow some "good citizen"
+rules.</p>
+<div class="example"><a id="d4e3853"/><p class="title"><b>Example 10.2. Accessing an IndexReader</b></p><div class="example-contents">
+
+<pre class="programlisting">IndexReader reader = searchFactory.getIndexReaderAccessor().open(Order.class);
+try {
+   //perform read-only operations on the reader
+}
+finally {
+   searchFactory.getIndexReaderAccessor().close(reader);
+}</pre>
+</div></div><br class="example-break"/>
+<p>In this example the SearchFactory figures out which indexes are needed to query this entity. Using
+the configured ReaderProvider (described in <a href="search-architecture.html#search-architecture-readerstrategy" title="2.3. Reader strategy">Section 2.3, “Reader strategy”</a>) on each index,
+it returns a compound <code class="literal">IndexReader</code> on top of all involved indexes. Because this IndexReader is
+shared amongst several clients, you must adhere to the following rules:</p>
+<div class="itemizedlist"><ul><li>
+Never call <code class="literal">indexReader.close()</code>, but always call <code class="literal">readerProvider.closeReader(reader)</code>, using a
+finally block.
+</li><li>
+Don’t use this <code class="literal">IndexReader</code> for modification operations: it’s a read-only instace, you would
+get an exception.
+</li></ul></div>
+<p>Aside from those rules, you can use the IndexReader freely, especially to do native Lucene queries.
+Using this shared IndexReaders will be more efficient than by opening one directly from - for
+example - the filesystem.</p>
+<p>As an alternative to the method <code class="literal">open(Class…​ types)</code> you can use <code class="literal">open(String…​ indexNames)</code>
+in this case you pass in one or more index names; using this strategy you can also select a subset
+of the indexes for any indexed type if sharding is used.</p>
+<div class="example"><a id="d4e3871"/><p class="title"><b>Example 10.3. Accessing an IndexReader by index names</b></p><div class="example-contents">
+
+<pre class="programlisting">IndexReader reader = searchFactory
+      .getIndexReaderAccessor()
+      .open("Products.1", "Products.3");</pre>
+</div></div><br class="example-break"/>
+</div>
+<div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="_accessing_a_lucene_directory"/>10.3. Accessing a Lucene Directory</h2></div></div></div>
+
+<p>A Directory is the most common abstraction used by Lucene to represent the index storage; Hibernate
+Search doesn’t interact directly with a Lucene Directory but abstracts these interactions via an
+IndexManager: an index does not necessarily need to be implemented by a Directory.</p>
+<p>If you are certain that your index is represented as a Directory and need to access it, you can get
+a reference to the Directory via the IndexManager. You will have to cast the IndexManager instance
+to a DirectoryBasedIndexManager and then use <code class="literal">getDirectoryProvider().getDirectory()</code> to get a
+reference to the underlying Directory. This is not recommended, if you need low level access to the
+index using Lucene APIs we suggest to see <a href="search-lucene-native.html#IndexReaders" title="10.2. Using an IndexReader">Section 10.2, “Using an IndexReader”</a> instead.</p>
+</div>
+<div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="advanced-features-sharding"/>10.4. Sharding indexes</h2></div></div></div>
+
+<p>In some cases it can be useful to split (shard) the data into several Lucene indexes. There are two
+main use use cases:</p>
+<div class="itemizedlist"><ul><li>
+A single index is so big that index update times are slowing the application down. In this case
+static sharding can be used to split the data into a pre-defined number of shards.
+</li><li>
+Data is naturally segmented by customer, region, language or other application parameter and the
+index should be split according to these segments. This is a use case for dynamic sharding.
+</li></ul></div>
+<div xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="tip"><h2>Tip</h2>
+<p>By default sharding is not enabled.</p>
+</div>
+<div class="section" lang="en-US"><div class="titlepage"><div><div><h3 class="title"><a id="_static_sharding"/>10.4.1. Static sharding</h3></div></div></div>
+
+<p>To enable static sharding set the hibernate.search.&lt;indexName&gt;.sharding_strategy.nbr_of_shards
+property as seen in <a href="search-lucene-native.html#example-index-sharding" title="Example 10.4. Enabling index sharding">Example 10.4, “Enabling index sharding”</a>.</p>
+<div class="example"><a id="example-index-sharding"/><p class="title"><b>Example 10.4. Enabling index sharding</b></p><div class="example-contents">
+
+<pre class="screen">hibernate.search.[default|&lt;indexName&gt;].sharding_strategy.nbr_of_shards = 5</pre>
+</div></div><br class="example-break"/>
+<p>The default sharding strategy which gets enabled by setting this property, splits the data according
+to the hash value of the document id (generated by the FieldBridge). This ensures a fairly balanced
+sharding. You can replace the default strategy by implementing a custom IndexShardingStrategy. To
+use your custom strategy you have to set the
+hibernate.search.[default|&lt;indexName&gt;].sharding_strategy property to the fully qualified class
+name of your custom IndexShardingStrategy.</p>
+<div class="example"><a id="example-index-sharding-strategy"/><p class="title"><b>Example 10.5. Registering a custom IndexShardingStrategy</b></p><div class="example-contents">
+
+<pre class="screen">hibernate.search.[default|&lt;indexName&gt;].sharding_strategy = my.custom.RandomShardingStrategy</pre>
+</div></div><br class="example-break"/>
+</div>
+<div class="section" lang="en-US"><div class="titlepage"><div><div><h3 class="title"><a id="advanced-features-dynamic-sharding"/>10.4.2. Dynamic sharding</h3></div></div></div>
+
+<p>Dynamic sharding allows you to manage the shards yourself and even create new shards on the fly. To
+do so you need to implement the interface ShardIdentifierProvider and set the
+hibernate.search.[default|&lt;indexName&gt;].sharding_strategy property to the fully qualified name
+of this class. Note that instead of implementing the interface directly, you should rather derive
+your implementation from org.hibernate.search.store.ShardIdentifierProviderTemplate which provides a
+basic implementation. Let’s look at <a href="search-lucene-native.html#example-custom-shard-identifier-provider" title="Example 10.6. Custom ShardIdentifierProvider">Example 10.6, “Custom ShardIdentifierProvider”</a> for an example.</p>
+<div class="example"><a id="example-custom-shard-identifier-provider"/><p class="title"><b>Example 10.6. Custom ShardIdentifierProvider</b></p><div class="example-contents">
+
+<pre class="programlisting">public static class AnimalShardIdentifierProvider extends ShardIdentifierProviderTemplate {
+
+ @Override
+ public String getShardIdentifier(Class&lt;?&gt; entityType, Serializable id,
+         String idAsString, Document document) {
+    if (entityType.equals(Animal.class)) {
+       String typeValue = document.getField("type").stringValue();
+       addShard(typeValue);
+       return typeValue;
+    }
+    throw new RuntimeException("Animal expected but found " + entityType);
+ }
+
+ @Override
+ protected Set&lt;String&gt; loadInitialShardNames(Properties properties, BuildContext buildContext) {
+    ServiceManager serviceManager = buildContext.getServiceManager();
+    SessionFactory sessionFactory = serviceManager.requestService(
+        HibernateSessionFactoryService.class).getSessionFactory();
+    Session session = sessionFactory.openSession();
+    try {
+       Criteria initialShardsCriteria = session.createCriteria(Animal.class);
+       initialShardsCriteria.setProjection(Projections.distinct(Property.forName("type")));
+       List&lt;String&gt; initialTypes = initialShardsCriteria.list();
+       return new HashSet&lt;String&gt;(initialTypes);
+    }
+    finally {
+       session.close();
+    }
+ }
+}</pre>
+</div></div><br class="example-break"/>
+<p>The are several things happening in <code class="literal">AnimalShardIdentifierProvider</code>. First off its purpose is to
+create one shard per animal type (e.g. mammal, insect, etc.). It does so by inspecting the class
+type and the Lucene document passed to the <code class="literal">getShardIdentifier()</code> method. It extracts the type field
+from the document and uses it as shard name. <code class="literal">getShardIdentifier()</code> is called for every addition to
+the index and a new shard will be created with every new animal type encountered. The base class
+<code class="literal">ShardIdentifierProviderTemplate</code> maintains a set with all known shards to which any identifier must
+be added by calling <code class="literal">addShard()</code>.</p>
+<p>It is important to understand that Hibernate Search cannot know which shards already exist when the
+application starts. When using <code class="literal">ShardIdentifierProviderTemplate</code> as base class of a
+<code class="literal">ShardIdentifierProvider</code> implementation, the initial set of shard identifiers must be returned by the
+<code class="literal">loadInitialShardNames()</code> method. How this is done will depend on the use case. However, a common case
+in combination with Hibernate ORM is that the initial shard set is defined by the the distinct
+values of a given database column. <a href="search-lucene-native.html#example-custom-shard-identifier-provider" title="Example 10.6. Custom ShardIdentifierProvider">Example 10.6, “Custom ShardIdentifierProvider”</a> shows how to handle
+such a case. <code class="literal">AnimalShardIdentifierProvider</code> makes in its <code class="literal">loadInitialShardNames()</code> implementation use
+of a service called <code class="literal">HibernateSessionFactoryService</code> (see also <a href="search-lucene-native.html#section-services" title="10.6. Using external services">Section 10.6, “Using external services”</a>) which is
+available within an ORM environment. It allows to request a Hibernate <code class="literal">SessionFactory</code> instance which
+can be used to run a Criteria query in order to determine the initial set of shard identifiers.</p>
+<p>Last but not least, the <code class="literal">ShardIdentifierProvider</code> also allows for optimizing searches by selecting
+which shard to run a query against. By activating a filter (see <a href="search-query.html#query-filter-shard" title="5.3.1. Using filters in a sharded environment">Section 5.3.1, “Using filters in a sharded environment”</a>), a sharding
+strategy can select a subset of the shards used to answer a query (<code class="literal">getShardIdentifiersForQuery()</code>,
+not shown in the example) and thus speed up the query execution.</p>
+<div xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="important"><h2>Important</h2>
+<p>This ShardIdentifierProvider is considered experimental. We might need to apply some changes to the
+defined method signatures to accommodate for unforeseen use cases. Please provide feedback if you
+have ideas, or just to let us know how you’re using this API.</p>
+</div>
+</div>
+</div>
+<div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="section-sharing-indexes"/>10.5. Sharing indexes</h2></div></div></div>
+
+<p>It is technically possible to store the information of more than one entity into a single Lucene
+index. There are two ways to accomplish this:</p>
+<div class="itemizedlist"><ul><li>
+Configuring the underlying directory providers to point to the same physical index directory.
+In practice, you set the property <code class="literal">hibernate.search.[fully qualified entity name].indexName</code> to the
+same value. As an example, let’s use the same index (directory) for the <code class="literal">Furniture</code> and <code class="literal">Animal</code>
+entities. We just set <code class="literal">indexName</code> for both entities to "Animal". Both entities will then be stored
+in the Animal directory:
+</li></ul></div>
+<div class="informalexample">
+<pre class="screen">hibernate.search.org.hibernate.search.test.shards.Furniture.indexName = Animal
+hibernate.search.org.hibernate.search.test.shards.Animal.indexName = Animal</pre>
+</div>
+<div class="itemizedlist"><ul><li>
+Setting the @Indexed annotation’s index attribute of the entities you want to merge to the
+same value. If we again wanted all Furniture instances to be indexed in the Animal index along with
+all instances of Animal we would specify @Indexed(index="Animal") on both Animal and Furniture classes.
+</li></ul></div>
+<div xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="note"><h2>Note</h2>
+<p>This is only presented here so that you know the option is available. There is really not much
+benefit in sharing indexes.</p>
+</div>
+</div>
+<div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="section-services"/>10.6. Using external services</h2></div></div></div>
+
+<p>A <code class="literal">Service</code> in Hibernate Search is a class implementing the interface
+<code class="literal">org.hibernate.search.engine.service.spi.Service</code> and providing a default no-arg constructor.
+Theoretically that’s all that is needed to request a given service type from the Hibernate Search
+<code class="literal">ServiceManager</code>. In practice you want probably want to add some service life cycle methods
+(implement <code class="literal">Startable</code> and <code class="literal">Stoppable</code>) as well as actual methods providing some functionality.</p>
+<p>Hibernate Search uses the service approach to decouple different components of
+the system. Let’s have a closer look at services and how they are used.</p>
+<div class="section" lang="en-US"><div class="titlepage"><div><div><h3 class="title"><a id="_using_a_service"/>10.6.1. Using a Service</h3></div></div></div>
+
+<p>Many of of the pluggable contracts of Hibernate Search can use services. Services are accessible via
+the <code class="literal">BuildContext</code> interface as in the following example.</p>
+<div class="example"><a id="d4e3960"/><p class="title"><b>Example 10.7. Example of a custom DirectoryProvider using a ClassLoaderService</b></p><div class="example-contents">
+
+<pre class="programlisting">public CustomDirectoryProvider implements DirectoryProvider&lt;RAMDirectory&gt; {
+    private ServiceManager serviceManager;
+    private ClassLoaderService classLoaderService;
+
+    public void initialize(
+        String directoryProviderName,
+        Properties properties,
+        BuildContext context) {
+        //get a reference to the ServiceManager
+        this.serviceManager = context.getServiceManager();
+    }
+
+    public void start() {
+        //get the current ClassLoaderService
+        classLoaderService = serviceManager.requestService(ClassLoaderService.class);
+    }
+
+    public RAMDirectory getDirectory() {
+        //use the ClassLoaderService
+    }
+
+    public stop() {
+        //make sure to release all services
+        serviceManager.releaseService(ClassLoaderService.class);
+    }
+}</pre>
+</div></div><br class="example-break"/>
+<p>When you request a service, an instance of the requested service type is returned to you.
+Make sure release the service via <code class="literal">ServiceManager.releaseService</code> once you don’t need it
+anymore. Note that the service can be released in the <code class="literal">DirectoryProvider.stop</code> method if
+the <code class="literal">DirectoryProvider</code> uses the service during its lifetime or could be released right away
+if the service is only needed during initialization time.</p>
+</div>
+<div class="section" lang="en-US"><div class="titlepage"><div><div><h3 class="title"><a id="_implementing_a_service"/>10.6.2. Implementing a Service</h3></div></div></div>
+
+<p>To implement a service, you need to create an interface which identifies it and extends
+<code class="literal">org.hibernate.search.engine.service.spi.Service</code>. You can then add additional methods to your service
+interface as needed.</p>
+<p>Naturally you will also need to provide an implementation of your service interface. This
+implementation must have a public no-arg constructor. Optionally your service can also
+implement the life cycle methods <code class="literal">org.hibernate.search.engine.service.spi.Startable</code>
+and/or <code class="literal">org.hibernate.search.engine.service.spi.Stoppable</code>. These methods will be called by the
+<code class="literal">ServiceManager</code> when the service is created respectively the last reference to a requested service
+is released.</p>
+<p>Services are retrieved from the <code class="literal">ServiceManager.requestService</code> using the <code class="literal">Class</code> object of the
+interface you define as a key.</p>
+<div class="section" lang="en-US"><div class="titlepage"><div><div><h4 class="title"><a id="_managed_services"/>10.6.2.1. Managed services</h4></div></div></div>
+
+<p>To transparently discover services Hibernate Search uses the Java ServiceLoader mechanism. This means
+you need to add a service file to your jar under <code class="literal">/META-INF/services/</code> named after the fully qualified
+classname of your service interface. The content of the file contains the fully qualified
+classname of your service implementation.</p>
+<div class="example"><a id="d4e3982"/><p class="title"><b>Example 10.8. Service file for the Infinispan CacheManagerService service</b></p><div class="example-contents">
+
+<pre class="screen">/META-INF/services/org.hibernate.search.infinispan.CacheManagerService</pre>
+</div></div><br class="example-break"/>
+<div class="example"><a id="d4e3985"/><p class="title"><b>Example 10.9. Content of META-INF/services/org.hibernate.search.infinispan.CacheManagerService</b></p><div class="example-contents">
+
+<pre class="screen">org.hibernate.search.infinispan.DefaultCacheManagerService</pre>
+</div></div><br class="example-break"/>
+<div xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="note"><h2>Note</h2>
+<p>Hibernate Search only supports a single service implementation of a given service. There is no
+mechanism to select between multiple versions of a service. It is an
+error to have multiple jars defining each a different implementation for the same service.
+If you want to override the implementation of a already existing service at runtime you will need to
+look at <a href="search-lucene-native.html#section-provided-services" title="10.6.2.2. Provided services">Section 10.6.2.2, “Provided services”</a>.</p>
+</div>
+</div>
+<div class="section" lang="en-US"><div class="titlepage"><div><div><h4 class="title"><a id="section-provided-services"/>10.6.2.2. Provided services</h4></div></div></div>
+
+<div xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="important"><h2>Important</h2>
+<p>Provided services are usually used by frameworks integrating with Hibernate
+Search and not by library users themselves.</p>
+</div>
+<p>As an alternative to manages services, a service can be provided by the environment bootstrapping
+Hibernate Search. For example, Infinispan which uses Hibernate Search as its internal search engine,
+passes the <code class="literal">CacheContainer</code> to Hibernate Search.
+In this case, the <code class="literal">CacheContainer</code> instance is not managed by Hibernate Search and the start/stop
+methods defined by optional <code class="literal">Stoppable</code> and <code class="literal">Startable</code> interfaces will be ignored.</p>
+<p>A Service implementation which is only used as a Provided Service doesn’t need to have a public
+constructor taking no arguments.</p>
+<div xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="note"><h2>Note</h2>
+<p>Provided services have priority over managed services. If a provided service is registered with the
+same <code class="literal">ServiceManager</code> instance as a managed service, the provided service will be used.</p>
+</div>
+<p>The provided services are passed to Hibernate Search via the <code class="literal">SearchConfiguration</code> interface: as
+implementor of method <code class="literal">getProvidedServices</code> you can return a <code class="literal">Map</code> of all services you need to
+provide.</p>
+<div xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="note"><h2>Note</h2>
+<p>When implementing a custom <code class="literal">org.hibernate.search.cfg.spi.SearchConfiguration</code> we recommend you
+extend the base class <code class="literal">org.hibernate.search.cfg.spi.SearchConfigurationBase</code>: that will improve
+compatibility by not breaking your code when we need to add new methods to this interface.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="_customizing_lucene_s_scoring_formula"/>10.7. Customizing Lucene’s scoring formula</h2></div></div></div>
+
+<p>Lucene allows the user to customize its scoring formula by extending
+org.apache.lucene.search.similarities.Similarity. The abstract methods defined in this class match
+the factors of the following formula calculating the score of query q for document d:</p>
+<p><span class="strong"><strong>score(q,d) = coord(q,d) · queryNorm(q) · ∑ ~t in q~ ( tf(t in d) · idf(t) <sup>2</sup> · t.getBoost() · norm(t,d) )</strong></span></p>
+<div class="informaltable">
+<table border="1"><colgroup><col/><col/></colgroup><thead><tr><th align="left" valign="top">Factor</th><th align="left" valign="top">Description</th></tr></thead><tbody><tr><td align="left" valign="top"><p>tf(t ind)</p></td><td align="left" valign="top"><p>Term frequency factor for the term (t) in the document
+              (d).</p></td></tr><tr><td align="left" valign="top"><p>idf(t)</p></td><td align="left" valign="top"><p>Inverse document frequency of the term.</p></td></tr><tr><td align="left" valign="top"><p>coord(q,d)</p></td><td align="left" valign="top"><p>Score factor based on how many of the query terms are
+              found in the specified document.</p></td></tr><tr><td align="left" valign="top"><p>queryNorm(q)</p></td><td align="left" valign="top"><p>Normalizing factor used to make scores between queries
+              comparable.</p></td></tr><tr><td align="left" valign="top"><p>t.getBoost()</p></td><td align="left" valign="top"><p>Field boost.</p></td></tr><tr><td align="left" valign="top"><p>norm(t,d)</p></td><td align="left" valign="top"><p>Encapsulates a few (indexing time) boost and length
+              factors.</p></td></tr></tbody></table>
+</div>
+<p>It is beyond the scope of this manual to explain this formula in more detail. Please refer to
+Similarity’s Javadocs for more information.</p>
+<p>Hibernate Search provides two ways to modify Lucene’s similarity calculation.</p>
+<p>First you can set the default similarity by specifying the fully specified classname of your
+Similarity implementation using the property hibernate.search.similarity. The default value is
+org.apache.lucene.search.similarities.DefaultSimilarity.</p>
+<p>Secondly, you can override the similarity used for a specific index by setting the <code class="literal">similarity</code>
+property for this index (see <a href="search-configuration.html#search-configuration-directory" title="3.3. Directory configuration">Section 3.3, “Directory configuration”</a> for more information about index
+configuration):</p>
+<div class="informalexample">
+<pre class="screen">hibernate.search.[default|&lt;indexname&gt;].similarity = my.custom.Similarity</pre>
+</div>
+<p>As an example, let’s assume it is not important how often a term appears in a document. Documents
+with a single occurrence of the term should be scored the same as documents with multiple
+occurrences. In this case your custom implementation of the method <code class="literal">tf(float freq)</code> should return 1.0.</p>
+<div xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="note"><h2>Note</h2>
+<p>When two entities share the same index they must declare the same Similarity implementation.</p>
+</div>
+</div>
+</div><HR xmlns=""/><a xmlns="" href=""/><ul class="docnav"><li class="previous"><a accesskey="p" href="spatial.html"><strong>Prev</strong>Chapter 9. Spatial</a></li><li class="up"><a accesskey="u" href="#"><strong>Top of page</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Front page</strong></a></li><li class="next"><a accesskey="n" href="_further_reading.html"><strong>Next</strong>Chapter 11. Further reading</a></li></ul><!-- HibernateDoc.OutdatedContent --><script src="//code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script><script src="/hibernate/_outdated-content/outdated-content.js" type="text/javascript"></script><script type="text/javascript">var jQuery_3_1 = $.noConflict(true); jQuery_3_1(document).ready(function() { HibernateDoc.OutdatedContent.install("search"); });</script><!-- /HibernateDoc.OutdatedContent --></body></html>

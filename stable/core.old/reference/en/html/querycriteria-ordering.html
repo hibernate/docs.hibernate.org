@@ -1,0 +1,68 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>15.3.&nbsp;Ordering the results</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="querycriteria.html" title="Chapter&nbsp;15.&nbsp;Criteria Queries">
+      <link rel="prev" href="querycriteria-narrowing.html" title="15.2.&nbsp;Narrowing the result set">
+      <link rel="next" href="querycriteria-associations.html" title="15.4.&nbsp;Associations">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">15.3.&nbsp;Ordering the results</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="querycriteria-narrowing.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;15.&nbsp;Criteria Queries</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="querycriteria-associations.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="querycriteria-ordering"></a>15.3.&nbsp;Ordering the results
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+                        You may order the results using <code class="literal">org.hibernate.criterion.Order</code>.
+                    
+         </p><pre class="programlisting">List cats = sess.createCriteria(Cat.class)
+    .add( Restrictions.like("name", "F%")
+    .addOrder( Order.asc("name") )
+    .addOrder( Order.desc("age") )
+    .setMaxResults(50)
+    .list();</pre><pre class="programlisting">List cats = sess.createCriteria(Cat.class)
+    .add( Property.forName("name").like("F%") )
+    .addOrder( Property.forName("name").asc() )
+    .addOrder( Property.forName("age").desc() )
+    .setMaxResults(50)
+    .list();</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="querycriteria-narrowing.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="querycriteria.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="querycriteria-associations.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">15.2.&nbsp;Narrowing the result set&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;15.4.&nbsp;Associations</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

@@ -1,0 +1,425 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>11.2.&nbsp;Database transaction demarcation</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="transactions.html" title="Chapter&nbsp;11.&nbsp;Transactions And Concurrency">
+      <link rel="prev" href="transactions.html" title="Chapter&nbsp;11.&nbsp;Transactions And Concurrency">
+      <link rel="next" href="transactions-optimistic.html" title="11.3.&nbsp;Optimistic concurrency control">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">11.2.&nbsp;Database transaction demarcation</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="transactions.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;11.&nbsp;Transactions And Concurrency</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="transactions-optimistic.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="transactions-demarcation"></a>11.2.&nbsp;Database transaction demarcation
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+            Database (or system) transaction boundaries are always necessary. No communication with
+            the database can occur outside of a database transaction (this seems to confuse many developers
+            who are used to the auto-commit mode). Always use clear transaction boundaries, even for
+            read-only operations. Depending on your isolation level and database capabilities this might not
+            be required but there is no downside if you always demarcate transactions explicitly. Certainly,
+                        a single database transaction is going to perform better than many small transactions, even
+                        for reading data.
+                    
+         </p>
+         <p>
+                        A Hibernate application can run in non-managed (i.e. standalone, simple Web- or Swing applications)
+                        and managed J2EE environments. In a non-managed environment, Hibernate is usually responsible for
+                        its own database connection pool. The application developer has to manually set transaction
+                        boundaries, in other words, begin, commit, or rollback database transactions himself. A managed environment
+                        usually provides container-managed transactions (CMT), with the transaction assembly defined declaratively
+                        in deployment descriptors of EJB session beans, for example. Programmatic transaction demarcation is
+                        then no longer necessary.
+                    
+         </p>
+         <p>
+                        However, it is often desirable to keep your persistence layer portable between non-managed
+                        resource-local environments, and systems that can rely on JTA but use BMT instead of CMT.
+                        In both cases you'd use programmatic transaction demarcation. Hibernate offers a wrapper
+                        API called <code class="literal">Transaction</code> that translates into the native transaction system of
+                        your deployment environment. This API is actually optional, but we strongly encourage its use
+                        unless you are in a CMT session bean.
+                    
+         </p>
+         <p>
+                        Usually, ending a <code class="literal">Session</code> involves four distinct phases:
+                    
+         </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p>
+                                         flush the session
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         commit the transaction
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         close the session
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         handle exceptions
+                                     
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p>
+                        Flushing the session has been discussed earlier, we'll now have a closer look at transaction
+                        demarcation and exception handling in both managed- and non-managed environments.
+                    
+         </p>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="transactions-demarcation-nonmanaged"></a>11.2.1.&nbsp;Non-managed environment
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                               If a Hibernate persistence layer runs in a non-managed environment, database connections
+                               are usually handled by simple (i.e. non-DataSource) connection pools from which
+               	            Hibernate obtains connections as needed. The session/transaction handling idiom looks
+               	            like this:
+                           
+            </p><pre class="programlisting">// Non-managed environment idiom
+Session sess = factory.openSession();
+Transaction tx = null;
+try {
+    tx = sess.beginTransaction();
+
+    // do some work
+    ...
+
+    tx.commit();
+}
+catch (RuntimeException e) {
+    if (tx != null) tx.rollback();
+    throw e; // or display error message
+}
+finally {
+    sess.close();
+}</pre><p>
+                               You don't have to <code class="literal">flush()</code> the <code class="literal">Session</code> explicitly -
+                               the call to <code class="literal">commit()</code> automatically triggers the synchronization (depending
+               	            upon the <a href="objectstate-flushing.html" title="10.10.&nbsp;Flushing the Session">FlushMode</a> for the session.
+                               A call to <code class="literal">close()</code> marks the end of a session. The main implication
+                               of <code class="literal">close()</code> is that the JDBC connection will be relinquished by the
+                               session. This Java code is portable and runs in both non-managed and JTA environments.
+                           
+            </p>
+            <p>
+                               A much more flexible solution is Hibernate's built-in "current session" context
+                               management, as described earlier:
+                           
+            </p><pre class="programlisting">// Non-managed environment idiom with getCurrentSession()
+try {
+    factory.getCurrentSession().beginTransaction();
+
+    // do some work
+    ...
+
+    factory.getCurrentSession().getTransaction().commit();
+}
+catch (RuntimeException e) {
+    factory.getCurrentSession().getTransaction().rollback();
+    throw e; // or display error message
+}</pre><p>
+                               You will very likely never see these code snippets in a regular application;
+                               fatal (system) exceptions should always be caught at the "top". In other words, the
+                               code that executes Hibernate calls (in the persistence layer) and the code that handles
+                               <code class="literal">RuntimeException</code> (and usually can only clean up and exit) are in
+                               different layers. The current context management by Hibernate can significantly
+                               simplify this design, as all you need is access to a <code class="literal">SessionFactory</code>.
+                               Exception handling is discussed later in this chapter.
+                           
+            </p>
+            <p>
+                               Note that you should select <code class="literal">org.hibernate.transaction.JDBCTransactionFactory</code>
+                               (which is the default), and for the second example <code class="literal">"thread"</code> as your
+                               <code class="literal">hibernate.current_session_context_class</code>.
+                           
+            </p>
+         </div>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="transactions-demarcation-jta"></a>11.2.2.&nbsp;Using JTA
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                               If your persistence layer runs in an application server (e.g. behind EJB session beans),
+                               every datasource connection obtained by Hibernate will automatically be part of the global
+                               JTA transaction. You can also install a standalone JTA implementation and use it without
+                               EJB. Hibernate offers two strategies for JTA integration.
+                           
+            </p>
+            <p>
+                               If you use bean-managed transactions (BMT) Hibernate will tell the application server to start
+                               and end a BMT transaction if you use the <code class="literal">Transaction</code> API. So, the
+                               transaction management code is identical to the non-managed environment.
+                           
+            </p><pre class="programlisting">// BMT idiom
+Session sess = factory.openSession();
+Transaction tx = null;
+try {
+    tx = sess.beginTransaction();
+
+    // do some work
+    ...
+
+    tx.commit();
+}
+catch (RuntimeException e) {
+    if (tx != null) tx.rollback();
+    throw e; // or display error message
+}
+finally {
+    sess.close();
+}</pre><p>
+                               If you want to use a transaction-bound <code class="literal">Session</code>, that is, the
+                              <code class="literal">getCurrentSession()</code> functionality for easy context propagation,
+                              you will have to use the JTA <code class="literal">UserTransaction</code> API directly:
+                           
+            </p><pre class="programlisting">// BMT idiom with getCurrentSession()
+try {
+    UserTransaction tx = (UserTransaction)new InitialContext()
+                            .lookup("java:comp/UserTransaction");
+
+    tx.begin();
+
+    // Do some work on Session bound to transaction
+    factory.getCurrentSession().load(...);
+    factory.getCurrentSession().persist(...);
+
+    tx.commit();
+}
+catch (RuntimeException e) {
+    tx.rollback();
+    throw e; // or display error message
+}</pre><p>
+                               With CMT, transaction demarcation is done in session bean deployment descriptors, not programmatically,
+                               hence, the code is reduced to:
+                           
+            </p><pre class="programlisting">// CMT idiom
+ Session sess = factory.getCurrentSession();
+
+ // do some work
+ ...
+</pre><p>
+                               In a CMT/EJB even rollback happens automatically, since an unhandled <code class="literal">RuntimeException</code>
+                               thrown  by a session bean method tells the container to set the global transaction to rollback.
+                               <span class="emphasis"><em>This means you do not need to use the Hibernate <code class="literal">Transaction</code> API at
+                                     all with BMT or CMT, and you get automatic propagation of the "current" Session bound to the
+                                     transaction.</em></span>
+                           
+            </p>
+            <p>
+                               Note that you should choose <code class="literal">org.hibernate.transaction.JTATransactionFactory</code>
+                               if you use JTA directly (BMT), and <code class="literal">org.hibernate.transaction.CMTTransactionFactory</code>
+                               in a CMT session bean, when you configure Hibernate's transaction factory. Remember to also set
+                               <code class="literal">hibernate.transaction.manager_lookup_class</code>. Furthermore, make sure
+                               that your <code class="literal">hibernate.current_session_context_class</code> is either unset (backwards
+                               compatibility), or set to <code class="literal">"jta"</code>.
+                           
+            </p>
+            <p>
+                               The <code class="literal">getCurrentSession()</code> operation has one downside in a JTA environment.
+                               There is one caveat to the use of <code class="literal">after_statement</code> connection release
+                               mode, which is then used by default. Due to a silly limitation of the JTA spec, it is not
+                               possible for Hibernate to automatically clean up any unclosed <code class="literal">ScrollableResults</code> or
+                               <code class="literal">Iterator</code> instances returned by <code class="literal">scroll()</code> or 
+                               <code class="literal">iterate()</code>. You <span class="emphasis"><em>must</em></span> release the underlying database 
+                               cursor by calling <code class="literal">ScrollableResults.close()</code> or 
+                               <code class="literal">Hibernate.close(Iterator)</code> explicitly from a <code class="literal">finally</code> 
+                               block. (Of course, most applications can easily avoid using <code class="literal">scroll()</code> or 
+                               <code class="literal">iterate()</code> at all from the JTA or CMT code.)
+                           
+            </p>
+         </div>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="transactions-demarcation-exceptions"></a>11.2.3.&nbsp;Exception handling
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                               If the <code class="literal">Session</code> throws an exception (including any
+                               <code class="literal">SQLException</code>), you should immediately rollback the database
+                               transaction, call <code class="literal">Session.close()</code> and discard the
+                               <code class="literal">Session</code> instance. Certain methods of <code class="literal">Session</code>
+                               will <span class="emphasis"><em>not</em></span> leave the session in a consistent state. No
+                               exception thrown by Hibernate can be treated as recoverable. Ensure that the
+                               <code class="literal">Session</code> will be closed by calling <code class="literal">close()</code>
+                               in a <code class="literal">finally</code> block.
+                           
+            </p>
+            <p>
+                               The <code class="literal">HibernateException</code>, which wraps most of the errors that
+                               can occur in a Hibernate persistence layer, is an unchecked exception (it wasn't
+                               in older versions of Hibernate). In our opinion, we shouldn't force the application
+                               developer to catch an unrecoverable exception at a low layer. In most systems, unchecked
+                               and fatal exceptions are handled in one of the first frames of the method call
+                               stack (i.e. in higher layers) and an error message is presented to the application
+                               user (or some other appropriate action is taken). Note that Hibernate might also throw
+                               other unchecked exceptions which are not a <code class="literal">HibernateException</code>. These 
+                               are, again, not recoverable and appropriate action should be taken.
+                           
+            </p>
+            <p>
+                               Hibernate wraps <code class="literal">SQLException</code>s thrown while interacting with the database
+                               in a <code class="literal">JDBCException</code>. In fact, Hibernate will attempt to convert the exception
+                               into a more meaningful subclass of <code class="literal">JDBCException</code>.  The underlying
+                               <code class="literal">SQLException</code> is always available via <code class="literal">JDBCException.getCause()</code>.
+                               Hibernate converts the <code class="literal">SQLException</code> into an appropriate 
+                               <code class="literal">JDBCException</code> subclass using the <code class="literal">SQLExceptionConverter</code> 
+                               attached to the <code class="literal">SessionFactory</code>. By default, the 
+                               <code class="literal">SQLExceptionConverter</code> is defined by the configured dialect; however, it is
+                               also possible to plug in a custom implementation (see the javadocs for the
+                               <code class="literal">SQLExceptionConverterFactory</code> class for details).  The standard 
+                               <code class="literal">JDBCException</code> subtypes are:
+                           
+            </p>
+            <div class="itemizedlist">
+               <ul type="disc" compact>
+                  <li>
+                     <p>
+                                                <code class="literal">JDBCConnectionException</code> - indicates an error
+                                                with the underlying JDBC communication.
+                                            
+                     </p>
+                  </li>
+                  <li>
+                     <p>
+                                                <code class="literal">SQLGrammarException</code> - indicates a grammar
+                                                or syntax problem with the issued SQL.
+                                            
+                     </p>
+                  </li>
+                  <li>
+                     <p>
+                                                <code class="literal">ConstraintViolationException</code> - indicates some
+                                                form of integrity constraint violation.
+                                            
+                     </p>
+                  </li>
+                  <li>
+                     <p>
+                                                <code class="literal">LockAcquisitionException</code> - indicates an error
+                                                acquiring a lock level necessary to perform the requested operation.
+                                            
+                     </p>
+                  </li>
+                  <li>
+                     <p>
+                                                <code class="literal">GenericJDBCException</code> - a generic exception
+                                                which did not fall into any of the other categories.
+                                            
+                     </p>
+                  </li>
+               </ul>
+            </div>
+         </div>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="transactions-demarcation-timeout"></a>11.2.4.&nbsp;Transaction timeout
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                               One extremely important feature provided by a managed environment like EJB
+                               that is never provided for non-managed code is transaction timeout. Transaction
+                               timeouts ensure that no misbehaving transaction can indefinitely tie up 
+                               resources while returning no response to the user. Outside a managed (JTA)
+                               environment, Hibernate cannot fully provide this functionality. However,
+                               Hibernate can at least control data access operations, ensuring that database
+                               level deadlocks and queries with huge result sets are limited by a defined
+                               timeout. In a managed environment, Hibernate can delegate transaction timeout
+                               to JTA. This functionality is abstracted by the Hibernate 
+                               <code class="literal">Transaction</code> object.
+                           
+            </p><pre class="programlisting">
+Session sess = factory.openSession();
+try {
+    //set transaction timeout to 3 seconds
+    sess.getTransaction().setTimeout(3);
+    sess.getTransaction().begin();
+
+    // do some work
+    ...
+
+    sess.getTransaction().commit()
+}
+catch (RuntimeException e) {
+    sess.getTransaction().rollback();
+    throw e; // or display error message
+}
+finally {
+    sess.close();
+}</pre><p>
+                               Note that <code class="literal">setTimeout()</code> may not be called in a CMT bean,
+                               where transaction timeouts must be defined declaratively.
+                           
+            </p>
+         </div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="transactions.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="transactions.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="transactions-optimistic.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">Chapter&nbsp;11.&nbsp;Transactions And Concurrency&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;11.3.&nbsp;Optimistic concurrency control</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

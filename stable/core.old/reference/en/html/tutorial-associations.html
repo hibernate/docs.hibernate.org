@@ -1,0 +1,493 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>1.3.&nbsp;Part 2 - Mapping associations</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="tutorial.html" title="Chapter&nbsp;1.&nbsp;Introduction to Hibernate">
+      <link rel="prev" href="tutorial-firstapp.html" title="1.2.&nbsp;Part 1 - The first Hibernate Application">
+      <link rel="next" href="tutorial-webapp.html" title="1.4.&nbsp;Part 3 - The EventManager web application">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">1.3.&nbsp;Part 2 - Mapping associations</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="tutorial-firstapp.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;1.&nbsp;Introduction to Hibernate</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="tutorial-webapp.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="tutorial-associations"></a>1.3.&nbsp;Part 2 - Mapping associations
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+            We mapped a persistent entity class to a table. Let's build on this and add some class associations.
+                        First we'll add people to our application, and store a list of events they participate in.
+                    
+         </p>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="tutorial-associations-mappinguser"></a>1.3.1.&nbsp;Mapping the Person class
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                               The first cut of the <code class="literal">Person</code> class is simple:
+                           
+            </p><pre class="programlisting">package events;
+
+public class Person {
+
+    private Long id;
+    private int age;
+    private String firstname;
+    private String lastname;
+
+    public Person() {}
+
+    // Accessor methods for all properties, private setter for 'id'
+
+}</pre><p>
+                               Create a new mapping file called <code class="literal">Person.hbm.xml</code> (don't forget the
+                               DTD reference at the top):
+                           
+            </p><pre class="programlisting">&lt;hibernate-mapping&gt;
+
+    &lt;class name="events.Person" table="PERSON"&gt;
+        &lt;id name="id" column="PERSON_ID"&gt;
+            &lt;generator class="native"/&gt;
+        &lt;/id&gt;
+        &lt;property name="age"/&gt;
+        &lt;property name="firstname"/&gt;
+        &lt;property name="lastname"/&gt;
+    &lt;/class&gt;
+
+&lt;/hibernate-mapping&gt;</pre><p>
+                               Finally, add the new mapping to Hibernate's configuration:
+                           
+            </p><pre class="programlisting">&lt;mapping resource="events/Event.hbm.xml"/&gt;
+&lt;mapping resource="events/Person.hbm.xml"/&gt;</pre><p>
+                               We'll now create an association between these two entities. Obviously, persons
+                               can participate in events, and events have participants. The design questions
+                               we have to deal with are: directionality, multiplicity, and collection
+                               behavior.
+                           
+            </p>
+         </div>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="tutorial-associations-unidirset"></a>1.3.2.&nbsp;A unidirectional Set-based association
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                               We'll add a collection of events to the <code class="literal">Person</code> class. That way we can
+                               easily navigate to the events for a particular person, without executing an explicit query -
+                               by calling <code class="literal">aPerson.getEvents()</code>. We use a Java collection, a <code class="literal">Set</code>,
+                               because the collection will not contain duplicate elements and the ordering is not relevant for us.
+                           
+            </p>
+            <p>
+                               We need a unidirectional, many-valued associations, implemented with a <code class="literal">Set</code>.
+                               Let's write the code for this in the Java classes and then map it:
+                           
+            </p><pre class="programlisting">public class Person {
+
+    private Set events = new HashSet();
+
+    public Set getEvents() {
+        return events;
+    }
+
+    public void setEvents(Set events) {
+        this.events = events;
+    }
+}</pre><p>
+                               Before we map this association, think about the other side. Clearly, we could just keep this
+                               unidirectional. Or, we could create another collection on the <code class="literal">Event</code>, if we
+                               want to be able to navigate it bi-directional, i.e. <code class="literal">anEvent.getParticipants()</code>.
+                               This is not necessary, from a functional perspective. You could always execute an explicit query
+                               to retrieve the participants for a particular event. This is a design choice left to you, but what
+                               is clear from this discussion is the multiplicity of the association: "many" valued on both sides,
+                               we call this a <span class="emphasis"><em>many-to-many</em></span> association. Hence, we use Hibernate's
+                               many-to-many mapping:
+                           
+            </p><pre class="programlisting">&lt;class name="events.Person" table="PERSON"&gt;
+    &lt;id name="id" column="PERSON_ID"&gt;
+        &lt;generator class="native"/&gt;
+    &lt;/id&gt;
+    &lt;property name="age"/&gt;
+    &lt;property name="firstname"/&gt;
+    &lt;property name="lastname"/&gt;
+
+    &lt;set name="events" table="PERSON_EVENT"&gt;
+        &lt;key column="PERSON_ID"/&gt;
+        &lt;many-to-many column="EVENT_ID" class="events.Event"/&gt;
+    &lt;/set&gt;
+
+&lt;/class&gt;</pre><p>
+                               Hibernate supports all kinds of collection mappings, a <code class="literal">&lt;set&gt;</code> being most
+                               common. For a many-to-many association (or <span class="emphasis"><em>n:m</em></span> entity relationship), an
+                               association table is needed. Each row in this table represents a link between a person and an event.
+                               The table name is configured with the <code class="literal">table</code> attribute of the <code class="literal">set</code>
+                               element. The identifier column name in the association, for the person's side, is defined with the
+                               <code class="literal">&lt;key&gt;</code> element, the column name for the event's side with the
+                               <code class="literal">column</code> attribute of the <code class="literal">&lt;many-to-many&gt;</code>. You also
+                               have to tell Hibernate the class of the objects in your collection (correct: the class on the
+                               other side of the collection of references).
+                           
+            </p>
+            <p>
+                               The database schema for this mapping is therefore:
+                           
+            </p><pre class="programlisting">
+    _____________        __________________
+   |             |      |                  |       _____________
+   |   EVENTS    |      |   PERSON_EVENT   |      |             |
+   |_____________|      |__________________|      |    PERSON   |
+   |             |      |                  |      |_____________|
+   | *EVENT_ID   | &lt;--&gt; | *EVENT_ID        |      |             |
+   |  EVENT_DATE |      | *PERSON_ID       | &lt;--&gt; | *PERSON_ID  |
+   |  TITLE      |      |__________________|      |  AGE        |
+   |_____________|                                |  FIRSTNAME  |
+                                                  |  LASTNAME   |
+                                                  |_____________|
+ </pre></div>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="tutorial-associations-working"></a>1.3.3.&nbsp;Working the association
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                               Let's bring some people and events together in a new method in <code class="literal">EventManager</code>:
+                           
+            </p><pre class="programlisting">private void addPersonToEvent(Long personId, Long eventId) {
+
+    Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+    session.beginTransaction();
+
+    Person aPerson = (Person) session.load(Person.class, personId);
+    Event anEvent = (Event) session.load(Event.class, eventId);
+
+    aPerson.getEvents().add(anEvent);
+
+    session.getTransaction().commit();
+}</pre><p>
+                               After loading a <code class="literal">Person</code> and an <code class="literal">Event</code>, simply
+                               modify the collection using the normal collection methods. As you can see, there is no explicit call
+                               to <code class="literal">update()</code> or <code class="literal">save()</code>, Hibernate automatically
+                               detects that the collection has been modified and needs to be updated. This is called <span class="emphasis"><em>automatic
+                                     dirty checking</em></span>, and you can also try it by modifying the name or the date property of
+                               any of your objects. As long as they are in <span class="emphasis"><em>persistent</em></span> state, that is, bound
+                               to a particular Hibernate <code class="literal">Session</code> (i.e. they have been just loaded or saved in
+                               a unit of work), Hibernate monitors any changes and executes SQL in a write-behind fashion. The
+                               process of synchronizing the memory state with the database, usually only at the end of a unit of
+                               work, is called <span class="emphasis"><em>flushing</em></span>. In our code, the unit of work ends with a commit
+                               (or rollback) of the database transaction - as defined by the <code class="literal">thread</code> configuration
+                               option for the <code class="literal">CurrentSessionContext</code> class.
+                           
+            </p>
+            <p>
+                               You might of course load person and event in different units of work. Or you modify an object
+                               outside of a <code class="literal">Session</code>, when it is not in persistent state (if it was persistent
+                               before, we call this state <span class="emphasis"><em>detached</em></span>). You can even modify a collection when
+                               it is detached:
+                           
+            </p><pre class="programlisting">private void addPersonToEvent(Long personId, Long eventId) {
+
+    Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+    session.beginTransaction();
+
+    Person aPerson = (Person) session
+            .createQuery("select p from Person p left join fetch p.events where p.id = :pid")
+            .setParameter("pid", personId)
+            .uniqueResult(); // Eager fetch the collection so we can use it detached
+
+    Event anEvent = (Event) session.load(Event.class, eventId);
+
+    session.getTransaction().commit();
+
+    // End of first unit of work
+
+    aPerson.getEvents().add(anEvent); // aPerson (and its collection) is detached
+
+    // Begin second unit of work
+
+    Session session2 = HibernateUtil.getSessionFactory().getCurrentSession();
+    session2.beginTransaction();
+
+    session2.update(aPerson); // Reattachment of aPerson
+
+    session2.getTransaction().commit();
+}</pre><p>
+                               The call to <code class="literal">update</code> makes a detached object persistent again, you could
+                               say it binds it to a new unit of work, so any modifications you made to it while detached
+                               can be saved to the database. This includes any modifications (additions/deletions) you
+                               made to a collection of that entity object.
+                           
+            </p>
+            <p>
+                               Well, this is not much use in our current situation, but it's an important concept you can
+                               design into your own application. For now, complete this exercise by adding a new action
+                               to the <code class="literal">EventManager</code>'s main method and call it from the command line. If
+                               you need the identifiers of a person and an event - the <code class="literal">save()</code> method
+                               returns it (you might have to modify some of the previous methods to return that identifier):
+                           
+            </p><pre class="programlisting">else if (args[0].equals("addpersontoevent")) {
+    Long eventId = mgr.createAndStoreEvent("My Event", new Date());
+    Long personId = mgr.createAndStorePerson("Foo", "Bar");
+    mgr.addPersonToEvent(personId, eventId);
+    System.out.println("Added person " + personId + " to event " + eventId);
+}</pre><p>
+                               This was an example of an association between two equally important classes, two entities.
+                               As mentioned earlier, there are other classes and types in a typical model, usually "less
+                               important". Some you have already seen, like an <code class="literal">int</code> or a <code class="literal">String</code>.
+                               We call these classes <span class="emphasis"><em>value types</em></span>, and their instances <span class="emphasis"><em>depend</em></span>
+                               on a particular entity. Instances of these types don't have their own identity, nor are they
+                               shared between entities (two persons don't reference the same <code class="literal">firstname</code>
+                               object, even if they have the same first name). Of course, value types can not only be found in
+                               the JDK (in fact, in a Hibernate application all JDK classes are considered value types), but
+                               you can also write dependent classes yourself, <code class="literal">Address</code> or <code class="literal">MonetaryAmount</code>,
+                               for example.
+                           
+            </p>
+            <p>
+                               You can also design a collection of value types. This is conceptually very different from a
+                               collection of references to other entities, but looks almost the same in Java.
+                           
+            </p>
+         </div>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="tutorial-associations-valuecollections"></a>1.3.4.&nbsp;Collection of values
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                               We add a collection of value typed objects to the <code class="literal">Person</code> entity. We want to
+                               store email addresses, so the type we use is <code class="literal">String</code>, and the collection is
+                               again a <code class="literal">Set</code>:
+                           
+            </p><pre class="programlisting">private Set emailAddresses = new HashSet();
+
+public Set getEmailAddresses() {
+    return emailAddresses;
+}
+
+public void setEmailAddresses(Set emailAddresses) {
+    this.emailAddresses = emailAddresses;
+}</pre><p>
+                               The mapping of this <code class="literal">Set</code>:
+                           
+            </p><pre class="programlisting">&lt;set name="emailAddresses" table="PERSON_EMAIL_ADDR"&gt;
+    &lt;key column="PERSON_ID"/&gt;
+    &lt;element type="string" column="EMAIL_ADDR"/&gt;
+&lt;/set&gt;</pre><p>
+                               The difference compared with the earlier mapping is the <code class="literal">element</code> part, which tells Hibernate that the collection
+                               does not contain references to another entity, but a collection of elements of type
+                               <code class="literal">String</code> (the lowercase name tells you it's a Hibernate mapping type/converter).
+                               Once again, the <code class="literal">table</code> attribute of the <code class="literal">set</code> element determines
+                               the table name for the collection. The <code class="literal">key</code> element defines the foreign-key column
+                               name in the collection table. The <code class="literal">column</code> attribute in the <code class="literal">element</code>
+                               element defines the column name where the <code class="literal">String</code> values will actually be stored.
+                           
+            </p>
+            <p>
+                               Have a look at the updated schema:
+                           
+            </p><pre class="programlisting">
+  _____________        __________________
+ |             |      |                  |       _____________
+ |   EVENTS    |      |   PERSON_EVENT   |      |             |       ___________________
+ |_____________|      |__________________|      |    PERSON   |      |                   |
+ |             |      |                  |      |_____________|      | PERSON_EMAIL_ADDR |
+ | *EVENT_ID   | &lt;--&gt; | *EVENT_ID        |      |             |      |___________________|
+ |  EVENT_DATE |      | *PERSON_ID       | &lt;--&gt; | *PERSON_ID  | &lt;--&gt; |  *PERSON_ID       |
+ |  TITLE      |      |__________________|      |  AGE        |      |  *EMAIL_ADDR      |
+ |_____________|                                |  FIRSTNAME  |      |___________________|
+                                                |  LASTNAME   |
+                                                |_____________|
+ </pre><p>
+                               You can see that the primary key of the collection table is in fact a composite key,
+                               using both columns. This also implies that there can't be duplicate email addresses
+                               per person, which is exactly the semantics we need for a set in Java.
+                           
+            </p>
+            <p>
+                               You can now try and add elements to this collection, just like we did before by
+                               linking persons and events. It's the same code in Java:
+                           
+            </p><pre class="programlisting">private void addEmailToPerson(Long personId, String emailAddress) {
+
+    Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+    session.beginTransaction();
+
+    Person aPerson = (Person) session.load(Person.class, personId);
+
+    // The getEmailAddresses() might trigger a lazy load of the collection
+    aPerson.getEmailAddresses().add(emailAddress);
+
+    session.getTransaction().commit();
+}</pre><p>
+                               This time we didn't use a <span class="emphasis"><em>fetch</em></span> query to initialize the collection.
+                               Hence, the call to its getter method will trigger an additional select to initialize
+                               it, so we can add an element to it. Monitor the SQL log and try to optimize this with
+                               an eager fetch.
+                           
+            </p>
+         </div>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="tutorial-associations-bidirectional"></a>1.3.5.&nbsp;Bi-directional associations
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                               Next we are going to map a bi-directional association - making the association between
+                               person and event work from both sides in Java. Of course, the database schema doesn't
+                               change, we still have many-to-many multiplicity. A relational database is more flexible
+                               than a network programming language, so it doesn't need anything like a navigation
+                               direction - data can be viewed and retrieved in any possible way.
+                           
+            </p>
+            <p>
+                               First, add a collection of participants to the <code class="literal">Event</code> Event class:
+                           
+            </p><pre class="programlisting">private Set participants = new HashSet();
+
+public Set getParticipants() {
+    return participants;
+}
+
+public void setParticipants(Set participants) {
+    this.participants = participants;
+}</pre><p>
+                               Now map this side of the association too, in <code class="literal">Event.hbm.xml</code>.
+                           
+            </p><pre class="programlisting">&lt;set name="participants" table="PERSON_EVENT" inverse="true"&gt;
+    &lt;key column="EVENT_ID"/&gt;
+    &lt;many-to-many column="PERSON_ID" class="events.Person"/&gt;
+&lt;/set&gt;</pre><p>
+                               As you see, these are normal <code class="literal">set</code> mappings in both mapping documents.
+                               Notice that the column names in <code class="literal">key</code> and <code class="literal">many-to-many</code> are
+                               swapped in both mapping documents. The most important addition here is the
+                               <code class="literal">inverse="true"</code> attribute in the <code class="literal">set</code> element of the
+                               <code class="literal">Event</code>'s collection mapping.
+                           
+            </p>
+            <p>
+                               What this means is that Hibernate should take the other side - the <code class="literal">Person</code> class -
+                               when it needs to find out information about the link between the two. This will be a lot easier to
+                               understand once you see how the bi-directional link between our two entities is created .
+                           
+            </p>
+         </div>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="tutorial-associations-usingbidir"></a>1.3.6.&nbsp;Working bi-directional links
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                               First, keep in mind that Hibernate does not affect normal Java semantics. How did we create a
+                               link between a <code class="literal">Person</code> and an <code class="literal">Event</code> in the unidirectional
+                               example? We added an instance of <code class="literal">Event</code> to the collection of event references,
+                               of an instance of <code class="literal">Person</code>. So, obviously, if we want to make this link working
+                               bi-directional, we have to do the same on the other side - adding a <code class="literal">Person</code>
+                               reference to the collection in an <code class="literal">Event</code>. This "setting the link on both sides"
+                               is absolutely necessary and you should never forget doing it.
+                           
+            </p>
+            <p>
+                               Many developers program defensively and create link management methods to
+                               correctly set both sides, e.g. in <code class="literal">Person</code>:
+                           
+            </p><pre class="programlisting">protected Set getEvents() {
+    return events;
+}
+
+protected void setEvents(Set events) {
+    this.events = events;
+}
+
+public void addToEvent(Event event) {
+    this.getEvents().add(event);
+    event.getParticipants().add(this);
+}
+
+public void removeFromEvent(Event event) {
+    this.getEvents().remove(event);
+    event.getParticipants().remove(this);
+}</pre><p>
+                               Notice that the get and set methods for the collection are now protected - this allows classes in the
+                               same package and subclasses to still access the methods, but prevents everybody else from messing
+                               with the collections directly (well, almost). You should probably do the same with the collection
+                               on the other side.
+                           
+            </p>
+            <p>
+                               What about the <code class="literal">inverse</code> mapping attribute? For you, and for Java, a bi-directional
+                               link is simply a matter of setting the references on both sides correctly. Hibernate however doesn't
+                               have enough information to correctly arrange SQL <code class="literal">INSERT</code> and <code class="literal">UPDATE</code>
+                               statements (to avoid constraint violations), and needs some help to handle bi-directional associations
+                               properly. Making one side of the association <code class="literal">inverse</code> tells Hibernate to basically
+                               ignore it, to consider it a <span class="emphasis"><em>mirror</em></span> of the other side. That's all that is necessary
+                               for Hibernate to work out all of the issues when transformation a directional navigation model to
+                               a SQL database schema. The rules you have to remember are straightforward: All bi-directional associations
+                               need one side as <code class="literal">inverse</code>. In a one-to-many association it has to be the many-side,
+                               in many-to-many association you can pick either side, there is no difference.
+                           
+            </p>
+         </div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="tutorial-firstapp.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="tutorial.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="tutorial-webapp.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">1.2.&nbsp;Part 1 - The first Hibernate Application&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;1.4.&nbsp;Part 3 - The EventManager web application</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

@@ -1,0 +1,140 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>19.3.&nbsp;Managing the caches</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="performance.html" title="Chapter&nbsp;19.&nbsp;Improving performance">
+      <link rel="prev" href="performance-cache.html" title="19.2.&nbsp;The Second Level Cache">
+      <link rel="next" href="performance-querycache.html" title="19.4.&nbsp;The Query Cache">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">19.3.&nbsp;Managing the caches</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="performance-cache.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;19.&nbsp;Improving performance</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="performance-querycache.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="performance-sessioncache"></a>19.3.&nbsp;Managing the caches
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+                        Whenever you pass an object to <code class="literal">save()</code>, <code class="literal">update()</code>
+                        or <code class="literal">saveOrUpdate()</code> and whenever you retrieve an object using 
+                        <code class="literal">load()</code>, <code class="literal">get()</code>, <code class="literal">list()</code>, 
+                        <code class="literal">iterate()</code> or <code class="literal">scroll()</code>, that object is added 
+                        to the internal cache of the <code class="literal">Session</code>. 
+                    
+         </p>
+         <p>
+                        When <code class="literal">flush()</code> is subsequently called, the state of that object will 
+                        be synchronized with the database. If you do not want this synchronization to occur or 
+                        if you are processing a huge number of objects and need to manage memory efficiently, 
+                        the <code class="literal">evict()</code> method may be used to remove the object and its collections 
+                        from the first-level cache.
+                    
+         </p><pre class="programlisting">ScrollableResult cats = sess.createQuery("from Cat as cat").scroll(); //a huge result set
+while ( cats.next() ) {
+    Cat cat = (Cat) cats.get(0);
+    doSomethingWithACat(cat);
+    sess.evict(cat);
+}</pre><p>
+                        The <code class="literal">Session</code> also provides a <code class="literal">contains()</code> method to determine 
+                        if an instance belongs to the session cache.
+                    
+         </p>
+         <p>
+                        To completely evict all objects from the session cache, call <code class="literal">Session.clear()</code>
+                    
+         </p>
+         <p>
+                        For the second-level cache, there are methods defined on <code class="literal">SessionFactory</code> for 
+                        evicting the cached state of an instance, entire class, collection instance or entire collection 
+                        role.
+                    
+         </p><pre class="programlisting">sessionFactory.evict(Cat.class, catId); //evict a particular Cat
+sessionFactory.evict(Cat.class);  //evict all Cats
+sessionFactory.evictCollection("Cat.kittens", catId); //evict a particular collection of kittens
+sessionFactory.evictCollection("Cat.kittens"); //evict all kitten collections</pre><p>
+                        The <code class="literal">CacheMode</code> controls how a particular session interacts with the second-level
+                        cache.
+                    
+         </p>
+         <div class="itemizedlist">
+            <ul type="disc">
+               <li>
+                  <p>
+                                 <code class="literal">CacheMode.NORMAL</code> - read items from and write items to the second-level cache
+                             
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                 <code class="literal">CacheMode.GET</code> - read items from the second-level cache, but don't write to
+                                 the second-level cache except when updating data
+                             
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                 <code class="literal">CacheMode.PUT</code> - write items to the second-level cache, but don't read from
+                                 the second-level cache
+                             
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                 <code class="literal">CacheMode.REFRESH</code> - write items to the second-level cache, but don't read from
+                                 the second-level cache, bypass the effect of <code class="literal">hibernate.cache.use_minimal_puts</code>, forcing
+                                 a refresh of the second-level cache for all items read from the database
+                             
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p>
+                        To browse the contents of a second-level or query cache region, use the <code class="literal">Statistics</code>
+                        API:
+                    
+         </p><pre class="programlisting">Map cacheEntries = sessionFactory.getStatistics()
+        .getSecondLevelCacheStatistics(regionName)
+        .getEntries();</pre><p>
+                        You'll need to enable statistics, and, optionally, force Hibernate to keep the cache entries in a
+                        more human-understandable format:
+                    
+         </p><pre class="programlisting">hibernate.generate_statistics true
+hibernate.cache.use_structured_entries true</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="performance-cache.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="performance.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="performance-querycache.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">19.2.&nbsp;The Second Level Cache&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;19.4.&nbsp;The Query Cache</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

@@ -1,0 +1,104 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>21.2.&nbsp;un-vers-plusieurs bidirectionnel</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="example-parentchild.html" title="Chapitre&nbsp;21.&nbsp;Exemple : P&egrave;re/Fils">
+      <link rel="prev" href="example-parentchild.html" title="Chapitre&nbsp;21.&nbsp;Exemple : P&egrave;re/Fils">
+      <link rel="next" href="example-parentchild-cascades.html" title="21.3.&nbsp;Cycle de vie en cascade">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">21.2.&nbsp;un-vers-plusieurs bidirectionnel</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="example-parentchild.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;21.&nbsp;Exemple : P&egrave;re/Fils</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="example-parentchild-cascades.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="example-parentchild-bidir"></a>21.2.&nbsp;un-vers-plusieurs bidirectionnel
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Supposons que nous ayons une simple association <code class="literal">&lt;one-to-many&gt;</code> de <code class="literal">Parent</code> vers <code class="literal">Child</code>. 
+         </p><pre class="programlisting">&lt;set name="children"&gt;
+    &lt;key column="parent_id"/&gt;
+    &lt;one-to-many class="Child"/&gt;
+&lt;/set&gt;</pre><p>Si nous executions le code suivant </p><pre class="programlisting">Parent p = .....;
+Child c = new Child();
+p.getChildren().add(c);
+session.save(c);
+session.flush();</pre><p>Hibernate ex&eacute;cuterait deux ordres SQL: </p>
+         <div class="itemizedlist">
+            <ul type="disc">
+               <li>
+                  <p>un <code class="literal">INSERT</code> pour cr&eacute;er l'enregistrement pour <code class="literal">c</code></p>
+               </li>
+               <li>
+                  <p>un <code class="literal">UPDATE</code> pour cr&eacute;er le lien de <code class="literal">p</code> vers <code class="literal">c</code> 
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p>Ceci est non seuleument inefficace, mais viole aussi toute contrainte <code class="literal">NOT NULL</code> sur la colonne <code class="literal">parent_id</code>. Nous pouvons r&eacute;parer la contrainte de nullit&eacute; en sp&eacute;cifiant <code class="literal">not-null="true"</code> dans le mapping de la collection : 
+         </p><pre class="programlisting">&lt;set name="children"&gt;
+    &lt;key column="parent_id" not-null="true"/&gt;
+    &lt;one-to-many class="Child"/&gt;
+&lt;/set&gt;</pre><p>Cependant ce n'est pas la solution recommand&eacute;e. </p>
+         <p>La cause sous jacente &agrave; ce comportement est que le lien (la cl&eacute; &eacute;trang&egrave;re <code class="literal">parent_id</code>) de <code class="literal">p</code> vers <code class="literal">c</code> n'est pas consid&eacute;r&eacute;e comme faisant partie de l'&eacute;tat de l'objet <code class="literal">Child</code> et n'est donc pas cr&eacute;&eacute; par l'<code class="literal">INSERT</code>. La solution est donc que ce lien fasse partie du mapping de <code class="literal">Child</code>. 
+         </p><pre class="programlisting">&lt;many-to-one name="parent" column="parent_id" not-null="true"/&gt;</pre><p>(Nous avons aussi besoin d'ajouter la propri&eacute;t&eacute; <code class="literal">parent</code> dans la classe <code class="literal">Child</code>). 
+         </p>
+         <p>Maintenant que l'&eacute;tat du lien est g&eacute;r&eacute; par l'entit&eacute; <code class="literal">Child</code>, nous sp&eacute;cifions &agrave; la collection de ne pas mettre &agrave; jour le lien. Nous utilisons l'attribut <code class="literal">inverse</code>. 
+         </p><pre class="programlisting">&lt;set name="children" inverse="true"&gt;
+    &lt;key column="parent_id"/&gt;
+    &lt;one-to-many class="Child"/&gt;
+&lt;/set&gt;</pre><p>Le code suivant serait utilis&eacute; pour ajouter un nouveau <code class="literal">Child</code> 
+         </p><pre class="programlisting">Parent p = (Parent) session.load(Parent.class, pid);
+Child c = new Child();
+c.setParent(p);
+p.getChildren().add(c);
+session.save(c);
+session.flush();</pre><p>Maintenant, seul un <code class="literal">INSERT</code> SQL est n&eacute;cessaire ! 
+         </p>
+         <p>Pour all&eacute;ger encore un peu les choses, nous devrions cr&eacute;er une m&eacute;thode <code class="literal">addChild()</code> dans <code class="literal">Parent</code>. 
+         </p><pre class="programlisting">public void addChild(Child c) {
+    c.setParent(this);
+    children.add(c);
+}</pre><p>Le code d'ajout d'un <code class="literal">Child</code> serait alors 
+         </p><pre class="programlisting">Parent p = (Parent) session.load(Parent.class, pid);
+Child c = new Child();
+p.addChild(c);
+session.save(c);
+session.flush();</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="example-parentchild.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="example-parentchild.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="example-parentchild-cascades.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">Chapitre&nbsp;21.&nbsp;Exemple : P&egrave;re/Fils&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;21.3.&nbsp;Cycle de vie en cascade</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

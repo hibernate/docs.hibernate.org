@@ -1,0 +1,170 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>Chapter&nbsp;18.&nbsp;XML Mapping</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="prev" href="filters.html" title="Chapter&nbsp;17.&nbsp;Filtering data">
+      <link rel="next" href="xml-mapping.html" title="18.2.&nbsp;XML mapping metadata">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">Chapter&nbsp;18.&nbsp;XML Mapping</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="filters.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">&nbsp;</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="xml-mapping.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="chapter" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title"><a name="xml"></a>Chapter&nbsp;18.&nbsp;XML Mapping
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p><span class="emphasis"><em>
+                  Note that this is an experimental feature in Hibernate 3.0 and is under
+                          extremely active development.
+                      </em></span></p>
+         <div class="sect1" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="xml-intro"></a>18.1.&nbsp;Working with XML data
+                     </h2>
+                  </div>
+               </div>
+            </div>
+            <p>
+               Hibernate lets you work with persistent XML data in much the same way
+                           you work with persistent POJOs. A parsed XML tree can be thought of
+                           as just another way to represent the relational data at the object level,
+                           instead of POJOs.
+                       
+            </p>
+            <p>
+                           Hibernate supports dom4j as API for manipulating XML trees. You can write 
+                           queries that retrieve dom4j trees from the database and have any 
+                           modification you make to the tree automatically synchronized to the 
+                           database. You can even take an XML document, parse it using dom4j, and
+                           write it to the database with any of Hibernate's basic operations: 
+                           <code class="literal">persist(), saveOrUpdate(), merge(), delete(), replicate()</code> 
+                           (merging is not yet supported).
+                       
+            </p>
+            <p>
+                           This feature has many applications including data import/export, 
+                           externalization of entity data via JMS or SOAP and XSLT-based reporting.
+                       
+            </p>
+            <p>
+                           A single mapping may be used to simultaneously map properties of a class
+                           and nodes of an XML document to the database, or, if there is no class to map, 
+                           it may be used to map just the XML.
+                       
+            </p>
+            <div class="sect2" lang="en-US">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="xml-intro-mapping"></a>18.1.1.&nbsp;Specifying XML and class mapping together
+                        </h3>
+                     </div>
+                  </div>
+               </div>
+               <p>
+                                  Here is an example of mapping a POJO and XML simultaneously:
+                              
+               </p><pre class="programlisting">&lt;class name="Account" 
+        table="ACCOUNTS" 
+        node="account"&gt;
+        
+    &lt;id name="accountId" 
+            column="ACCOUNT_ID" 
+            node="@id"/&gt;
+            
+    &lt;many-to-one name="customer" 
+            column="CUSTOMER_ID" 
+            node="customer/@id" 
+            embed-xml="false"/&gt;
+            
+    &lt;property name="balance" 
+            column="BALANCE" 
+            node="balance"/&gt;
+            
+    ...
+    
+&lt;/class&gt;</pre></div>
+            <div class="sect2" lang="en-US">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="xml-onlyxml"></a>18.1.2.&nbsp;Specifying only an XML mapping
+                        </h3>
+                     </div>
+                  </div>
+               </div>
+               <p>
+                                  Here is an example where there is no POJO class:
+                              
+               </p><pre class="programlisting">&lt;class entity-name="Account" 
+        table="ACCOUNTS" 
+        node="account"&gt;
+        
+    &lt;id name="id" 
+            column="ACCOUNT_ID" 
+            node="@id" 
+            type="string"/&gt;
+            
+    &lt;many-to-one name="customerId" 
+            column="CUSTOMER_ID" 
+            node="customer/@id" 
+            embed-xml="false" 
+            entity-name="Customer"/&gt;
+            
+    &lt;property name="balance" 
+            column="BALANCE" 
+            node="balance" 
+            type="big_decimal"/&gt;
+            
+    ...
+    
+&lt;/class&gt;</pre><p>
+                                  This mapping allows you to access the data as a dom4j tree, or as a graph of
+                                  property name/value pairs (java <code class="literal">Map</code>s). The property names
+                                  are purely logical constructs that may be referred to in HQL queries.
+                              
+               </p>
+            </div>
+         </div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="filters.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center">&nbsp;</td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="xml-mapping.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">Chapter&nbsp;17.&nbsp;Filtering data&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;18.2.&nbsp;XML mapping metadata</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

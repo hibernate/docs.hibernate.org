@@ -1,0 +1,69 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>10.8.&nbsp;Deleting persistent objects</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="objectstate.html" title="Chapter&nbsp;10.&nbsp;Working with objects">
+      <link rel="prev" href="objectstate-saveorupdate.html" title="10.7.&nbsp;Automatic state detection">
+      <link rel="next" href="objectstate-replicating.html" title="10.9.&nbsp;Replicating object between two different datastores">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">10.8.&nbsp;Deleting persistent objects</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="objectstate-saveorupdate.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;10.&nbsp;Working with objects</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="objectstate-replicating.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="objectstate-deleting"></a>10.8.&nbsp;Deleting persistent objects
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+                        <code class="literal">Session.delete()</code> will remove an object's state from the database.
+                        Of course, your application might still hold a reference to a deleted object.
+                        It's best to think of <code class="literal">delete()</code> as making a persistent instance
+                        transient.
+                    
+         </p><pre class="programlisting">sess.delete(cat);</pre><p>
+                        You may delete objects in any order you like, without risk of foreign key
+                        constraint violations. It is still possible to violate a <code class="literal">NOT
+                           NULL</code> constraint on a foreign key column by deleting objects in
+                        the wrong order, e.g. if you delete the parent, but forget to delete the
+                        children.
+                    
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="objectstate-saveorupdate.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="objectstate.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="objectstate-replicating.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">10.7.&nbsp;Automatic state detection&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;10.9.&nbsp;Replicating object between two different datastores</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

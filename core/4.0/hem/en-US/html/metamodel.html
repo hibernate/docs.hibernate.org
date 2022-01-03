@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory">Chapter 4. Metamodel</title><link rel="stylesheet" href="css/hibernate.css" type="text/css"/><meta xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" name="generator" content="DocBook XSL Stylesheets V1.72.0"/><link rel="start" href="index.html" title="Hibernate EntityManager"/><link rel="up" href="index.html" title="Hibernate EntityManager"/><link rel="prev" href="objectstate.html" title="Chapter 3. Working with objects"/><link rel="next" href="transactions.html" title="Chapter 5. Transactions and Concurrency"/></head><body><p id="title"><a href="http://www.hibernate.org" class="site_href"><strong>Hibernate.org</strong></a><a href="http://hibernate.org/Documentation/DocumentationOverview" class="doc_href"><strong>Community Documentation</strong></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="objectstate.html"><strong>Prev</strong></a></li><li class="next"><a accesskey="n" href="transactions.html"><strong>Next</strong></a></li></ul><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a id="metamodel"/>Chapter 4. Metamodel</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="metamodel.html#metamodel-static">4.1. Static metamodel</a></span></dt></dl></div><div xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="note"><h2>Note</h2><p>
+            The Metamodel itself is described in <em class="citetitle">Chapter 5 Metamodel API</em>
+            of the [<span class="citation"><a href="bi01.html#JPA2" title="JSR 317: Java™ Persistence API, Version 2.0"><abbr class="abbrev"/></a><a id="JPA2_ABBREV"/><a href="bi01.html#JPA2" title="JSR 317: Java™ Persistence API, Version 2.0"><abbr class="abbrev">JPA 2 Specification</abbr></a></span>].  <em class="citetitle">Chapter 6 Criteria API</em>
+            of the [<span class="citation"><a href="bi01.html#JPA2" title="JSR 317: Java™ Persistence API, Version 2.0"><abbr class="abbrev"/></a><a id="JPA2_ABBREV"/><a href="bi01.html#JPA2" title="JSR 317: Java™ Persistence API, Version 2.0"><abbr class="abbrev">JPA 2 Specification</abbr></a></span>] describes and shows uses of the metamodel in criteria
+            queries, as does <a href="querycriteria.html" title="Chapter 9. Criteria Queries">Chapter 9, <i xmlns:xlink="http://www.w3.org/1999/xlink">Criteria Queries</i></a>.
+        </p></div><p>
+        The metamodel is a set of objects that describe your domain model.
+        <code class="interfacename">javax.persistence.metamodel.Metamodel</code> acts as a repository of these metamodel
+        objects and provides access to them, and can be obtained from either the
+        <code class="interfacename">javax.persistence.EntityManagerFactory</code> or the
+        <code class="interfacename">javax.persistence.EntityManager</code> via their
+        <code class="methodname">getMetamodel</code> method.
+    </p><p>
+        This metamodel is important in 2 ways.  First, it allows providers and frameworks a generic way to
+        deal with an application's domain model.  Persistence providers will already have some form of
+        metamodel that they use to describe the domain model being mapped.  This API however defines a single,
+        independent access to that existing information.  A validation framework, for example, could use this
+        information to understand associations; a marshaling framework might use this information to decide how
+        much of an entity graph to marshal.  This usage is beyond the scope of this documentation.
+    </p><div xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="important"><h2>Important</h2><p>
+            As of today the JPA 2 metamodel does not provide any facility for accessing relational information
+            pertaining to the physical model.  It is expected this will be addressed in a future release of the
+            specification.
+        </p></div><p>
+        Second, from an application writer's perspective, it allows very fluent expression of completely type-safe
+        criteria queries, especially the <span class="emphasis"><em>Static Metamodel</em></span> approach.  The
+        [<span class="citation"><a href="bi01.html#JPA2" title="JSR 317: Java™ Persistence API, Version 2.0"><abbr class="abbrev"/></a><a id="JPA2_ABBREV"/><a href="bi01.html#JPA2" title="JSR 317: Java™ Persistence API, Version 2.0"><abbr class="abbrev">JPA 2 Specification</abbr></a></span>] defines a number of ways the metamodel can be accessed and used,
+        including the <span class="emphasis"><em>Static Metamodel</em></span> approach, which we will look at later.
+        The <span class="emphasis"><em>Static Metamodel</em></span> approach is wonderful when the code has
+        <a xmlns:xlink="http://www.w3.org/1999/xlink" href="http://en.wikipedia.org/wiki/A_priori_and_a_posteriori">a priori knowledge</a> of the domain
+        model.  <a href="querycriteria.html" title="Chapter 9. Criteria Queries">Chapter 9, <i xmlns:xlink="http://www.w3.org/1999/xlink">Criteria Queries</i></a> uses this approach exclusively in its examples.
+    </p><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title"><a id="metamodel-static"/>4.1. Static metamodel</h2></div></div></div><p>
+            A <span class="emphasis"><em>static metamodel</em></span> is a series of classes that "mirror" the entities and embeddables
+            in the domain model and provide static access to the metadata about the mirrored class's attributes.  We
+            will exclusively discuss what the [<span class="citation"><a href="bi01.html#JPA2" title="JSR 317: Java™ Persistence API, Version 2.0"><abbr class="abbrev"/></a><a id="JPA2_ABBREV"/><a href="bi01.html#JPA2" title="JSR 317: Java™ Persistence API, Version 2.0"><abbr class="abbrev">JPA 2 Specification</abbr></a></span>] terms a
+            <span class="emphasis"><em>Canonical Metamodel</em></span>:
+        </p><div class="blockquote"><table border="0" width="100%" cellspacing="0" cellpadding="0" class="blockquote" summary="Block quote"><tr><td width="10%" valign="top"> </td><td width="80%" valign="top"><p>
+                </p><div class="itemizedlist"><ul><li><p>
+                            For each managed class <code class="classname">X</code> in package <span class="package">p</span>,
+                            a metamodel class <code class="classname">X_</code> in package <span class="package">p</span> is created.
+                        </p></li><li><p>
+                            The name of the metamodel class is derived from the name of the managed class by appending
+                           "_" to the name of the managed class.
+                        </p></li><li><p>
+                            The metamodel class <code class="classname">X_</code> must be annotated with the
+                            <code class="interfacename">javax.persistence.StaticMetamodel</code>annotation
+                            <sup>[<a id="d0e1938" href="#ftn.d0e1938">1</a>]</sup>
+                        </p></li><li><p>
+                            If class <code class="classname">X</code> extends another class <code class="classname">S</code>, where
+                            <code class="classname">S</code> is the most derived managed class (i.e., entity or mapped
+                            superclass) extended by <code class="classname">X</code>, then class <code class="classname">X_</code> must
+                            extend class <code class="classname">S_</code>, where <code class="classname">S_</code> is the metamodel
+                            class created for <code class="classname">S</code>.
+                        </p></li><li><p>
+                            For every persistent non-collection-valued attribute <span class="emphasis"><em>y</em></span> declared by
+                            class <code class="classname">X</code>, where the type of <span class="emphasis"><em>y</em></span> is
+                            <code class="classname">Y</code>, the metamodel class must contain a declaration as follows:
+                            </p><pre class="programlisting">public static volatile SingularAttribute&lt;X, Y&gt; y;</pre><p>
+                        </p></li><li><p>
+                            For every persistent collection-valued attribute <span class="emphasis"><em>z</em></span> declared by class
+                            <code class="classname">X</code>, where the element type of <span class="emphasis"><em>z</em></span> is
+                            <code class="classname">Z</code>, the metamodel class must contain a declaration as follows:
+                            </p><div class="itemizedlist"><ul><li><p>
+                                        if the collection type of <span class="emphasis"><em>z</em></span> is
+                                        <code class="interfacename">java.util.Collection</code>, then
+                                        </p><pre class="programlisting">public static volatile CollectionAttribute&lt;X, Z&gt; z;</pre><p>
+                                    </p></li><li><p>
+                                        if the collection type of <span class="emphasis"><em>z</em></span> is
+                                        <code class="interfacename">java.util.Set</code>, then
+                                        </p><pre class="programlisting">public static volatile SetAttribute&lt;X, Z&gt; z;</pre><p>
+                                    </p></li><li><p>
+                                        if the collection type of <span class="emphasis"><em>z</em></span> is
+                                        <code class="interfacename">java.util.List</code>, then
+                                        </p><pre class="programlisting">public static volatile ListAttribute&lt;X, Z&gt; z;</pre><p>
+                                    </p></li><li><p>
+                                        if the collection type of <span class="emphasis"><em>z</em></span> is
+                                        <code class="interfacename">java.util.Map</code>, then
+                                        </p><pre class="programlisting">public static volatile MapAttribute&lt;X, K, Z&gt; z;</pre><p>
+                                        where <code class="classname">K</code> is the type of the key of the map in class
+                                        <code class="classname">X</code>
+                                    </p></li></ul></div><p>
+                        </p></li></ul></div><p>
+            </p><p>
+                Import statements must be included for the needed <span class="package">javax.persistence.metamodel</span> types
+                as appropriate (e.g., <code class="interfacename">javax.persistence.metamodel.SingularAttribute</code>,
+                <code class="interfacename">javax.persistence.metamodel.CollectionAttribute</code>,
+                <code class="interfacename">javax.persistence.metamodel.SetAttribute</code>,
+                <code class="interfacename">javax.persistence.metamodel.ListAttribute</code>,
+                <code class="interfacename">javax.persistence.metamodel.MapAttribute</code>) and all classes
+                <code class="classname">X</code>, <code class="classname">Y</code>, <code class="classname">Z</code>, and <code class="classname">K</code>.
+            </p></td><td width="10%" valign="top"> </td></tr><tr><td width="10%" valign="top"> </td><td colspan="2" align="right" valign="top">--<span class="attribution">
+                [<span class="citation"><a href="bi01.html#JPA2" title="JSR 317: Java™ Persistence API, Version 2.0"><abbr class="abbrev"/></a><a id="JPA2_ABBREV"/><a href="bi01.html#JPA2" title="JSR 317: Java™ Persistence API, Version 2.0"><abbr class="abbrev">JPA 2 Specification</abbr></a>, section 6.2.1.1, pp 198-199</span>]
+            </span></td></tr></table></div><div class="example"><a id="metamodel-static-ex"/><p class="title"><b>Example 4.1. Static metamodel example</b></p><div class="example-contents"><p>
+                For the <code class="classname">Person</code> entity
+                </p><pre class="programlisting">package org.hibernate.jpa2.metamodel.example;
+
+import java.util.Set;
+import javax.persistence.Entity;
+
+@Entity
+public class Person {
+    @Id private Long id;
+    private String name;
+    private int age;
+    private Address address;
+    @OneToMany  private Set&lt;Order&gt; orders;
+}</pre><p>
+                The corresponding canonical metamodel class, <code class="classname">Person_</code> would look like
+                </p><pre class="programlisting">package org.hibernate.jpa2.metamodel.example;
+
+import javax.persistence.metamodel.SingularAttribute;
+import javax.persistence.metamodel.SetAttribute;
+import javax.persistence.metamodel.StaticMetamodel;
+
+@StaticMetamodel( Person.class )
+public class Person_ {
+    public static volatile SingularAttribute&lt;Person, Long&gt; id;
+    public static volatile SingularAttribute&lt;Person, String&gt; name;
+    public static volatile SingularAttribute&lt;Person, Integer&gt; age;
+    public static volatile SingularAttribute&lt;Person, Address&gt; address;
+    public static volatile SetAttribute&lt;Person, Order&gt; orders;
+}</pre><p>
+            </p></div></div><br class="example-break"/><div xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="note"><h2>Note</h2><p>
+                These canonical metamodel classes can be generated manually if you wish though it is expected
+                that most developers will prefer use of an <a xmlns:xlink="http://www.w3.org/1999/xlink" href="http://java.sun.com/javase/6/docs/technotes/tools/solaris/javac.html#processing">annotation processor</a>.
+                Annotation processors themselves are beyond the scope of this document.  However, the Hibernate team
+                does develop an annotation processor tool for generating a canonical metamodel.
+                See <em class="citetitle">Hibernate Metamodel Generator</em>.
+            </p></div><p>
+            When the Hibernate <code class="interfacename">EntityManagerFactory</code> is being built, it will
+            look for a canonical metamodel class for each of the managed typed is knows about and if it finds
+            any it will inject the appropriate metamodel information into them, as outlined in
+            [<span class="citation"><a href="bi01.html#JPA2" title="JSR 317: Java™ Persistence API, Version 2.0"><abbr class="abbrev"/></a><a id="JPA2_ABBREV"/><a href="bi01.html#JPA2" title="JSR 317: Java™ Persistence API, Version 2.0"><abbr class="abbrev">JPA 2 Specification</abbr></a>, section 6.2.2, pg 200</span>]
+        </p></div><div xmlns="" xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="footnotes"><br/><hr/><div xmlns="http://www.w3.org/1999/xhtml" class="footnote"><p><sup>[<a id="ftn.d0e1938" href="#d0e1938">1</a>] </sup>
+                                    <span class="emphasis"><em>(from the original)</em></span> If the class was generated, the
+                                    <code class="interfacename">javax.annotation.Generated</code> annotation should be
+                                    used to annotate the class. The use of any other annotations on static metamodel
+                                    classes is undefined.
+                                </p></div></div></div><HR xmlns=""/><a xmlns="" href=""><p xmlns="http://www.w3.org/1999/xhtml" class="copyright">Copyright © 2005 Red Hat Inc. and the various authors</p></a><ul class="docnav"><li class="previous"><a accesskey="p" href="objectstate.html"><strong>Prev</strong>Chapter 3. Working with objects</a></li><li class="up"><a accesskey="u" href="#"><strong>Top of page</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Front page</strong></a></li><li class="next"><a accesskey="n" href="transactions.html"><strong>Next</strong>Chapter 5. Transactions and Concurrency</a></li></ul></body></html>

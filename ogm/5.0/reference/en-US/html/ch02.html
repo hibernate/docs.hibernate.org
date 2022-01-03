@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Chapter 2. Getting started with Hibernate OGM</title><!-- HibernateDoc.Meta --><meta name="description" content="Hibernate OGM, JPA for NoSQL datastores - Reference Documentation" /><meta name="keywords" content="hibernate, ogm, hibernate ogm, nosql, jpa, infinispan, mongodb, neo4j, cassandra, couchdb, ehcache, redis" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://docs.jboss.org/hibernate/stable/ogm/reference/en-US/html_single/" /><!-- /HibernateDoc.Meta --><link rel="stylesheet" type="text/css" href="css/hibernate.css"/><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"/><link rel="home" href="index.html" title="Hibernate OGM Reference Guide"/><link rel="up" href="index.html" title="Hibernate OGM Reference Guide"/><link rel="prev" href="ch01.html" title="Chapter 1. How to get help and contribute on Hibernate OGM"/><link rel="next" href="ch03.html" title="Chapter 3. Architecture"/><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/></head><body><p id="title"><a href="http://www.hibernate.org" class="site_href"><strong>Hibernate.org</strong></a><a href="http://hibernate.org/Documentation/DocumentationOverview" class="doc_href"><strong>Community Documentation</strong></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="ch01.html"><strong>Prev</strong></a></li><li class="next"><a accesskey="n" href="ch03.html"><strong>Next</strong></a></li></ul><div class="chapter" title="Chapter 2. Getting started with Hibernate OGM"><div class="titlepage"><div><div><h2 class="title"><a id="ogm-gettingstarted"/>Chapter 2. Getting started with Hibernate OGM</h2></div></div></div><p>If you are familiar with JPA, you are almost good to go.
+We will nevertheless walk you through the first few steps of persisting
+and retrieving an entity using Hibernate OGM.</p><p>Before we can start, make sure you have the following tools configured:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">Java JDK 8</li><li class="listitem">Maven 3.2.3 or above</li></ul></div><p>Hibernate OGM can be used with JDK 7 too, but in this example we’ll
+be using Infinispan 8, which requires JDK 8.</p><p>Hibernate OGM is published in the Maven central repository.</p><p>Add <code class="literal">org.hibernate.ogm:hibernate-ogm-bom:5.0.4.Final</code> to your dependency management block
+and <code class="literal">org.hibernate.ogm:hibernate-ogm-infinispan:5.0.4.Final</code>
+to your project dependencies:</p><pre><code class="language-xml">&lt;dependencyManagement&gt;
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.hibernate.ogm&lt;/groupId&gt;
+            &lt;artifactId&gt;hibernate-ogm-bom&lt;/artifactId&gt;
+            &lt;version&gt;5.0.4.Final&lt;/version&gt;
+            &lt;type&gt;pom&lt;/type&gt;
+            &lt;scope&gt;import&lt;/scope&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+&lt;dependencyManagement&gt;
+
+&lt;dependencies&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.hibernate.ogm&lt;/groupId&gt;
+        &lt;artifactId&gt;hibernate-ogm-infinispan&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+&lt;/dependencies&gt;</code></pre><p>The former is a so-called "bill of materials" POM
+which specifies a matching set of versions for Hibernate OGM and its dependencies.
+That way you never need to specify a version explicitly within your dependencies block,
+you will rather get the versions from the BOM automatically.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>If you’re deploying your application onto WildFly 10,
+you don’t need to add the Hibernate OGM modules to your deployment unit
+but you can rather add them as modules to the application server.
+Refer to <a class="xref" href="ch04.html#ogm-configuration-jbossmodule" title="4.5. How to package Hibernate OGM applications for WildFly 10">Section 4.5, “How to package Hibernate OGM applications for WildFly 10”</a> to learn more.</p></div><p>We will use the JPA APIs in this tutorial.
+While Hibernate OGM depends on JPA 2.1,
+it is marked as provided in the Maven POM file.
+If you run outside a Java EE container,
+make sure to explicitly add the dependency:</p><pre><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.hibernate.javax.persistence&lt;/groupId&gt;
+    &lt;artifactId&gt;hibernate-jpa-2.1-api&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre><p>Let’s now map our first Hibernate OGM entity.</p><pre><code class="language-java">@Entity
+public class Dog {
+   @Id @GeneratedValue(strategy = GenerationType.TABLE, generator = "dog")
+   @TableGenerator(
+      name = "dog",
+      table = "sequences",
+      pkColumnName = "key",
+      pkColumnValue = "dog",
+      valueColumnName = "seed"
+   )
+   public Long getId() { return id; }
+   public void setId(Long id) { this.id = id; }
+   private Long id;
+
+   public String getName() { return name; }
+   public void setName(String name) { this.name = name; }
+   private String name;
+
+   @ManyToOne
+   public Breed getBreed() { return breed; }
+   public void setBreed(Breed breed) { this.breed = breed; }
+   private Breed breed;
+}
+
+@Entity
+public class Breed {
+
+   @Id @GeneratedValue(generator = "uuid")
+   @GenericGenerator(name="uuid", strategy="uuid2")
+   public String getId() { return id; }
+   public void setId(String id) { this.id = id; }
+   private String id;
+
+   public String getName() { return name; }
+   public void setName(String name) { this.name = name; }
+   private String name;
+}</code></pre><p>I lied to you, we have already mapped two entities!</p><p>If you are familiar with JPA,
+you can see that there is nothing specific to Hibernate OGM in our mapping.</p><p>In this tutorial, we will use JBoss Transactions for our JTA transaction manager.
+So let’s add the JTA API and JBoss Transactions to our POM as well.
+The final list of dependencies should look like this:</p><pre><code class="language-xml">&lt;dependencies&gt;
+    &lt;!-- Hibernate OGM Infinispan module; pulls in the OGM core module --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.hibernate.ogm&lt;/groupId&gt;
+        &lt;artifactId&gt;hibernate-ogm-infinispan&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+
+    &lt;!-- standard APIs dependencies - provided in a Java EE container --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.hibernate.javax.persistence&lt;/groupId&gt;
+        &lt;artifactId&gt;hibernate-jpa-2.1-api&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.jboss.spec.javax.transaction&lt;/groupId&gt;
+        &lt;artifactId&gt;jboss-transaction-api_1.2_spec&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+
+    &lt;!-- Add the Narayana Transactions Manager
+         an implementation would be provided in a Java EE container,
+         but this works nicely in Java SE as well --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.jboss.narayana.jta&lt;/groupId&gt;
+        &lt;artifactId&gt;narayana-jta&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.jboss&lt;/groupId&gt;
+        &lt;artifactId&gt;jboss-transaction-spi&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+&lt;/dependencies&gt;</code></pre><p>Next we need to define the persistence unit.
+Create a <code class="literal">META-INF/persistence.xml</code> file.</p><pre><code class="language-xml">&lt;?xml version="1.0"?&gt;
+&lt;persistence xmlns="http://java.sun.com/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+             version="2.0"&gt;
+
+    &lt;persistence-unit name="ogm-jpa-tutorial" transaction-type="JTA"&gt;
+        &lt;!-- Use the Hibernate OGM provider: configuration will be transparent --&gt;
+        &lt;provider&gt;org.hibernate.ogm.jpa.HibernateOgmPersistence&lt;/provider&gt;
+        &lt;properties&gt;
+            &lt;!-- Here you will pick which NoSQL technology to use, and configure it;
+                 in this example we start a local in-memory Infinispan node. --&gt;
+            &lt;property name="hibernate.ogm.datastore.provider" value="infinispan"/&gt;
+        &lt;/properties&gt;
+    &lt;/persistence-unit&gt;
+&lt;/persistence&gt;</code></pre><p>Let’s now persist a set of entities and retrieve them.</p><pre><code class="language-java">//accessing JBoss's Transaction can be done differently but this one works nicely
+TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
+
+//build the EntityManagerFactory as you would build in in Hibernate ORM
+EntityManagerFactory emf = Persistence.createEntityManagerFactory(
+    "ogm-jpa-tutorial");
+
+final Logger logger = LoggerFactory.getLogger(DogBreedRunner.class);
+
+[..]
+
+//Persist entities the way you are used to in plain JPA
+tm.begin();
+logger.infof("About to store dog and breed");
+EntityManager em = emf.createEntityManager();
+Breed collie = new Breed();
+collie.setName("Collie");
+em.persist(collie);
+Dog dina = new Dog();
+dina.setName("Dina");
+dina.setBreed(collie);
+em.persist(dina);
+Long dinaId = dina.getId();
+em.flush();
+em.close();
+tm.commit();
+
+[..]
+
+//Retrieve your entities the way you are used to in plain JPA
+tm.begin();
+logger.infof("About to retrieve dog and breed");
+em = emf.createEntityManager();
+dina = em.find(Dog.class, dinaId);
+logger.infof("Found dog %s of breed %s", dina.getName(), dina.getBreed().getName());
+em.flush();
+em.close();
+tm.commit();
+
+[..]
+
+emf.close();</code></pre><p>A working example can be found in Hibernate OGM’s distribution under
+<code class="literal">hibernate-ogm-documentation/examples/gettingstarted</code>.</p><p>What have we seen?</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">Hibernate OGM is a JPA implementation
+and is used as such both for mapping and in API usage</li><li class="listitem">It is configured as a specific JPA provider:
+<code class="literal">org.hibernate.ogm.jpa.HibernateOgmPersistence</code></li></ul></div><p>Let’s explore more in the next chapters.</p></div><script xmlns="" xmlns:d="http://docbook.org/ns/docbook" type="text/javascript" src="highlight.js/highlight.pack.js"> </script><script xmlns="" xmlns:d="http://docbook.org/ns/docbook" type="text/javascript">hljs.initHighlightingOnLoad();</script><script type="text/javascript">
+dataLayer = [{'channel' : 'Hibernate', 'additional_tracking_code' : 'UA-45270411-3'}];
+(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NJWS5L');</script><noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-NJWS5L" height="0" width="0" style="display:none;visibility:hidden"> </iframe></noscript><hr xmlns="" xmlns:d="http://docbook.org/ns/docbook"/><a xmlns="" xmlns:d="http://docbook.org/ns/docbook" href="legalnotice.html"/><ul class="docnav"><li class="previous"><a accesskey="p" href="ch01.html"><strong>Prev</strong>Chapter 1. How to get help and contribute on Hibe...</a></li><li class="up"><a accesskey="u" href="#"><strong>Up</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Home</strong></a></li><li class="next"><a accesskey="n" href="ch03.html"><strong>Next</strong>Chapter 3. Architecture</a></li></ul><!-- HibernateDoc.OutdatedContent --><script src="//code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script><script src="/hibernate/_outdated-content/outdated-content.js" type="text/javascript"></script><script type="text/javascript">var jQuery_3_1 = $.noConflict(true); jQuery_3_1(document).ready(function() { HibernateDoc.OutdatedContent.install("ogm"); });</script><!-- /HibernateDoc.OutdatedContent --></body></html>

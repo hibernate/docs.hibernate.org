@@ -1,0 +1,170 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>13.4.&nbsp;La pseudo-syntaxe pour les expressions UPDATE et DELETE est : ( UPDATE | DELETE ) FROM? EntityName (WHERE where_conditions)?.
+         Certains points sont &Atilde;&nbsp; noter :
+      </title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="batch.html" title="Chapitre&nbsp;13.&nbsp;Traitement par paquet">
+      <link rel="prev" href="batch-statelesssession.html" title="13.3.&nbsp;Notez que dans le code de l'exemple, les intances de Customer retourn&Atilde;&copy;es par la requ&Atilde;&ordf;te sont imm&Atilde;&copy;diatement d&Atilde;&copy;tach&Atilde;&copy;es. Elles ne sont jamais associ&Atilde;&copy;es &Atilde;&nbsp; un contexte de persistance.">
+      <link rel="next" href="queryhql.html" title="Chapitre&nbsp;14.&nbsp;HQL: Langage de requ&ecirc;tage d'Hibernate">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">13.4.&nbsp;La pseudo-syntaxe pour les expressions <code class="literal">UPDATE</code> et <code class="literal">DELETE</code> est : <code class="literal">( UPDATE | DELETE ) FROM? EntityName (WHERE where_conditions)?</code>. Certains points sont &Atilde;&nbsp; noter :
+               </th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="batch-statelesssession.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;13.&nbsp;Traitement par paquet</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="queryhql.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="batch-direct"></a>13.4.&nbsp;La pseudo-syntaxe pour les expressions <code class="literal">UPDATE</code> et <code class="literal">DELETE</code> est : <code class="literal">( UPDATE | DELETE ) FROM? EntityName (WHERE where_conditions)?</code>. Certains points sont &Atilde;&nbsp; noter :
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Dans la clause from, le mot-clef FROM est optionnel </p>
+         <p>Il ne peut y avoir qu'une seule entit&Atilde;&copy; nomm&Atilde;&copy;e dans la clause from ; elle peut optionnellement avoir un alias. Si le nom
+            de l'entit&Atilde;&copy; a un alias, alors n'importe quelle r&Atilde;&copy;f&Atilde;&copy;rence de propri&Atilde;&copy;t&Atilde;&copy; doit &Atilde;&ordf;tre qualifi&Atilde;&copy;e en ayant un alias ; si le
+            nom de l'entit&Atilde;&copy; n'a pas d'alias, alors il est ill&Atilde;&copy;gal pour n'importe quelle r&Atilde;&copy;f&Atilde;&copy;rence de propri&Atilde;&copy;t&Atilde;&copy; d'&Atilde;&ordf;tre qualifi&Atilde;&copy;e.
+            
+         </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p>Aucune jointure (implicite ou explicite) ne peut &Atilde;&ordf;tre sp&Atilde;&copy;cifi&Atilde;&copy;e dans une requ&Atilde;&ordf;te HQL. Les sous-requ&Atilde;&ordf;tes peuvent &Atilde;&ordf;tre
+                     utilis&Atilde;&copy;es dans la clause where ; les sous-requ&Atilde;&ordf;tes, elles-m&Atilde;&ordf;mes, peuvent contenir des jointures. 
+                  </p>
+               </li>
+               <li>
+                  <p>La clause where est aussi optionnelle. </p>
+               </li>
+               <li>
+                  <p>Par exemple, pour ex&Atilde;&copy;cuter un <code class="literal">UPDATE</code> HQL, utilisez la m&Atilde;&copy;thode <code class="literal">Query.executeUpdate()</code> (la m&Atilde;&copy;thode est donn&Atilde;&copy;es pour ceux qui sont familiers avec <code class="literal">PreparedStatement.executeUpdate()</code> de JDBC) : 
+                  </p>
+               </li>
+               <li>
+                  <p>Pour ex&Atilde;&copy;cuter un <code class="literal">DELETE</code> HQL, utilisez la m&Atilde;&ordf;me m&Atilde;&copy;thode <code class="literal">Query.executeUpdate()</code> : 
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p>La valeur du <code class="literal">int</code> retourn&Atilde;&copy; par la m&Atilde;&copy;thode <code class="literal">Query.executeUpdate()</code> indique le nombre d'entit&Atilde;&copy;s affect&Atilde;&copy;es par l'op&Atilde;&copy;ration. Consid&Atilde;&copy;rez que cela peut ou pas corr&Atilde;&copy;ler le nombre de lignes
+            affect&Atilde;&copy;s dans la base de donn&Atilde;&copy;es. Une op&Atilde;&copy;ration HQL pourrait entra&Atilde;&reg;ner l'ex&Atilde;&copy;cution de multiples expressions SQL r&Atilde;&copy;elles,
+            pour des classes filles mapp&Atilde;&copy;es par jointure (NdT: join-subclass), par exemple. Le nombre retourn&Atilde;&copy; indique le nombre d'entit&Atilde;&copy;s
+            r&Atilde;&copy;elles affect&Atilde;&copy;es par l'expression. Retour &Atilde;&nbsp; l'exemple de la classe fille mapp&Atilde;&copy;e par jointure, un effacement d'une des
+            classes filles peut r&Atilde;&copy;ellement entra&Atilde;&reg;ner des suppressions pas seulement dans la table qui mappe la classe fille, mais aussi
+            dans la table "racine" et potentillement dans les tables des classes filles plus bas dans la hi&Atilde;&copy;rarchie d'h&Atilde;&copy;ritage. 
+         </p><pre class="programlisting">Session session = sessionFactory.openSession();
+Transaction tx = session.beginTransaction();
+
+String hqlUpdate = "update Customer c set c.name = :newName where c.name = :oldName";
+// or String hqlUpdate = "update Customer set name = :newName where name = :oldName";
+int updatedEntities = s.createQuery( hqlUpdate )
+        .setString( "newName", newName )
+        .setString( "oldName", oldName )
+        .executeUpdate();
+tx.commit();
+session.close();</pre><p>La pseudo-syntaxe pour l'expression <code class="literal">INSERT</code> est : <code class="literal">INSERT INTO EntityName properties_list select_statement</code>. Quelques points sont &Atilde;&nbsp; noter : 
+         </p><pre class="programlisting">Session session = sessionFactory.openSession();
+Transaction tx = session.beginTransaction();
+String hqlVersionedUpdate = "update versioned Customer set name = :newName where name = :oldName";
+int updatedEntities = s.createQuery( hqlUpdate )
+        .setString( "newName", newName )
+        .setString( "oldName", oldName )
+        .executeUpdate();
+tx.commit();
+session.close();</pre><p>Seule la forme INSERT INTO ... SELECT ... est support&Atilde;&copy;e ; pas la forme INSERT INTO ... VALUES ... . </p>
+         <p>La properties_list est analogue &Atilde;&nbsp; la <code class="literal">sp&Atilde;&copy;cification de la colonne</code> The properties_list is analogous to the <code class="literal">column speficiation</code> dans l'expression SQL <code class="literal">INSERT</code>. Pour les entit&Atilde;&copy;s impliqu&Atilde;&copy;es dans un h&Atilde;&copy;ritage mapp&Atilde;&copy;, seules les propri&Atilde;&copy;t&Atilde;&copy;s directement d&Atilde;&copy;finies &Atilde;&nbsp; ce niveau de classe
+            donn&Atilde;&copy; peuvent &Atilde;&ordf;tre utilis&Atilde;&copy;es dans properties_list. Les propri&Atilde;&copy;t&Atilde;&copy;s de la classe m&Atilde;&uml;re ne sont pas permises ; et les propri&Atilde;&copy;t&Atilde;&copy;s
+            des classes filles n'ont pas de sens. En d'autres mots, les expressions <code class="literal">INSERT</code> par nature non polymorphiques. 
+         </p><pre class="programlisting">Session session = sessionFactory.openSession();
+Transaction tx = session.beginTransaction();
+
+String hqlDelete = "delete Customer c where c.name = :oldName";
+// or String hqlDelete = "delete Customer where name = :oldName";
+int deletedEntities = s.createQuery( hqlDelete )
+        .setString( "oldName", oldName )
+        .executeUpdate();
+tx.commit();
+session.close();</pre><p>select_statement peut &Atilde;&ordf;tre n'importe quelle requ&Atilde;&ordf;te de s&Atilde;&copy;lection HQl valide, avec l'avertissement que les types de retour
+            doivent correspondre aux types attendus par l'insertion. Actuellement, c'est v&Atilde;&copy;rifi&Atilde;&copy; durant la compilation de la requ&Atilde;&ordf;te
+            plut&Atilde;&acute;t que la v&Atilde;&copy;rification soit rel&Atilde;&copy;gu&Atilde;&copy;e &Atilde;&nbsp; la base de donn&Atilde;&copy;es. Notez cependant que cela pourrait poser des probl&Atilde;&uml;mes
+            entre les <code class="literal">Type</code>s d'Hibernate qui sont <span class="emphasis"><em>&Atilde;&copy;quivalents</em></span> oppos&Atilde;&copy; &Atilde;&nbsp; <span class="emphasis"><em>&Atilde;&copy;gaux</em></span>. Cela pourrait poser des probl&Atilde;&uml;mes avec des disparit&Atilde;&copy;s entre une propri&Atilde;&copy;t&Atilde;&copy; d&Atilde;&copy;finie comme un <code class="literal">org.hibernate.type.DateType</code> et une propri&Atilde;&copy;t&Atilde;&copy; d&Atilde;&copy;finie comme un <code class="literal">org.hibernate.type.TimestampType</code>, m&Atilde;&ordf;me si la base de donn&Atilde;&copy;es ne ferait pas de distinction ou ne serait pas capable de g&Atilde;&copy;rer la conversion. 
+         </p>
+         <p>Pour la propri&Atilde;&copy;te id, l'expression d'insertion vous donne deux options. Vous pouvez soit sp&Atilde;&copy;cifier explicitement la propri&Atilde;&copy;t&Atilde;&copy;
+            id dans properties_list (auquel cas sa valeur est extraite de l'expression de s&Atilde;&copy;lection correspondante), soit l'omettre de
+            properties_list (auquel cas une valeur g&Atilde;&copy;n&Atilde;&copy;r&Atilde;&copy;e est utilis&Atilde;&copy;e). Cette derni&Atilde;&uml;re option est seulement disponible en utilisant
+            le g&Atilde;&copy;n&Atilde;&copy;rateur d'identifiant qui op&Atilde;&uml;re dans la base de donn&Atilde;&copy;es ; tenter d'utiliser cette option avec n'importe quel type
+            de g&Atilde;&copy;n&Atilde;&copy;rateur "en m&Atilde;&copy;moire" causera une exception durant l'analyse. Notez que pour les buts de cette discussion, les g&Atilde;&copy;n&Atilde;&copy;rateurs
+            "en base" sont consid&Atilde;&copy;r&Atilde;&copy;s &Atilde;&ordf;tre <code class="literal">org.hibernate.id.SequenceGenerator</code> (et ses classes filles) et n'importe quelles impl&Atilde;&copy;mentations de <code class="literal">org.hibernate.id.PostInsertIdentifierGenerator</code>. L'exception la plus notable ici est <code class="literal">org.hibernate.id.TableHiLoGenerator</code>, qu ne peut pas &Atilde;&ordf;tre utilis&Atilde;&copy;e parce qu'il ne propose pas un moyen de d'exposer ses valeurs par un select. 
+         </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p>Pour des propri&Atilde;&copy;t&Atilde;&copy;s mapp&Atilde;&copy;es comme <code class="literal">version</code> ou <code class="literal">timestamp</code>, l'expression d'insertion vous donne deux options. Vous pouvez soit sp&Atilde;&copy;cifier la propri&Atilde;&copy;t&Atilde;&copy; dans properties_list (auquel
+                     cas sa valeur est extraite des expressions select correspondantes), soit l'omettre de properties_list (auquel cas la <code class="literal">valeur de graine</code> (NdT : seed value) d&Atilde;&copy;finie par le <code class="literal">org.hibernate.type.VersionType</code> est utilis&Atilde;&copy;e). 
+                  </p>
+                  <p>Un exemple d'ex&Atilde;&copy;cution d'une expression <code class="literal">INSERT</code> HQL : 
+                  </p>
+               </li>
+               <li>
+                  <p>translator-credits </p>
+               </li>
+               <li>
+                  <p>For the id property, the insert statement gives you two options. You can either explicitly specify the id property in the
+                     properties_list (in which case its value is taken from the corresponding select expression) or omit it from the properties_list
+                     (in which case a generated value is used). This later option is only available when using id generators that operate in the
+                     database; attempting to use this option with any "in memory" type generators will cause an exception during parsing. Note
+                     that for the purposes of this discussion, in-database generators are considered to be <code class="literal">org.hibernate.id.SequenceGenerator</code> (and its subclasses) and any implementors of <code class="literal">org.hibernate.id.PostInsertIdentifierGenerator</code>. The most notable exception here is <code class="literal">org.hibernate.id.TableHiLoGenerator</code>, which cannot be used because it does not expose a selectable way to get its values. 
+                  </p>
+               </li>
+               <li>
+                  <p>For properties mapped as either <code class="literal">version</code> or <code class="literal">timestamp</code>, the insert statement gives you two options. You can either specify the property in the properties_list (in which case its
+                     value is taken from the corresponding select expressions) or omit it from the properties_list (in which case the <code class="literal">seed value</code> defined by the <code class="literal">org.hibernate.type.VersionType</code> is used). 
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p>An example HQL <code class="literal">INSERT</code> statement execution: 
+         </p><pre class="programlisting">Session session = sessionFactory.openSession();
+Transaction tx = session.beginTransaction();
+
+String hqlInsert = "insert into DelinquentAccount (id, name) select c.id, c.name from Customer c where ...";
+int createdEntities = s.createQuery( hqlInsert )
+        .executeUpdate();
+tx.commit();
+session.close();</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="batch-statelesssession.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="batch.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="queryhql.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">13.3.&nbsp;Notez que dans le code de l'exemple, les intances de <code class="literal">Customer</code> retourn&Atilde;&copy;es par la requ&Atilde;&ordf;te sont imm&Atilde;&copy;diatement d&Atilde;&copy;tach&Atilde;&copy;es. Elles ne sont jamais associ&Atilde;&copy;es &Atilde;&nbsp; un contexte de persistance.&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;Chapitre&nbsp;14.&nbsp;HQL: Langage de requ&ecirc;tage d'Hibernate</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

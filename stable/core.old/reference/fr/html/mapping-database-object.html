@@ -1,0 +1,82 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>5.7.&nbsp;Objets auxiliaires de la base de donn&eacute;es</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="mapping.html" title="Chapitre&nbsp;5.&nbsp;Mapping O/R basique">
+      <link rel="prev" href="mapping-generated.html" title="5.6.&nbsp;Propri&eacute;t&eacute;s g&eacute;n&eacute;r&eacute;es">
+      <link rel="next" href="collections.html" title="Chapitre&nbsp;6.&nbsp;Mapping des collections">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">5.7.&nbsp;Objets auxiliaires de la base de donn&eacute;es</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="mapping-generated.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;5.&nbsp;Mapping O/R basique</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="collections.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="mapping-database-object"></a>5.7.&nbsp;Objets auxiliaires de la base de donn&eacute;es
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Permettent les ordres CREATE et DROP d'objets arbitraire de la base de donn&eacute;&eacute;es, en conjonction avec les outils Hibernate
+            d'&eacute;volutions de sch&eacute;ma, pour permettre de d&eacute;finir compl&egrave;tement un sch&eacute;ma utilisateur au sein des fichiers de mapping Hibernate.
+            Bien que con&ccedil;u sp&eacute;cifiquement pour cr&eacute;er et supprimer des objets tels que des triggers et des proc&eacute;dures stock&eacute;es, ou toute
+            commande pouvant &ecirc;tre ex&eacute;cut&eacute;e via une m&eacute;thode de <code class="literal">java.sql.Statement.execute()</code> (ALTERs, INSERTS, etc). Il y a principalement deux modes pour d&eacute;finir les objets auxiliaires de base de donn&eacute;es... 
+         </p>
+         <p>Le premier mode est de lister explicitement les commandes CREATE et DROP dans le fichier de mapping: </p><pre class="programlisting">&lt;hibernate-mapping&gt;
+    ...
+    &lt;database-object&gt;
+        &lt;create&gt;CREATE TRIGGER my_trigger ...&lt;/create&gt;
+        &lt;drop&gt;DROP TRIGGER my_trigger&lt;/drop&gt;
+    &lt;/database-object&gt;
+&lt;/hibernate-mapping&gt;</pre><p>Le second mode est de fournir une classe particuli&egrave;re qui connait comment construire les commandes CREATE et DROP. Cette classe
+            particuli&egrave;re doit impl&eacute;menter l'interface <code class="literal">org.hibernate.mapping.AuxiliaryDatabaseObject</code>. 
+         </p><pre class="programlisting">&lt;hibernate-mapping&gt;
+    ...
+    &lt;database-object&gt;
+        &lt;definition class="MyTriggerDefinition"/&gt;
+    &lt;/database-object&gt;
+&lt;/hibernate-mapping&gt;</pre><p>Additionnellement, ces objets de base de donn&eacute;es peuvent &ecirc;tre optionnellement trait&eacute;s selon l'utilisation de dialectes particuliers..
+            
+         </p><pre class="programlisting">&lt;hibernate-mapping&gt;
+    ...
+    &lt;database-object&gt;
+        &lt;definition class="MyTriggerDefinition"/&gt;
+        &lt;dialect-scope name="org.hibernate.dialect.Oracle9Dialect"/&gt;
+        &lt;dialect-scope name="org.hibernate.dialect.OracleDialect"/&gt;
+    &lt;/database-object&gt;
+&lt;/hibernate-mapping&gt;</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="mapping-generated.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="mapping.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="collections.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">5.6.&nbsp;Propri&eacute;t&eacute;s g&eacute;n&eacute;r&eacute;es&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;Chapitre&nbsp;6.&nbsp;Mapping des collections</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

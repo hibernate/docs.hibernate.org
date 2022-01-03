@@ -1,0 +1,419 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>Chapter&nbsp;16.&nbsp;Native SQL</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="prev" href="query-criteria-naturalid.html" title="15.9.&nbsp;Queries by natural identifier">
+      <link rel="next" href="querysql-namedqueries.html" title="16.2.&nbsp;Named SQL queries">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">Chapter&nbsp;16.&nbsp;Native SQL</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="query-criteria-naturalid.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">&nbsp;</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="querysql-namedqueries.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="chapter" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title"><a name="querysql"></a>Chapter&nbsp;16.&nbsp;Native SQL
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>You may also express queries in the native SQL dialect of your
+            database. This is useful if you want to utilize database specific features
+              such as query hints or the <code class="literal">CONNECT</code> keyword in Oracle. It
+              also provides a clean migration path from a direct SQL/JDBC based
+              application to Hibernate.
+         </p>
+         <p>Hibernate3 allows you to specify handwritten SQL (including stored
+              procedures) for all create, update, delete, and load operations.
+         </p>
+         <div class="sect1" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="querysql-creating"></a>16.1.&nbsp;Using a <code class="literal">SQLQuery</code></h2>
+                  </div>
+               </div>
+            </div>
+            <p>Execution of native SQL queries is controlled via the
+                   <code class="literal">SQLQuery</code> interface, which is obtained by calling
+                   <code class="literal">Session.createSQLQuery()</code>. The following describes how
+                   to use this API for querying.
+            </p>
+            <div class="sect2" lang="en-US">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="d0e13523"></a>16.1.1.&nbsp;Scalar queries
+                        </h3>
+                     </div>
+                  </div>
+               </div>
+               <p>The most basic SQL query is to get a list of scalars
+                        (values).
+               </p><pre class="programlisting">sess.createSQLQuery("SELECT * FROM CATS").list();
+sess.createSQLQuery("SELECT ID, NAME, BIRTHDATE FROM CATS").list();
+</pre><p>These will both return a List of Object arrays (Object[]) with
+                        scalar values for each column in the CATS table. Hibernate will use
+                        ResultSetMetadata to deduce the actual order and types of the returned
+                        scalar values.
+               </p>
+               <p>To avoid the overhead of using
+                        <code class="literal">ResultSetMetadata</code> or simply to be more explicit in
+                        what is returned one can use <code class="literal">addScalar()</code>.
+               </p><pre class="programlisting">sess.createSQLQuery("SELECT * FROM CATS")
+ .addScalar("ID", Hibernate.LONG)
+ .addScalar("NAME", Hibernate.STRING)
+ .addScalar("BIRTHDATE", Hibernate.DATE)
+</pre><p>This query specified:</p>
+               <div class="itemizedlist">
+                  <ul type="disc">
+                     <li>
+                        <p>the SQL query string</p>
+                     </li>
+                     <li>
+                        <p>the columns and types to return</p>
+                     </li>
+                  </ul>
+               </div>
+               <p>This will still return Object arrays, but now it will not use
+                        <code class="literal">ResultSetMetadata</code> but will instead explicitly get the
+                        ID, NAME and BIRTHDATE column as respectively a Long, String and a Short
+                        from the underlying resultset. This also means that only these three
+                        columns will be returned, even though the query is using
+                        <code class="literal">*</code> and could return more than the three listed
+                        columns.
+               </p>
+               <p>It is possible to leave out the type information for all or some
+                        of the scalars.
+               </p><pre class="programlisting">sess.createSQLQuery("SELECT * FROM CATS")
+ .addScalar("ID", Hibernate.LONG)
+ .addScalar("NAME")
+ .addScalar("BIRTHDATE")
+</pre><p>This is essentially the same query as before, but now
+                        <code class="literal">ResultSetMetaData</code> is used to decide the type of NAME
+                        and BIRTHDATE where as the type of ID is explicitly specified.
+               </p>
+               <p>How the java.sql.Types returned from ResultSetMetaData is mapped
+                        to Hibernate types is controlled by the Dialect. If a specific type is
+                        not mapped or does not result in the expected type it is possible to
+                        customize it via calls to <code class="literal">registerHibernateType</code> in
+                        the Dialect.
+               </p>
+            </div>
+            <div class="sect2" lang="en-US">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="d0e13573"></a>16.1.2.&nbsp;Entity queries
+                        </h3>
+                     </div>
+                  </div>
+               </div>
+               <p>The above queries were all about returning scalar values,
+                        basically returning the "raw" values from the resultset. The following
+                        shows how to get entity objects from a native sql query via
+                        <code class="literal">addEntity()</code>.
+               </p><pre class="programlisting">sess.createSQLQuery("SELECT * FROM CATS").addEntity(Cat.class);
+sess.createSQLQuery("SELECT ID, NAME, BIRTHDATE FROM CATS").addEntity(Cat.class);
+</pre><p>This query specified:</p>
+               <div class="itemizedlist">
+                  <ul type="disc">
+                     <li>
+                        <p>the SQL query string</p>
+                     </li>
+                     <li>
+                        <p>the entity returned by the query</p>
+                     </li>
+                  </ul>
+               </div>
+               <p>Assuming that Cat is mapped as a class with the columns ID, NAME
+                        and BIRTHDATE the above queries will both return a List where each
+                        element is a Cat entity.
+               </p>
+               <p>If the entity is mapped with a <code class="literal">many-to-one</code> to
+                        another entity it is required to also return this when performing the
+                        native query, otherwise a database specific "column not found" error
+                        will occur. The additional columns will automatically be returned when
+                        using the * notation, but we prefer to be explicit as in the following
+                        example for a <code class="literal">many-to-one</code> to a
+                        <code class="literal">Dog</code>:
+               </p><pre class="programlisting">sess.createSQLQuery("SELECT ID, NAME, BIRTHDATE, DOG_ID FROM CATS").addEntity(Cat.class);
+</pre><p>This will allow cat.getDog() to function properly.</p>
+            </div>
+            <div class="sect2" lang="en-US">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="d0e13609"></a>16.1.3.&nbsp;Handling associations and collections
+                        </h3>
+                     </div>
+                  </div>
+               </div>
+               <p>It is possible to eagerly join in the <code class="literal">Dog</code> to
+                        avoid the possible extra roundtrip for initializing the proxy. This is
+                        done via the <code class="literal">addJoin()</code> method, which allows you to
+                        join in an association or collection.
+               </p><pre class="programlisting">sess.createSQLQuery("SELECT c.ID, NAME, BIRTHDATE, DOG_ID, D_ID, D_NAME FROM CATS c, DOGS d WHERE c.DOG_ID = d.D_ID")
+ .addEntity("cat", Cat.class)
+ .addJoin("cat.dog");
+</pre><p>In this example the returned <code class="literal">Cat</code>'s will have
+                        their <code class="literal">dog</code> property fully initialized without any
+                        extra roundtrip to the database. Notice that we added a alias name
+                        ("cat") to be able to specify the target property path of the join. It
+                        is possible to do the same eager joining for collections, e.g. if the
+                        <code class="literal">Cat</code> had a one-to-many to <code class="literal">Dog</code>
+                        instead.
+               </p><pre class="programlisting">sess.createSQLQuery("SELECT ID, NAME, BIRTHDATE, D_ID, D_NAME, CAT_ID FROM CATS c, DOGS d WHERE c.ID = d.CAT_ID")
+ .addEntity("cat", Cat.class)
+ .addJoin("cat.dogs");
+</pre><p>
+                              At this stage we are reaching the limits of what is possible with native queries without starting to
+                              enhance the sql queries to make them usable in Hibernate; the problems starts to arise when returning
+                              multiple entities of the same type or when the default alias/column names are not enough.
+                          
+               </p>
+            </div>
+            <div class="sect2" lang="en-US">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="d0e13640"></a>16.1.4.&nbsp;Returning multiple entities
+                        </h3>
+                     </div>
+                  </div>
+               </div>
+               <p>Until now the result set column names are assumed to be the same
+                        as the column names specified in the mapping document. This can be
+                        problematic for SQL queries which join multiple tables, since the same
+                        column names may appear in more than one table.
+               </p>
+               <p>Column alias injection is needed in the following query (which
+                        most likely will fail):
+               </p><pre class="programlisting">sess.createSQLQuery("SELECT c.*, m.*  FROM CATS c, CATS m WHERE c.MOTHER_ID = c.ID")
+ .addEntity("cat", Cat.class)
+ .addEntity("mother", Cat.class)
+</pre><p>The intention for this query is to return two Cat instances per
+                        row, a cat and its mother. This will fail since there is a conflict of
+                        names since they are mapped to the same column names and on some
+                        databases the returned column aliases will most likely be on the form
+                        "c.ID", "c.NAME", etc. which are not equal to the columns specified in
+                        the mappings ("ID" and "NAME").
+               </p>
+               <p>The following form is not vulnerable to column name
+                        duplication:
+               </p><pre class="programlisting">sess.createSQLQuery("SELECT {cat.*}, {mother.*}  FROM CATS c, CATS m WHERE c.MOTHER_ID = c.ID")
+ .addEntity("cat", Cat.class)
+ .addEntity("mother", Cat.class)
+</pre><p>This query specified:</p>
+               <div class="itemizedlist">
+                  <ul type="disc">
+                     <li>
+                        <p>the SQL query string, with placeholders for Hibernate to
+                                     inject column aliases
+                        </p>
+                     </li>
+                     <li>
+                        <p>the entities returned by the query</p>
+                     </li>
+                  </ul>
+               </div>
+               <p>The {cat.*} and {mother.*} notation used above is a shorthand for
+                        "all properties". Alternatively, you may list the columns explicitly, but
+                        even in this case we let Hibernate inject the SQL column aliases for
+                        each property. The placeholder for a column alias is just the property
+                        name qualified by the table alias. In the following example, we retrieve
+                        Cats and their mothers from a different table (cat_log) to the one
+                        declared in the mapping metadata. Notice that we may even use the
+                        property aliases in the where clause if we like.
+               </p><pre class="programlisting">String sql = "SELECT ID as {c.id}, NAME as {c.name}, " + 
+         "BIRTHDATE as {c.birthDate}, MOTHER_ID as {c.mother}, {mother.*} " +
+         "FROM CAT_LOG c, CAT_LOG m WHERE {c.mother} = c.ID";
+
+List loggedCats = sess.createSQLQuery(sql)
+        .addEntity("cat", Cat.class)
+        .addEntity("mother", Cat.class).list()
+</pre><div class="sect3" lang="en-US">
+                  <div class="titlepage">
+                     <div>
+                        <div>
+                           <h4 class="title"><a name="querysql-aliasreferences"></a>16.1.4.1.&nbsp;Alias and property references
+                           </h4>
+                        </div>
+                     </div>
+                  </div>
+                  <p>For most cases the above alias injection is needed, but for
+                             queries relating to more complex mappings like composite properties,
+                             inheritance discriminators, collections etc. there are some specific
+                             aliases to use to allow Hibernate to inject the proper aliases.
+                  </p>
+                  <p>The following table shows the different possibilities of using
+                             the alias injection. Note: the alias names in the result are examples,
+                             each alias will have a unique and probably different name when
+                             used.
+                  </p>
+                  <div class="table"><a name="aliasinjection-summary"></a><p class="title"><b>Table&nbsp;16.1.&nbsp;Alias injection names</b></p>
+                     <div class="table-contents">
+                        <table summary="Alias injection names" border="1">
+                           <colgroup>
+                              <col>
+                              <col>
+                              <col>
+                           </colgroup>
+                           <thead>
+                              <tr>
+                                 <th>Description</th>
+                                 <th>Syntax</th>
+                                 <th>Example</th>
+                              </tr>
+                           </thead>
+                           <tbody>
+                              <tr>
+                                 <td>A simple property</td>
+                                 <td><code class="literal">{[aliasname].[propertyname]</code></td>
+                                 <td><code class="literal">A_NAME as {item.name}</code></td>
+                              </tr>
+                              <tr>
+                                 <td>A composite property</td>
+                                 <td><code class="literal">{[aliasname].[componentname].[propertyname]}</code></td>
+                                 <td><code class="literal">CURRENCY as {item.amount.currency}, VALUE as
+                                                       {item.amount.value}</code></td>
+                              </tr>
+                              <tr>
+                                 <td>Discriminator of an entity</td>
+                                 <td><code class="literal">{[aliasname].class}</code></td>
+                                 <td><code class="literal">DISC as {item.class}</code></td>
+                              </tr>
+                              <tr>
+                                 <td>All properties of an entity</td>
+                                 <td><code class="literal">{[aliasname].*}</code></td>
+                                 <td><code class="literal">{item.*}</code></td>
+                              </tr>
+                              <tr>
+                                 <td>A collection key</td>
+                                 <td><code class="literal">{[aliasname].key}</code></td>
+                                 <td><code class="literal">ORGID as {coll.key}</code></td>
+                              </tr>
+                              <tr>
+                                 <td>The id of an collection</td>
+                                 <td><code class="literal">{[aliasname].id}</code></td>
+                                 <td><code class="literal">EMPID as {coll.id}</code></td>
+                              </tr>
+                              <tr>
+                                 <td>The element of an collection</td>
+                                 <td><code class="literal">{[aliasname].element}</code></td>
+                                 <td><code class="literal">XID as {coll.element}</code></td>
+                              </tr>
+                              <tr>
+                                 <td>roperty of the element in the collection</td>
+                                 <td><code class="literal">{[aliasname].element.[propertyname]}</code></td>
+                                 <td><code class="literal">NAME as {coll.element.name}</code></td>
+                              </tr>
+                              <tr>
+                                 <td>All properties of the element in the collection</td>
+                                 <td><code class="literal">{[aliasname].element.*}</code></td>
+                                 <td><code class="literal">{coll.element.*}</code></td>
+                              </tr>
+                              <tr>
+                                 <td>All properties of the the collection</td>
+                                 <td><code class="literal">{[aliasname].*}</code></td>
+                                 <td><code class="literal">{coll.*}</code></td>
+                              </tr>
+                           </tbody>
+                        </table>
+                     </div>
+                  </div><br class="table-break"></div>
+            </div>
+            <div class="sect2" lang="en-US">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="d0e13781"></a>16.1.5.&nbsp;Returning non-managed entities
+                        </h3>
+                     </div>
+                  </div>
+               </div>
+               <p>It is possible to apply a ResultTransformer to native sql queries. Allowing it to e.g. return non-managed entities.</p><pre class="programlisting">sess.createSQLQuery("SELECT NAME, BIRTHDATE FROM CATS")
+        .setResultTransformer(Transformers.aliasToBean(CatDTO.class))</pre><p>This query specified:</p>
+               <div class="itemizedlist">
+                  <ul type="disc">
+                     <li>
+                        <p>the SQL query string</p>
+                     </li>
+                     <li>
+                        <p>a result transformer</p>
+                     </li>
+                  </ul>
+               </div>
+               <p>
+                          The above query will return a list of <code class="literal">CatDTO</code> which has been instantiated and injected the values of NAME and BIRTHNAME into its corresponding
+                          properties or fields.
+                          
+               </p>
+            </div>
+            <div class="sect2" lang="en-US">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="d0e13802"></a>16.1.6.&nbsp;Handling inheritance
+                        </h3>
+                     </div>
+                  </div>
+               </div>
+               <p>Native sql queries which query for entities that is mapped as part
+                        of an inheritance must include all properties for the baseclass and all
+                        it subclasses.
+               </p>
+            </div>
+            <div class="sect2" lang="en-US">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="d0e13807"></a>16.1.7.&nbsp;Parameters
+                        </h3>
+                     </div>
+                  </div>
+               </div>
+               <p>Native sql queries support positional as well as named
+                        parameters:
+               </p><pre class="programlisting">Query query = sess.createSQLQuery("SELECT * FROM CATS WHERE NAME like ?").addEntity(Cat.class);
+List pusList = query.setString(0, "Pus%").list();
+     
+query = sess.createSQLQuery("SELECT * FROM CATS WHERE NAME like :name").addEntity(Cat.class);
+List pusList = query.setString("name", "Pus%").list();          </pre></div>
+         </div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="query-criteria-naturalid.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center">&nbsp;</td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="querysql-namedqueries.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">15.9.&nbsp;Queries by natural identifier&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;16.2.&nbsp;Named SQL queries</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Chapter 5. Map your entities</title><!-- HibernateDoc.Meta --><meta name="description" content="Hibernate OGM, JPA for NoSQL datastores - Reference Documentation" /><meta name="keywords" content="hibernate, ogm, hibernate ogm, nosql, jpa, infinispan, mongodb, neo4j, cassandra, couchdb, ehcache, redis" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://docs.jboss.org/hibernate/stable/ogm/reference/en-US/html_single/" /><!-- /HibernateDoc.Meta --><link rel="stylesheet" type="text/css" href="css/hibernate.css"/><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"/><link rel="home" href="index.html" title="Hibernate OGM Reference Guide"/><link rel="up" href="index.html" title="Hibernate OGM Reference Guide"/><link rel="prev" href="ch04.html" title="Chapter 4. Configure and start Hibernate OGM"/><link rel="next" href="ch06.html" title="Chapter 6. Hibernate OGM APIs"/><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/></head><body><p id="title"><a href="http://www.hibernate.org" class="site_href"><strong>Hibernate.org</strong></a><a href="http://hibernate.org/Documentation/DocumentationOverview" class="doc_href"><strong>Community Documentation</strong></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="ch04.html"><strong>Prev</strong></a></li><li class="next"><a accesskey="n" href="ch06.html"><strong>Next</strong></a></li></ul><div class="chapter" title="Chapter 5. Map your entities"><div class="titlepage"><div><div><h2 class="title"><a id="ogm-mapping"/>Chapter 5. Map your entities</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="ch05.html#supported_entity_mapping">5.1. Supported entity mapping</a></span></dt><dt><span class="section"><a href="ch05.html#ogm-mapping-supported-types">5.2. Supported Types</a></span></dt><dt><span class="section"><a href="ch05.html#supported_association_mapping">5.3. Supported association mapping</a></span></dt></dl></div><p>This section mainly describes the specificities of Hibernate OGM mappings.
+It’s not meant to be a comprehensive guide to entity mappings,
+the complete guide is
+<a class="link" href="http://docs.jboss.org/hibernate/orm/5.0/userguide/html_single/Hibernate_User_Guide.html#domain-model">Hibernate ORM’s documentation</a>:
+after all Hibernate OGM <span class="emphasis"><em>is</em></span> Hibernate ORM.</p><div class="section" title="5.1. Supported entity mapping"><div class="titlepage"><div><div><h2 class="title"><a id="supported_entity_mapping"/>5.1. Supported entity mapping</h2></div></div></div><p>Pretty much all entity related constructs should work out of the box in Hibernate OGM.
+<code class="literal">@Entity</code>, <code class="literal">@Table</code>, <code class="literal">@Column</code>,
+<code class="literal">@Enumarated</code>, <code class="literal">@Temporal</code>, <code class="literal">@Cacheable</code>
+and the like will work as expected.
+If you want an example,
+check out <a class="xref" href="ch02.html" title="Chapter 2. Getting started with Hibernate OGM">Chapter 2, <em>Getting started with Hibernate OGM</em></a> or the documentation of Hibernate ORM.
+Let’s concentrate of the features that differ
+or are simply not supported by Hibernate OGM.</p><p>Hibernate OGM supports the following inheritance strategies:
+* <code class="literal">InheritanceType.TABLE_PER_CLASS</code>
+* <code class="literal">InheritanceType.SINGLE_TABLE</code></p><p>If you feel the need to support other strategies,
+let us know (see <a class="xref" href="ch01.html#ogm-howtocontribute-contribute" title="1.2. How to contribute">Section 1.2, “How to contribute”</a>).</p><p>JPA annotations refer to tables but the kind of abstraction the database will use depends on the
+nature of the NoSQL datastore you are dealing with. For example, in MongoDB a table is mapped as
+a document.</p><p>You can find more details about the way entities are stored in the corresponding
+mapping section of the datastore you are using.</p><p>Secondary tables are not supported by Hibernate OGM at the moment.
+If you have needs for this feature, let us know (see <a class="xref" href="ch01.html#ogm-howtocontribute-contribute" title="1.2. How to contribute">Section 1.2, “How to contribute”</a>).</p><p>Queries are partially supported, you will find more information in the <a class="link" href="ch07.html" title="Chapter 7. Query your entities">query chapter</a>.</p><p>All standard JPA id generators are supported: IDENTITY, SEQUENCE, TABLE and AUTO.
+If you need support for additional generators,
+let us know (see <a class="xref" href="ch01.html#ogm-howtocontribute-contribute" title="1.2. How to contribute">Section 1.2, “How to contribute”</a>).</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>Some NoSQL databases can not provide an efficient implementation for IDENTITY or SEQUENCE,
+for these cases we recommend you use a UUID based generator.
+For example on Infinispan using IDENTITY is possible but it will require using cluster
+wide coordination to maintain the counters, which is not going to perform very well.</p><pre><code class="language-java">@Entity
+public class Breed {
+
+    @Id @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name="uuid", strategy="uuid2")
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+    private String id;
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    private String name;
+}</code></pre></div></div><div class="section" title="5.2. Supported Types"><div class="titlepage"><div><div><h2 class="title"><a id="ogm-mapping-supported-types"/>5.2. Supported Types</h2></div></div></div><p>Most Java built-in types are supported at this stage.
+However, custom types (<code class="literal">@Type</code>) are not supported.</p><p>Here is a list of supported Java types:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">Boolean</li><li class="listitem">Byte</li><li class="listitem">Byte Array</li><li class="listitem">Calendar</li><li class="listitem">Class</li><li class="listitem">Date</li><li class="listitem">Double</li><li class="listitem">Integer</li><li class="listitem">Long</li><li class="listitem">Short</li><li class="listitem">Float</li><li class="listitem">Character</li><li class="listitem">String</li><li class="listitem">BigDecimal (mapped as scientific notation)</li><li class="listitem">BigInteger</li><li class="listitem">Url (as described by RFC 1738 and returned by toString of the Java URL type)</li><li class="listitem">UUID stored as described by RFC 4122</li><li class="listitem">Enums</li></ul></div><p>Let us know if you need more type support <a class="xref" href="ch01.html#ogm-howtocontribute-contribute" title="1.2. How to contribute">Section 1.2, “How to contribute”</a></p></div><div class="section" title="5.3. Supported association mapping"><div class="titlepage"><div><div><h2 class="title"><a id="supported_association_mapping"/>5.3. Supported association mapping</h2></div></div></div><p>All association types are supported (<code class="literal">@OneToOne</code>,
+<code class="literal">@OneToMany</code>, <code class="literal">@ManyToOne</code>, <code class="literal">@ManyToMany</code>).
+Likewise, all collection types are supported (<code class="literal">Set</code>, <code class="literal">Map</code>,
+<code class="literal">List</code>).
+The way Hibernate OGM stores association information is however quite different
+than the traditional RDBMS representation.
+Each chapter dedicated to a datastore describes how associations are persisted,
+make sure to check them out.</p><p>Keep in mind that collections with many entries won’t perform very well
+in Hibernate OGM (at least today)
+as all of the association navigation for a given entity is stored in a single key.
+If your collection is made of 1 million elements,
+Hibernate OGM stores 1 million tuples in the association key.</p></div></div><script xmlns="" xmlns:d="http://docbook.org/ns/docbook" type="text/javascript" src="highlight.js/highlight.pack.js"> </script><script xmlns="" xmlns:d="http://docbook.org/ns/docbook" type="text/javascript">hljs.initHighlightingOnLoad();</script><script type="text/javascript">
+dataLayer = [{'channel' : 'Hibernate', 'additional_tracking_code' : 'UA-45270411-3'}];
+(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NJWS5L');</script><noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-NJWS5L" height="0" width="0" style="display:none;visibility:hidden"> </iframe></noscript><hr xmlns="" xmlns:d="http://docbook.org/ns/docbook"/><a xmlns="" xmlns:d="http://docbook.org/ns/docbook" href="legalnotice.html"/><ul class="docnav"><li class="previous"><a accesskey="p" href="ch04.html"><strong>Prev</strong>Chapter 4. Configure and start Hibernate OGM</a></li><li class="up"><a accesskey="u" href="#"><strong>Up</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Home</strong></a></li><li class="next"><a accesskey="n" href="ch06.html"><strong>Next</strong>Chapter 6. Hibernate OGM APIs</a></li></ul><!-- HibernateDoc.OutdatedContent --><script src="//code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script><script src="/hibernate/_outdated-content/outdated-content.js" type="text/javascript"></script><script type="text/javascript">var jQuery_3_1 = $.noConflict(true); jQuery_3_1(document).ready(function() { HibernateDoc.OutdatedContent.install("ogm"); });</script><!-- /HibernateDoc.OutdatedContent --></body></html>

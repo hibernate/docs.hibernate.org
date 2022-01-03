@@ -1,0 +1,223 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>5.2.&nbsp;Hibernate Types</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="mapping.html" title="Chapitre&nbsp;5.&nbsp;Mapping O/R basique">
+      <link rel="prev" href="mapping.html" title="Chapitre&nbsp;5.&nbsp;Mapping O/R basique">
+      <link rel="next" href="mapping-entityname.html" title="5.3.&nbsp;Mapper une classe plus d'une fois">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">5.2.&nbsp;Hibernate Types</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="mapping.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;5.&nbsp;Mapping O/R basique</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="mapping-entityname.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="mapping-types"></a>5.2.&nbsp;Hibernate Types
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <div class="sect2" lang="fr-FR">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="mapping-types-entitiesvalues"></a>5.2.1.&nbsp;Entit&eacute;s et valeurs
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>Pour comprendre le comportement des diff&eacute;rents objets Java par rapport au service de persistance, nous avons besoin de les
+               classer en deux groupes : 
+            </p>
+            <p>Une <span class="emphasis"><em>entit&eacute;</em></span> existe ind&eacute;pendamment de tout autre objet poss&eacute;dant une r&eacute;f&eacute;rence vers l'entit&eacute;. Comparez cela avec le mod&egrave;le Java habituel
+               o&ugrave; un objet est supprim&eacute; par le garbage collector d&egrave;s qu'il n'est plus r&eacute;f&eacute;renc&eacute;. Les entit&eacute;s doivent &ecirc;tre explicitement enregistr&eacute;es
+               et supprim&eacute;es (sauf dans les cas o&ugrave; sauvegardes et suppressions sont <span class="emphasis"><em>cascad&eacute;es</em></span> d'une entit&eacute; m&egrave;re vers ses enfants). C'est diff&eacute;rent du mod&egrave;le ODMG de persistance par atteignabilit&eacute; - et correspond mieux
+               &agrave; la fa&ccedil;on dont les objets sont habituellement utilis&eacute;s dans des grands syst&egrave;mes. Les entit&eacute;s permettent les r&eacute;f&eacute;rences circulaires
+               et partag&eacute;es. Elles peuvent aussi &ecirc;tre versionn&eacute;es. 
+            </p>
+            <p>L'&eacute;tat persistant d'une entit&eacute; consiste en des r&eacute;f&eacute;rences vers d'autres entit&eacute;s et instances de types <span class="emphasis"><em>valeurs</em></span>. Ces valeurs sont des types primitifs, des collections (et non le contenu d'une collection), des composants de certains objets
+               immuables. Contrairement aux entit&eacute;s, les valeurs (et en particulier les collections et composants) <span class="emphasis"><em>sont</em></span> persist&eacute;s par atteignabiliit&eacute;. Comme les valeurs (et types primitifs) sont persist&eacute;s et supprim&eacute;s avec l'entit&eacute; qui les contient,
+               ils ne peuvent pas poss&eacute;der leurs propres versions. Les valeurs n'ont pas d'identit&eacute; ind&eacute;pendantes, ainsi elles ne peuvent
+               pas &ecirc;tre partag&eacute;es par deux entit&eacute;s ou collections. 
+            </p>
+            <p>Jusqu'&agrave; pr&eacute;sent nous avons utilis&eacute; le terme "classe persistante" pour parler d'entit&eacute;s. Nous allons continuer &agrave; faire ainsi.
+               Cependant, au sens strict, toutes les classes d&eacute;finies par un utilisateur poss&eacute;dant un &eacute;tat persistant ne sont pas des entit&eacute;s.
+               Un <span class="emphasis"><em>composant</em></span> est une classe d&eacute;finie par un utilisateur avec les caract&eacute;ristiques d'une valeur. Une propri&eacute;t&eacute; Java de type <code class="literal">java.lang.String</code> a aussi les caract&eacute;ristiques d'une valeur. Given this definition, we can say that all types (classes) provided by the JDK
+               have value type semantics in Java, while user-defined types may be mapped with entity or value type semantics. This decision
+               is up to the application developer. A good hint for an entity class in a domain model are shared references to a single instance
+               of that class, while composition or aggregation usually translates to a value type. 
+            </p>
+            <p>Nous nous pencherons sur ces deux concepts tout au long de la documentation. </p>
+            <p>Le d&eacute;fi est de mapper les type Javas (et la d&eacute;finition des d&eacute;veloppeurs des entit&eacute;s et valeurs types) sur les types du SQL
+               ou des bases de donn&eacute;es. Le pont entre les deux syst&egrave;mes est propos&eacute; par Hibernate : pour les entit&eacute;s nous utilisons <code class="literal">&lt;class&gt;</code>, <code class="literal">&lt;subclass&gt;</code> et ainsi de suite. Pour les types valeurs nous utilisons <code class="literal">&lt;property&gt;</code>, <code class="literal">&lt;component&gt;</code>, etc., habituellement avec un attribut <code class="literal">type</code>. La valeur de cet attribut est le nom d'un <span class="emphasis"><em>type de mapping</em></span> Hibernate. Hibernate propose de base de nombreux mappings (pour les types de valeurs standards du JDK). Vous pouvez &eacute;crire
+               vos propres types de mappings et impl&eacute;menter aussi vos propres strat&eacute;gies de conversion, nous le verrons plus tard. 
+            </p>
+            <p>Tous les types propos&eacute;s de base par Hibernate &agrave; part les collections autorisent la valeur null. </p>
+         </div>
+         <div class="sect2" lang="fr-FR">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="mapping-types-basictypes"></a>5.2.2.&nbsp;Basic value types
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>The built-in <span class="emphasis"><em>basic mapping types</em></span> may be roughly categorized into 
+            </p>
+            <div class="variablelist">
+               <dl>
+                  <dt><span class="term"><code class="literal">integer, long, short, float, double, character, byte, boolean, yes_no, true_false</code></span></dt>
+                  <dd>
+                     <p>Les mappings de type des primitives Java ou leurs classes wrappers (ex: Integer pour int) vers les types SQL (propri&eacute;taires)
+                        appropri&eacute;s. <code class="literal">boolean, yes_no</code>et <code class="literal">true_false</code> sont tous des alternatives pour les types Java <code class="literal">boolean</code> ou <code class="literal">java.lang.Boolean</code>. 
+                     </p>
+                  </dd>
+                  <dt><span class="term"><code class="literal">string</code></span></dt>
+                  <dd>
+                     <p>Mapping de type de <code class="literal">java.lang.String</code> vers <code class="literal">VARCHAR</code> (ou le <code class="literal">VARCHAR2</code> Oracle). 
+                     </p>
+                  </dd>
+                  <dt><span class="term"><code class="literal">date, time, timestamp</code></span></dt>
+                  <dd>
+                     <p>Mappings de type pour <code class="literal">java.util.Date</code> et ses sous-classes vers les types SQL <code class="literal">DATE</code>, <code class="literal">TIME</code> et <code class="literal">TIMESTAMP</code> (ou &eacute;quivalent). 
+                     </p>
+                  </dd>
+                  <dt><span class="term"><code class="literal">calendar, calendar_date</code></span></dt>
+                  <dd>
+                     <p>Mappings de type pour <code class="literal">java.util.Calendar</code> vers les types SQL <code class="literal">TIMESTAMP</code> et <code class="literal">DATE</code> (ou &eacute;quivalent). 
+                     </p>
+                  </dd>
+                  <dt><span class="term"><code class="literal">big_decimal, big_integer</code></span></dt>
+                  <dd>
+                     <p>Mappings de type pour <code class="literal">java.math.BigDecimal</code> et <code class="literal">java.math.BigInteger</code> vers <code class="literal">NUMERIC</code> (ou le <code class="literal">NUMBER</code> Oracle). 
+                     </p>
+                  </dd>
+                  <dt><span class="term"><code class="literal">locale, timezone, currency</code></span></dt>
+                  <dd>
+                     <p>Mappings de type pour <code class="literal">java.util.Locale</code>, <code class="literal">java.util.TimeZone</code> et <code class="literal">java.util.Currency</code> vers <code class="literal">VARCHAR</code> (ou le <code class="literal">VARCHAR2</code> Oracle). Les instances de <code class="literal">Locale</code> et <code class="literal">Currency</code> sont mapp&eacute;es sur leurs codes ISO. Les instances de <code class="literal">TimeZone</code> sont mapp&eacute;es sur leur <code class="literal">ID</code>. 
+                     </p>
+                  </dd>
+                  <dt><span class="term"><code class="literal">class</code></span></dt>
+                  <dd>
+                     <p>Un type de mapping pour <code class="literal">java.lang.Class</code> vers <code class="literal">VARCHAR</code> (ou le <code class="literal">VARCHAR2</code> Oracle). Un objet <code class="literal">Class</code> est mapp&eacute; sur son nom Java complet. 
+                     </p>
+                  </dd>
+                  <dt><span class="term"><code class="literal">binary</code></span></dt>
+                  <dd>
+                     <p>Mappe les tableaux de bytes vers le type binaire SQL appropri&eacute;. </p>
+                  </dd>
+                  <dt><span class="term"><code class="literal">text</code></span></dt>
+                  <dd>
+                     <p>Mappe les longues cha&icirc;nes de caract&egrave;res Java vers les types SQL <code class="literal">CLOB</code> ou <code class="literal">TEXT</code>. 
+                     </p>
+                  </dd>
+                  <dt><span class="term"><code class="literal">serializable</code></span></dt>
+                  <dd>
+                     <p>Mappe les types Java s&eacute;rialisables vers le type SQL binaire appropri&eacute;. Vous pouvez aussi indiquer le type Hibernate <code class="literal">serializable</code> avec le nom d'une classe Java s&eacute;rialisable ou une interface qui ne soit pas par d&eacute;faut un type de base. 
+                     </p>
+                  </dd>
+                  <dt><span class="term"><code class="literal">clob, blob</code></span></dt>
+                  <dd>
+                     <p>Mappings de type pour les classes JDBC <code class="literal">java.sql.Clob</code> and <code class="literal">java.sql.Blob</code>. Ces types peuvent ne pas convenir pour certaines applications car un objet blob ou clob peut ne pas &ecirc;tre r&eacute;utilisable en
+                        dehors d'une transaction (de plus l'impl&eacute;mentation par les pilotes est moyennement bonne). 
+                     </p>
+                  </dd>
+                  <dt><span class="term">
+                                                    <code class="literal">imm_date, imm_time, imm_timestamp, imm_calendar, imm_calendar_date, imm_serializable, imm_binary</code>
+                                                </span></dt>
+                  <dd>
+                     <p>Mappings de type pour ceux qui sont habituellement modifiable, pour lesquels Hibernate effectue certains optimisations convenant
+                        seulement aux types Java immuables, et l'application les traite comme immuable. Par exemple, vous ne devriez pas appeler <code class="literal">Date.setTime()</code> sur une instance mapp&eacute;e sur un <code class="literal">imm_timestamp</code>. Pour changer la valeur de la propri&eacute;t&eacute;, et faire que cette modification soit persist&eacute;e, l'application doit assigner un nouvel
+                        (non identique) objet &agrave; la propri&eacute;t&eacute;. 
+                     </p>
+                  </dd>
+               </dl>
+            </div>
+            <p>
+               
+                           
+            </p>
+            <p>Les identifiants uniques des entit&eacute;s et collections peuvent &ecirc;tre de n'importe quel type de base except&eacute; <code class="literal">binary</code>, <code class="literal">blob</code> et <code class="literal">clob</code> (les identifiants composites sont aussi permis, voir plus bas). 
+            </p>
+            <p>Les types de base des valeurs ont des <code class="literal">Type</code> constants correspondants d&eacute;finis dans <code class="literal">org.hibernate.Hibernate</code>. Par exemple, <code class="literal">Hibernate.STRING</code> repr&eacute;sent&eacute; le type <code class="literal">string</code>. 
+            </p>
+         </div>
+         <div class="sect2" lang="fr-FR">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="mapping-types-custom"></a>5.2.3.&nbsp;Types de valeur d&eacute;finis par l'utilisateur
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>Il est assez facile pour les d&eacute;veloppeurs de cr&eacute;er leurs propres types de valeurs. Par exemple, vous pourriez vouloir persister
+               des propri&eacute;t&eacute;s du type <code class="literal">java.lang.BigInteger</code> dans des colonnnes <code class="literal">VARCHAR</code>. Hibernate ne procure pas par d&eacute;faut un type pour cela. Mais les types que vous pouvez cr&eacute;er ne se limitent pas &agrave; mapper
+               des propri&eacute;t&eacute;s (ou &eacute;l&eacute;ment collection) &agrave; une simple colonne d'une table. Donc, par exemple, vous pourriez avoir une propri&eacute;t&eacute;
+               Java <code class="literal">getName()</code>/<code class="literal">setName()</code> de type <code class="literal">java.lang.String</code> persist&eacute;e dans les colonnes <code class="literal">FIRST_NAME</code>, <code class="literal">INITIAL</code>, <code class="literal">SURNAME</code>. 
+            </p>
+            <p>Pour impl&eacute;menter votre propre type, vous pouvez soit impl&eacute;menter <code class="literal">org.hibernate.UserType</code> soit <code class="literal">org.hibernate.CompositeUserType</code> et d&eacute;clarer des propri&eacute;t&eacute;s utilisant des noms de classes complets du type. Regardez <code class="literal">org.hibernate.test.DoubleStringType</code> pour voir ce qu'il est possible de faire. 
+            </p><pre class="programlisting">&lt;property name="twoStrings" type="org.hibernate.test.DoubleStringType"&gt;
+    &lt;column name="first_string"/&gt;
+    &lt;column name="second_string"/&gt;
+&lt;/property&gt;</pre><p>Remarquez l'utilisation des tags <code class="literal">&lt;column&gt;</code> pour mapper une propri&eacute;t&eacute; sur des colonnes multiples. 
+            </p>
+            <p>Les interfaces <code class="literal">CompositeUserType</code>, <code class="literal">EnhancedUserType</code>, <code class="literal">UserCollectionType</code>, et <code class="literal">UserVersionType</code> permettent des utilisations plus sp&eacute;cialis&eacute;es. 
+            </p>
+            <p>Vous pouvez m&ecirc;me donner des param&egrave;tres en indiquant <code class="literal">UserType</code> dans le fichier de mapping ; Pour cela, votre <code class="literal">UserType</code> doit impl&eacute;menter l'interface <code class="literal">org.hibernate.usertype.ParameterizedType</code>. Pour sp&eacute;cifier des param&egrave;tres dans votre type propre, vous pouvez utiliser l'&eacute;l&eacute;ment <code class="literal">&lt;type&gt;</code> dans vos fichiers de mapping. 
+            </p><pre class="programlisting">&lt;property name="priority"&gt;
+    &lt;type name="com.mycompany.usertypes.DefaultValueIntegerType"&gt;
+        &lt;param name="default"&gt;0&lt;/param&gt;
+    &lt;/type&gt;
+&lt;/property&gt;</pre><p>Le <code class="literal">UserType</code> permet maintenant de r&eacute;cup&eacute;rer la valeur pour le param&egrave;tre nomm&eacute; <code class="literal">default</code> &agrave; partir de l'objet <code class="literal">Properties</code> qui lui est pass&eacute;. 
+            </p>
+            <p>Si vous utilisez fr&eacute;quemment un <code class="literal">UserType</code>, cela peut &ecirc;tre utile de lui d&eacute;finir un nom plus court. Vous pouvez faire cela en utilisant l'&eacute;l&eacute;ment <code class="literal">&lt;typedef&gt;</code>. Les typedefs permettent d'assigner un nom &agrave; votre type propre et peuvent aussi contenir une liste de valeurs de param&egrave;tres
+               par d&eacute;faut si ce type est param&eacute;tr&eacute;. 
+            </p><pre class="programlisting">&lt;typedef class="com.mycompany.usertypes.DefaultValueIntegerType" name="default_zero"&gt;
+    &lt;param name="default"&gt;0&lt;/param&gt;
+&lt;/typedef&gt;</pre><pre class="programlisting">&lt;property name="priority" type="default_zero"/&gt;</pre><p>Il est aussi possible de red&eacute;finir les param&egrave;tres par d&eacute;faut du typedef au cas par cas en utilisant des param&egrave;tres type sur
+               le mapping de la propri&eacute;t&eacute;. 
+            </p>
+            <p>Bien que le fait que Hibernate propose de base une riche vari&eacute;t&eacute; de types, et qu'il supporte les composants signifie que vous
+               aurez tr&egrave;s rarement <span class="emphasis"><em>besoin</em></span> d'utiliser un nouveau type propre, il est n&eacute;anmoins de bonne pratique d'utiliser des types propres pour les classes (non
+               entit&eacute;s) qui apparaissent fr&eacute;quemment dans votre application. Par exemple une classe <code class="literal">MonetaryAmount</code> est un bon candidat pour un <code class="literal">CompositeUserType</code> m&ecirc;me s'il pourrait facilement &ecirc;tre mapp&eacute; comme un composant. Une motivation pour cela est l'abstraction. Avec un type propre
+               vos documents de mapping sont &agrave; l'abri des changements futurs dans votre fa&ccedil;on de repr&eacute;senter des valeurs mon&eacute;taires. 
+            </p>
+         </div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="mapping.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="mapping.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="mapping-entityname.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">Chapitre&nbsp;5.&nbsp;Mapping O/R basique&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;5.3.&nbsp;Mapper une classe plus d'une fois</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

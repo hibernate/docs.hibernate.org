@@ -1,0 +1,111 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>14.3.&nbsp;Associations et jointures</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="queryhql.html" title="Chapitre&nbsp;14.&nbsp;HQL: Langage de requ&ecirc;tage d'Hibernate">
+      <link rel="prev" href="queryhql-from.html" title="14.2.&nbsp;La clause from">
+      <link rel="next" href="queryhql-joins-forms.html" title="14.4.&nbsp;Formes de syntaxes pour les jointures">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">14.3.&nbsp;Associations et jointures</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="queryhql-from.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;14.&nbsp;HQL: Langage de requ&ecirc;tage d'Hibernate</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="queryhql-joins-forms.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="queryhql-joins"></a>14.3.&nbsp;Associations et jointures
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>On peut aussi assigner des alias &agrave; des entit&eacute;s associ&eacute;es, ou m&ecirc;me aux &eacute;l&eacute;ments d'une collection de valeurs, en utilisant un
+            <code class="literal">join</code> (jointure). 
+         </p><pre class="programlisting">from Cat as cat
+    inner join cat.mate as mate
+    left outer join cat.kittens as kitten</pre><pre class="programlisting">from Cat as cat left join cat.mate.kittens as kittens</pre><pre class="programlisting">from Formula form full join form.parameter param</pre><p>Les types de jointures support&eacute;es sont celles de ANSI SQL </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p>
+                                         <code class="literal"><code class="literal">inner join</code> (jointure ferm&eacute;e)</code>
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         <code class="literal"><code class="literal">left outer join</code> (jointure ouverte par la gauche)</code>
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         <code class="literal"><code class="literal">right outer join</code> (jointure ouverte par la droite)</code>
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p><code class="literal">full join</code> (jointure ouverte totalement - g&eacute;n&eacute;ralement inutile) 
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p>Les constructions des jointures <code class="literal">inner join</code>, <code class="literal">left outer join</code> et <code class="literal">right outer join</code> peuvent &ecirc;tre abbr&eacute;g&eacute;es. 
+         </p><pre class="programlisting">from Cat as cat
+    join cat.mate as mate
+    left join cat.kittens as kitten</pre><p>Nous pouvons soumettre des conditions de jointure suppl&eacute;mentaires en utilisant le mot-clef HQL <code class="literal">with</code>. 
+         </p><pre class="programlisting">from Cat as cat
+    left join cat.kittens as kitten
+        with kitten.bodyWeight &gt; 10.0</pre><p>Par ailleurs, une jointure "fetch&eacute;e" (rapport&eacute;e) permet d'initialiser les associations ou collections de valeurs en m&ecirc;me temps
+            que leur objet parent, le tout n'utilisant qu'un seul Select. Ceci est particuli&egrave;rement utile dans le cas des collections.
+            Ce syst&egrave;me permet de surcharger les d&eacute;clarations "lazy" et "outer-join" des fichiers de mapping pour les associations et collections.
+            Voir <a href="performance.html#performance-fetching" title="19.1.&nbsp;Strat&eacute;gies de chargement">Section&nbsp;19.1, &laquo;&nbsp;Strat&eacute;gies de chargement&nbsp;&raquo;</a> pour plus d'informations. 
+         </p><pre class="programlisting">from Cat as cat
+    inner join fetch cat.mate
+    left join fetch cat.kittens</pre><p>Une jointure "fetch&eacute;e" (rapport&eacute;e) n'a g&eacute;n&eacute;ralement pas besoin de se voir assigner un alias puisque les objets associ&eacute;s n'ont
+            pas &agrave; &ecirc;tre utilis&eacute;s dans les autres clauses. Notez aussi que les objets associ&eacute;s ne sont pas retourn&eacute;s directement dans le
+            r&eacute;sultat de la requ&ecirc;te mais l'on peut y acc&eacute;der via l'objet parent. La seule raison pour laquelle nous pourrions avoir besoin
+            d'un alias est si nous r&eacute;cup&eacute;rions r&eacute;cursivement une collection suppl&eacute;mentaire : 
+         </p><pre class="programlisting">from Cat as cat
+    inner join fetch cat.mate
+    left join fetch cat.kittens child
+    left join fetch child.kittens</pre><p>Notez que la construction de <code class="literal">fetch</code> ne peut pas &ecirc;tre utilis&eacute;e dans les requ&ecirc;tes appel&eacute;es par <code class="literal">scroll()</code> ou <code class="literal">iterate()</code>. <code class="literal">fetch</code> ne devrait pas non plus &ecirc;tre utilis&eacute; avec <code class="literal">setMaxResults()</code> ou <code class="literal">setFirstResult()</code>. <code class="literal">fetch</code> ne peut pas non plus &ecirc;tre utilis&eacute; avec une condition <code class="literal">with</code> ad hoc. Il est possible de cr&eacute;er un produit cart&eacute;sien par jointure en r&eacute;cup&eacute;rant plus d'une collection dans une requ&ecirc;te,
+            donc faites attention dans ce cas. R&eacute;cup&eacute;rer par jointure de multiples collections donne aussi parfois des r&eacute;sultats inattendus
+            pour des mappings de bag, donc soyez prudent lorsque vous formulez vos requ&ecirc;tes dans de tels cas. Finalement, notez que <code class="literal">full join fetch</code> et <code class="literal">right join fetch</code> ne sont pas utiles en g&eacute;n&eacute;ral. 
+         </p>
+         <p>Si vous utilisez un chargement retard&eacute; pour les propri&eacute;t&eacute;s (avec une instrumentation par bytecode), il est possible de forcer
+            Hibernate &agrave; r&eacute;cup&eacute;rer les propri&eacute;t&eacute;s non encore charg&eacute;es imm&eacute;diatement (dans la premi&egrave;re requ&ecirc;te) en utilisant <code class="literal">fetch all properties</code>. 
+         </p><pre class="programlisting">from Document fetch all properties order by name</pre><pre class="programlisting">from Document doc fetch all properties where lower(doc.name) like '%cats%'</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="queryhql-from.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="queryhql.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="queryhql-joins-forms.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">14.2.&nbsp;La clause from&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;14.4.&nbsp;Formes de syntaxes pour les jointures</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

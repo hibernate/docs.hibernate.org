@@ -1,0 +1,67 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>12.3.&nbsp;S&eacute;curit&eacute; d&eacute;clarative d'Hibernate</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="events.html" title="Chapitre&nbsp;12.&nbsp;Les intercepteurs et les &eacute;v&eacute;nements">
+      <link rel="prev" href="objectstate-events.html" title="12.2.&nbsp;Syst&egrave;me d'&eacute;v&eacute;nements">
+      <link rel="next" href="batch.html" title="Chapitre&nbsp;13.&nbsp;Traitement par paquet">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">12.3.&nbsp;S&eacute;curit&eacute; d&eacute;clarative d'Hibernate</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="objectstate-events.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;12.&nbsp;Les intercepteurs et les &eacute;v&eacute;nements</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="batch.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="objectstate-decl-security"></a>12.3.&nbsp;S&eacute;curit&eacute; d&eacute;clarative d'Hibernate
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>G&eacute;n&eacute;ralement, la s&eacute;curit&eacute; d&eacute;clarative dans les applications Hibernate est g&eacute;r&eacute;e dans la couche de session. Maintenant, Hibernate3
+            permet &agrave; certaines actions d'&ecirc;tre approuv&eacute;es via JACC, et autoris&eacute;es via JAAS. Cette fonctionnalit&eacute; optionnelle est construite
+            au dessus de l'architecture d'&eacute;v&eacute;nements. 
+         </p>
+         <p>D'abord, vous devez configurer les listeners d'&eacute;v&eacute;nements appropri&eacute;s pour permettre l'utilisation d'autorisations JAAS. </p><pre class="programlisting">&lt;listener type="pre-delete" class="org.hibernate.secure.JACCPreDeleteEventListener"/&gt;
+&lt;listener type="pre-update" class="org.hibernate.secure.JACCPreUpdateEventListener"/&gt;
+&lt;listener type="pre-insert" class="org.hibernate.secure.JACCPreInsertEventListener"/&gt;
+&lt;listener type="pre-load" class="org.hibernate.secure.JACCPreLoadEventListener"/&gt;</pre><p>Notez que <code class="literal">&lt;listener type="..." class="..."/&gt;</code> est juste un raccourci pour <code class="literal">&lt;event type="..."&gt;&lt;listener class="..."/&gt;&lt;/event&gt;</code> quand il y a exactement un listener pour un type d'&eacute;v&eacute;nement particulier. 
+         </p>
+         <p>Ensuite, toujours dans <code class="literal">hibernate.cfg.xml</code>, lier les permissions aux r&ocirc;les : 
+         </p><pre class="programlisting">&lt;grant role="admin" entity-name="User" actions="insert,update,read"/&gt;
+&lt;grant role="su" entity-name="User" actions="*"/&gt;</pre><p>Les noms de r&ocirc;le sont les r&ocirc;les compris par votre fournisseur JAAC. </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="objectstate-events.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="events.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="batch.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">12.2.&nbsp;Syst&egrave;me d'&eacute;v&eacute;nements&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;Chapitre&nbsp;13.&nbsp;Traitement par paquet</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

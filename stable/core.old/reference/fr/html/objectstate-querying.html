@@ -1,0 +1,343 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>10.4.&nbsp;Requ&ecirc;tage</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="objectstate.html" title="Chapitre&nbsp;10.&nbsp;Travailler avec des objets">
+      <link rel="prev" href="objectstate-loading.html" title="10.3.&nbsp;Chargement d'un objet">
+      <link rel="next" href="objectstate-modifying.html" title="10.5.&nbsp;Modifier des objets persistants">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">10.4.&nbsp;Requ&ecirc;tage</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="objectstate-loading.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;10.&nbsp;Travailler avec des objets</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="objectstate-modifying.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="objectstate-querying"></a>10.4.&nbsp;Requ&ecirc;tage
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Si vous ne connaissez par les identifiants des objets que vous recherchez, vous avez besoin d'une requ&ecirc;te. Hibernate supporte
+            un langage de requ&ecirc;tes orient&eacute;es objet facile &agrave; utiliser mais puissant. Pour la cr&eacute;ation de requ&ecirc;tes par programmation, Hibernate
+            supporte une fonction de requ&ecirc;tage sophistiqu&eacute; Criteria et Example (QBC et QBE). Vous pouvez aussi exprimez votre requ&ecirc;te
+            dans le SQL natif de votre base de donn&eacute;es, avec un support optionnel d'Hibernate pour la conversion des ensembles de r&eacute;sultats
+            en objets. 
+         </p>
+         <div class="sect2" lang="fr-FR">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="objectstate-querying-executing"></a>10.4.1.&nbsp;Ex&eacute;cution de requ&ecirc;tes
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>Les requ&ecirc;tes HQL et SQL natives sont repr&eacute;sent&eacute;es avec une instance de <code class="literal">org.hibernate.Query</code>. L'interface offre des m&eacute;thodes pour la liaison des param&egrave;tres, la gestion des ensembles de resultats, et pour l'ex&eacute;cution
+               de la requ&ecirc;te r&eacute;elle. Vous obtenez toujours une <code class="literal">Query</code> en utilisant la <code class="literal">Session</code> courante : 
+            </p><pre class="programlisting">List cats = session.createQuery(
+    "from Cat as cat where cat.birthdate &lt; ?")
+    .setDate(0, date)
+    .list();
+
+List mothers = session.createQuery(
+    "select mother from Cat as cat join cat.mother as mother where cat.name = ?")
+    .setString(0, name)
+    .list();
+
+List kittens = session.createQuery(
+    "from Cat as cat where cat.mother = ?")
+    .setEntity(0, pk)
+    .list();
+
+Cat mother = (Cat) session.createQuery(
+    "select cat.mother from Cat as cat where cat = ?")
+    .setEntity(0, izi)
+    .uniqueResult();]]
+
+Query mothersWithKittens = (Cat) session.createQuery(
+    "select mother from Cat as mother left join fetch mother.kittens");
+Set uniqueMothers = new HashSet(mothersWithKittens.list());</pre><p>Une requ&ecirc;te est g&eacute;n&eacute;ralement ex&eacute;cut&eacute;e en invoquant <code class="literal">list()</code>, le r&eacute;sultat de la requ&ecirc;te sera charg&eacute;e compl&egrave;tement dans une collection en m&eacute;moire. Les intances d'entit&eacute;s recup&eacute;r&eacute;es par
+               une requ&ecirc;te sont dans un &eacute;tat persistant. La m&eacute;thode <code class="literal">uniqueResult()</code> offre un raccourci si vous savez que votre requ&ecirc;te retournera seulement un seul objet. 
+            </p>
+            <div class="sect3" lang="fr-FR">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h4 class="title"><a name="objectstate-querying-executing-iterate"></a>10.4.1.1.&nbsp;It&eacute;ration de r&eacute;sultats
+                        </h4>
+                     </div>
+                  </div>
+               </div>
+               <p>Occasionnellement, vous pourriez &ecirc;tre capable d'obtenir de meilleures performances en ex&eacute;cutant la requ&ecirc;te avec la m&eacute;thode
+                  <code class="literal">iterate()</code>. Ce sera g&eacute;n&eacute;ralement seulement le cas si vous esp&eacute;rez que les intances r&eacute;elles d'entit&eacute; retourn&eacute;es par la requ&ecirc;te soient
+                  d&eacute;j&agrave; charg&eacute;es dans la session ou le cache de second niveau. Si elles ne sont pas cach&eacute;es, <code class="literal">iterate()</code> sera plus lent que <code class="literal">list()</code> et pourrait n&eacute;cessiter plusieurs acc&egrave;s &agrave; la base de donn&eacute;es pour une simple requ&ecirc;te, g&eacute;n&eacute;ralement <span class="emphasis"><em>1</em></span> pour le select initial qui retourne seulement les identifiants, et <span class="emphasis"><em>n</em></span> selects suppl&eacute;mentaires pour initialiser les instances r&eacute;elles. 
+               </p><pre class="programlisting">// fetch ids
+Iterator iter = sess.createQuery("from eg.Qux q order by q.likeliness").iterate();
+while ( iter.hasNext() ) {
+    Qux qux = (Qux) iter.next();  // fetch the object
+    // something we couldnt express in the query
+    if ( qux.calculateComplicatedAlgorithm() ) {
+        // delete the current instance
+        iter.remove();
+        // dont need to process the rest
+        break;
+    }
+}</pre></div>
+            <div class="sect3" lang="fr-FR">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h4 class="title"><a name="objectstate-querying-executing-tuples"></a>10.4.1.2.&nbsp;Requ&ecirc;tes qui retournent des tuples
+                        </h4>
+                     </div>
+                  </div>
+               </div>
+               <p>Les requ&ecirc;tes d'Hibernate retournent parfois des tuples d'objets, auquel cas chaque tuple est retourn&eacute; comme un tableau : </p><pre class="programlisting">Iterator kittensAndMothers = sess.createQuery(
+            "select kitten, mother from Cat kitten join kitten.mother mother")
+            .list()
+            .iterator();
+
+while ( kittensAndMothers.hasNext() ) {
+    Object[] tuple = (Object[]) kittensAndMothers.next();
+    Cat kitten = (Cat) tuple[0];
+    Cat mother = (Cat) tuple[1];
+    ....
+}</pre></div>
+            <div class="sect3" lang="fr-FR">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h4 class="title"><a name="objectstate-querying-executing-scalar"></a>10.4.1.3.&nbsp;R&eacute;sultats scalaires
+                        </h4>
+                     </div>
+                  </div>
+               </div>
+               <p>Des requ&ecirc;tes peuvent sp&eacute;cifier une propri&eacute;t&eacute; d'une classe dans la clause <code class="literal">select</code>. Elles peuvent m&ecirc;me appeler des fonctions d'aggr&eacute;gat SQL. Les propri&eacute;t&eacute;s ou les aggr&eacute;gats sont consid&eacute;r&eacute;s comme des r&eacute;sultats
+                  "scalaires" (et pas des entit&eacute;s dans un &eacute;tat persistant). 
+               </p><pre class="programlisting">Iterator results = sess.createQuery(
+        "select cat.color, min(cat.birthdate), count(cat) from Cat cat " +
+        "group by cat.color")
+        .list()
+        .iterator();
+
+while ( results.hasNext() ) {
+    Object[] row = (Object[]) results.next();
+    Color type = (Color) row[0];
+    Date oldest = (Date) row[1];
+    Integer count = (Integer) row[2];
+    .....
+}</pre></div>
+            <div class="sect3" lang="fr-FR">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h4 class="title"><a name="objectstate-querying-executing-parameters"></a>10.4.1.4.&nbsp;Lier des param&egrave;tres
+                        </h4>
+                     </div>
+                  </div>
+               </div>
+               <p>Des m&eacute;thodes de <code class="literal">Query</code> sont fournies pour lier des valeurs &agrave; des param&egrave;tres nomm&eacute;s ou &agrave; des param&egrave;tres de style JDBC <code class="literal">?</code>. <span class="emphasis"><em>Contrairement &agrave; JDBC, les num&eacute;ros des param&egrave;tres d'Hibernate commencent &agrave; z&eacute;ro.</em></span> Les param&egrave;tres nomm&eacute;s sont des identifiants de la forme <code class="literal">:nom</code> dans la cha&icirc;ne de caract&egrave;res de la requ&ecirc;te. Les avantages des param&egrave;tres nomm&eacute;s sont : 
+               </p>
+               <div class="itemizedlist">
+                  <ul type="disc" compact>
+                     <li>
+                        <p>les param&egrave;tres nomm&eacute;s sont insensibles &agrave; l'ordre de leur place dans la cha&icirc;ne de la requ&ecirc;te </p>
+                     </li>
+                     <li>
+                        <p>ils peuvent appara&icirc;tre plusieurs fois dans la m&ecirc;me requ&ecirc;te </p>
+                     </li>
+                     <li>
+                        <p>ils sont auto-document&eacute;s </p>
+                     </li>
+                  </ul>
+               </div><pre class="programlisting">//named parameter (preferred)
+Query q = sess.createQuery("from DomesticCat cat where cat.name = :name");
+q.setString("name", "Fritz");
+Iterator cats = q.iterate();</pre><pre class="programlisting">//positional parameter
+Query q = sess.createQuery("from DomesticCat cat where cat.name = ?");
+q.setString(0, "Izi");
+Iterator cats = q.iterate();</pre><pre class="programlisting">//named parameter list
+List names = new ArrayList();
+names.add("Izi");
+names.add("Fritz");
+Query q = sess.createQuery("from DomesticCat cat where cat.name in (:namesList)");
+q.setParameterList("namesList", names);
+List cats = q.list();</pre></div>
+            <div class="sect3" lang="fr-FR">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h4 class="title"><a name="objectstate-querying-executing-pagination"></a>10.4.1.5.&nbsp;Pagination
+                        </h4>
+                     </div>
+                  </div>
+               </div>
+               <p>Si vous avez besoin de sp&eacute;cifier des liens sur votre ensemble de r&eacute;sultats (le nombre maximum de lignes que vous voulez r&eacute;cup&eacute;rez
+                  et/ou la premi&egrave;re ligne que vous voulez r&eacute;cup&eacute;rer) vous devriez utiliser des m&eacute;thodes de l'interface <code class="literal">Query</code> : 
+               </p><pre class="programlisting">Query q = sess.createQuery("from DomesticCat cat");
+q.setFirstResult(20);
+q.setMaxResults(10);
+List cats = q.list();</pre><p>Hibernate sait comment traduite cette requ&ecirc;te de limite en SQL natif pour votre SGBD. </p>
+            </div>
+            <div class="sect3" lang="fr-FR">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h4 class="title"><a name="objectstate-querying-executing-scrolling"></a>10.4.1.6.&nbsp;It&eacute;ration "scrollable"
+                        </h4>
+                     </div>
+                  </div>
+               </div>
+               <p>Si votre connecteur JDBC supporte les <code class="literal">ResultSet</code>s "scrollables", l'interface <code class="literal">Query</code> peut &ecirc;tre utilis&eacute;e pour obtenir un objet <code class="literal">ScrollableResults</code>, lequel permet une navigation flexible dans les r&eacute;sultats de la requ&ecirc;te. 
+               </p><pre class="programlisting">Query q = sess.createQuery("select cat.name, cat from DomesticCat cat " +
+                            "order by cat.name");
+ScrollableResults cats = q.scroll();
+if ( cats.first() ) {
+
+    // find the first name on each page of an alphabetical list of cats by name
+    firstNamesOfPages = new ArrayList();
+    do {
+        String name = cats.getString(0);
+        firstNamesOfPages.add(name);
+    }
+    while ( cats.scroll(PAGE_SIZE) );
+
+    // Now get the first page of cats
+    pageOfCats = new ArrayList();
+    cats.beforeFirst();
+    int i=0;
+    while( ( PAGE_SIZE &gt; i++ ) &amp;&amp; cats.next() ) pageOfCats.add( cats.get(1) );
+
+}
+cats.close()</pre><p>Notez qu'une connexion ouverte (et un curseur) est requise pour cette fonctionnalit&eacute;, utilisez <code class="literal">setMaxResult()</code>/<code class="literal">setFirstResult()</code> si vous avez besoin d'une fonctionnalit&eacute; de pagination hors ligne. 
+               </p>
+            </div>
+            <div class="sect3" lang="fr-FR">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h4 class="title"><a name="objectstate-querying-executing-named"></a>10.4.1.7.&nbsp;Externaliser des requ&ecirc;tes nomm&eacute;es
+                        </h4>
+                     </div>
+                  </div>
+               </div>
+               <p>Vous pouvez aussi d&eacute;finir des requ&ecirc;tes nomm&eacute;es dans le document de mapping. (Souvenez-vous d'utiliser une section <code class="literal">CDATA</code> si votre requ&ecirc;te contient des caract&egrave;res qui pourraient &ecirc;tre interpr&eacute;t&eacute;s comme des &eacute;l&eacute;ments XML.) 
+               </p><pre class="programlisting">&lt;query name="ByNameAndMaximumWeight"&gt;&lt;![CDATA[
+    from eg.DomesticCat as cat
+        where cat.name = ?
+        and cat.weight &gt; ?
+] ]&gt;&lt;/query&gt;</pre><p>La liaison de param&egrave;tres et l'ex&eacute;cution sont fait par programmation : </p><pre class="programlisting">Query q = sess.getNamedQuery("ByNameAndMaximumWeight");
+q.setString(0, name);
+q.setInt(1, minWeight);
+List cats = q.list();</pre><p>Notez que le code r&eacute;el du programme est ind&eacute;pendant du langage de requ&ecirc;te qui est utilis&eacute;, vous pouvez aussi d&eacute;finir des requ&ecirc;tes
+                  SQL nativez dans les m&eacute;ta-donn&eacute;es, ou migrer des requ&ecirc;tes existantes vers Hibernate en les pla&ccedil;ant dans les fichiers de mapping.
+                  
+               </p>
+               <p>UNTRANSLATED! Also note that a query declaration inside a <code class="literal">&lt;hibernate-mapping&gt;</code> element requires a global unique name for the query, while a query declaration inside a <code class="literal">&lt;class&gt;</code> element is made unique automatically by prepending the fully qualified name of the class, for example <code class="literal">eg.Cat.ByNameAndMaximumWeight</code>. 
+               </p>
+            </div>
+         </div>
+         <div class="sect2" lang="fr-FR">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="objectstate-filtering"></a>10.4.2.&nbsp;Filtrer des collections
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>Un <span class="emphasis"><em>filtre</em></span> de collection est un type sp&eacute;cial de requ&ecirc;te qui peut &ecirc;tre appliqu&eacute; &agrave; une collection persistante ou &agrave; un tableau. La cha&icirc;ne
+               de requ&ecirc;te peut se r&eacute;f&eacute;rer &agrave; <code class="literal">this</code>, correspondant &agrave; l'&eacute;l&eacute;ment de la collection courant. 
+            </p><pre class="programlisting">Collection blackKittens = session.createFilter(
+    pk.getKittens(), 
+    "where this.color = ?")
+    .setParameter( Color.BLACK, Hibernate.custom(ColorUserType.class) )
+    .list()
+);</pre><p>La collection retourn&eacute;e est consid&eacute;r&eacute;e comme un bag, et c'est une copie de la collection donn&eacute;e. La collection originale n'est
+               pas modifi&eacute;e (c'est contraire &agrave; l'implication du nom "filtre"; mais coh&eacute;rent avec le comportement attendu). 
+            </p>
+            <p>Observez que les filtres ne n&eacute;cessitent pas une clause <code class="literal">from</code> (bien qu'ils puissent en avoir une si besoin est). Les filtres ne sont pas limit&eacute;s &agrave; retourner des &eacute;l&eacute;ments de la collection
+               eux-m&ecirc;mes. 
+            </p><pre class="programlisting">Collection blackKittenMates = session.createFilter(
+    pk.getKittens(), 
+    "select this.mate where this.color = eg.Color.BLACK.intValue")
+    .list();</pre><p>M&ecirc;me une requ&ecirc;te de filtre vide est utile, par exemple pour charger un sous-ensemble d'&eacute;l&eacute;ments dans une &eacute;norme collection
+               : 
+            </p><pre class="programlisting">Collection tenKittens = session.createFilter(
+    mother.getKittens(), "")
+    .setFirstResult(0).setMaxResults(10)
+    .list();</pre></div>
+         <div class="sect2" lang="fr-FR">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="objecstate-querying-criteria"></a>10.4.3.&nbsp;Requ&ecirc;tes Criteria
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>HQL est extr&ecirc;mement puissant mais certains d&eacute;veloppeurs pr&eacute;f&egrave;rent construire des requ&ecirc;tes dynamiquement, en utilisant l'API
+               orient&eacute;e objet, plut&ocirc;t que construire des cha&icirc;nes de requ&ecirc;tes. Hibernate fournit une API intuitive de requ&ecirc;te <code class="literal">Criteria</code> pour ces cas : 
+            </p><pre class="programlisting">Criteria crit = session.createCriteria(Cat.class);
+crit.add( Restrictions.eq( "color", eg.Color.BLACK ) );
+crit.setMaxResults(10);
+List cats = crit.list();</pre><p>Les APIs <code class="literal">Criteria</code> et <code class="literal">Example</code> associ&eacute; sont trait&eacute;es plus en d&eacute;tail dans <a href="querycriteria.html" title="Chapitre&nbsp;15.&nbsp;Requ&ecirc;tes par crit&egrave;res">Chapitre&nbsp;15, <i xmlns:xlink="http://www.w3.org/1999/xlink">Requ&ecirc;tes par crit&egrave;res</i></a>. 
+            </p>
+         </div>
+         <div class="sect2" lang="fr-FR">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="objectstate-querying-nativesql"></a>10.4.4.&nbsp;Requ&ecirc;tes en SQL natif
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>Vous pouvez exprimer une requ&ecirc;te en SQL, en utilisant <code class="literal">createSQLQuery()</code> et laisser Hibernate s'occuper du mapping des r&eacute;sultats vers des objets. Notez que vous pouvez n'importe quand appeler <code class="literal">session.connection()</code> et utiliser directement la <code class="literal">Connection</code> JDBC. Si vous choisissez d'utiliser l'API Hibernate, vous devez mettre les alias SQL entre accolades : 
+            </p><pre class="programlisting">List cats = session.createSQLQuery("SELECT {cat.*} FROM CAT {cat} WHERE ROWNUM&lt;10")
+    .addEntity("cat", Cat.class)
+.list();</pre><pre class="programlisting">List cats = session.createSQLQuery(
+    "SELECT {cat}.ID AS {cat.id}, {cat}.SEX AS {cat.sex}, " +
+           "{cat}.MATE AS {cat.mate}, {cat}.SUBCLASS AS {cat.class}, ... " +
+    "FROM CAT {cat} WHERE ROWNUM&lt;10")
+    .addEntity("cat", Cat.class)
+.list()</pre><p>Les requ&ecirc;tes SQL peuvent contenir des param&egrave;tres nomm&eacute;s et positionnels, comme des requ&ecirc;tes Hibernate. Plus d'informations
+               &agrave; propos des requ&ecirc;tes SQL natives dans Hibernate peuvent &ecirc;tre trouv&eacute;es dans <a href="querysql.html" title="Chapitre&nbsp;16.&nbsp;SQL natif">Chapitre&nbsp;16, <i xmlns:xlink="http://www.w3.org/1999/xlink">SQL natif</i></a>. 
+            </p>
+         </div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="objectstate-loading.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="objectstate.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="objectstate-modifying.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">10.3.&nbsp;Chargement d'un objet&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;10.5.&nbsp;Modifier des objets persistants</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

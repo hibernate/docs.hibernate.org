@@ -1,0 +1,375 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>6.3.&nbsp;Advanced collection mappings</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="collections.html" title="Chapter&nbsp;6.&nbsp;Collection Mapping">
+      <link rel="prev" href="collections-mapping.html" title="6.2.&nbsp;Collection mappings">
+      <link rel="next" href="collections-example.html" title="6.4.&nbsp;Collection examples">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">6.3.&nbsp;Advanced collection mappings</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="collections-mapping.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;6.&nbsp;Collection Mapping</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="collections-example.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="collections-advancedmappings"></a>6.3.&nbsp;Advanced collection mappings
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="collections-sorted"></a>6.3.1.&nbsp;Sorted collections
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                           Hibernate supports collections implementing <code class="literal">java.util.SortedMap</code> and
+                           <code class="literal">java.util.SortedSet</code>. You must specify a comparator in the mapping file:
+                       
+            </p><pre class="programlisting">&lt;set name="aliases" 
+            table="person_aliases" 
+            sort="natural"&gt;
+    &lt;key column="person"/&gt;
+    &lt;element column="name" type="string"/&gt;
+&lt;/set&gt;
+
+&lt;map name="holidays" sort="my.custom.HolidayComparator"&gt;
+    &lt;key column="year_id"/&gt;
+    &lt;map-key column="hol_name" type="string"/&gt;
+    &lt;element column="hol_date" type="date"/&gt;
+&lt;/map&gt;</pre><p>
+                           Allowed values of the <code class="literal">sort</code> attribute are <code class="literal">unsorted</code>,
+                           <code class="literal">natural</code> and the name of a class implementing
+                           <code class="literal">java.util.Comparator</code>.
+                       
+            </p>
+            <p>
+                           Sorted collections actually behave like <code class="literal">java.util.TreeSet</code> or
+                           <code class="literal">java.util.TreeMap</code>.
+                       
+            </p>
+            <p>
+                           If you want the database itself to order the collection elements use the
+                           <code class="literal">order-by</code> attribute of <code class="literal">set</code>, <code class="literal">bag</code>
+                           or <code class="literal">map</code> mappings. This solution is only available under
+                           JDK 1.4 or higher (it is implemented using <code class="literal">LinkedHashSet</code> or
+                           <code class="literal">LinkedHashMap</code>). This performs the ordering in the SQL query, 
+                           not in memory.
+                       
+            </p><pre class="programlisting">&lt;set name="aliases" table="person_aliases" order-by="lower(name) asc"&gt;
+    &lt;key column="person"/&gt;
+    &lt;element column="name" type="string"/&gt;
+&lt;/set&gt;
+
+&lt;map name="holidays" order-by="hol_date, hol_name"&gt;
+    &lt;key column="year_id"/&gt;
+    &lt;map-key column="hol_name" type="string"/&gt;
+    &lt;element column="hol_date type="date"/&gt;
+&lt;/map&gt;</pre><p>
+                           Note that the value of the <code class="literal">order-by</code> attribute is an SQL ordering, not
+                           a HQL ordering!
+                       
+            </p>
+            <p>
+                           Associations may even be sorted by some arbitrary criteria at runtime using a collection
+                           <code class="literal">filter()</code>.
+                       
+            </p><pre class="programlisting">sortedUsers = s.createFilter( group.getUsers(), "order by this.name" ).list();</pre></div>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="collections-bidirectional"></a>6.3.2.&nbsp;Bidirectional associations
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                           A <span class="emphasis"><em>bidirectional association</em></span> allows navigation from both
+                           "ends" of the association. Two kinds of bidirectional association are
+                           supported:
+               
+                           
+            </p>
+            <div class="variablelist">
+               <dl>
+                  <dt><span class="term">one-to-many</span></dt>
+                  <dd>
+                     <p>
+                                                    set or bag valued at one end, single-valued at the other
+                                                
+                     </p>
+                  </dd>
+                  <dt><span class="term">many-to-many</span></dt>
+                  <dd>
+                     <p>
+                                                    set or bag valued at both ends
+                                                
+                     </p>
+                  </dd>
+               </dl>
+            </div>
+            <p>
+               
+                       
+            </p>
+            <p>
+                           You may specify a bidirectional many-to-many association simply by mapping two
+                           many-to-many associations to the same database table and declaring one end as
+                           <span class="emphasis"><em>inverse</em></span> (which one is your choice, but it can not be an
+                           indexed collection).
+                       
+            </p>
+            <p>
+                           Here's an example of a bidirectional many-to-many association; each category can
+                           have many items and each item can be in many categories:
+                       
+            </p><pre class="programlisting">&lt;class name="Category"&gt;
+    &lt;id name="id" column="CATEGORY_ID"/&gt;
+    ...
+    &lt;bag name="items" table="CATEGORY_ITEM"&gt;
+        &lt;key column="CATEGORY_ID"/&gt;
+        &lt;many-to-many class="Item" column="ITEM_ID"/&gt;
+    &lt;/bag&gt;
+&lt;/class&gt;
+
+&lt;class name="Item"&gt;
+    &lt;id name="id" column="ITEM_ID"/&gt;
+    ...
+
+    &lt;!-- inverse end --&gt;
+    &lt;bag name="categories" table="CATEGORY_ITEM" inverse="true"&gt;
+        &lt;key column="ITEM_ID"/&gt;
+        &lt;many-to-many class="Category" column="CATEGORY_ID"/&gt;
+    &lt;/bag&gt;
+&lt;/class&gt;</pre><p>
+                           Changes made only to the inverse end of the association are <span class="emphasis"><em>not</em></span>
+                           persisted. This means that Hibernate has two representations in memory for every
+                           bidirectional association, one link from A to B and another link from B to A. This
+                           is easier to understand if you think about the Java object model and how we create
+                           a many-to-many relationship in Java:
+                       
+            </p><pre class="programlisting">
+category.getItems().add(item);          // The category now "knows" about the relationship
+item.getCategories().add(category);     // The item now "knows" about the relationship
+
+session.persist(item);                   // The relationship won't be saved!
+session.persist(category);               // The relationship will be saved</pre><p>
+                           The non-inverse side is used to save the in-memory representation to the database.
+                       
+            </p>
+            <p>
+                           You may define a bidirectional one-to-many association by mapping a one-to-many association
+                           to the same table column(s) as a many-to-one association and declaring the many-valued
+                           end <code class="literal">inverse="true"</code>.
+                       
+            </p><pre class="programlisting">&lt;class name="Parent"&gt;
+    &lt;id name="id" column="parent_id"/&gt;
+    ....
+    &lt;set name="children" inverse="true"&gt;
+        &lt;key column="parent_id"/&gt;
+        &lt;one-to-many class="Child"/&gt;
+    &lt;/set&gt;
+&lt;/class&gt;
+
+&lt;class name="Child"&gt;
+    &lt;id name="id" column="child_id"/&gt;
+    ....
+    &lt;many-to-one name="parent" 
+        class="Parent" 
+        column="parent_id"
+        not-null="true"/&gt;
+&lt;/class&gt;</pre><p>
+                           Mapping one end of an association with <code class="literal">inverse="true"</code> doesn't
+                           affect the operation of cascades, these are orthogonal concepts!
+                       
+            </p>
+         </div>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="collections-indexedbidirectional"></a>6.3.3.&nbsp;Bidirectional associations with indexed collections
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                           A bidirectional association where one end is represented as a <code class="literal">&lt;list&gt;</code>
+                           or <code class="literal">&lt;map&gt;</code> requires special consideration. If there is a property of
+                           the child class which maps to the index column, no problem, we can continue using 
+                           <code class="literal">inverse="true"</code> on the collection mapping:
+                       
+            </p><pre class="programlisting">&lt;class name="Parent"&gt;
+    &lt;id name="id" column="parent_id"/&gt;
+    ....
+    &lt;map name="children" inverse="true"&gt;
+        &lt;key column="parent_id"/&gt;
+        &lt;map-key column="name" 
+            type="string"/&gt;
+        &lt;one-to-many class="Child"/&gt;
+    &lt;/map&gt;
+&lt;/class&gt;
+
+&lt;class name="Child"&gt;
+    &lt;id name="id" column="child_id"/&gt;
+    ....
+    &lt;property name="name" 
+        not-null="true"/&gt;
+    &lt;many-to-one name="parent" 
+        class="Parent" 
+        column="parent_id"
+        not-null="true"/&gt;
+&lt;/class&gt;</pre><p>
+                           But, if there is no such property on the child class, we can't think of the association as
+                           truly bidirectional (there is information available at one end of the association that is
+                           not available at the other end). In this case, we can't map the collection 
+                           <code class="literal">inverse="true"</code>. Instead, we could use the following mapping:
+                       
+            </p><pre class="programlisting">&lt;class name="Parent"&gt;
+    &lt;id name="id" column="parent_id"/&gt;
+    ....
+    &lt;map name="children"&gt;
+        &lt;key column="parent_id"
+            not-null="true"/&gt;
+        &lt;map-key column="name" 
+            type="string"/&gt;
+        &lt;one-to-many class="Child"/&gt;
+    &lt;/map&gt;
+&lt;/class&gt;
+
+&lt;class name="Child"&gt;
+    &lt;id name="id" column="child_id"/&gt;
+    ....
+    &lt;many-to-one name="parent" 
+        class="Parent" 
+        column="parent_id"
+        insert="false"
+        update="false"
+        not-null="true"/&gt;
+&lt;/class&gt;</pre><p>
+                          Note that in this mapping, the collection-valued end of the association is responsible for 
+                          updates to the foreign key. TODO: Does this really result in some unnecessary update statements?
+                      
+            </p>
+         </div>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="collections-ternary"></a>6.3.4.&nbsp;Ternary associations
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                           There are three possible approaches to mapping a ternary association. One is to use a 
+                           <code class="literal">Map</code> with an association as its index:
+                       
+            </p><pre class="programlisting">&lt;map name="contracts"&gt;
+    &lt;key column="employer_id" not-null="true"/&gt;
+    &lt;map-key-many-to-many column="employee_id" class="Employee"/&gt;
+    &lt;one-to-many class="Contract"/&gt;
+&lt;/map&gt;</pre><pre class="programlisting">&lt;map name="connections"&gt;
+    &lt;key column="incoming_node_id"/&gt;
+    &lt;map-key-many-to-many column="outgoing_node_id" class="Node"/&gt;
+    &lt;many-to-many column="connection_id" class="Connection"/&gt;
+&lt;/map&gt;</pre><p>
+                           A second approach is to simply remodel the association as an entity class. This
+                           is the approach we use most commonly.
+                       
+            </p>
+            <p>
+                           A final alternative is to use composite elements, which we will discuss later. 
+                       
+            </p>
+         </div>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="collections-idbag"></a>6.3.5.&nbsp;<code class="literal">Using an &lt;idbag&gt;</code></h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                           If you've fully embraced our view that composite keys are a bad thing and that
+                           entities should have synthetic identifiers (surrogate keys), then you might
+                           find it a bit odd that the many to many associations and collections of values
+                           that we've shown so far all map to tables with composite keys! Now, this point
+                           is quite arguable; a pure association table doesn't seem to benefit much from
+                           a surrogate key (though a collection of composite values <span class="emphasis"><em>might</em></span>).
+                           Nevertheless, Hibernate provides a feature that allows you to map many to many
+                           associations and collections of values to a table with a surrogate key.
+                       
+            </p>
+            <p>
+                           The <code class="literal">&lt;idbag&gt;</code> element lets you map a <code class="literal">List</code>
+                           (or <code class="literal">Collection</code>) with bag semantics.
+                       
+            </p><pre class="programlisting">&lt;idbag name="lovers" table="LOVERS"&gt;
+    &lt;collection-id column="ID" type="long"&gt;
+        &lt;generator class="sequence"/&gt;
+    &lt;/collection-id&gt;
+    &lt;key column="PERSON1"/&gt;
+    &lt;many-to-many column="PERSON2" class="Person" fetch="join"/&gt;
+&lt;/idbag&gt;</pre><p>
+                           As you can see, an <code class="literal">&lt;idbag&gt;</code> has a synthetic id generator,
+                           just like an entity class! A different surrogate key is assigned to each collection
+                           row. Hibernate does not provide any mechanism to discover the surrogate key value
+                           of a particular row, however.
+                       
+            </p>
+            <p>
+                           Note that the update performance of an <code class="literal">&lt;idbag&gt;</code> is
+                           <span class="emphasis"><em>much</em></span> better than a regular <code class="literal">&lt;bag&gt;</code>!
+                           Hibernate can locate individual rows efficiently and update or delete them
+                           individually, just like a list, map or set.
+                       
+            </p>
+            <p>
+                           In the current implementation, the <code class="literal">native</code> identifier generation
+                           strategy is not supported for <code class="literal">&lt;idbag&gt;</code> collection identifiers.
+                       
+            </p>
+         </div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="collections-mapping.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="collections.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="collections-example.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">6.2.&nbsp;Collection mappings&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;6.4.&nbsp;Collection examples</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

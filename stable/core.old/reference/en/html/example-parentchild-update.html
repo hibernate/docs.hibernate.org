@@ -1,0 +1,84 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>21.4.&nbsp;Cascades and unsaved-value</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="example-parentchild.html" title="Chapter&nbsp;21.&nbsp;Example: Parent/Child">
+      <link rel="prev" href="example-parentchild-cascades.html" title="21.3.&nbsp;Cascading life cycle">
+      <link rel="next" href="example-parentchild-conclusion.html" title="21.5.&nbsp;Conclusion">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">21.4.&nbsp;Cascades and <code class="literal">unsaved-value</code></th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="example-parentchild-cascades.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;21.&nbsp;Example: Parent/Child</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="example-parentchild-conclusion.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="example-parentchild-update"></a>21.4.&nbsp;Cascades and <code class="literal">unsaved-value</code></h2>
+               </div>
+            </div>
+         </div>
+         <p>
+                         Suppose we loaded up a <code class="literal">Parent</code> in one <code class="literal">Session</code>, made some changes 
+                         in a UI action and wish to persist these changes in a new session by calling <code class="literal">update()</code>. 
+                         The <code class="literal">Parent</code> will contain a collection of childen and, since cascading update is enabled, 
+                         Hibernate needs to know which children are newly instantiated and which represent existing rows in the 
+                         database. Lets assume that both <code class="literal">Parent</code> and <code class="literal">Child</code> have genenerated
+                         identifier properties of type <code class="literal">Long</code>. Hibernate will use the identifier and 
+                         version/timestamp property value to determine which of the children are new. (See
+                         <a href="objectstate-saveorupdate.html" title="10.7.&nbsp;Automatic state detection">Section&nbsp;10.7, &#8220;Automatic state detection&#8221;</a>.) <span class="emphasis"><em>In Hibernate3, it is no longer necessary to specify
+                               an <code class="literal">unsaved-value</code> explicitly.</em></span>
+                     
+         </p>
+         <p>
+                         The following code will update <code class="literal">parent</code> and <code class="literal">child</code> and insert 
+                         <code class="literal">newChild</code>.
+                     
+         </p><pre class="programlisting">//parent and child were both loaded in a previous session
+parent.addChild(child);
+Child newChild = new Child();
+parent.addChild(newChild);
+session.update(parent);
+session.flush();</pre><p>
+                         Well, that's all very well for the case of a generated identifier, but what about assigned identifiers
+                         and composite identifiers? This is more difficult, since Hibernate can't use the identifier property to
+                         distinguish between a newly instantiated object (with an identifier assigned by the user) and an 
+                         object loaded in a previous session. In this case, Hibernate will either use the timestamp or version 
+                         property, or will actually query the second-level cache or, worst case, the database, to see if the 
+                         row exists.
+                     
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="example-parentchild-cascades.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="example-parentchild.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="example-parentchild-conclusion.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">21.3.&nbsp;Cascading life cycle&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;21.5.&nbsp;Conclusion</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

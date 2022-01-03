@@ -1,0 +1,2196 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>Chapitre&nbsp;2.&nbsp;Entity Beans</title><link rel="stylesheet" href="../shared/css/html.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.65.1"><link rel="home" href="index.html" title="Hibernate Annotations"><link rel="up" href="index.html" title="Hibernate Annotations"><link rel="previous" href="ch01.html" title="Chapitre&nbsp;1.&nbsp;Configurer un projet avec des annotations"><link rel="next" href="xml-overriding.html" title="Chapitre&nbsp;3.&nbsp;Surcharger des m&eacute;ta-donn&eacute;es &agrave; travers du XML"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapitre&nbsp;2.&nbsp;Entity Beans</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch01.html">Pr&eacute;c&eacute;dent</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="xml-overriding.html">Suivant</a></td></tr></table><hr></div><div class="chapter" lang="fr"><div class="titlepage"><div><div><h2 class="title"><a name="entity"></a>Chapitre&nbsp;2.&nbsp;Entity Beans</h2></div></div><div></div></div><div class="sect1" lang="fr"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="entity-overview"></a>2.1.&nbsp;Introduction</h2></div></div><div></div></div><p>Cette section couvre les annotations entity bean EJB 3.0 (alias JPA)
+    et les extensions sp&eacute;cifiques &agrave; Hibernate.</p></div><div class="sect1" lang="fr"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="entity-mapping"></a>2.2.&nbsp;Mapping avec les annotations EJB3/JPA</h2></div></div><div></div></div><p>Les entit&eacute;s EJB3 sont des POJOs ordinaires. En fait, ils
+    repr&eacute;sentent exactement le m&ecirc;me concept que les entit&eacute;s de persistance
+    Hibernate. Leur mapping est d&eacute;fini &agrave; travers les annotations du JDK 5.0
+    (une syntaxe de descripteur XML pour la surcharge est d&eacute;finie dans la
+    sp&eacute;cification EJB3). Les annotations peuvent &ecirc;tre divis&eacute;es en deux
+    cat&eacute;gories, les annotations de mapping logique (vous permettant de d&eacute;crire
+    le mod&egrave;le objet, les associations de classe, etc) et les annotations de
+    mapping physique (d&eacute;crivant le sch&eacute;ma physique, les tables, les colonnes,
+    les index, etc). Nous m&eacute;langerons les annotations des deux cat&eacute;gories dans
+    les exemples de code.</p><p>Les annotations EJB3 sont dans le package
+    <tt class="literal">javax.persistence.*</tt>. La plupart des IDE compatibles JDK 5
+    (comme Eclipse, IntelliJ IDEA et Netbeans) peuvent auto-compl&eacute;ter les
+    interfaces et les attributes d'annotation pour vous (m&ecirc;me sans module "EJB3"
+    sp&eacute;cifique, puisque les annotations EJB3 sont des annotations ordinaires de
+    JDK 5).</p><p>Pour plus d'exemples concrets, lisez le tutorial EJB 3.0 de JBoss ou
+    parcourez la suite de tests d'Hibernate Annotations. La plupart des tests
+    unitaires ont &eacute;t&eacute; con&ccedil;us pour repr&eacute;senter un exemple concret et &ecirc;tre une
+    source d'inspiration.</p><div class="sect2" lang="fr"><div class="titlepage"><div><div><h3 class="title"><a name="d0e163"></a>2.2.1.&nbsp;D&eacute;clarer un entity bean</h3></div></div><div></div></div><p>Chaque classe POJO persistante li&eacute;e est un entity bean et est
+      d&eacute;clar&eacute;e en utilisant l'annotation <tt class="literal">@Entity</tt> (au niveau
+      de la classe) :</p><pre class="programlisting">
+@Entity
+public class Flight implements Serializable {
+    Long id;
+
+    @Id
+    public Long getId() { return id; }
+
+    public void setId(Long id) { this.id = id; }
+}
+</pre><p><tt class="literal">@Entity</tt> d&eacute;clare la classe comme un entity bean
+      (ie une classe POJO persistante), <tt class="literal">@Id</tt> d&eacute;clare la
+      propri&eacute;t&eacute; identifiante de cet entity bean. Les autres d&eacute;clarations de
+      mapping sont implicites. Ce concept de d&eacute;claration par exception est
+      un composant essentiel de la nouvelle sp&eacute;cification EJB3 et une
+      am&eacute;lioration majeure. La classe Flight est mapp&eacute;e sur la table Flight, en
+      utilisant la colonne id comme colonne de la clef primaire.</p><p>Selon que vous annotez des champs ou des m&eacute;thodes, le type d'acc&egrave;s
+      utilis&eacute; par Hibernate sera <tt class="literal">field</tt> ou
+      <tt class="literal">property</tt>. La sp&eacute;cification EJB3 exige que vous
+      d&eacute;clariez les annotations sur le type d'&eacute;l&eacute;ment qui sera acc&eacute;d&eacute;,
+      c'est-&agrave;-dire le getter si vous utilisez l'acc&egrave;s
+      <tt class="literal">property</tt>, le champ si vous utilisez l'acc&egrave;s
+      <tt class="literal">field</tt>. M&eacute;langer des EJB3 annotations dans les champs et
+      les m&eacute;thodes devrait &ecirc;tre &eacute;vit&eacute;. Hibernate devinera le type d'acc&egrave;s de
+      l'identifiant &agrave; partir de la position d'<tt class="literal">@Id</tt> ou
+      d'<tt class="literal">@EmbeddedId</tt>.</p><div class="sect3" lang="fr"><div class="titlepage"><div><div><h4 class="title"><a name="d0e200"></a>2.2.1.1.&nbsp;D&eacute;finir la table</h4></div></div><div></div></div><p><tt class="literal">@Table</tt> est positionn&eacute;e au niveau de la classe ;
+        cela vous permet de d&eacute;finir le nom de la table, du catalogue et du
+        sch&eacute;ma pour le mapping de votre entity bean. Si aucune
+        <tt class="literal">@Table</tt> n'est d&eacute;finie les valeurs par d&eacute;faut sont
+        utilis&eacute;es : le nom de la classe de l'entit&eacute; (sans le nom de
+        package).</p><pre class="programlisting">
+@Entity
+@Table(name="tbl_sky")
+public class Sky implements Serializable {
+...
+            </pre><p>L'&eacute;l&eacute;ment <tt class="literal">@Table</tt> contient aussi un attribut
+        <tt class="literal">schema</tt> et un attribut <tt class="literal">catalog</tt>,
+        si vous avez besoin de les d&eacute;finir. Vous pouvez aussi d&eacute;finir des
+        contraintes d'unicit&eacute; sur la table en utilisant l'annotation
+        <tt class="literal">@UniqueConstraint</tt> en conjonction avec
+        <tt class="literal">@Table</tt> (pour une contrainte d'unicit&eacute; n'impliquant
+        qu'une seule colonne, r&eacute;f&eacute;rez-vous &agrave; <tt class="literal">@Column</tt>).</p><pre class="programlisting">@Table(name="tbl_sky",
+    <span class="bold"><b>uniqueConstraints = {@UniqueConstraint(columnNames={"month", "day"})}</b></span>
+)</pre><p>Une contrainte d'unicit&eacute; est appliqu&eacute;e au tuple {month, day}.
+        Notez que le tableau <tt class="literal">columnNames</tt> fait r&eacute;f&eacute;rence aux
+        noms logiques des colonnes.</p><i><span class="remark">Le nom logique d'une colonne est d&eacute;fini par l'impl&eacute;mentation
+        de NamingStrategy d'Hibernate. La strat&eacute;gie de nommage EJB3 par d&eacute;faut
+        utilise le nom de colonne physique comme nom de colonne logique. Notez
+        qu'il peut &ecirc;tre diff&eacute;rent du nom de la propri&eacute;t&eacute; (si le nom de colonne
+        est explicite). A moins que vous surchargiez la strat&eacute;gie de nommage,
+        vous ne devriez pas vous soucier de &ccedil;a.</span></i></div><div class="sect3" lang="fr"><div class="titlepage"><div><div><h4 class="title"><a name="d0e244"></a>2.2.1.2.&nbsp;Versionner pour un contr&ocirc;le de concurrence optimiste</h4></div></div><div></div></div><p>Vous pouvez ajouter un contr&ocirc;le de concurrence optimiste &agrave; un
+        entity bean en utilisant l'annotation
+        <tt class="literal">@Version</tt> :</p><pre class="programlisting">
+@Entity
+public class Flight implements Serializable {
+...
+    @Version
+    @Column(name="OPTLOCK")
+    public Integer getVersion() { ... }
+}           </pre><p>La propri&eacute;t&eacute; de version sera mapp&eacute;e sur la colonne
+        <tt class="literal">OPTLOCK</tt>, et le gestionnaire d'entit&eacute;s l'utilisera
+        pour d&eacute;tecter des conflits lors des mises &agrave; jour (pr&eacute;venant des pertes
+        de donn&eacute;es lors de mises &agrave; jours que vous pourriez voir avec la
+        strat&eacute;gie du last-commit-wins).</p><p>La colonne de version peut &ecirc;tre un num&eacute;rique (solution
+        recommand&eacute;e) ou un timestamp comme pour la sp&eacute;cification EJB3. Hibernate
+        prend en charge n'importe quel type fourni que vous d&eacute;finissez et
+        impl&eacute;mentez avec la classe <tt class="classname">UserVersionType</tt>
+        appropri&eacute;e.</p></div></div><div class="sect2" lang="fr"><div class="titlepage"><div><div><h3 class="title"><a name="d0e264"></a>2.2.2.&nbsp;Mapping de simples propri&eacute;t&eacute;s</h3></div></div><div></div></div><div class="sect3" lang="fr"><div class="titlepage"><div><div><h4 class="title"><a name="d0e267"></a>2.2.2.1.&nbsp;D&eacute;clarer des mappings de propri&eacute;t&eacute;s &eacute;l&eacute;mentaires</h4></div></div><div></div></div><p>Chaque propri&eacute;t&eacute; (champ ou m&eacute;thode) non statique non transient
+        d'un entity bean est consid&eacute;r&eacute;e persistante, &agrave; moins que vous l'annotiez
+        comme <tt class="literal">@Transient</tt>. Ne pas avoir d'annotation pour
+        votre propri&eacute;t&eacute; est &eacute;quivalent &agrave; l'annotation <tt class="literal">@Basic</tt>.
+        L'annotation <tt class="literal">@Basic</tt> vous permet de d&eacute;clarer la
+        strat&eacute;gie de r&eacute;cup&eacute;ration pour une propri&eacute;t&eacute; :</p><pre class="programlisting">public transient int counter; // propri&eacute;t&eacute; transient
+
+private String firstname; // propri&eacute;t&eacute; persistante
+
+@Transient
+String getLengthInMeter() { ... } // propri&eacute;t&eacute; transient
+
+String getName() {... } // propri&eacute;t&eacute; persistante
+
+@Basic
+int getLength() { ... } // propri&eacute;t&eacute; persistante
+
+@Basic(fetch = FetchType.LAZY)
+String getDetailedComment() { ... } // propri&eacute;t&eacute; persistante
+
+@Temporal(TemporalType.TIME)
+java.util.Date getDepartureTime() { ... } // propri&eacute;t&eacute; persistante
+
+@Enumerated(EnumType.STRING)
+Starred getNote() { ... } // enum persist&eacute;e en tant que String dans la base de donn&eacute;es</pre><p><tt class="literal">counter</tt>, un champ transient, et
+        <tt class="literal">lengthInMeter</tt>, une m&eacute;thode annot&eacute;e comme
+        <tt class="literal">@Transient</tt>, seront ignor&eacute;s par le gestionnaire
+        d'entit&eacute;s. Les propri&eacute;t&eacute;s <tt class="literal">name</tt>,
+        <tt class="literal">length</tt>, et <tt class="literal">firstname</tt> sont mapp&eacute;es
+        comme persistantes et &agrave; charger imm&eacute;diatement (ce sont les valeurs
+        par d&eacute;faut pour les propri&eacute;t&eacute;s simples). La valeur de la propri&eacute;t&eacute;
+        <tt class="literal">detailedComment</tt> sera charg&eacute;e &agrave; partir de la base de
+        donn&eacute;es d&egrave;s que la propri&eacute;t&eacute; de l'entit&eacute; sera acc&eacute;d&eacute;e pour la premi&egrave;re
+        fois. En g&eacute;n&eacute;ral vous n'avez pas besoin de marquer de simples propri&eacute;t&eacute;s
+        comme "&agrave; charger &agrave; la demande" (NdT: lazy) (&agrave; ne pas confondre avec la
+        r&eacute;cup&eacute;ration d'association "lazy").</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>Pour activer la r&eacute;cup&eacute;ration &agrave; la demande au niveau de la
+          propri&eacute;t&eacute;, vos classes doivent &ecirc;tre instrument&eacute;es : du bytecode est
+          ajout&eacute; au code original pour activer cette fonctionnalit&eacute;, veuillez
+          vous r&eacute;f&eacute;rer &agrave; la documentation de r&eacute;f&eacute;rence d'Hibernate. Si vos
+          classes ne sont pas instrument&eacute;es, le chargement &agrave; la demande au
+          niveau de la propri&eacute;t&eacute; est silencieusement ignor&eacute;.</p></div><p>L'alternative recommand&eacute;e est d'utiliser la capacit&eacute; de projection
+        de JPA-QL ou des requ&ecirc;tes Criteria.</p><p>EJB3 prend en charge le mapping de propri&eacute;t&eacute; de tous les types
+        &eacute;l&eacute;mentaires pris en charge par Hibernate (tous les types de base Java,
+        leur wrapper respectif et les classes s&eacute;rialisables). Hibernate
+        Annotations prend en charge le mapping des types Enum soit vers une
+        colonne ordinale (en stockant le num&eacute;ro ordinal de l'enum), soit vers
+        une colonne de type cha&icirc;ne de caract&egrave;res (en stockant la cha&icirc;ne de
+        caract&egrave;res repr&eacute;sentant l'enum) : la repr&eacute;sentation de la persistance,
+        par d&eacute;faut ordinale, peut &ecirc;tre surcharg&eacute;e gr&acirc;ce &agrave; l'annotation
+        <tt class="literal">@Enumerated</tt> comme montr&eacute; avec la propri&eacute;t&eacute;
+        <tt class="literal">note</tt> de l'exemple.</p><p>Dans les APIs core de Java, la pr&eacute;cision temporelle n'est pas
+        d&eacute;finie. Lors du traitement de donn&eacute;es temporelles vous pourriez vouloir
+        d&eacute;crire la pr&eacute;cision attendue dans la base de donn&eacute;es. Les donn&eacute;es
+        temporelles peuvent avoir une pr&eacute;cision de type <tt class="literal">DATE</tt>,
+        <tt class="literal">TIME</tt>, ou <tt class="literal">TIMESTAMP</tt> (c'est-&agrave;-dire
+        seulement la date, seulement l'heure, ou les deux). Utilisez
+        l'annotation <tt class="literal">@Temporal</tt> pour ajuster cela.</p><p><tt class="literal">@Lob</tt> indique que la propri&eacute;t&eacute; devrait &ecirc;tre
+        persist&eacute;e dans un Blob ou un Clob selon son type :
+        <tt class="classname">java.sql.Clob</tt>,
+        <tt class="classname">Character[]</tt>, <tt class="classname">char[]</tt> et
+        java.lang.<tt class="classname">String</tt> seront persist&eacute;s dans un Clob.
+        <tt class="classname">java.sql.Blob</tt>, <tt class="classname">Byte[]</tt>,
+        <tt class="classname">byte[] </tt> et les types s&eacute;rialisables seront
+        persist&eacute;s dans un Blob.</p><pre class="programlisting">
+@Lob
+public String getFullText() {
+    return fullText;
+}
+
+@Lob
+public byte[] getFullCode() {
+    return fullCode;
+}
+ </pre><p>Si le type de la propri&eacute;t&eacute; impl&eacute;mente
+        <tt class="classname">java.io.Serializable</tt> et n'est pas un type de
+        base, et si la propri&eacute;t&eacute; n'est pas annot&eacute;e avec <tt class="literal">@Lob</tt>,
+        alors le type Hibernate <tt class="literal">serializable</tt> est
+        utilis&eacute;.</p></div><div class="sect3" lang="fr"><div class="titlepage"><div><div><h4 class="title"><a name="d0e370"></a>2.2.2.2.&nbsp;D&eacute;clarer des attributs de colonne</h4></div></div><div></div></div><p>La(les) colonne(s) utilis&eacute;e(s) pour mapper une propri&eacute;t&eacute; peuvent
+        &ecirc;tre d&eacute;finies en utilisant l'annotation <tt class="literal">@Column</tt>.
+        Utilisez-la pour surcharger les valeurs par d&eacute;faut (voir la
+        sp&eacute;cification EJB3 pour plus d'informations sur les valeurs par d&eacute;faut).
+        Vous pouvez utilisez cette annotation au niveau de la propri&eacute;t&eacute; pour
+        celles qui sont :</p><div class="itemizedlist"><ul type="disc"><li><p>pas du tout annot&eacute;es</p></li><li><p>annot&eacute;es avec <tt class="literal">@Basic</tt></p></li><li><p>annot&eacute;es avec <tt class="literal">@Version</tt></p></li><li><p>annot&eacute;es avec <tt class="literal">@Lob</tt></p></li><li><p>annot&eacute;es avec <tt class="literal">@Temporal</tt></p></li><li><p>annot&eacute;es avec
+            <tt class="literal">@org.hibernate.annotations.CollectionOfElements</tt>
+            (pour Hibernate uniquement)</p></li></ul></div><pre class="programlisting">
+@Entity
+public class Flight implements Serializable {
+...
+@Column(updatable = false, name = "flight_name", nullable = false, length=50)
+public String getName() { ... }
+            </pre><p>La propri&eacute;t&eacute; <tt class="literal">name</tt> est mapp&eacute;e sur la colonne
+        <tt class="literal">flight_name</tt>, laquelle ne peut pas avoir de valeur
+        nulle, a une longueur de 50 et ne peut pas &ecirc;tre mise &agrave; jour (rendant
+        la propri&eacute;t&eacute; immuable).</p><p>Cette annotation peut &ecirc;tre appliqu&eacute;e aux propri&eacute;t&eacute;s habituelles
+        ainsi qu'aux propri&eacute;t&eacute;s <tt class="literal">@Id</tt> ou
+        <tt class="literal">@Version</tt>.</p><div class="programlistingco"><pre class="programlisting">@Column(
+    name="columnName";                                <span class="co">(1)</span>
+    boolean unique() default false;                   <span class="co">(2)</span>
+    boolean nullable() default true;                  <span class="co">(3)</span>
+    boolean insertable() default true;                <span class="co">(4)</span>
+    boolean updatable() default true;                 <span class="co">(5)</span>
+    String columnDefinition() default "";             <span class="co">(6)</span>
+    String table() default "";                        <span class="co">(7)</span>
+    int length() default 255;                         <span class="co">(8)</span>
+    int precision() default 0; // decimal precision   <span class="co">(9)</span>
+    int scale() default 0; // decimal scale</pre><div class="calloutlist"><table border="0" summary="Callout list"><tr><td width="5%" valign="top" align="left">(1)</td><td valign="top" align="left"><p><tt class="literal">name</tt> (optionnel) : le nom de la colonne
+              (par d&eacute;faut le nom de la propri&eacute;t&eacute;)</p></td></tr><tr><td width="5%" valign="top" align="left">(2)</td><td valign="top" align="left"><p><tt class="literal">unique</tt> (optionnel) : indique si la colonne
+              fait partie d'une contrainte d'unicit&eacute; ou non (par d&eacute;faut
+              false)</p></td></tr><tr><td width="5%" valign="top" align="left">(3)</td><td valign="top" align="left"><p><tt class="literal">nullable</tt> (optionnel) : indique si la
+              colonne peut avoir une valeur nulle (par d&eacute;faut false).</p></td></tr><tr><td width="5%" valign="top" align="left">(4)</td><td valign="top" align="left"><p><tt class="literal">insertable</tt> (optionnel) : indique si la
+              colonne fera partie de la commande insert (par d&eacute;faut true)</p></td></tr><tr><td width="5%" valign="top" align="left">(5)</td><td valign="top" align="left"><p><tt class="literal">updatable</tt> (optionnel) : indique si la
+              colonne fera partie de la commande update (par d&eacute;faut true)</p></td></tr><tr><td width="5%" valign="top" align="left">(6)</td><td valign="top" align="left"><p><tt class="literal">columnDefinition</tt> (optionnel) : surcharge
+              le fragment DDL sql pour cette colonne en particulier (non
+              portable)</p></td></tr><tr><td width="5%" valign="top" align="left">(7)</td><td valign="top" align="left"><p><tt class="literal">table</tt> (optionnel) : d&eacute;finit la table
+              cible (par d&eacute;faut la table principale)</p></td></tr><tr><td width="5%" valign="top" align="left">(8)</td><td valign="top" align="left"><p><tt class="literal"><tt class="literal">length</tt></tt> (optionnel) :
+              longueur de la colonne (par d&eacute;faut 255)</p></td></tr><tr><td width="5%" valign="top" align="left">(8)</td><td valign="top" align="left"><p><tt class="literal"><tt class="literal">precision</tt></tt>
+              (optionnel) : pr&eacute;cision d&eacute;cimale de la colonne (par d&eacute;faut
+              0)</p></td></tr><tr><td width="5%" valign="top" align="left">(10)</td><td valign="top" align="left"><p><tt class="literal"><tt class="literal">scale</tt></tt> (optionnel) :
+              &eacute;chelle d&eacute;cimale de la colonne si n&eacute;cessaire (par d&eacute;faut 0)</p></td></tr></table></div></div></div><div class="sect3" lang="fr"><div class="titlepage"><div><div><h4 class="title"><a name="d0e494"></a>2.2.2.3.&nbsp;Objets embarqu&eacute;s (alias composants)</h4></div></div><div></div></div><p>Il est possible de d&eacute;clarer un composant embarqu&eacute; &agrave; l'int&eacute;rieur
+        d'une entit&eacute; et m&ecirc;me de surcharger le mapping de ses colonnes. Les
+        classes de composant doivent &ecirc;tre annot&eacute;es au niveau de la classe avec
+        l'annotation <tt class="literal">@Embeddable</tt>. Il est possible de
+        surcharger le mapping de colonne d'un objet embarqu&eacute; pour une entit&eacute;
+        particuli&egrave;re en utilisant les annotations
+        <tt class="literal">@Embedded</tt> et <tt class="literal">@AttributeOverride</tt>
+        sur la propri&eacute;t&eacute; associ&eacute;e :</p><pre class="programlisting">
+@Entity
+public class Person implements Serializable {
+
+    // Composant persistant utilisant les valeurs par d&eacute;faut
+    Address homeAddress;
+
+    @Embedded
+    @AttributeOverrides( {
+            @AttributeOverride(name="iso2", column = @Column(name="bornIso2") ),
+            @AttributeOverride(name="name", column = @Column(name="bornCountryName") )
+    } )
+    Country bornIn;
+    ...
+}
+            </pre><pre class="programlisting">
+@Embeddable
+public class Address implements Serializable {
+    String city;
+    Country nationality; // par de surcharge ici
+}
+            </pre><pre class="programlisting">
+@Embeddable
+public class Country implements Serializable {
+    private String iso2;
+    @Column(name="countryName") private String name;
+
+    public String getIso2() { return iso2; }
+    public void setIso2(String iso2) { this.iso2 = iso2; }
+
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    ...
+}
+            </pre><p>Un objet embarquable h&eacute;rite du type d'acc&egrave;s de son entit&eacute;
+        d'appartenance (notez que vous pouvez surcharger cela en utilisant les
+        annotations sp&eacute;cifiques &agrave; Hibernate <tt class="literal">@AccessType</tt>,
+        voir <a href="entity.html#entity-hibspec">Extensions d'Hibernate Annotation</a>).</p><p>L'entity bean <tt class="literal">Person</tt> a deux propri&eacute;t&eacute;s
+        composant, <tt class="literal">homeAddress</tt> et
+        <tt class="literal">bornIn</tt>. La propri&eacute;t&eacute; <tt class="literal">homeAddress</tt>
+        n'a pas &eacute;t&eacute; annot&eacute;e, mais Hibernate devinera que c'est un composant
+        persistant en cherchant l'annotation <tt class="literal">@Embeddable</tt>
+        dans la classe Address. Nous surchargeons aussi le mapping d'un nom de
+        colonne (pour <tt class="literal">bornCountryName</tt>) avec les annotations
+        <tt class="literal">@Embedded</tt> et <tt class="literal">@AttributeOverride</tt>
+        pour chaque attribut mapp&eacute; de <tt class="literal">Country</tt>. Comme vous
+        pouvez le voir, <tt class="literal">Country</tt> est aussi un composant
+        imbriqu&eacute; de <tt class="literal">Address</tt>, utilisant de nouveau la
+        d&eacute;tection automatique d'Hibernate et les valeurs par d&eacute;faut EJB3.
+        Surcharger des colonnes d'objets embarqu&eacute;s d'objets (eux-m&ecirc;mes)
+        embarqu&eacute;s n'est actuellement pas pris en charge par la sp&eacute;cification
+        EJB3, cependant, Hibernate Annotations le prend en charge &agrave; travers des
+        expressions s&eacute;par&eacute;es par des points.</p><pre class="programlisting">    @Embedded
+    @AttributeOverrides( {
+            @AttributeOverride(name="city", column = @Column(name="fld_city") ),
+            @AttributeOverride(name="<span class="bold"><b>nationality.iso2</b></span>", column = @Column(name="nat_Iso2") ),
+            @AttributeOverride(name="<span class="bold"><b>nationality.name</b></span>", column = @Column(name="nat_CountryName") )
+            // les colonnes de nationality dans homeAddress sont surcharg&eacute;es
+    } )
+    Address homeAddress;</pre><p>Hibernate Annotations prend en charge
+        une fonctionnalit&eacute; de plus qui n'est pas explicitement prise en charge
+        par la sp&eacute;cification EJB3. Vous pouvez annoter un objet embarqu&eacute; avec
+        l'annotation
+        <tt class="literal">@MappedSuperclass</tt> pour rendre les propri&eacute;t&eacute;s de la
+        classe parente persistantes (voir <tt class="literal">@MappedSuperclass</tt>
+        pour plus d'informations).</p><p>Alors que ce n'est pas pris en charge par la sp&eacute;cification EJB3,
+        Hibernate Annotations vous permet d'utiliser les annotations
+        d'association dans un objet embarquable (ie <tt class="literal">@*ToOne</tt>
+        ou <tt class="literal">@*ToMany</tt>). Pour surcharger les colonnes de
+        l'association vous pouvez utiliser
+        <tt class="literal">@AssociationOverride</tt>.</p><p>Si vous voulez avoir le m&ecirc;me type d'objet embarquable deux fois
+        dans la m&ecirc;me entit&eacute;, le nom de colonne par d&eacute;faut ne fonctionnera pas :
+        au moins une des colonnes devra &ecirc;tre explicit&eacute;e. Hibernate va au-del&agrave;
+        de la sp&eacute;cification EJB3 et vous permet d'am&eacute;liorer le m&eacute;canisme par
+        d&eacute;faut avec <tt class="classname">NamingStrategy</tt>.
+        <tt class="classname">DefaultComponentSafeNamingStrategy</tt> est une petite
+        am&eacute;lioration par rapport &agrave; la strat&eacute;gie par d&eacute;faut
+        <tt class="classname">EJB3NamingStrategy</tt> qui permet aux objets
+        embarqu&eacute;s de fonctionner avec leur valeur par d&eacute;faut m&ecirc;me s'ils sont
+        utilis&eacute;s deux fois dans la m&ecirc;me entit&eacute;.</p></div><div class="sect3" lang="fr"><div class="titlepage"><div><div><h4 class="title"><a name="d0e594"></a>2.2.2.4.&nbsp;Valeurs par d&eacute;faut des propri&eacute;t&eacute;s non annot&eacute;es</h4></div></div><div></div></div><p>Si une propri&eacute;t&eacute; n'est pas annot&eacute;e, les r&egrave;gles suivantes
+        s'appliquent :</p><div class="itemizedlist"><ul type="disc"><li>
+            Si la propri&eacute;t&eacute; est de type simple, elle est mapp&eacute;e comme @Basic
+          </li><li>
+            Sinon, si le type de la propri&eacute;t&eacute; est annot&eacute; comme @Embeddable,
+            elle est mapp&eacute;e comme @Embedded
+          </li><li>
+            Sinon, si le type de la propri&eacute;t&eacute; est Serializable, elle est mapp&eacute;e
+            comme @Basic vers une colonne contenant l'objet sous sa forme
+            s&eacute;rialis&eacute;e
+          </li><li>
+              Sinon, si le type de la propri&eacute;t&eacute; est java.sql.Clob ou
+              java.sql.Blob, elle est mapp&eacute;e comme @Lob avec le LobType
+              appropri&eacute;
+          </li></ul></div></div></div><div class="sect2" lang="fr"><div class="titlepage"><div><div><h3 class="title"><a name="entity-mapping-identifier"></a>2.2.3.&nbsp;Mapper des propri&eacute;t&eacute;s identifiantes</h3></div></div><div></div></div><p>L'annotation <tt class="literal">@Id</tt> vous permet de d&eacute;finir quelle
+      propri&eacute;t&eacute; identifie votre entity bean. Cette propri&eacute;t&eacute; peut &ecirc;tre
+      positionn&eacute;e par l'application elle-m&ecirc;me ou g&eacute;n&eacute;r&eacute;e par Hibernate
+      (pr&eacute;f&eacute;r&eacute;). Vous pouvez d&eacute;finir la strat&eacute;gie de g&eacute;n&eacute;ration de l'identifiant
+      gr&acirc;ce &agrave; l'annotation <tt class="literal">@GeneratedValue</tt> :</p><div class="itemizedlist"><ul type="disc"><li>
+           AUTO - soit la colonne identity, soit la s&eacute;quence, soit la table
+           selon la base de donn&eacute;es sous-jacente
+        </li><li>
+           TABLE - table contenant l'id
+        </li><li>
+           IDENTITY - colonne identity
+        </li><li>
+           SEQUENCE - s&eacute;quence
+        </li></ul></div><p>Hibernate fournit plus de g&eacute;n&eacute;rateurs d'identifiant que les simples
+      g&eacute;n&eacute;rateurs EJB3. V&eacute;rifiez <a href="entity.html#entity-hibspec">Extensions d'Hibernate Annotation</a> pour plus
+      d'informations.</p><p>L'exemple suivant montre un g&eacute;n&eacute;rateur par s&eacute;quence utilisant la
+      configuration SEQ_STORE (voir plus bas) :</p><pre class="programlisting">
+@Id @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="SEQ_STORE")
+public Integer getId() { ... }
+         </pre><p>L'exemple suivant utilise le g&eacute;n&eacute;rateur identity :</p><pre class="programlisting">
+@Id @GeneratedValue(strategy=GenerationType.IDENTITY)
+public Long getId() { ... }
+         </pre><p>Le g&eacute;n&eacute;rateur <tt class="literal">AUTO</tt> est le type pr&eacute;f&eacute;r&eacute; pour les
+      applications portables (vers diff&eacute;rentes base de donn&eacute;es). La
+      configuration de la g&eacute;n&eacute;ration d'identifiant peut &ecirc;tre partag&eacute;e par
+      diff&eacute;rents mappings <tt class="literal">@Id</tt> avec l'attribut du g&eacute;n&eacute;rateur.
+      Il y a diff&eacute;rentes configurations disponibles avec
+      <tt class="literal">@SequenceGenerator</tt> et
+      <tt class="literal">@TableGenerator</tt>. La port&eacute;e d'un g&eacute;n&eacute;rateur peut &ecirc;tre
+      l'application ou la classe. Les g&eacute;n&eacute;rateurs d&eacute;finis dans les classes ne
+      sont pas visibles &agrave; l'ext&eacute;rieur de la classe et peuvent surcharger les
+      g&eacute;n&eacute;rateurs de niveau applicatif. Les g&eacute;n&eacute;rateurs de niveau applicatif
+      sont d&eacute;finis au niveau XML (voir
+      <a href="xml-overriding.html" title="Chapitre&nbsp;3.&nbsp;Surcharger des m&eacute;ta-donn&eacute;es &agrave; travers du XML">Chapitre&nbsp;3, <i>Surcharger des m&eacute;ta-donn&eacute;es &agrave; travers du XML</i></a>) :</p><pre class="programlisting">&lt;table-generator name="EMP_GEN"
+            table="GENERATOR_TABLE"
+            pk-column-name="key"
+            value-column-name="hi"
+            pk-column-value="EMP"
+            allocation-size="20"/&gt;
+
+// et l'annotation &eacute;quivalente
+
+@javax.persistence.TableGenerator(
+    name="EMP_GEN",
+    table="GENERATOR_TABLE",
+    pkColumnName = "key",
+    valueColumnName = "hi"
+    pkColumnValue="EMP",
+    allocationSize=20
+)
+
+&lt;sequence-generator name="SEQ_GEN"
+    sequence-name="my_sequence"
+    allocation-size="20"/&gt;
+
+// et l'annotation &eacute;quivalente
+
+@javax.persistence.SequenceGenerator(
+    name="SEQ_GEN",
+    sequenceName="my_sequence",
+    allocationSize=20
+)
+         </pre><p>Si JPA XML (comme <tt class="filename">META-INF/orm.xml</tt>) est utilis&eacute;
+      pour d&eacute;finir les g&eacute;n&eacute;rateurs, <tt class="literal">EMP_GEN</tt> et
+      <tt class="literal">SEQ_GEN</tt> sont des g&eacute;n&eacute;rateurs de niveau applicatif.
+      <tt class="literal">EMP_GEN</tt> d&eacute;finit un g&eacute;n&eacute;rateur d'identifiant bas&eacute; sur
+      une table utilisant l'algorithme hilo avec un <tt class="literal">max_lo</tt> de
+      20. La valeur haute est conserv&eacute;e dans une <tt class="literal">table</tt>
+      "<tt class="literal">GENERATOR_TABLE</tt>". L'information est gard&eacute;e dans une
+      ligne o&ugrave; la colonne <tt class="literal">pkColumnName</tt> ("clef") est &eacute;gale &agrave;
+      <tt class="literal">pkColumnValue</tt> "<tt class="literal">EMP</tt>" et une colonne
+      <tt class="literal">valueColumnName</tt> "<tt class="literal">hi</tt>" contient la
+      prochaine valeur haute utilis&eacute;e.</p><p><tt class="literal">SEQ_GEN</tt> d&eacute;finit un g&eacute;n&eacute;rateur par s&eacute;quence
+      utilisant une s&eacute;quence nomm&eacute;e <tt class="literal">my_sequence</tt>. La taille
+      d'allocation utilis&eacute;e pour cet algorithme hilo bas&eacute; sur une s&eacute;quence est
+      20. Notez que cette version d'Hibernate Annotations ne g&egrave;re pas
+      <tt class="literal">initialValue</tt> dans le g&eacute;n&eacute;rateur par s&eacute;quence.
+      La taille par d&eacute;faut de l'allocation est 50, donc si vous voulez utiliser
+      une s&eacute;quence et r&eacute;cup&eacute;rer la valeur chaque fois, vous devez positionner
+      la taille de l'allocation &agrave; 1.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>La d&eacute;finition au niveau package n'est plus prise en charge par la
+        sp&eacute;cification EJB 3.0. Vous pouvez cependant utiliser
+        <tt class="literal">@GenericGenerator</tt> au niveau du package (voir <a href="entity.html#entity-hibspec-identifier" title="2.4.2.&nbsp;Identifiant">Section&nbsp;2.4.2, &laquo;&nbsp;Identifiant&nbsp;&raquo;</a>).</p></div><p>Le prochain exemple montre la d&eacute;finition d'un g&eacute;n&eacute;rateur par
+      s&eacute;quence dans la port&eacute;e d'une classe :</p><pre class="programlisting">
+@Entity
+@javax.persistence.SequenceGenerator(
+    name="SEQ_STORE",
+    sequenceName="my_sequence"
+)
+public class Store implements Serializable {
+    private Long id;
+
+    @Id @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="SEQ_STORE")
+    public Long getId() { return id; }
+}
+         </pre><p>Cette classe utilisera une s&eacute;quence nomm&eacute;e my_sequence et le
+      g&eacute;n&eacute;rateur SEQ_STORE n'est pas visible dans les autres classes. Notez que
+      vous pouvez regarder les tests unitaires d'Hibernate Annotations dans le
+      package org.hibernate.test.metadata.id pour plus d'exemples.</p><p>Vous pouvez d&eacute;finir une clef primaire compos&eacute;e &agrave; travers diff&eacute;rentes
+      syntaxes :</p><div class="itemizedlist"><ul type="disc"><li>
+           annote la propri&eacute;t&eacute; du composant comme @Id et rend la classe du
+           composant @Embeddable
+        </li><li>
+           annote la propri&eacute;t&eacute; du composant comme @EmbeddedId
+        </li><li>
+           annote la classe comme @IdClass et annote chaque propri&eacute;t&eacute; de
+           l'entit&eacute; impliqu&eacute;e dans la clef primaire avec @Id
+        </li></ul></div><p>Bien qu'assez commun pour le d&eacute;veloppeur EJB2,
+      <tt class="literal">@IdClass</tt> est probablement nouveau pour les utilisateurs
+      d'Hibernate. La classe de la clef primaire compos&eacute;e correspond aux
+      multiples champs ou propri&eacute;t&eacute;s de l'entit&eacute; ; de plus, les noms des champs
+      ou propri&eacute;t&eacute;s de la clef primaire et ceux de l'entit&eacute; doivent
+      correspondre ; et enfin, leur type doit &ecirc;tre le m&ecirc;me. Regardons un
+      exemple :</p><pre class="programlisting">@Entity
+<span class="bold"><b>@IdClass(FootballerPk.class)</b></span>
+public class Footballer {
+    // partie de la clef
+    <span class="bold"><b>@Id</b></span> public String getFirstname() {
+        return firstname;
+    }
+
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
+
+    // partie de la clef
+    <span class="bold"><b>@Id</b></span> public String getLastname() {
+        return lastname;
+    }
+
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
+    }
+
+    public String getClub() {
+        return club;
+    }
+
+    public void setClub(String club) {
+        this.club = club;
+    }
+
+    // impl&eacute;mentation appropri&eacute;e de equals() et hashCode()
+}
+
+@Embeddable
+public class FootballerPk implements Serializable {
+    // m&ecirc;me nom et m&ecirc;me type que dans Footballer
+    public String getFirstname() {
+        return firstname;
+    }
+
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
+
+    // m&ecirc;me nom et m&ecirc;me type que dans Footballer
+    public String getLastname() {
+        return lastname;
+    }
+
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
+    }
+
+    // impl&eacute;mentation appropri&eacute;e de equals() et hashCode()
+}
+</pre><p>Comme vous pouvez le voir, <tt class="literal">@IdClass</tt> pointe vers
+      la classe de la clef primaire correspondante.</p><p>Bien que ce ne soit pas pris en charge par la sp&eacute;cification EJB3,
+      Hibernate vous permet de d&eacute;finir des associations &agrave; l'int&eacute;rieur d'un
+      identifiant compos&eacute;. Pour cela, utilisez simplement les annotations
+      habituelles.</p><pre class="programlisting">@Entity
+@AssociationOverride( name="id.channel", joinColumns = @JoinColumn(name="chan_id") )
+public class TvMagazin {
+    @EmbeddedId public TvMagazinPk id;
+    @Temporal(TemporalType.TIME) Date time;
+}
+
+@Embeddable
+public class TvMagazinPk implements Serializable {
+    @ManyToOne
+    public Channel channel;
+    public String name;
+    @ManyToOne
+    public Presenter presenter;
+}
+</pre></div><div class="sect2" lang="fr"><div class="titlepage"><div><div><h3 class="title"><a name="d0e754"></a>2.2.4.&nbsp;Mapper l'h&eacute;ritage</h3></div></div><div></div></div><p>EJB3 prend en charge les trois types d'h&eacute;ritage :</p><div class="itemizedlist"><ul type="disc"><li>
+           Strat&eacute;gie d'une table par classe concr&egrave;te : l'&eacute;l&eacute;ment
+           &lt;union-class&gt; dans Hibernate
+        </li><li>
+            Strat&eacute;gie d'une seule table par hi&eacute;rarchie de classe : l'&eacute;l&eacute;ment
+            &lt;subclass&gt; dans Hibernate
+        </li><li>
+           Strat&eacute;gie d'une table par classe fille : l'&eacute;l&eacute;ment
+           &lt;joined-subclass&gt; dans Hibernate
+        </li></ul></div><p>La strat&eacute;gie choisie est d&eacute;clar&eacute;e au niveau de la classe de l'entit&eacute;
+      la plus haute dans la hi&eacute;rarhie en utilisant l'annotation
+      <tt class="literal">@Inheritance</tt>.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>Annoter des interfaces n'est pour le moment pas pris en
+        charge.</p></div><div class="sect3" lang="fr"><div class="titlepage"><div><div><h4 class="title"><a name="d0e774"></a>2.2.4.1.&nbsp;Une table par classe concr&egrave;te</h4></div></div><div></div></div><p>Cette strat&eacute;gie a beaucoup d'inconv&eacute;nients (surtout avec les
+        requ&ecirc;tes polymorphiques et les associations) expliqu&eacute;s dans la
+        sp&eacute;cification EJB3, la documentation de r&eacute;f&eacute;rence d'Hibernate, Hibernate
+        in Action, et plusieurs autres endroits. Hibernate en contourne la
+        plupart en impl&eacute;mentant cette strat&eacute;gie en utilisant des requ&ecirc;tes
+        <tt class="literal">SQL UNION</tt>. Elle est habituellement utilis&eacute;e pour le
+        niveau le plus haut d'une hi&eacute;rarchie d'h&eacute;ritage :</p><pre class="programlisting">
+@Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+public class Flight implements Serializable {
+            </pre><p>Cette strat&eacute;gie prend en charge les associations de un vers
+        plusieurs bidirectionnelles. Cette strat&eacute;gie ne prend pas en charge
+        la strat&eacute;gie de g&eacute;n&eacute;rateur <tt class="literal">IDENTITY</tt> : l'identifiant
+        doit &ecirc;tre partag&eacute; par plusieurs tables. Par cons&eacute;quent, lors de
+        l'utilisation de cette strat&eacute;gie, vous ne devriez pas utilisez
+        <tt class="literal">AUTO</tt> ni <tt class="literal">IDENTITY</tt>.</p></div><div class="sect3" lang="fr"><div class="titlepage"><div><div><h4 class="title"><a name="d0e795"></a>2.2.4.2.&nbsp;Une seule table par hi&eacute;rarchie de classe</h4></div></div><div></div></div><p>Toutes les propri&eacute;t&eacute;s de toutes les classes parentes et classes
+        filles sont mapp&eacute;es dans la m&ecirc;me table, les instances sont diff&eacute;renci&eacute;es
+        par une colonne sp&eacute;ciale discriminante :</p><pre class="programlisting">
+@Entity
+@Inheritance(strategy=InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(
+    name="planetype",
+    discriminatorType=DiscriminatorType.STRING
+)
+@DiscriminatorValue("Plane")
+public class Plane { ... }
+
+@Entity
+@DiscriminatorValue("A320")
+public class A320 extends Plane { ... }
+            </pre><p><tt class="classname">Plane</tt> est la classe parente, elle d&eacute;finit
+        la strat&eacute;gie d'h&eacute;ritage <tt class="literal">InheritanceType.SINGLE_TABLE</tt>.
+        Elle d&eacute;finit aussi la colonne discriminante avec l'annotation
+        <tt class="literal">@DiscriminatorColumn</tt>, une colonne discriminante peut
+        aussi d&eacute;finir le type du discriminant. Finalement, l'annotation
+        <tt class="literal">@DiscriminatorValue</tt> d&eacute;finit la valeur utilis&eacute;e pour
+        diff&eacute;rencier une classe dans la hi&eacute;rarchie. Tous ces attributs ont des
+        valeurs par d&eacute;faut sens&eacute;es. Le nom par d&eacute;faut de la colonne
+        discriminante est <tt class="literal">DTYPE</tt>. La valeur discriminante par
+        d&eacute;faut est le nom de l'entit&eacute; (comme d&eacute;fini dans
+        <tt class="literal">@Entity.name</tt>) avec le type
+        <tt class="literal">DiscriminatorType.STRING</tt>. <tt class="classname">A320</tt>
+        est une classe fille ; vous devez seulement d&eacute;finir la valeur
+        discriminante si vous ne voulez pas utiliser la valeur par d&eacute;faut. La
+        strat&eacute;gie et le type du discriminant sont implicites.</p><p><tt class="literal">@Inheritance</tt> et
+        <tt class="literal">@DiscriminatorColumn</tt> devraient seulement &ecirc;tre
+        d&eacute;finies sur l'entit&eacute; la plus haute de la hi&eacute;rarchie.</p></div><div class="sect3" lang="fr"><div class="titlepage"><div><div><h4 class="title"><a name="d0e834"></a>2.2.4.3.&nbsp;Une table par classe fille</h4></div></div><div></div></div><p>Les annotations <tt class="literal"> @PrimaryKeyJoinColumn</tt> et
+        <tt class="literal">@PrimaryKeyJoinColumns</tt> d&eacute;finissent la (les) clef(s)
+        primaire(s) de la table de la classe fille jointe :</p><pre class="programlisting">
+@Entity
+@Inheritance(strategy=InheritanceType.JOINED)
+public class Boat implements Serializable { ... }
+
+@Entity
+public class Ferry extends Boat { ... }
+
+@Entity
+@PrimaryKeyJoinColumn(name="BOAT_ID")
+public class AmericaCupClass  extends Boat { ... }
+            </pre><p>Toutes les entit&eacute;s ci-dessus utilisent la strat&eacute;gie
+        <tt class="literal">JOINED</tt>, la table <tt class="literal">Ferry</tt> est jointe
+        avec la table <tt class="literal">Boat</tt> en utilisant les m&ecirc;mes noms de
+        clef primaire. La table <tt class="literal">AmericaCupClass</tt> est jointe
+        avec <tt class="literal">Boat</tt> en utilisant la condition de jointure
+        <tt class="code">Boat.id = AmericaCupClass.BOAT_ID</tt>.</p></div><div class="sect3" lang="fr"><div class="titlepage"><div><div><h4 class="title"><a name="d0e867"></a>2.2.4.4.&nbsp;H&eacute;ritage de propri&eacute;t&eacute;s des classes parentes</h4></div></div><div></div></div><p>Il est parfois utile de partager des propri&eacute;t&eacute;s communes &agrave; travers
+        une classe technique ou m&eacute;tier sans l'inclure comme une entit&eacute;
+        habituelle (c'est-&agrave;-dire aucune table sp&eacute;cifique pour cette entit&eacute;).
+        Pour cela, vous pouvez les mapper comme
+        <tt class="literal">@MappedSuperclass</tt>.</p><pre class="programlisting">@MappedSuperclass
+public class BaseEntity {
+    @Basic
+    @Temporal(TemporalType.TIMESTAMP)
+    public Date getLastUpdate() { ... }
+    public String getLastUpdater() { ... }
+    ...
+}
+
+@Entity class Order extends BaseEntity {
+    @Id public Integer getId() { ... }
+    ...
+}</pre><p>En base de donn&eacute;es, cette hi&eacute;rarchie sera repr&eacute;sent&eacute;e comme une
+        table <tt class="literal">Order</tt> ayant les colonnes <tt class="literal">id</tt>,
+        <tt class="literal">lastUpdate</tt> et <tt class="literal">lastUpdater</tt>.
+        Les mappings de propri&eacute;t&eacute; de la classe parente embarqu&eacute;e sont copi&eacute;s
+        dans les classes filles de l'entit&eacute;. Souvenez-vous que la classe parente
+        embarquable n'est cependant pas la racine de la hi&eacute;rarchie.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>Les propri&eacute;t&eacute;s des classes parentes non mapp&eacute;es comme
+          <tt class="literal">@MappedSuperclass</tt> sont ignor&eacute;es.</p></div><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>Le type d'acc&egrave;s (champ ou m&eacute;thode) est h&eacute;rit&eacute; de l'entit&eacute;
+          racine, &agrave; moins que vous utilisiez l'annotation Hibernate
+          <tt class="literal">@AccessType</tt>.</p></div><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>La m&ecirc;me notion peut &ecirc;tre appliqu&eacute;e aux objets
+          <tt class="literal">@Embeddable</tt> pour persister des propri&eacute;t&eacute;s de leurs
+          classes parentes. Vous avez aussi besoin d'utiliser
+          <tt class="literal">@MappedSuperclass</tt> pour faire &ccedil;a (cependant cela ne
+          devrait pas &ecirc;tre consid&eacute;r&eacute; comme une fonctionnalit&eacute; EJB3
+          standard).</p></div><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>Il est permis de marquer une classe comme
+          <tt class="literal">@MappedSuperclass</tt> dans le milieu d'une hi&eacute;rarchie
+          d'h&eacute;ritage mapp&eacute;e.</p></div><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>Toute classe de la hi&eacute;rarchie non annot&eacute;e avec
+          <tt class="literal">@MappedSuperclass</tt> ou <tt class="literal">@Entity</tt>
+          sera ignor&eacute;e.</p></div><p>Vous pouvez surcharger des colonnes d&eacute;finies dans des entit&eacute;s
+        parentes au niveau de l'entit&eacute; racine en utilisant l'annotation
+        <tt class="literal">@AttributeOverride</tt>.</p><pre class="programlisting">@MappedSuperclass
+public class FlyingObject implements Serializable {
+
+    public int getAltitude() {
+        return altitude;
+    }
+
+    @Transient
+    public int getMetricAltitude() {
+        return metricAltitude;
+    }
+
+    @ManyToOne
+    public PropulsionType getPropulsion() {
+        return metricAltitude;
+    }
+    ...
+}
+
+@Entity
+@AttributeOverride( name="altitude", column = @Column(name="fld_altitude") )
+@AssociationOverride( name="propulsion", joinColumns = @JoinColumn(name="fld_propulsion_fk") )
+public class Plane extends FlyingObject {
+    ...
+}</pre><p>La propri&eacute;t&eacute; <tt class="literal">altitude</tt> sera persist&eacute;e dans la
+        colonne <tt class="literal">fld_altitude</tt> de la table
+        <tt class="literal">Plane</tt> et l'association <tt class="literal">propulsion</tt>
+        sera mat&eacute;rialis&eacute;e dans la colonne de clef &eacute;trang&egrave;re
+        <tt class="literal">fld_propulsion_fk</tt>.</p><p>Vous pouvez d&eacute;finir <tt class="literal">@AttributeOverride</tt>(s) et
+        <tt class="literal">@AssociationOverride</tt>(s) sur des classes
+        <tt class="literal">@Entity</tt>, des classes
+        <tt class="literal">@MappedSuperclass</tt> et des propri&eacute;t&eacute;s pointant vers un
+        objet <tt class="literal">@Embeddable</tt>.</p></div></div><div class="sect2" lang="fr"><div class="titlepage"><div><div><h3 class="title"><a name="entity-mapping-association"></a>2.2.5.&nbsp;Mapper des associations/relations d'entity beans</h3></div></div><div></div></div><div class="sect3" lang="fr"><div class="titlepage"><div><div><h4 class="title"><a name="d0e971"></a>2.2.5.1.&nbsp;One-to-one</h4></div></div><div></div></div><p>Vous pouvez associer des entity beans avec une relation one-to-one
+        en utilisant <tt class="literal">@OneToOne</tt>. Il y a trois cas pour les
+        associations one-to-one : soit les entit&eacute;s associ&eacute;es partagent les m&ecirc;mes
+        valeurs de clef primaire, soit une clef &eacute;trang&egrave;re est d&eacute;tenue par une
+        des entit&eacute;s (notez que cette colonne de clef &eacute;trang&egrave;re dans la base de
+        donn&eacute;es devrait &ecirc;tre avoir une contrainte d'unicit&eacute; pour simuler la
+        cardinalit&eacute; one-to-one), soit une table d'association est utilis&eacute;e pour
+        stocker le lien entre les 2 entit&eacute;s (une contrainte d'unicit&eacute; doit &ecirc;tre
+        d&eacute;finie sur chaque clef &eacute;trang&egrave;re pour assurer la cardinalit&eacute; un &agrave;
+        un).</p><p>Tout d'abord, nous mappons une v&eacute;ritable association one-to-one en
+        utilisant des clefs primaires partag&eacute;es :</p><pre class="programlisting">
+@Entity
+public class Body {
+    @Id
+    public Long getId() { return id; }
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    public Heart getHeart() {
+        return heart;
+    }
+    ...
+}
+            </pre><pre class="programlisting">
+@Entity
+public class Heart {
+    @Id
+    public Long getId() { ...}
+}
+            </pre><p>L'association un &agrave; un est activ&eacute;e en utilisant l'annotation
+        <tt class="literal">@PrimaryKeyJoinColumn</tt>.</p><p>Dans l'exemple suivant, les entit&eacute;s associ&eacute;es sont li&eacute;es &agrave; travers
+        une clef &eacute;trang&egrave;re :</p><pre class="programlisting">
+@Entity
+public class Customer implements Serializable {
+    @OneToOne(cascade = CascadeType.ALL)
+    <span class="bold"><b>@JoinColumn(name="passport_fk")</b></span>
+    public Passport getPassport() {
+        ...
+    }
+
+@Entity
+public class Passport implements Serializable {
+    @OneToOne(<span class="bold"><b>mappedBy = "passport"</b></span>)
+    public Customer getOwner() {
+    ...
+}
+            </pre><p>Un <tt class="classname">Customer</tt> est li&eacute; &agrave; un
+        <tt class="classname">Passport</tt>, avec une colonne de clef &eacute;trang&egrave;re
+        nomm&eacute;e <tt class="literal">passport_fk</tt> dans la table
+        <tt class="literal">Customer</tt>. La colonne de jointure est d&eacute;clar&eacute;e avec
+        l'annotation <tt class="literal">@JoinColumn</tt> qui ressemble &agrave; l'annotation
+        <tt class="literal">@Column</tt>. Elle a un param&egrave;tre de plus nomm&eacute;
+        <tt class="literal">referencedColumnName</tt>. Ce param&egrave;tre d&eacute;clare la colonne
+        dans l'entit&eacute; cible qui sera utilis&eacute;e pour la jointure. Notez que lors
+        de l'utilisation de <tt class="literal">referencedColumnName</tt> vers une
+        colonne qui ne fait pas partie de la clef primaire, la classe associ&eacute;e
+        doit &ecirc;tre <tt class="classname">Serializable</tt>. Notez aussi que
+        <tt class="literal">referencedColumnName</tt> doit &ecirc;tre mapp&eacute; sur une
+        propri&eacute;t&eacute; ayant une seule colonne lorsqu'elle pointe vers une colonne
+        qui ne fait pas partie de la clef primaire (d'autres cas pourraient ne
+        pas fonctionnner).</p><p>L'association peut &ecirc;tre bidirectionnelle. Dans une relation
+        bidirectionnelle, une des extr&eacute;mit&eacute;s (et seulement une) doit &ecirc;tre la
+        propri&eacute;taire : la propri&eacute;taire est responsable de la mise &agrave; jour des
+        colonnes de l'association. Pour d&eacute;clarer une extr&eacute;mit&eacute; comme
+        <span class="emphasis"><em>non</em></span> responsable de la relation, l'attribut
+        <tt class="literal">mappedBy</tt> est utilis&eacute;.
+        <tt class="literal">mappedBy</tt> r&eacute;f&eacute;rence le nom de la propri&eacute;t&eacute; de
+        l'association du c&ocirc;t&eacute; du propri&eacute;taire. Dans notre cas, c'est
+        <tt class="literal">passport</tt>. Comme vous pouvez le voir, vous ne devez
+        (absolument) pas d&eacute;clarer la colonne de jointure puisqu'elle a d&eacute;j&agrave; &eacute;t&eacute;
+        d&eacute;clar&eacute;e du c&ocirc;t&eacute; du propri&eacute;taire.</p><p>Si aucune <tt class="literal">@JoinColumn</tt> n'est d&eacute;clar&eacute;e du c&ocirc;t&eacute; du
+        propri&eacute;taire, les valeurs par d&eacute;faut s'appliquent. Une(des) colonne(s)
+        de jointure sera(ont) cr&eacute;&eacute;e(s) dans la table propri&eacute;taire, et son(leur)
+        nom sera la concat&eacute;nation du nom de la relation du c&ocirc;t&eacute; propri&eacute;taire,
+        <span><b class="keycap">_</b></span> (underscore), et le nom de la (des) colonne(s) de la
+        clef primaire du propri&eacute;taire. Dans cet exemple
+        <tt class="literal">passport_id</tt> parce que le nom de la propri&eacute;t&eacute; est
+        <tt class="literal">passport</tt> et la colonne identifiante de
+        <tt class="literal">Passport</tt> est <tt class="literal">id</tt>.</p><p>La troisi&egrave;me possibilit&eacute; (utilisant une table d'association) est
+        tr&egrave;s exotique.</p><pre class="programlisting">
+@Entity
+public class Customer implements Serializable {
+    @OneToOne(cascade = CascadeType.ALL)
+    <span class="bold"><b>@JoinTable(name = "CustomerPassports",
+        joinColumns = @JoinColumn(name="customer_fk"),
+        inverseJoinColumns = @JoinColumn(name="passport_fk")</b></span>
+    )
+    public Passport getPassport() {
+        ...
+    }
+
+@Entity
+public class Passport implements Serializable {
+    @OneToOne(<span class="bold"><b>mappedBy = "passport"</b></span>)
+    public Customer getOwner() {
+    ...
+}
+            </pre><p>Un <tt class="classname">Customer</tt> est li&eacute; &agrave; un
+        <tt class="classname">Passport</tt> &agrave; travers une table d'association
+        nomm&eacute;e <tt class="literal">CustomerPassports</tt> ; cette table d'association
+        a une colonne de clef &eacute;trang&egrave;re nomm&eacute;e <tt class="literal">passport_fk</tt>
+        pointant vers la table <tt class="literal">Passport</tt> (mat&eacute;rialis&eacute;e par
+        l'attribut <tt class="literal">inverseJoinColumn</tt>), et une colonne de clef
+        &eacute;trang&egrave;re nomm&eacute;e <tt class="literal">customer_fk</tt> pointant vers la table
+        <tt class="literal">Customer</tt> (mat&eacute;rialis&eacute;e par l'attribut
+        <tt class="literal">joinColumns</tt>).</p><p>Vous devez d&eacute;clarer le nom de la table de jointure et les colonnes
+        de jointure explicitement dans un tel mapping.</p></div><div class="sect3" lang="fr"><div class="titlepage"><div><div><h4 class="title"><a name="d0e1107"></a>2.2.5.2.&nbsp;Many-to-one</h4></div></div><div></div></div><p>Les associations Many-to-one sont d&eacute;clar&eacute;es au niveau de la
+        propri&eacute;t&eacute; avec l'annotation <tt class="literal">@ManyToOne</tt> :</p><pre class="programlisting">
+@Entity()
+public class Flight implements Serializable {
+    <span class="bold"><b>@ManyToOne</b></span>( cascade = {CascadeType.PERSIST, CascadeType.MERGE} )
+    @JoinColumn(name="COMP_ID")
+    public Company getCompany() {
+        return company;
+    }
+    ...
+}
+            </pre><p>L'attribut <tt class="literal">@JoinColumn</tt> est optionnel, la valeur
+        par d&eacute;faut est comme l'association un &agrave; un, la concat&eacute;nation du nom
+        de la relation du c&ocirc;t&eacute; propri&eacute;taire, <span><b class="keycap">_</b></span>
+        (underscore), et le nom de la colonne de la clef primaire du c&ocirc;t&eacute;
+        propri&eacute;taire. Dans cet exemple, <tt class="literal">company_id</tt> parce que
+        le nom de la propri&eacute;t&eacute; est <tt class="literal">company</tt> et la colonne
+        identifiante de Company est <tt class="literal">id</tt>.</p><p><tt class="literal">@ManyToOne</tt> a un param&egrave;tre nomm&eacute;
+        <tt class="literal">targetEntity</tt> qui d&eacute;crit le nom de l'entit&eacute; cible.
+        G&eacute;n&eacute;ralement, vous ne devriez pas avoir besoin de ce param&egrave;tre puisque
+        la valeur par d&eacute;faut (le type de la propri&eacute;t&eacute; qui stocke l'association)
+        est correcte dans la plupart des cas. Il est cependant utile lorsque
+        vous souhaitez retourner une interface plut&ocirc;t qu'une entit&eacute;
+        normale.</p><pre class="programlisting">
+@Entity()
+public class Flight implements Serializable {
+    @ManyToOne( cascade = {CascadeType.PERSIST, CascadeType.MERGE}, <span class="bold"><b>targetEntity=CompanyImpl.class</b></span> )
+    @JoinColumn(name="COMP_ID")
+    public Company getCompany() {
+        return company;
+    }
+    ...
+}
+
+public interface Company {
+    ...
+            </pre><p>Vous pouvez sinon mapper une association plusieurs &agrave; un avec une
+        table d'association. Cette association d&eacute;crite par l'annotation
+        <tt class="literal">@JoinTable</tt> contiendra une clef &eacute;trang&egrave;re r&eacute;f&eacute;ren&ccedil;ant
+        la table de l'entit&eacute; (avec
+        <tt class="literal">@JoinTable.joinColumns</tt>) et une clef &eacute;trang&egrave;re
+        r&eacute;f&eacute;ren&ccedil;ant la table de l'entit&eacute; cible (avec
+        <tt class="literal">@JoinTable.inverseJoinColumns</tt>).</p><pre class="programlisting">
+@Entity()
+public class Flight implements Serializable {
+    @ManyToOne( cascade = {CascadeType.PERSIST, CascadeType.MERGE} )
+    <span class="bold"><b>@JoinTable(name="Flight_Company",
+        joinColumns = @JoinColumn(name="FLIGHT_ID"),
+        inverseJoinColumns = @JoinColumn(name="COMP_ID")
+    )</b></span>
+    public Company getCompany() {
+        return company;
+    }
+    ...
+}
+            </pre></div><div class="sect3" lang="fr"><div class="titlepage"><div><div><h4 class="title"><a name="entity-mapping-association-collections"></a>2.2.5.3.&nbsp;Collections</h4></div></div><div></div></div><div class="sect4" lang="fr"><div class="titlepage"><div><div><h5 class="title"><a name="entity-mapping-association-collections-overview"></a>2.2.5.3.1.&nbsp;Vue d'ensemble</h5></div></div><div></div></div><p>Vous pouvez mapper des <tt class="classname">Collection</tt>s, des
+          <tt class="literal">List</tt>s (ie des listes ordonn&eacute;es, pas des listes
+          index&eacute;es), des <tt class="literal">Map</tt>s et des
+          <tt class="classname">Set</tt>s. La sp&eacute;cification EJB3 d&eacute;crit comment
+          mapper une liste ordonn&eacute;e (ie une liste ordonn&eacute;e au chargement) en
+          utilisant l'annotation <tt class="literal">@javax.persistence.OrderBy</tt> :
+          pour ordonner la collection, cette annotation prend en param&egrave;tre une
+          liste de propri&eacute;t&eacute;s (de l'entit&eacute; cible) s&eacute;par&eacute;es par des virgules
+          (p. ex. <tt class="code">firstname asc, age desc</tt>) ; si la cha&icirc;ne de
+          caract&egrave;res est vide, la collection sera ordonn&eacute;e par les identifiants.
+          Pour le moment <tt class="literal">@OrderBy</tt> fonctionne seulement sur
+          des collections n'ayant pas de table d'association. Pour les
+          v&eacute;ritables collections index&eacute;es, veuillez vous r&eacute;f&eacute;rer &agrave;
+          <a href="entity.html#entity-hibspec">Extensions d'Hibernate Annotation</a>. EJB3 vous permet de mapper des
+          <tt class="literal">Map</tt>s en utilisant comme clef une des propri&eacute;t&eacute;s de
+          l'entit&eacute; cible avec <tt class="literal">@MapKey(name="myProperty")</tt>
+          (myProperty est un nom de propri&eacute;t&eacute; de l'entit&eacute; cible). Lorsque vous
+          utilisez <tt class="literal">@MapKey</tt> sans nom de propri&eacute;t&eacute;, la clef
+          primaire de l'entit&eacute; cible est utilis&eacute;e. La clef de la map utilise la
+          m&ecirc;me colonne que celle point&eacute;e par la propri&eacute;t&eacute; : il n'y a pas de
+          colonne suppl&eacute;mentaire d&eacute;finie pour la clef de la map, et c'est normal
+          puisque la clef de la map repr&eacute;sente en fait un propri&eacute;t&eacute; de la cible.
+          Faites attention qu'une fois charg&eacute;e, la clef n'est plus synchronis&eacute;e
+          avec la propri&eacute;t&eacute;, en d'autres mots, si vous modifiez la valeur de la
+          propri&eacute;t&eacute;, la clef ne sera pas chang&eacute;e automatiquement dans votre
+          mod&egrave;le Java (pour une v&eacute;ritable prise en charge des maps veuillez vous
+          r&eacute;f&eacute;rer &agrave; <a href="entity.html#entity-hibspec">Extensions d'Hibernate Annotation</a>). Beaucoup de gens
+          confondent les capacit&eacute;s de <tt class="literal">&lt;map&gt;</tt> et celles
+          de <tt class="literal">@MapKey</tt>. Ce sont deux fonctionnalit&eacute;s
+          diff&eacute;rentes. <tt class="literal">@MapKey</tt> a encore quelques limitations,
+          veuillez vous r&eacute;f&eacute;rer au forum ou au syst&egrave;me de suivi de bogues JIRA
+          pour plus d'informations.</p><p>Hibernate a plusieurs notions de collections.</p><p></p><div class="table"><a name="d0e1219"></a><p class="title"><b>Tableau&nbsp;2.1.&nbsp;S&eacute;mantique des collections</b></p><table summary="S&eacute;mantique des collections" border="1"><colgroup><col><col><col></colgroup><thead><tr><th>S&eacute;mantique</th><th>Repr&eacute;sentation Java</th><th>Annotations</th></tr></thead><tbody><tr><td>S&eacute;mantique de Bag</td><td>java.util.List, java.util.Collection</td><td>@org.hibernate.annotations.CollectionOfElements ou
+                  @OneToMany ou @ManyToMany</td></tr><tr><td>S&eacute;mantique de Bag avec une clef primaire (sans les
+                  limitations de la s&eacute;mantique de Bag)</td><td>java.util.List, java.util.Collection</td><td>(@org.hibernate.annotations.CollectionOfElements ou
+                  @OneToMany ou @ManyToMany) et @CollectionId</td></tr><tr><td>S&eacute;mantique de List</td><td>java.util.List</td><td>(@org.hibernate.annotations.CollectionOfElements ou
+                  @OneToMany ou @ManyToMany) et
+                  @org.hibernate.annotations.IndexColumn</td></tr><tr><td>S&eacute;mantique de Set</td><td>java.util.Set</td><td>@org.hibernate.annotations.CollectionOfElements ou
+                  @OneToMany ou @ManyToMany</td></tr><tr><td>S&eacute;mantique de Map</td><td>java.util.Map</td><td>(@org.hibernate.annotations.CollectionOfElements ou
+                  @OneToMany ou @ManyToMany) et (rien ou
+                  @org.hibernate.annotations.MapKey/MapKeyManyToMany pour une
+                  v&eacute;ritable prise en charge des maps, ou
+                  @javax.persistence.MapKey</td></tr></tbody></table></div><i><span class="remark">Donc sp&eacute;cifiquement, les collections java.util.List sans
+          @org.hibernate.annotations.IndexColumn vont &ecirc;tre consid&eacute;r&eacute;es commes
+          des bags.</span></i><p>Les collections de types primitifs, de types core ou d'objets
+          embarqu&eacute;s ne sont pas prises en charge par la sp&eacute;cification EJB3.
+          Cependant Hibernate Annotations les autorise
+          (voir <a href="entity.html#entity-hibspec">Extensions d'Hibernate Annotation</a>).</p><pre class="programlisting">@Entity public class City {
+    @OneToMany(mappedBy="city")
+    <span class="bold"><b>@OrderBy("streetName")</b></span>
+    public List&lt;Street&gt; getStreets() {
+        return streets;
+    }
+...
+}
+
+@Entity public class Street {
+    <span class="bold"><b>public String getStreetName()</b></span> {
+        return streetName;
+    }
+
+    @ManyToOne
+    public City getCity() {
+        return city;
+    }
+    ...
+}
+
+
+@Entity
+public class Software {
+    @OneToMany(mappedBy="software")
+    <span class="bold"><b>@MapKey(name="codeName")</b></span>
+    public Map&lt;String, Version&gt; getVersions() {
+        return versions;
+    }
+...
+}
+
+@Entity
+@Table(name="tbl_version")
+public class Version {
+    <span class="bold"><b>public String getCodeName()</b></span> {...}
+
+    @ManyToOne
+    public Software getSoftware() { ... }
+...
+}</pre><p>Donc <tt class="literal">City</tt> a une collection de
+          <tt class="literal">Street</tt>s qui sont ordonn&eacute;es par
+          <tt class="literal">streetName</tt> (de <tt class="literal">Street</tt>) lorsque
+          la collection est charg&eacute;e. <tt class="literal">Software</tt> a une map de
+          <tt class="literal">Version</tt>s dont la clef est
+          <tt class="literal">codeName</tt> de <tt class="literal">Version</tt>.</p><p>A moins que la collection soit une "generic", vous devrez
+          d&eacute;finir <tt class="literal">targetEntity</tt>. C'est un attribut de
+          l'annotation qui prend comme valeur la classe de l'entit&eacute;
+          cible.</p></div><div class="sect4" lang="fr"><div class="titlepage"><div><div><h5 class="title"><a name="entity-mapping-association-collection-onetomany"></a>2.2.5.3.2.&nbsp;One-to-many</h5></div></div><div></div></div><p>Les associations one-to-many sont d&eacute;clar&eacute;es au niveau propri&eacute;t&eacute;
+          avec l'annotation <tt class="literal">@OneToMany</tt>. Les associations un
+          &agrave; plusieurs peuvent &ecirc;tre bidirectionnelles.</p><div class="sect5" lang="fr"><div class="titlepage"><div><div><h6 class="title"><a name="d0e1329"></a>2.2.5.3.2.1.&nbsp;Relation bidirectionnelle</h6></div></div><div></div></div><p>Puisque les associations plusieurs &agrave; un sont (presque)
+            toujours l'extr&eacute;mit&eacute; propri&eacute;taire de la relation bidirectionnelle
+            dans la sp&eacute;cification EJB3, l'association un &agrave; plusieurs est
+            annot&eacute;e par <tt class="literal">@OneToMany(mappedBy=...)</tt>.</p><pre class="programlisting">@Entity
+public class Troop {
+    @OneToMany(mappedBy="troop")
+    public Set&lt;Soldier&gt; getSoldiers() {
+    ...
+}
+
+@Entity
+public class Soldier {
+    @ManyToOne
+    @JoinColumn(name="troop_fk")
+    public Troop getTroop() {
+    ...
+}              </pre><p><tt class="classname">Troop</tt> a une relation bidirectionnelle
+            un &agrave; plusieurs avec <tt class="literal">Soldier</tt> &agrave; travers la
+            propri&eacute;t&eacute; <tt class="literal">troop</tt>. Vous ne devez pas d&eacute;finir
+            de mapping physique &agrave; l'extr&eacute;mit&eacute; de
+            <tt class="literal">mappedBy</tt>.</p><p>Pour mapper une relation bidirectionnelle un &agrave; plusieurs, avec
+            l'extr&eacute;mit&eacute; one-to-many comme extr&eacute;mit&eacute; propri&eacute;taire, vous devez
+            enlever l'&eacute;l&eacute;ment <tt class="literal">mappedBy</tt> et marquer
+            l'annotation <tt class="literal">@JoinColumn</tt> de l'extr&eacute;mit&eacute; plusieurs
+            &agrave; un comme ne pouvant pas &ecirc;tre ins&eacute;r&eacute;e et ni mise &agrave; jour. Cette
+            solution n'est certainement pas optimis&eacute;e et produira quelques
+            commandes UPDATE suppl&eacute;mentaires.</p><pre class="programlisting">@Entity
+public class Troop {
+    @OneToMany
+    @JoinColumn(name="troop_fk") // nous avons besoin de dupliquer l'information physique
+    public Set&lt;Soldier&gt; getSoldiers() {
+    ...
+}
+
+@Entity
+public class Soldier {
+    @ManyToOne
+    @JoinColumn(name="troop_fk", insertable=false, updatable=false)
+    public Troop getTroop() {
+    ...
+}</pre></div><div class="sect5" lang="fr"><div class="titlepage"><div><div><h6 class="title"><a name="d0e1362"></a>2.2.5.3.2.2.&nbsp;Relation unidirectionnelle</h6></div></div><div></div></div><p>Une relation un &agrave; plusieurs unidirectionnelle utilisant une
+            colonne de clef &eacute;trang&egrave;re de l'entit&eacute; propri&eacute;taire n'est pas si
+            commune, r&eacute;ellement recommand&eacute;e. Nous vous conseillons
+            fortement d'utiliser une table de jointure pour cette sorte
+            d'association (comme expliqu&eacute; dans la prochaine section). Cette
+            sorte d'association est d&eacute;crite &agrave; travers
+            <tt class="literal">@JoinColumn</tt>.</p><pre class="programlisting">
+@Entity
+public class Customer implements Serializable {
+    @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER)
+    @JoinColumn(name="CUST_ID")
+    public Set&lt;Ticket&gt; getTickets() {
+    ...
+}
+
+@Entity
+public class Ticket implements Serializable {
+    ... // pas de relation bidirectionnelle
+}
+               </pre><p><tt class="literal">Customer</tt> d&eacute;crit une relation
+            unidirectionnelle avec <tt class="literal">Ticket</tt> en utilisant la
+            colonne de jointure <tt class="literal">CUST_ID</tt>.</p></div><div class="sect5" lang="fr"><div class="titlepage"><div><div><h6 class="title"><a name="d0e1382"></a>2.2.5.3.2.3.&nbsp;Relation unidirectionnel avec une table de jointure</h6></div></div><div></div></div><p>Une relation unidirectionnelle un &agrave; plusieurs avec une table
+            de jointure est largement pr&eacute;f&eacute;r&eacute;e. Cette association est d&eacute;crite
+            &agrave; travers l'annotation <tt class="literal">@JoinTable</tt>.</p><pre class="programlisting">
+@Entity
+public class Trainer {
+    @OneToMany
+    @JoinTable(
+            name="TrainedMonkeys",
+            joinColumns = @JoinColumn( name="trainer_id"),
+            inverseJoinColumns = @JoinColumn( name="monkey_id")
+    )
+    public Set&lt;Monkey&gt; getTrainedMonkeys() {
+    ...
+}
+
+@Entity
+public class Monkey {
+    ... // pas de relation bidirectionnelle
+}
+               </pre><p><tt class="literal">Trainer</tt> d&eacute;crit une relation
+            unidirectionelle avec <tt class="classname">Monkey</tt> en utilisant la
+            table de jointure <tt class="classname">TrainedMonkeys</tt>, avec une
+            clef &eacute;trang&egrave;re <tt class="literal">trainer_id</tt> vers
+            <tt class="literal">Trainer</tt> (<tt class="literal">joinColumns</tt>) et une
+            clef &eacute;trang&egrave;re <tt class="literal">monkey_id</tt> vers
+            <tt class="literal">Monkey</tt>
+            (<tt class="literal">inversejoinColumns</tt>).</p></div><div class="sect5" lang="fr"><div class="titlepage"><div><div><h6 class="title"><a name="entity-mapping-association-collection-manytomany-default"></a>2.2.5.3.2.4.&nbsp;Valeurs par d&eacute;faut</h6></div></div><div></div></div><p>Si aucun mapping physique n'est d&eacute;clar&eacute;, une relation
+            unidirectionnelle un vers plusieurs utilise une table de jointure.
+            Le nom de la table est la concat&eacute;nation du nom de la table
+            propri&eacute;taire, <span><b class="keycap">_</b></span>, et le nom de la table de l'autre
+            extr&eacute;mit&eacute;. Le nom des colonnes de la clef &eacute;trang&egrave;re r&eacute;f&eacute;ren&ccedil;ant la
+            table propri&eacute;taire est la concat&eacute;nation de la table propri&eacute;taire,
+            <span><b class="keycap">_</b></span>, et le nom des colonnes de la clef primaire. Le
+            nom des colonnes de la clef &eacute;trang&egrave;re r&eacute;f&eacute;ren&ccedil;ant l'autre extr&eacute;mit&eacute;
+            est la concat&eacute;nation du nom de la propri&eacute;t&eacute; du propri&eacute;taire,
+            <span><b class="keycap">_</b></span>, et le nom des colonnes de la clef primaire de
+            l'autre extr&eacute;mit&eacute;. Une contrainte d'unicit&eacute; est ajout&eacute;e sur la
+            clef &eacute;trang&egrave;re r&eacute;f&eacute;ren&ccedil;ant la table de l'autre extr&eacute;mit&eacute; pour
+            r&eacute;fl&eacute;ter le un &agrave; plusieurs.</p><pre class="programlisting">
+@Entity
+public class Trainer {
+    @OneToMany
+    public Set&lt;Tiger&gt; getTrainedTigers() {
+    ...
+}
+
+@Entity
+public class Tiger {
+    ... // non bidirectionnelle
+}
+               </pre><p><tt class="classname">Trainer</tt> d&eacute;crit une relation
+            unidirectionnelle avec <tt class="classname">Tiger</tt> utilisant la
+            table de jointure <tt class="literal">Trainer_Tiger</tt>, avec une clef
+            &eacute;trang&egrave;re <tt class="literal">trainer_id</tt> vers
+            <tt class="literal">Trainer</tt> (nom de la table, <span><b class="keycap">_</b></span>,
+            identifiant de trainer) et une clef &eacute;trang&egrave;re
+            <tt class="literal">trainedTigers_id</tt> vers <tt class="literal">Monkey</tt>
+            (nom de la propri&eacute;t&eacute;, <span><b class="keycap">_</b></span>, colonne de la clef
+            primaire de Tiger).</p></div></div><div class="sect4" lang="fr"><div class="titlepage"><div><div><h5 class="title"><a name="eentity-mapping-association-collection-manytomany"></a>2.2.5.3.3.&nbsp;Many-to-many</h5></div></div><div></div></div><div class="sect5" lang="fr"><div class="titlepage"><div><div><h6 class="title"><a name="d0e1467"></a>2.2.5.3.3.1.&nbsp;D&eacute;finition</h6></div></div><div></div></div><p>Une association many-to-many est d&eacute;finie logiquement en
+            utilisant l'annotation <tt class="literal">@ManyToMany</tt>. Vous devez
+            aussi d&eacute;crire la table d'association et les conditions de jointure
+            en utilisant l'annotation <tt class="literal">@JoinTable</tt>. Si
+            l'association est bidirectionnelle, une extr&eacute;mit&eacute; doit &ecirc;tre la
+            propri&eacute;taire et l'autre doit &ecirc;tre marqu&eacute;e comme "inverse" (ie
+            qu'elle sera ignor&eacute;e lors de la mise &agrave; jour des valeurs de la
+            relation dans la table d'association) :</p><pre class="programlisting">
+@Entity
+public class Employer implements Serializable {
+    @ManyToMany(
+        targetEntity=org.hibernate.test.metadata.manytomany.Employee.class,
+        cascade={CascadeType.PERSIST, CascadeType.MERGE}
+    )
+    @JoinTable(
+        name="EMPLOYER_EMPLOYEE",
+        joinColumns=@JoinColumn(name="EMPER_ID"),
+        inverseJoinColumns=@JoinColumn(name="EMPEE_ID")
+    )
+    public Collection getEmployees() {
+        return employees;
+    }
+    ...
+}
+               </pre><pre class="programlisting">
+@Entity
+public class Employee implements Serializable {
+    @ManyToMany(
+        cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+        mappedBy = "employees",
+        targetEntity = Employer.class
+    )
+    public Collection getEmployers() {
+        return employers;
+    }
+}
+               </pre><p>Nous avons d&eacute;j&agrave; montr&eacute; les d&eacute;clarations des relations
+            "many" et d&eacute;taill&eacute; les attributs de ces associations. Allons
+            plus en profondeur dans la description de
+            <tt class="literal">@JoinTable</tt> ; elle d&eacute;finit un
+            <tt class="literal">name</tt>, un tableau de colonnes de jointure (un
+            tableau dans une annotation est d&eacute;fini par {A, B, C}), et un tableau
+            de colonnes de jointure inverse. Ces derni&egrave;res sont les colonnes
+            de la table d'association qui r&eacute;f&eacute;rencent la clef primaire de
+            <tt class="classname">Employee</tt> ("l'autre extr&eacute;mit&eacute;").</p><p>Comme vu pr&eacute;c&eacute;demment, l'autre extr&eacute;mit&eacute; ne doit pas d&eacute;crire
+            le mapping physique : un simple argument
+            <tt class="literal">mappedBy</tt> contenant le nom de la propri&eacute;t&eacute; de
+            l'extr&eacute;mit&eacute; propri&eacute;taire suffit &agrave; relier les deux.</p></div><div class="sect5" lang="fr"><div class="titlepage"><div><div><h6 class="title"><a name="d0e1498"></a>2.2.5.3.3.2.&nbsp;Valeurs par d&eacute;faut</h6></div></div><div></div></div><p>Comme d'autres annotations, la plupart des valeurs d'une
+            relation plusieurs &agrave; plusieurs sont inf&eacute;r&eacute;es. Si aucun mapping
+            physique n'est d&eacute;crit dans une relation plusieurs &agrave; plusieurs
+            unidirectionnelle, alors les r&egrave;gles suivantes s'appliquent. Le nom
+            de la table est la concat&eacute;nation du nom de la table propri&eacute;taire,
+            <span><b class="keycap">_</b></span> et le nom de la table de l'autre extr&eacute;mit&eacute;. Le
+            nom des colonnes de la clef &eacute;trang&egrave;re r&eacute;f&eacute;ren&ccedil;ant la table
+            propri&eacute;taire est la concat&eacute;nation du nom de la table propri&eacute;taire,
+            <span><b class="keycap">_</b></span> et le nom des colonnes de la clef primaire
+            de cette table. Le nom des colonnes de la clef &eacute;trang&egrave;re r&eacute;f&eacute;ren&ccedil;ant
+            l'autre extr&eacute;mit&eacute; est la concat&eacute;nation du nom de la propri&eacute;t&eacute; du
+            propri&eacute;taire, <span><b class="keycap">_</b></span> et le nom des colonnes de la
+            clef primaire de l'autre extr&eacute;mit&eacute;. Ce sont les m&ecirc;mes r&egrave;gles que
+            celles utilis&eacute;es pour une relation un &agrave; plusieurs
+            unidirectionnelle.</p><pre class="programlisting">
+@Entity
+public class Store {
+    @ManyToMany(cascade = CascadeType.PERSIST)
+    public Set&lt;City&gt; getImplantedIn() {
+        ...
+    }
+}
+
+@Entity
+public class City {
+    ... // pas de relation bidirectionnelle
+}
+               </pre><p>La table <tt class="literal">Store_City</tt> est utilis&eacute;e comme
+            table de jointure. La colonne <tt class="literal">Store_id</tt> est
+            une clef &eacute;trang&egrave;re vers la table <tt class="literal">Store</tt>. La
+            colonne <tt class="literal">implantedIn_id</tt> est une clef &eacute;trang&egrave;re
+            vers la table <tt class="literal">City</tt>.</p><p>Si aucun mapping physique n'est d&eacute;crit dans une relation
+            plusieurs &agrave; plusieurs bidirectionnelle, alors les r&egrave;gles suivantes
+            s'appliquent. Le nom de la table est la concat&eacute;nation du nom de la
+            table propri&eacute;taire, <span><b class="keycap">_</b></span> et le nom de la table de
+            l'autre extr&eacute;mit&eacute;. Le nom des colonnes de la clef &eacute;trang&egrave;re
+            r&eacute;f&eacute;ren&ccedil;ant la table propri&eacute;taire est la concat&eacute;nation du nom de la
+            propri&eacute;t&eacute; de l'autre extr&eacute;mit&eacute;, <span><b class="keycap">_</b></span> et le nom des
+            colonnes de la clef primaire du propri&eacute;taire. Le nom des colonnes de
+            la clef &eacute;trang&egrave;re r&eacute;f&eacute;ren&ccedil;ant l'autre extr&eacute;mit&eacute; est la concat&eacute;nation
+            du nom de la propri&eacute;t&eacute; du propri&eacute;taire, <span><b class="keycap">_</b></span> et le nom
+            des colonnes de la clef primaire de l'autre extr&eacute;mit&eacute;. Ce sont les
+            m&ecirc;mes r&egrave;gles que celles utilis&eacute;es pour une relation un &agrave; plusieurs
+            unidirectionnelle.</p><pre class="programlisting">
+@Entity
+public class Store {
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    public Set&lt;Customer&gt; getCustomers() {
+        ...
+    }
+}
+
+@Entity
+public class Customer {
+    @ManyToMany(mappedBy="customers")
+    public Set&lt;Store&gt; getStores() {
+        ...
+    }
+}
+               </pre><p>La table <tt class="literal">Store_Customer</tt> est utilis&eacute;e comme
+            table de jointure. La colonne <tt class="literal">stores_id</tt> est une
+            clef &eacute;trang&egrave;re vers la table <tt class="literal">Store</tt>. La colonne
+            <tt class="literal">customers_id</tt> est une clef &eacute;trang&egrave;re vers la table
+            <tt class="literal">Customer</tt>.</p></div></div></div><div class="sect3" lang="fr"><div class="titlepage"><div><div><h4 class="title"><a name="d0e1561"></a>2.2.5.4.&nbsp;Persistance transitive avec les op&eacute;rations en cascade</h4></div></div><div></div></div><p>Vous avez probablement remarqu&eacute; l'attribut
+        <tt class="literal">cascade</tt> prenant comme valeur un tableau de
+        <tt class="classname">CascadeType</tt>s. Le concept de cascade dans EJB3 est
+        similaire &agrave; la persistance transitive et les op&eacute;rations en cascade dans
+        Hibernate, mais avec une s&eacute;mantique l&eacute;g&egrave;rement diff&eacute;rente et les types
+        de cascade suivants :</p><div class="itemizedlist"><ul type="disc"><li>
+             CascadeType.PERSIST : effectue en cascade l'op&eacute;ration de
+             persistance (cr&eacute;ation) sur les entit&eacute;s associ&eacute;es si persist() est
+             appel&eacute;e ou si l'entit&eacute; est supervis&eacute;e (par le gestionnaire
+             d'entit&eacute;s)
+          </li><li>
+             CascadeType.MERGE : effectue en cascade l'op&eacute;ration de fusion sur
+             les entit&eacute;s associ&eacute;es si merge() est app&eacute;l&eacute;e ou si l'entit&eacute; est
+             supervis&eacute;e
+          </li><li>
+             CascadeType.REMOVE : effectue en cascade l'op&eacute;ration de
+             suppression sur les entit&eacute;s associ&eacute;es si delete() est appel&eacute;e
+          </li><li>
+             CascadeType.REFRESH : effectue en cascade l'op&eacute;ration de
+             rafra&icirc;chissement sur les entit&eacute;s associ&eacute;es si refresh() est appel&eacute;e
+          </li><li>
+             CascadeType.ALL : tous ceux du dessus
+          </li></ul></div><p>Veullez vous r&eacute;f&eacute;rer au chapitre 6.3 de la sp&eacute;cification EJB3 pour
+        plus d'informations sur les op&eacute;rations en cascade et la s&eacute;mantique des
+        op&eacute;rations de cr&eacute;ation/fusion.</p></div><div class="sect3" lang="fr"><div class="titlepage"><div><div><h4 class="title"><a name="d0e1585"></a>2.2.5.5.&nbsp;R&eacute;cup&eacute;ration d'associations</h4></div></div><div></div></div><p>Vous avez la possibilit&eacute; de r&eacute;cup&eacute;rer les entit&eacute;s associ&eacute;es soit
+        imm&eacute;diatement ("eager"), soit &agrave; la demande ("lazy"). Le param&egrave;tre
+        <tt class="literal">fetch</tt> peut &ecirc;tre positionn&eacute; &agrave;
+        <tt class="literal">FetchType.LAZY</tt> ou &agrave;
+        <tt class="literal">FetchType.EAGER</tt>. <tt class="literal">EAGER</tt> essaiera
+        d'utiliser une jointure externe pour rappatrier l'objet associ&eacute;,
+        alors que <tt class="literal">LAZY</tt> est la valeur par d&eacute;faut et rapportera
+        les donn&eacute;es lorsque l'objet associ&eacute; sera acc&eacute;d&eacute; pour la premi&egrave;re fois.
+        JPA-QL a aussi un mot clef <tt class="literal">fetch</tt> qui vous permet de
+        surcharger le type de r&eacute;cup&eacute;ration pour une requ&ecirc;te particuli&egrave;re. C'est
+        tr&egrave;s utile pour am&eacute;liorer les performances et d&eacute;cider au cas par
+        cas.</p></div></div><div class="sect2" lang="fr"><div class="titlepage"><div><div><h3 class="title"><a name="d0e1608"></a>2.2.6.&nbsp;Mapper des clefs primaires et &eacute;trang&egrave;res compos&eacute;es</h3></div></div><div></div></div><p>Les clefs primaires compos&eacute;es utilisent une classe embarqu&eacute;e comme
+      repr&eacute;sentation de la clef primaire, donc vous devriez utiliser les
+      annotations <tt class="literal">@Id</tt> et <tt class="literal">@Embeddable</tt>.
+      Alternativement, vous pouvez utiliser l'annotation
+      <tt class="literal">@EmbeddedId</tt>. Notez que la classe d&eacute;pendante doit &ecirc;tre
+      s&eacute;rialisable et implementer
+      <tt class="methodname">equals()</tt>/<tt class="methodname">hashCode()</tt>.
+      Vous pouvez aussi utiliser <tt class="literal">@IdClass</tt> comme d&eacute;crit dans
+      <a href="entity.html#entity-mapping-identifier">Mapper des propri&eacute;t&eacute;s identifiantes</a>.</p><pre class="programlisting">
+@Entity
+public class RegionalArticle implements Serializable {
+
+    @Id
+    public RegionalArticlePk getPk() { ... }
+}
+
+@Embeddable
+public class RegionalArticlePk implements Serializable { ... }
+         </pre><p>ou alternativement</p><pre class="programlisting">
+@Entity
+public class RegionalArticle implements Serializable {
+
+    @EmbeddedId
+    public RegionalArticlePk getPk() { ... }
+}
+
+public class RegionalArticlePk implements Serializable { ... }
+         </pre><p><tt class="literal">@Embeddable</tt> h&eacute;rite le type d'acc&egrave;s de son entit&eacute;
+      d'appartenance &agrave; moins que l'annotation sp&eacute;cifique Hibernate
+      <tt class="literal">@AccessType</tt> soit utilis&eacute;e. Les clefs &eacute;trang&egrave;res
+      compos&eacute;es (si les valeurs par d&eacute;faut ne sont pas utilis&eacute;es) sont d&eacute;finies
+      sur les associations en utilisant l'&eacute;l&eacute;ment
+      <tt class="literal">@JoinColumns</tt>, lequel est simplement un tableau de
+      <tt class="literal">@JoinColumn</tt>s. Il est consid&eacute;r&eacute; comme une bonne pratique
+      d'exprimer <tt class="literal">referencedColumnNames</tt> explicitement. Sinon,
+      Hibernate supposera que vous utilisez le m&ecirc;me ordre de colonnes que dans
+      la d&eacute;claration de la clef primaire.</p><pre class="programlisting">
+@Entity
+public class Parent implements Serializable {
+    @Id
+    public ParentPk id;
+    public int age;
+
+    @OneToMany(cascade=CascadeType.ALL)
+    @JoinColumns ({
+        @JoinColumn(name="parentCivility", referencedColumnName = "isMale"),
+        @JoinColumn(name="parentLastName", referencedColumnName = "lastName"),
+        @JoinColumn(name="parentFirstName", referencedColumnName = "firstName")
+    })
+    public Set&lt;Child&gt; children; //unidirectionnelle
+    ...
+}
+         </pre><pre class="programlisting">
+@Entity
+public class Child implements Serializable {
+    @Id @GeneratedValue
+    public Integer id;
+
+    @ManyToOne
+    @JoinColumns ({
+        @JoinColumn(name="parentCivility", referencedColumnName = "isMale"),
+        @JoinColumn(name="parentLastName", referencedColumnName = "lastName"),
+        @JoinColumn(name="parentFirstName", referencedColumnName = "firstName")
+    })
+    public Parent parent; // unidirectionnelle
+}
+         </pre><pre class="programlisting">
+@Embeddable
+public class ParentPk implements Serializable {
+    String firstName;
+    String lastName;
+    ...
+}
+         </pre><p>Notez l'usage explicite de
+      <tt class="literal">referencedColumnName</tt>.</p></div><div class="sect2" lang="fr"><div class="titlepage"><div><div><h3 class="title"><a name="d0e1666"></a>2.2.7.&nbsp;Mapper des tables secondaires</h3></div></div><div></div></div><p>Vous pouvez mapper un simple entity bean vers plusieurs tables en
+      utilisant les annotations de niveau classe
+      <tt class="literal">@SecondaryTable</tt> ou
+      <tt class="literal">@SecondaryTables</tt>. Pour dire qu'une colonne est dans
+      une table particuli&egrave;re, utlisez le param&egrave;tre <tt class="literal">table</tt> de
+      <tt class="literal">@Column</tt> ou <tt class="literal">@JoinColumn</tt>.</p><pre class="programlisting">
+@Entity
+@Table(name="MainCat")
+<span class="bold"><b>@SecondaryTables({
+    @SecondaryTable(name="Cat1", pkJoinColumns={
+        @PrimaryKeyJoinColumn(name="cat_id", referencedColumnName="id")
+    ),
+    @SecondaryTable(name="Cat2", uniqueConstraints={@UniqueConstraint(columnNames={"storyPart2"})})
+})</b></span>
+public class Cat implements Serializable {
+
+    private Integer id;
+    private String name;
+    private String storyPart1;
+    private String storyPart2;
+
+    @Id @GeneratedValue
+    public Integer getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    <span class="bold"><b>@Column(table="Cat1")</b></span>
+    public String getStoryPart1() {
+        return storyPart1;
+    }
+
+    <span class="bold"><b>@Column(table="Cat2")</b></span>
+    public String getStoryPart2() {
+        return storyPart2;
+    }
+</pre><p>Dans cet exemple, <tt class="literal">name</tt> sera dans
+      <tt class="literal">MainCat</tt>. <tt class="literal">storyPart1</tt> sera dans
+      <tt class="literal">Cat1</tt> et <tt class="literal">storyPart2</tt> sera dans
+      <tt class="literal">Cat2</tt>. <tt class="literal">Cat1</tt> sera joint &agrave;
+      <tt class="literal">MainCat</tt> avec <tt class="literal">cat_id</tt> comme clef
+      &eacute;trang&egrave;re, et <tt class="literal">Cat2</tt> avec <tt class="literal">id</tt> (ie
+      le m&ecirc;me nom de colonne que la colonne identifiante de
+      <tt class="literal">MainCat</tt>). De plus, une contrainte d'unicit&eacute; sur
+      <tt class="literal">storyPart2</tt> a &eacute;t&eacute; renseign&eacute;e.</p><p>Regardez le tutoriel EJB3 de JBoss ou la suite de tests
+      unitaires d'Hibernate Annotations pour plus d'exemples.</p></div></div><div class="sect1" lang="fr"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="entity-mapping-query"></a>2.3.&nbsp;Mapper des requ&ecirc;tes</h2></div></div><div></div></div><div class="sect2" lang="fr"><div class="titlepage"><div><div><h3 class="title"><a name="entity-mapping-query-hql"></a>2.3.1.&nbsp;Mapper des requ&ecirc;tes JPAQL/HQL</h3></div></div><div></div></div><p>Vous pouvez mapper des requ&ecirc;tes JPA-QL/HQL en utilisant les
+      annotations. <tt class="literal">@NamedQuery</tt> et
+      <tt class="literal">@NamedQueries</tt> peuvent &ecirc;tre d&eacute;finies au niveau de la
+      classe ou dans un fichier JPA XML. Cependant, leurs d&eacute;finitions sont
+      globales au scope de la session factory/entity manager factory. Une
+      requ&ecirc;te nomm&eacute;e est d&eacute;finie par son nom et la cha&icirc;ne de caract&egrave;res de la
+      requ&ecirc;te r&eacute;elle.</p><pre class="programlisting">&lt;entity-mappings&gt;
+    &lt;named-query name="plane.getAll"&gt;
+        &lt;query&gt;select p from Plane p&lt;/query&gt;
+    &lt;/named-query&gt;
+    ...
+&lt;/entity-mappings&gt;
+...
+
+@Entity
+@NamedQuery(name="night.moreRecentThan", query="select n from Night n where n.date &gt;= :date")
+public class Night {
+    ...
+}
+
+public class MyDao {
+    doStuff() {
+        Query q = s.getNamedQuery("night.moreRecentThan");
+        q.setDate( "date", aMonthAgo );
+        List results = q.list();
+        ...
+    }
+    ...
+}
+        </pre><p>Vous pouvez aussi fournir des indications de fonctionnement &agrave; une
+      requ&ecirc;te &agrave; travers un tableau de <tt class="literal">QueryHint</tt>s avec
+      l'attribut <tt class="literal">hints</tt>.</p><p>Les indications de fonctionnement Hibernate disponibles
+      sont :</p><p></p><div class="table"><a name="d0e1767"></a><p class="title"><b>Tableau&nbsp;2.2.&nbsp;Indications de fonctionnement d'une requ&ecirc;te</b></p><table summary="Indications de fonctionnement d'une requ&ecirc;te" border="1"><colgroup><col><col></colgroup><thead><tr><th>Indication</th><th>description</th></tr></thead><tbody><tr><td>org.hibernate.cacheable</td><td>Indique si la requ&ecirc;te devrait interagir avec le cache de
+              second niveau (par d&eacute;faut &agrave; false)</td></tr><tr><td>org.hibernate.cacheRegion</td><td>Nom de la r&eacute;gion du cache (si ind&eacute;finie, la valeur par
+              d&eacute;faut est utilis&eacute;e)</td></tr><tr><td>org.hibernate.timeout</td><td>Timeout des requ&ecirc;tes</td></tr><tr><td>org.hibernate.fetchSize</td><td>Taille des result sets par fetch</td></tr><tr><td>org.hibernate.flushMode</td><td>Mode de flush utilis&eacute; pour cette requ&ecirc;te</td></tr><tr><td>org.hibernate.cacheMode</td><td>Mode de cache utilis&eacute; pour cette requ&ecirc;te</td></tr><tr><td>org.hibernate.readOnly</td><td>Indique si les entit&eacute;s charg&eacute;es par cette requ&ecirc;te devraient
+              &ecirc;tre en lecture seule ou pas (par d&eacute;faut &agrave; false)</td></tr><tr><td>org.hibernate.comment</td><td>Commentaire de la requ&ecirc;te, ajout&eacute; au SQL g&eacute;n&eacute;r&eacute;</td></tr></tbody></table></div></div><div class="sect2" lang="fr"><div class="titlepage"><div><div><h3 class="title"><a name="entity-mapping-query-native"></a>2.3.2.&nbsp;Mapper des requ&ecirc;tes natives</h3></div></div><div></div></div><p>Vous pouvez aussi mapper une requ&ecirc;te native (ie une requ&ecirc;te SQL).
+      Pour ce faire, vous devez d&eacute;crire la structure de l'ensemble de r&eacute;sultat
+      SQL en utilisant <tt class="literal">@SqlResultSetMapping</tt> (ou
+      <tt class="literal">@SqlResultSetMappings</tt> si vous pr&eacute;voyez de d&eacute;finir
+      plusieurs mappings de r&eacute;sultats). Comme <tt class="literal">@NamedQuery</tt>, un
+      <tt class="literal">@SqlResultSetMapping</tt> peut &ecirc;tre d&eacute;fini au niveau de la
+      classe ou dans un fichier XML JPA. Cependant sa port&eacute;e est globale &agrave;
+      l'application.</p><p>Comme vous le verrez, un param&egrave;tre de
+      <tt class="literal">resultSetMapping</tt> est d&eacute;fini dans
+      <tt class="literal">@NamedNativeQuery</tt>, il repr&eacute;sente le nom du
+      <tt class="literal">@SqlResultSetMapping</tt> d&eacute;fini. Le mapping de l'ensemble
+      des r&eacute;sultats d&eacute;clare les entit&eacute;s r&eacute;cup&eacute;r&eacute;es par cette requ&ecirc;te native.
+      Chaque champ de l'entit&eacute; est li&eacute; &agrave; un alias SQL (nom de colonne). Tous les
+      champs de l'entit&eacute; (dont ceux des classes filles) et les colonnes des
+      clefs &eacute;trang&egrave;res relatives aux entit&eacute;s doivent &ecirc;tre pr&eacute;sents dans la
+      requ&ecirc;te SQL. Les d&eacute;finitions des champs sont optionnelles, si elles ne
+      sont pas fournies, elles mappent le m&ecirc;me nom de colonne que celui d&eacute;clar&eacute;
+      sur la propri&eacute;t&eacute; de la classe.</p><pre class="programlisting">@NamedNativeQuery(name="night&amp;area", query="select night.id nid, night.night_duration, "
+    + " night.night_date, area.id aid, night.area_id, area.name "
+    + "from Night night, Area area where night.area_id = area.id", <span class="bold"><b>resultSetMapping="joinMapping"</b></span>)
+@SqlResultSetMapping(name="joinMapping", entities={
+    @EntityResult(entityClass=org.hibernate.test.annotations.query.Night.class, fields = {
+        @FieldResult(name="id", column="nid"),
+        @FieldResult(name="duration", column="night_duration"),
+        @FieldResult(name="date", column="night_date"),
+        @FieldResult(name="area", column="area_id"),
+        discriminatorColumn="disc"
+    }),
+    @EntityResult(entityClass=org.hibernate.test.annotations.query.Area.class, fields = {
+        @FieldResult(name="id", column="aid"),
+        @FieldResult(name="name", column="name")
+    })
+    }
+)</pre><p>Dans l'exemple ci-dessus, la requ&ecirc;te nomm&eacute;e
+      <tt class="literal">night&amp;area</tt> utilise le mapping de r&eacute;sultats
+      <tt class="literal">joinMapping</tt>. Ce mapping retourne 2 entit&eacute;s,
+      <tt class="literal">Night</tt> et <tt class="literal">Area</tt>, chaque propri&eacute;t&eacute; est
+      d&eacute;clar&eacute;e et associ&eacute;e &agrave; un nom de colonne, en fait le nom de colonne
+      r&eacute;cup&eacute;r&eacute; par la requ&ecirc;te. Voyons maintenant une d&eacute;claration implicite de
+      mapping propri&eacute;t&eacute;/colonne.</p><pre class="programlisting">@Entity
+<span class="bold"><b>@SqlResultSetMapping(name="implicit", entities=@EntityResult(entityClass=org.hibernate.test.annotations.query.SpaceShip.class))
+@NamedNativeQuery(name="implicitSample", query="select * from SpaceShip", resultSetMapping="implicit")</b></span>
+public class SpaceShip {
+    private String name;
+    private String model;
+    private double speed;
+
+    @Id
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Column(name="model_txt")
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public double getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(double speed) {
+        this.speed = speed;
+    }
+}</pre><p>Dans cet exemple, nous d&eacute;crivons seulement le membre de l'entit&eacute; du
+      mapping de r&eacute;sultats. Le mapping de propri&eacute;t&eacute;/colonne est fait en
+      utilisant les valeurs de mapping de l'entit&eacute;. Dans ce cas, la propri&eacute;t&eacute;
+      <tt class="literal">model</tt> est li&eacute;e &agrave; la colonne
+      <tt class="literal">model_txt</tt>. Si l'association &agrave; une entit&eacute; concern&eacute;e
+      implique une clef primaire compos&eacute;e, un &eacute;l&eacute;ment
+      <tt class="literal">@FieldResult</tt> devrait &ecirc;tre utilis&eacute; pour chaque colonne
+      de la clef &eacute;trang&egrave;re. Le nom de <tt class="literal">@FieldResult</tt> est
+      compos&eacute; du nom de la propri&eacute;t&eacute; pour la relation, suivi par un point ("."),
+      suivi par le nom ou le champ ou la propri&eacute;t&eacute; de la clef primaire.</p><pre class="programlisting">@Entity
+@SqlResultSetMapping(name="compositekey",
+        entities=@EntityResult(entityClass=org.hibernate.test.annotations.query.SpaceShip.class,
+            fields = {
+                    @FieldResult(name="name", column = "name"),
+                    @FieldResult(name="model", column = "model"),
+                    @FieldResult(name="speed", column = "speed"),
+<span class="bold"><b>                    @FieldResult(name="captain.firstname", column = "firstn"),
+                    @FieldResult(name="captain.lastname", column = "lastn"),</b></span>
+                    @FieldResult(name="dimensions.length", column = "length"),
+                    @FieldResult(name="dimensions.width", column = "width")
+                    }),
+        columns = { @ColumnResult(name = "surface"),
+                    @ColumnResult(name = "volume") } )
+
+@NamedNativeQuery(name="compositekey",
+    query="select name, model, speed, lname as lastn, fname as firstn, length, width, length * width as surface from SpaceShip",
+    resultSetMapping="compositekey")
+} )
+public class SpaceShip {
+    private String name;
+    private String model;
+    private double speed;
+    private Captain captain;
+    private Dimensions dimensions;
+
+    @Id
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @ManyToOne(fetch= FetchType.LAZY)
+    @JoinColumns( {
+            @JoinColumn(name="fname", referencedColumnName = "firstname"),
+            @JoinColumn(name="lname", referencedColumnName = "lastname")
+            } )
+    public Captain getCaptain() {
+        return captain;
+    }
+
+    public void setCaptain(Captain captain) {
+        this.captain = captain;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public double getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(double speed) {
+        this.speed = speed;
+    }
+
+    public Dimensions getDimensions() {
+        return dimensions;
+    }
+
+    public void setDimensions(Dimensions dimensions) {
+        this.dimensions = dimensions;
+    }
+}
+
+@Entity
+@IdClass(Identity.class)
+public class Captain implements Serializable {
+    private String firstname;
+    private String lastname;
+
+    @Id
+    public String getFirstname() {
+        return firstname;
+    }
+
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
+
+    @Id
+    public String getLastname() {
+        return lastname;
+    }
+
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
+    }
+}
+</pre><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>Si vous regardez la propri&eacute;t&eacute; dimension, vous verrez qu'Hibernate
+        prend en charge la notation avec les points pour les objets embarqu&eacute;s
+        (vous pouvez m&ecirc;me avoir des objets embarqu&eacute;s imbriqu&eacute;s). Les
+        impl&eacute;mentations EJB3 n'ont pas &agrave; prendre en charge cette fonctionnalit&eacute;,
+        mais nous le faisons :-)</p></div><p>Si vous r&eacute;cup&eacute;rez une simple entit&eacute; et si vous utilisez le mapping
+      par d&eacute;faut, vous pouvez utiliser l'attribut <tt class="literal">resultClass</tt>
+      &agrave; la place de <tt class="literal">resultSetMapping</tt> :</p><pre class="programlisting"><span class="bold"><b>@NamedNativeQuery(name="implicitSample", query="select * from SpaceShip",
+    resultClass=SpaceShip.class)</b></span>
+public class SpaceShip {</pre><p>Dans certaines de vos requ&ecirc;tes natives, vous devrez retourner des
+      valeurs scalaires, par exemple lors de la construction de requ&ecirc;tes de
+      rapport. Vous pouvez les mapper dans
+      <tt class="literal">@SqlResultsetMapping</tt> avec
+      <tt class="literal">@ColumnResult</tt>. En fait, vous pouvez m&ecirc;me m&eacute;langer des
+      retours d'entit&eacute;s et de valeurs scalaires dans la m&ecirc;me requ&ecirc;te native (ce
+      n'est cependant probablement pas commun).</p><pre class="programlisting"><span class="bold"><b>@SqlResultSetMapping(name="scalar", columns=@ColumnResult(name="dimension"))
+@NamedNativeQuery(name="scalar", query="select length*width as dimension from SpaceShip", resultSetMapping="scalar")</b></span></pre><p>Une autre indication de fonctionnement sp&eacute;cifique aux requ&ecirc;tes
+      natives a &eacute;t&eacute; pr&eacute;sent&eacute;e : <tt class="literal">org.hibernate.callable</tt>
+      laquelle peut &ecirc;tre &agrave; true ou &agrave; false fausse selon que la requ&ecirc;te est une
+      proc&eacute;dure stock&eacute;e ou pas.</p></div></div><div class="sect1" lang="fr"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="entity-hibspec"></a>2.4.&nbsp;Extensions d'Hibernate Annotation</h2></div></div><div></div></div><p>Hibernate 3.1 offre une vari&eacute;t&eacute; d'annotations suppl&eacute;mentaires que vous
+    pouvez m&eacute;langer/faire correspondre avec des entit&eacute;s EJB3. Elles ont &eacute;t&eacute;
+    con&ccedil;ues comme une extension naturelle aux annotations EJB3.</p><p>Pour aller plus loin que les capacit&eacute;s d'EJB3, Hibernate fournit des
+    annotations sp&eacute;cifiques qui correspondent aux fonctionnalit&eacute;s d'Hibernate.
+    Le package <tt class="classname">org.hibernate.annotations</tt> contient toutes
+    ces extensions d'annotations.</p><div class="sect2" lang="fr"><div class="titlepage"><div><div><h3 class="title"><a name="entity-hibspec-entity"></a>2.4.1.&nbsp;Entit&eacute;</h3></div></div><div></div></div><p>Vous pouvez finement param&eacute;trer certaines des actions faites par
+      Hibernate sur les entit&eacute;s au-del&agrave; de ce qu'offre la sp&eacute;cification
+      EJB3.</p><p><tt class="classname">@org.hibernate.annotations.Entity</tt> ajoute des
+      m&eacute;ta-donn&eacute;es suppl&eacute;mentaires qui peuvent &ecirc;tre n&eacute;cessaires au-del&agrave; de ce
+      qui est d&eacute;fini dans l'annotation <tt class="literal">@Entity</tt>
+      standard :</p><div class="itemizedlist"><ul type="disc"><li>
+             mutable : indique si l'entit&eacute; est modifiable ou non
+          </li><li>
+             dynamicInsert : autorise le SQL dynamique pour les insertions
+          </li><li>
+             dynamicUpdate : autorise le SQL dynamique pour les mise &agrave; jour
+          </li><li>
+             selectBeforeUpdate : sp&eacute;cifie qu'Hibernate ne devrait jamais
+             ex&eacute;cuter un UPDATE SQL &agrave; moins qu'il ne soit certain qu'un objet
+             est r&eacute;ellement modifi&eacute;
+          </li><li>
+             polymorphism : indique si le polymorphisme d'entit&eacute; est de type
+             PolymorphismType.IMPLICIT (valeur par d&eacute;faut) ou
+             PolymorphismType.EXPLICIT
+          </li><li>
+             persister : autorise la surcharge de l'impl&eacute;mentation de
+             persistance fournie par d&eacute;faut
+          </li><li>
+             optimisticLock : strat&eacute;gie de verrouillage optmiste
+             (OptimisticLockType.VERSION,
+             OptimisticLockType.NONE, OptimisticLockType.DIRTY ou
+             OptimisticLockType.ALL)
+          </li></ul></div><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>@javax.persistence.Entity est encore obligatoire,
+          @org.hibernate.annotations.Entity ne la remplace pas.</p></div><p>Voici quelques extensions d'annotations Hibernate
+      suppl&eacute;mentaires.</p><p><tt class="literal">@org.hibernate.annotations.BatchSize</tt> vous permet
+      de d&eacute;finir la taille du batch lors de la r&eacute;cup&eacute;ration d'instances de
+      cette entit&eacute; (p. ex. <tt class="literal">@BatchSize(size=4)</tt>). Lors du
+      chargement d'une entit&eacute; donn&eacute;e, Hibernate chargera alors toutes les
+      entit&eacute;s non initialis&eacute;es du m&ecirc;me type dans le contexte de la persistance
+      jusqu'&agrave; la taille du batch.</p><p><tt class="literal">@org.hibernate.annotations.Proxy</tt> d&eacute;finit les
+      attributs de chargement de l'entit&eacute;. lazy (valeur par d&eacute;faut) d&eacute;finit si
+      la classe est charg&eacute;e &agrave; la demande ou non. proxyClassName est l'interface
+      utilis&eacute;e pour g&eacute;n&eacute;rer le proxy (par d&eacute;faut, la classe elle-m&ecirc;me).</p><p><tt class="literal">@org.hibernate.annotations.Where</tt> d&eacute;finit une
+      clause WHERE SQL optionnelle utilis&eacute;e lorsque des instances de cette
+      classe sont r&eacute;cup&eacute;r&eacute;es.</p><p><tt class="literal">@org.hibernate.annotations.Check</tt> d&eacute;clare une
+      contrainte de v&eacute;rification optionnelle d&eacute;finie dans l'expression
+      DDL.</p><p><tt class="literal">@OnDelete(action=OnDeleteAction.CASCADE)</tt> sur des
+      classes filles jointes : utilise une commande SQL DELETE en cascade lors
+      de la suppression plut&ocirc;t que le m&eacute;canisme habituel d'Hibernate.</p><p><tt class="literal">@Table(appliesTo="tableName", indexes = {
+      @Index(name="index1", columnNames={"column1", "column2"} ) } )</tt>
+      cr&eacute;e les index d&eacute;finis sur les colonnes de la table
+      <tt class="literal">tableName</tt>. Cela peut s'appliquer sur une table primaire
+      ou une table secondaire. L'annotation <tt class="literal">@Tables</tt> vous
+      permet d'avoir des index sur des tables diff&eacute;rentes. Cette annotation est
+      attendue l&agrave; o&ugrave; <tt class="literal">@javax.persistence.Table</tt> ou
+      <tt class="literal">@javax.persistence.SecondaryTable</tt>(s) sont
+      d&eacute;clar&eacute;es.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p><tt class="literal">@org.hibernate.annotations.Table</tt> est un
+        compl&eacute;ment, pas un remplacement de
+        <tt class="literal">@javax.persistence.Table</tt>. Surtout, si vous souhaitez
+        changer le nom par d&eacute;faut d'une table, vous devez utiliser
+        <tt class="literal">@javax.persistence.Table</tt>, pas
+        <tt class="literal">@org.hibernate.annotations.Table</tt>.</p></div><pre class="programlisting">@Entity
+@BatchSize(size=5)
+@org.hibernate.annotations.Entity(
+        selectBeforeUpdate = true,
+        dynamicInsert = true, dynamicUpdate = true,
+        optimisticLock = OptimisticLockType.ALL,
+        polymorphism = PolymorphismType.EXPLICIT)
+@Where(clause="1=1")
+@org.hibernate.annotations.Table(name="Forest", indexes = { @Index(name="idx", columnNames = { "name", "length" } ) } )
+public class Forest { ... }</pre><pre class="programlisting">@Entity
+@Inheritance(
+    strategy=InheritanceType.JOINED
+)
+public class Vegetable { ... }
+
+@Entity
+@OnDelete(action=OnDeleteAction.CASCADE)
+public class Carrot extends Vegetable { ... }</pre></div><div class="sect2" lang="fr"><div class="titlepage"><div><div><h3 class="title"><a name="entity-hibspec-identifier"></a>2.4.2.&nbsp;Identifiant</h3></div></div><div></div></div><p><tt class="literal">@org.hibernate.annotations.GenericGenerator</tt> vous
+      permet de d&eacute;finir un g&eacute;n&eacute;rateur d'identifiants Hibernate
+      sp&eacute;cifique.</p><pre class="programlisting">@Id @GeneratedValue(generator="system-uuid")
+@GenericGenerator(name="system-uuid", strategy = "uuid")
+public String getId() {
+
+@Id @GeneratedValue(generator="hibseq")
+@GenericGenerator(name="hibseq", strategy = "seqhilo",
+    parameters = {
+        @Parameter(name="max_lo", value = "5"),
+        @Parameter(name="sequence", value="heybabyhey")
+    }
+)
+public Integer getId() {</pre><p><tt class="literal">strategy</tt> est le nom court de la strat&eacute;gie du
+      g&eacute;n&eacute;rateur Hibernate3 ou le nom pleinement qualifi&eacute; de la classe d'une
+      impl&eacute;mentation de <tt class="classname">IdentifierGenerator</tt>. Vous pouvez
+      ajouter des param&egrave;tres avec l'attribut
+      <tt class="literal">parameters</tt>.</p><p>Contrairement &agrave; son pendant standard,
+      <tt class="literal">@GenericGenerator</tt> peut &ecirc;te utilis&eacute;e dans les
+      annotations au niveau du package, en faisant ainsi un g&eacute;n&eacute;rateur de niveau
+      applicatif (comme s'il &eacute;tait dans un fichier JPA XML).</p><pre class="programlisting">@GenericGenerator(name="hibseq", strategy = "seqhilo",
+    parameters = {
+        @Parameter(name="max_lo", value = "5"),
+        @Parameter(name="sequence", value="heybabyhey")
+    }
+)
+package org.hibernate.test.model</pre></div><div class="sect2" lang="fr"><div class="titlepage"><div><div><h3 class="title"><a name="entity-hibspec-property"></a>2.4.3.&nbsp;Propri&eacute;t&eacute;</h3></div></div><div></div></div><div class="sect3" lang="fr"><div class="titlepage"><div><div><h4 class="title"><a name="d0e2054"></a>2.4.3.1.&nbsp;Type d'acc&egrave;s</h4></div></div><div></div></div><p>Le type d'acc&egrave;s est d&eacute;duit de la position de
+        <tt class="literal">@Id</tt> ou de <tt class="literal">@EmbeddedId</tt> dans la
+        hi&eacute;rarchie de l'entit&eacute;. Les entit&eacute;s filles, les objets embarqu&eacute;s et les
+        entit&eacute;s parentes mapp&eacute;s h&eacute;ritent du type d'acc&egrave;s de l'entit&eacute;
+        racine.</p><p>Dans Hibernate, vous pouvez surcharger le type d'acc&egrave;s
+        pour :</p><div class="itemizedlist"><ul type="disc"><li><p>utiliser une strat&eacute;gie d'acc&egrave;s personnalis&eacute;e</p></li><li><p>param&eacute;trer finement le type d'acc&egrave;s au niveau de la classe ou
+            au niveau de la propri&eacute;t&eacute;</p></li></ul></div><p>Une annocation @AccessType a &eacute;t&eacute; pr&eacute;sent&eacute;e pour prendre en charge
+        ce comportement. Vous pouvez d&eacute;finir le type d'acc&egrave;s sur :</p><div class="itemizedlist"><ul type="disc"><li><p>une entit&eacute;</p></li><li><p>une classe parente</p></li><li><p>un objet embarqu&eacute;</p></li><li><p>une propri&eacute;t&eacute;</p></li></ul></div><p>Le type d'acc&egrave;s est surcharg&eacute; pour l'&eacute;l&eacute;ment annot&eacute;, si surcharg&eacute;
+        sur une classe, toutes les propri&eacute;t&eacute;s de la classe donn&eacute;e h&eacute;ritent du
+        type d'acc&egrave;s. Pour les entit&eacute;s racines, le type d'acc&egrave;s est consid&eacute;r&eacute;
+        par d&eacute;faut comme celui de la hi&eacute;rarchie enti&egrave;re (surchargeable au niveau
+        de la classe ou de la propri&eacute;t&eacute;).</p><p>Si le type d'acc&egrave;s est marqu&eacute; comme "propri&eacute;t&eacute;", les getters sont
+        parcourus pour examiner les annotations, si le type d'acc&egrave;s est marqu&eacute;
+        comme "champ", ce sont les champs qui sont parcourus pour les
+        annotations. Sinon les &eacute;l&eacute;ments marqu&eacute;s avec @Id ou @embeddedId sont
+        scann&eacute;s.</p><p>Vous pouvez surcharger une type d'acc&egrave;s pour une propri&eacute;t&eacute;, mais
+        l'&eacute;l&eacute;ment annot&eacute; ne sera pas influenc&eacute; : par exemple, une entit&eacute; ayant
+        un type d'acc&egrave;s <tt class="literal">field</tt>, peut annoter un champ avec
+        <tt class="literal">@AccessType("property")</tt>, le type d'acc&egrave;s sera alors
+        "property" pour cet attribut, des annotations devront encore &ecirc;tre
+        port&eacute;es sur les champs.</p><p>Si une classe parente ou un objet embarquable n'est pas annot&eacute;, le
+        type d'acc&egrave;s de l'entit&eacute; racine est utilis&eacute; (m&ecirc;me si un type d'acc&egrave;s a
+        &eacute;t&eacute; d&eacute;fini sur une classe parente ou un objet embarquable
+        interm&eacute;diaire). Le principe de la poup&eacute;e russe ne s'applique pas.</p><pre class="programlisting">@Entity
+public class Person implements Serializable {
+    @Id  @GeneratedValue // type d'acc&egrave;s "champ"
+    Integer id;
+
+    @Embedded
+    @AttributeOverrides({
+    @AttributeOverride(name = "iso2", column = @Column(name = "bornIso2")),
+    @AttributeOverride(name = "name", column = @Column(name = "bornCountryName"))
+            })
+    Country bornIn;
+}
+
+@Embeddable
+<span class="bold"><b>@AccessType("property")</b></span> // surcharge le type d'acc&egrave;s pour toutes les propri&eacute;t&eacute;s dans Country
+public class Country implements Serializable {
+    private String iso2;
+    private String name;
+
+    public String getIso2() {
+        return iso2;
+    }
+
+    public void setIso2(String iso2) {
+        this.iso2 = iso2;
+    }
+
+    @Column(name = "countryName")
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+</pre></div><div class="sect3" lang="fr"><div class="titlepage"><div><div><h4 class="title"><a name="d0e2108"></a>2.4.3.2.&nbsp;Formule</h4></div></div><div></div></div><p>Parfois, vous voulez effectuer certains calculs par la base de
+        donn&eacute;es plut&ocirc;t que par la JVM, ou vous pourriez aussi vouloir cr&eacute;er une
+        sorte de colonne virtuelle. Vous pouvez utilisez un fragment SQL (alias
+        une formule) plut&ocirc;t que de mapper un propri&eacute;t&eacute; sur une colonne. Cette
+        sorte de propri&eacute;t&eacute; est en lecture seule (sa valeur est calcul&eacute;e par
+        votre formule).</p><pre class="programlisting">@Formula("obj_length * obj_height * obj_width")
+public long getObjectVolume()</pre><p>Le fragment SQL peut &ecirc;tre aussi complexe que vous le souhaitez,
+        m&ecirc;me avec des sous-selects inclus.</p></div><div class="sect3" lang="fr"><div class="titlepage"><div><div><h4 class="title"><a name="d0e2117"></a>2.4.3.3.&nbsp;Type</h4></div></div><div></div></div><p><tt class="literal">@org.hibernate.annotations.Type</tt> surcharge le
+        type Hibernate utilis&eacute; par d&eacute;faut : ce n'est g&eacute;n&eacute;ralement pas n&eacute;cessaire
+        puisque le type est correctement inf&eacute;r&eacute; par Hibernate. Veuillez vous
+        r&eacute;f&eacute;rer au guide de r&eacute;f&eacute;rence Hibernate pour plus d'informations sur les
+        types Hibernate.</p><p><tt class="literal">@org.hibernate.annotations.TypeDef</tt> et
+        <tt class="literal">@org.hibernate.annotations.TypeDefs</tt> vous permettent
+        de d&eacute;clarer des d&eacute;finitions de type. Ces annotations sont plac&eacute;es au
+        niveau de la classe ou du package. Notez que ces d&eacute;finitions seront
+        globales pour la session factory (m&ecirc;me au niveau de la classe) et que la
+        d&eacute;finition du type doit &ecirc;tre d&eacute;finie avant n'importe quelle
+        utilisation.</p><pre class="programlisting">@TypeDefs(
+    {
+    @TypeDef(
+        name="caster",
+        typeClass = CasterStringType.class,
+        parameters = {
+            @Parameter(name="cast", value="lower")
+        }
+    )
+    }
+)
+package org.hibernate.test.annotations.entity;
+
+...
+public class Forest {
+    @Type(type="caster")
+    public String getSmallText() {
+    ...
+}
+         </pre><p>Lors de l'utilisation d'un type utilisateur compos&eacute;, vous devrez
+        exprimer les d&eacute;finitions des colonnes. L'annotation
+        <tt class="literal">@Columns</tt> a &eacute;t&eacute; mise en place dans ce but.</p><pre class="programlisting">@Type(type="org.hibernate.test.annotations.entity.MonetaryAmountUserType")
+@Columns(columns = {
+    @Column(name="r_amount"),
+    @Column(name="r_currency")
+})
+public MonetaryAmount getAmount() {
+    return amount;
+}
+
+
+public class MonetaryAmount implements Serializable {
+    private BigDecimal amount;
+    private Currency currency;
+    ...
+}</pre></div><div class="sect3" lang="fr"><div class="titlepage"><div><div><h4 class="title"><a name="d0e2140"></a>2.4.3.4.&nbsp;Index</h4></div></div><div></div></div><p>Vous pouvez d&eacute;finir un index sur une colonne particuli&egrave;re en
+        utilisant l'annotation <tt class="literal">@Index</tt> sur une propri&eacute;t&eacute; d'une
+        colonne, l'attribut columnNames sera ignor&eacute;.</p><pre class="programlisting">@Column(secondaryTable="Cat1")
+@Index(name="story1index")
+public String getStoryPart1() {
+    return storyPart1;
+}</pre></div><div class="sect3" lang="fr"><div class="titlepage"><div><div><h4 class="title"><a name="d0e2150"></a>2.4.3.5.&nbsp;@Parent</h4></div></div><div></div></div><p>A l'int&eacute;rieur d'un objet embarquable, vous pouvez d&eacute;finir
+        une des propri&eacute;t&eacute;s comme un pointeur vers l'&eacute;l&eacute;ment
+        propri&eacute;taire.</p><pre class="programlisting">@Entity
+public class Person {
+    @Embeddable public Address address;
+    ...
+}
+
+@Embeddable
+public class Address {
+    @Parent public Person owner;
+    ...
+}
+
+
+person == person.address.owner</pre></div><div class="sect3" lang="fr"><div class="titlepage"><div><div><h4 class="title"><a name="d0e2157"></a>2.4.3.6.&nbsp;Propri&eacute;t&eacute;s g&eacute;n&eacute;r&eacute;es</h4></div></div><div></div></div><p>Certaines propri&eacute;t&eacute;s sont g&eacute;n&eacute;r&eacute;es au moment de l'insertion ou de
+        la mise &agrave; jour par votre base de donn&eacute;es. Hibernate peut traiter de
+        telles propri&eacute;t&eacute;s et d&eacute;clencher un select subs&eacute;quent pour lire ces
+        propri&eacute;t&eacute;s.</p><pre class="programlisting">@Entity
+public class Antenna {
+    @Id public Integer id;
+    @Generated(GenerationTime.ALWAYS) @Column(insertable = false, updatable = false)
+    public String longitude;
+
+    @Generated(GenerationTime.INSERT) @Column(insertable = false)
+    public String latitude;
+}</pre><p>Quand vous annotez votre propri&eacute;t&eacute; avec
+        <tt class="literal">@Generated</tt>, vous devez vous assurer que l'insertion
+        et la mise &agrave; jour n'entreront pas en conflit avec la strat&eacute;gie de
+        g&eacute;n&eacute;ration que vous avez choisie. Lorsque GenerationTime.INSERT est
+        choisi, la propri&eacute;t&eacute; ne doit pas contenir de colonnes ins&eacute;rables ;
+        lorsque GenerationTime.ALWAYS est choisi, la propri&eacute;t&eacute; ne doit pas
+        contenir de colonnes qui puissent &ecirc;tre ins&eacute;r&eacute;es ou mises &agrave; jour.</p><p>Les propri&eacute;t&eacute;s <tt class="literal">@Version</tt> ne peuvent pas (par
+        conception) &ecirc;tre <tt class="literal">@Generated(INSERT)</tt>, elles doivent
+        &ecirc;tre <tt class="literal">NEVER</tt> ou <tt class="literal">ALWAYS</tt>.</p></div></div><div class="sect2" lang="fr"><div class="titlepage"><div><div><h3 class="title"><a name="entity-hibspec-inheritance"></a>2.4.4.&nbsp;H&eacute;ritage</h3></div></div><div></div></div><p>SINGLE_TABLE est une strat&eacute;gie tr&egrave;s puissante mais parfois, et
+      surtout pour des syst&egrave;mes pr&eacute;-existants, vous ne pouvez pas ajouter une
+      colonne discriminante suppl&eacute;mentaire. Pour cela Hibernate a mis en place
+      la notion de formule discriminante :
+      <tt class="literal">@DiscriminatorFormula</tt> est une rempla&ccedil;cant de
+      <tt class="literal">@DiscriminatorColumn</tt> et utilise un fragment SQL en tant
+      que formule pour la r&eacute;solution du discriminant (pas besoin d'avoir une
+      colonne d&eacute;di&eacute;e).</p><pre class="programlisting">@Entity
+@DiscriminatorForumla("case when forest_type is null then 0 else forest_type end")
+public class Forest { ... }</pre><p>Par d&eacute;faut, lors du requ&ecirc;tage sur les entit&eacute;s les plus hautes,
+      Hibernate ne met pas de restriction sur la colonne discriminante. Ceci
+      peut &ecirc;tre un inconv&eacute;nient si cette colonne contient des valeurs qui ne sont
+      pas mapp&eacute;es dans votre hi&eacute;rarchie (avec
+      <tt class="literal">@DiscriminatorValue</tt>). Pour contourner ca, vous pouvez
+      utilser <tt class="literal">@ForceDiscriminator</tt> (au niveau de la classe,
+      &agrave; c&ocirc;t&eacute; de <tt class="literal">@DiscriminatorColumn</tt>). Hibernate listera
+      alors les valeurs disponibles lors du chargement des entit&eacute;s.</p></div><div class="sect2" lang="fr"><div class="titlepage"><div><div><h3 class="title"><a name="entity-hibspec-singleassoc"></a>2.4.5.&nbsp;Annotations concernant les simples associations</h3></div></div><div></div></div><p>Par d&eacute;faut, lorsqu'Hibernate ne peut pas r&eacute;soudre l'association
+      parce que l'&eacute;l&eacute;ment associ&eacute; attendu n'est pas dans la base de donn&eacute;es
+      (mauvais identifiant sur la colonne de l'association), une exception est
+      lev&eacute;e par Hibernate. Cela pourrait &ecirc;tre un inconv&eacute;nient pour des sch&eacute;mas
+      pr&eacute;-existants et mal maintenus. Vous pouvez demander &agrave; Hibernate d'ignorer
+      de tels &eacute;l&eacute;ments plut&ocirc;t que de lever une exception en utilisant
+      l'annotation <tt class="literal">@NotFound</tt>. Cette annotation peut &ecirc;tre
+      utilis&eacute;e sur une association <tt class="literal">@OneToOne</tt> (avec une clef
+      &eacute;trang&egrave;re), <tt class="literal">@ManyToOne</tt>, <tt class="literal">@OneToMany</tt>
+      ou <tt class="literal">@ManyToMany</tt>.</p><pre class="programlisting">@Entity
+public class Child {
+    ...
+    @ManyToOne
+    @NotFound(action=NotFoundAction.IGNORE)
+    public Parent getParent() { ... }
+    ...
+}</pre><p>Parfois vous voulez d&eacute;l&eacute;guer &agrave; votre base de donn&eacute;es la suppression
+      en cascade lorsqu'une entit&eacute; donn&eacute;e est supprim&eacute;e.</p><pre class="programlisting">@Entity
+public class Child {
+    ...
+    @ManyToOne
+    @OnDelete(action=OnDeleteAction.CASCADE)
+    public Parent getParent() { ... }
+    ...
+}</pre><p>Dans ce cas, Hibernate g&eacute;n&egrave;re une contrainte de suppression en
+      cascade au niveau de la base de donn&eacute;es.</p><p>Les contraintes de clef &eacute;trang&egrave;re, bien que g&eacute;n&eacute;r&eacute;es par Hibernate,
+      ont un nom justement illisible. Vous pouvez surcharger le nom de la
+      contrainte par l'utilisation de <tt class="literal">@ForeignKey</tt>.</p><pre class="programlisting">@Entity
+public class Child {
+    ...
+    @ManyToOne
+    <span class="bold"><b>@ForeignKey(name="FK_PARENT")</b></span>
+    public Parent getParent() { ... }
+    ...
+}
+
+alter table Child add constraint FK_PARENT foreign key (parent_id) references Parent</pre><div class="sect3" lang="fr"><div class="titlepage"><div><div><h4 class="title"><a name="d0e2245"></a>2.4.5.1.&nbsp;Options de chargement et modes de r&eacute;cup&eacute;ration</h4></div></div><div></div></div><p>EJB3 arrive avec l'option <tt class="literal">fetch</tt> pour d&eacute;finir
+        le chargement &agrave; la demande et les modes de r&eacute;cup&eacute;ration, cependant
+        Hibernate a beaucoup plus d'options dans ce domaine. Pour finement
+        param&eacute;trer le chargement &agrave; la demande et les strat&eacute;gies de r&eacute;cup&eacute;ration,
+        quelques annotations suppl&eacute;mentaires ont &eacute;t&eacute; mises en place :</p><div class="itemizedlist"><ul type="disc"><li><p><tt class="literal">@LazyToOne</tt> : d&eacute;finit l'option de chargement
+            &agrave; la demande sur les associations <tt class="literal">@ManyToOne</tt> et
+            <tt class="literal">@OneToOne</tt>. <tt class="literal">LazyToOneOption</tt>
+            peut &ecirc;tre <tt class="literal">PROXY</tt> (ie utiliser un chargement &agrave; la
+            demande bas&eacute; sur un proxy), <tt class="literal">NO_PROXY</tt> (utilise
+            un chargement &agrave; la demande sur l'ajout de bytecode - notez qu'un
+            temps de construction du bytecode est n&eacute;cessaire) et
+            <tt class="literal">FALSE</tt> (association sans chargement &agrave; la
+            demande) ;</p></li><li><p><tt class="literal">@LazyCollection</tt> : d&eacute;finit l'option de
+            chargement &agrave; la demande sur les associations
+            <tt class="literal">@ManyToMany</tt> et <tt class="literal">@OneToMany</tt>.
+            LazyCollectionOption peut &ecirc;tre <tt class="literal">TRUE</tt> (la
+            collection est charg&eacute;e &agrave; la demande lorsque son &eacute;tat est acc&eacute;d&eacute;),
+            <tt class="literal">EXTRA</tt> (la collection est charg&eacute;e &agrave; la demande et
+            toutes les op&eacute;rations essaieront d'&eacute;viter le chargement de la
+            collection, c'est surtout utile pour de grosses collections lorsque
+            le chargement de tous les &eacute;l&eacute;ments n'est pas n&eacute;cessaire) et
+            <tt class="literal">FALSE</tt> (association sans chargement &agrave; la
+            demande) ;</p></li><li><p><tt class="literal">@Fetch</tt> : d&eacute;finit une strat&eacute;gie de
+            r&eacute;cup&eacute;ration utilis&eacute;e pour charger l'association.
+            <tt class="literal">FetchMode</tt> peut &ecirc;tre
+            <tt class="literal">SELECT</tt> (un select est d&eacute;clench&eacute; lorsque
+            l'association a besoin d'&ecirc;tre charg&eacute;e), <tt class="literal">SUBSELECT</tt>
+            (disponible uniquement pour des collections, utilise une strat&eacute;gie
+            de sous select - veuillez vous r&eacute;f&eacute;rer &agrave; la documentation de
+            r&eacute;f&eacute;rence d'Hibernate pour plus d'informations) ou
+            <tt class="literal">JOIN</tt> (utilise un JOIN SQL pour charger
+            l'association lors du chargement de l'entit&eacute; propri&eacute;taire).
+            <tt class="literal">JOIN</tt> surcharge n'importe quel attribut de
+            chargement &agrave; la demande (une association charg&eacute;e avec la strat&eacute;gie
+            <tt class="literal">JOIN</tt> ne peut pas &ecirc;tre charg&eacute;e &agrave; la
+            demande).</p></li></ul></div><p>Les annotations Hibernate surchargent les options de r&eacute;cup&eacute;ration
+        EJB3.</p><div class="table"><a name="d0e2322"></a><p class="title"><b>Tableau&nbsp;2.3.&nbsp;Chargement &agrave; la demande et options de r&eacute;cup&eacute;ration
+          &eacute;quivalentes</b></p><table summary="Chargement &agrave; la demande et options de r&eacute;cup&eacute;ration&#xA;          &eacute;quivalentes" border="1"><colgroup><col><col><col></colgroup><thead><tr><th>Annotations</th><th>Chargement &agrave; la demande</th><th>R&eacute;cup&eacute;ration</th></tr></thead><tbody><tr><td>@[One|Many]ToOne](fetch=FetchType.LAZY)</td><td>@LazyToOne(PROXY)</td><td>@Fetch(SELECT)</td></tr><tr><td>@[One|Many]ToOne](fetch=FetchType.EAGER)</td><td>@LazyToOne(FALSE)</td><td>@Fetch(JOIN)</td></tr><tr><td>@ManyTo[One|Many](fetch=FetchType.LAZY)</td><td>@LazyCollection(TRUE)</td><td>@Fetch(SELECT)</td></tr><tr><td>@ManyTo[One|Many](fetch=FetchType.EAGER)</td><td>@LazyCollection(FALSE)</td><td>@Fetch(JOIN)</td></tr></tbody></table></div></div></div><div class="sect2" lang="fr"><div class="titlepage"><div><div><h3 class="title"><a name="entity-hibspec-collection"></a>2.4.6.&nbsp;Annotations concernant les collections</h3></div></div><div></div></div><div class="sect3" lang="fr"><div class="titlepage"><div><div><h4 class="title"><a name="entity-hibspec-collection-enhance"></a>2.4.6.1.&nbsp;Am&eacute;liorer les configurations des collections</h4></div></div><div></div></div><p>Il est possible de configurer :</p><div class="itemizedlist"><ul type="disc"><li>
+               la taille des batchs pour les collections en utilisant @BatchSize
+            </li><li>
+               la clause where, en utilisant @Where (appliqu&eacute;e &agrave; l'entit&eacute; cible)
+               ou @WhereJoinTable (appliqu&eacute;e &agrave; la table de l'association)
+            </li><li>
+               la clause de v&eacute;rification, en utilsant @Check
+            </li><li>
+               la clause SQL order by, en utilisant @OrderBy
+            </li><li>
+               la strat&eacute;gie de suppression en cascade avec
+               @OnDelete(action=OnDeleteAction.CASCADE)
+            </li></ul></div><p>Vous pouvez aussi d&eacute;clarer un comparateur de tri, utilisez
+        l'annotation <tt class="literal">@Sort</tt>. Exprimez le type de comparateur
+        que vous voulez entre "non tri&eacute;" (NdT : unsorted), "ordre naturel"
+        (NdT : natural) ou un comparateur personnalis&eacute;. Si vous voulez utilisez
+        votre propre impl&eacute;mentation de comparateur, vous devrez indiquer la
+        classe d'impl&eacute;mentation en utilisant l'attribut
+        <tt class="literal">comparator</tt>. Notez que vous avez besoin d'utiliser
+        l'interface <tt class="classname">SortedSet</tt> ou
+        <tt class="classname">SortedMap</tt>.</p><pre class="programlisting">    @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER)
+    @JoinColumn(name="CUST_ID")
+    @Sort(type = SortType.COMPARATOR, comparator = TicketComparator.class)
+    @Where(clause="1=1")
+    @OnDelete(action=OnDeleteAction.CASCADE)
+    public SortedSet&lt;Ticket&gt; getTickets() {
+        return tickets;
+    }</pre><p>Veuillez vous r&eacute;f&eacute;rer aux descriptions pr&eacute;c&eacute;dentes de ces
+        annotations pour plus d'informations.</p><p>Les contraintes de clef &eacute;trang&egrave;re, bien que g&eacute;n&eacute;r&eacute;es par
+        Hibernate, ont un nom illisible. Vous pouvez surcharger le nom de la
+        contrainte en utilisant <tt class="literal">@ForeignKey</tt>. Notez que cette
+        annotation doit &ecirc;tre plac&eacute;e du c&ocirc;t&eacute; poss&eacute;dant la relation,
+        <tt class="literal">inverseName</tt> r&eacute;f&eacute;ren&ccedil;ant la contrainte de l'autre
+        c&ocirc;t&eacute;.</p><pre class="programlisting">@Entity
+public class Woman {
+    ...
+    @ManyToMany(cascade = {CascadeType.ALL})
+    <span class="bold"><b>@ForeignKey(name = "TO_WOMAN_FK", inverseName = "TO_MAN_FK")</b></span>
+    public Set&lt;Man&gt; getMens() {
+        return mens;
+    }
+}
+
+alter table Man_Woman add constraint TO_WOMAN_FK foreign key (woman_id) references Woman
+alter table Man_Woman add constraint TO_MAN_FK foreign key (man_id) references Man</pre></div><div class="sect3" lang="fr"><div class="titlepage"><div><div><h4 class="title"><a name="entity-hibspec-collection-extratype"></a>2.4.6.2.&nbsp;Types de collection extra</h4></div></div><div></div></div><div class="sect4" lang="fr"><div class="titlepage"><div><div><h5 class="title"><a name="d0e2416"></a>2.4.6.2.1.&nbsp;List</h5></div></div><div></div></div><p>Outre EJB3, Hibernate Annotations prend en charge les v&eacute;ritables
+          <tt class="classname">List</tt> et <tt class="classname">Array</tt>. Mappez
+          votre collection de la m&ecirc;me mani&egrave;re que d'habitude et ajoutez
+          l'annotation @<tt class="literal">IndexColumn</tt>. Cette annotation vous
+          permet de d&eacute;crire la colonne qui contiendra l'index. Vous pouvez aussi
+          d&eacute;clarer la valeur de l'index en base de donn&eacute;es qui repr&eacute;sente le
+          premier &eacute;l&eacute;ment (alias index de base). La valeur habituelle est
+          <tt class="literal">0</tt> ou <tt class="literal">1</tt>.</p><pre class="programlisting">@OneToMany(cascade = CascadeType.ALL)
+@IndexColumn(name = "drawer_position", base=1)
+public List&lt;Drawer&gt; getDrawers() {
+    return drawers;
+}</pre><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>Si vous oubliez de positionner
+            <tt class="literal">@IndexColumn</tt>, la s&eacute;mantique du bag est appliqu&eacute;e.
+            Si vous voulez la s&eacute;mantique du bag sans ses limitations, consid&eacute;rez
+            l'utilisation de <tt class="literal">@CollectionId</tt>.</p></div></div><div class="sect4" lang="fr"><div class="titlepage"><div><div><h5 class="title"><a name="d0e2447"></a>2.4.6.2.2.&nbsp;Map</h5></div></div><div></div></div><p>Hibernate Annotations prend aussi en charge le mapping de
+          v&eacute;ritables Maps, si <tt class="literal">@javax.persistence.MapKey</tt> n'est
+          pas positionn&eacute;e, Hibernate mappera l'&eacute;l&eacute;ment clef ou l'objet
+          embarquable dans ses propres colonnes. Pour surcharger les colonnes
+          par d&eacute;faut, vous pouvez utiliser
+          <tt class="literal">@org.hibernate.annotations.MapKey</tt> si votre clef est
+          un type de base (par d&eacute;faut &agrave; <tt class="literal">mapkey</tt>) ou un objet
+          embarquable, ou vous pouvez utiliser
+          <tt class="literal">@org.hibernate.annotations.MapKeyManyToMany</tt> si
+          votre clef est une entit&eacute;.</p></div><div class="sect4" lang="fr"><div class="titlepage"><div><div><h5 class="title"><a name="entity-hibspec-collection-extratype-indexbidir"></a>2.4.6.2.3.&nbsp;Associations bidirectionnelle avec des collections index&eacute;es</h5></div></div><div></div></div><p>Une association bidirectionnelle o&ugrave; une extr&eacute;mit&eacute; est
+          repr&eacute;sent&eacute;e comme une <tt class="literal">@IndexColumn</tt> ou une
+          <tt class="literal">@org.hibernate.annotations.MapKey[ManyToMany]</tt>
+          requiert une consid&eacute;ration sp&eacute;ciale. S'il y a une propri&eacute;t&eacute; de la
+          classe enfante qui mappe la colonne de l'index, pas de probl&egrave;me, nous
+          pouvons continuer en utilisant <tt class="literal">mappedBy</tt> sur le
+          mapping de la collection :</p><pre class="programlisting">@Entity
+public class Parent {
+    @OneToMany(mappedBy="parent")
+    @org.hibernate.annotations.MapKey(columns=@Column(name="name"))
+    private Map&lt;String, Child&gt; children;
+    ...
+}
+
+@Entity
+public class Child {
+    ...
+    @Basic
+    private String name;
+
+    @ManyToOne
+    @JoinColumn(name="parent_id", nullable=false)
+    private Parent parent;
+    ...
+}</pre><p>Mais s'il n'y a pas de telle propri&eacute;t&eacute; sur la classe enfante,
+          nous ne pouvons pas penser que l'association est vraiment
+          bidirectionnelle (il y a des informations disponibles &agrave; une extr&eacute;mit&eacute;
+          qui ne sont pas disponibles &agrave; l'autre). Dans ce cas, nous ne pouvons
+          pas mapper la collection avec <tt class="literal">mappedBy</tt>. A la place,
+          nous pourrions utiliser le mapping suivant :</p><pre class="programlisting">@Entity
+public class Parent {
+    @OneToMany
+    @org.hibernate.annotations.MapKey(columns=@Column(name="name"))
+    @JoinColumn(name="parent_id", nullable=false)
+    private Map&lt;String, Child&gt; children;
+    ...
+}
+
+@Entity
+public class Child {
+    ...
+    @ManyToOne
+    @JoinColumn(name="parent_id", insertable=false, updatable=false, nullable=false)
+    private Parent parent;
+    ...
+}</pre><p>Notez que dans ce mapping, l'extr&eacute;mit&eacute; de l'association dont la
+          valeur est une collection est responsable des mises &agrave; jour pour la
+          clef &eacute;trang&egrave;re.</p></div><div class="sect4" lang="fr"><div class="titlepage"><div><div><h5 class="title"><a name="d0e2489"></a>2.4.6.2.4.&nbsp;Bag avec une clef primaire</h5></div></div><div></div></div><p>Une autre fonctionnalit&eacute; int&eacute;ressante est la possibilit&eacute; de
+          d&eacute;finir une clef primaire subrog&eacute;e &agrave; une collection bag. Ceci enl&egrave;ve
+          pas mal d'inconv&eacute;nients des bags : mise &agrave; jour et suppression
+          sont efficaces, plus d'un bag <tt class="literal">EAGER</tt> par requ&ecirc;te ou
+          par entit&eacute;. Cette clef primaire sera contenue dans une colonne
+          suppl&eacute;mentaire de votre table de collection mais ne sea pas visible
+          par l'application Java. @CollectionId est utilis&eacute;e pour marquer une
+          collection comme "id bag", ca permet aussi de surcharger les colonnes
+          de la clef primaire, le type de la clef primaire et la strat&eacute;gie du
+          g&eacute;n&eacute;rateur. La strat&eacute;gie peut &ecirc;tre <tt class="literal">identity</tt>, ou
+          n'importe quel nom de g&eacute;n&eacute;rateur d&eacute;fini de votre application.</p><pre class="programlisting">@Entity
+@TableGenerator(name="ids_generator", table="IDS")
+public class Passport {
+    ...
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name="PASSPORT_VISASTAMP")
+    <span class="bold"><b>@CollectionId(
+        columns = @Column(name="COLLECTION_ID"),
+        type=@Type(type="long"),
+        generator = "ids_generator"
+    )</b></span>
+    private Collection&lt;Stamp&gt; visaStamp = new ArrayList();
+    ...
+}</pre></div><div class="sect4" lang="fr"><div class="titlepage"><div><div><h5 class="title"><a name="d0e2505"></a>2.4.6.2.5.&nbsp;Collection d'&eacute;l&eacute;ments ou d'&eacute;l&eacute;ments compos&eacute;s</h5></div></div><div></div></div><p>Hibernate Annotations prend aussi en charge les collections de
+          types core (Integer, String, Enums, ...), les collections d'objets
+          embarquables et m&ecirc;me les tableaux de types primitifs. Ce sont des
+          collections d'&eacute;l&eacute;ments.</p><p>Une collection d'&eacute;l&eacute;ments doit &ecirc;tre annot&eacute;e comme
+          <tt class="literal">@CollectionOfElements</tt> (en tant que rempla&ccedil;ant de
+          <tt class="literal">@OneToMany</tt>). Pour d&eacute;finir la table de la
+          collection, l'annotation <tt class="literal">@JoinTable</tt> est utilis&eacute;e
+          sur la propri&eacute;t&eacute; de l'association, <tt class="literal">joinColumns</tt>
+          d&eacute;finit les colonnes de jointure entre la table de l'entit&eacute; primaire
+          et la table de la collection (inverseJoincolumn est inutile et
+          devrait &ecirc;tre laiss&eacute; &agrave; vide). Pour une collection de types core ou un
+          tableau de types primitifs, vous pouvez surcharger la d&eacute;finition de la
+          colonne de l'&eacute;l&eacute;ment en utilisant <tt class="literal">@Column</tt> sur la
+          propri&eacute;t&eacute; de l'association. Vous pouvez aussi surcharger les colonnes
+          d'une collection d'objets embarquables en utilisant
+          <tt class="literal">@AttributeOverride</tt>. Pour atteindre l'&eacute;l&eacute;ment de la
+          collection, vous avez besoin d'ajouter "element" au nom de l'attribut
+          surcharg&eacute; (p. ex. "element" pour les types core, ou "element.serial"
+          pour la propri&eacute;t&eacute; serial d'un &eacute;l&eacute;ment embarqu&eacute;). Pour atteindre
+          l'index/clef d'une collection, ajoutez "key" &agrave; la place.</p><pre class="programlisting">@Entity
+public class Boy {
+    private Integer id;
+    private Set&lt;String&gt; nickNames = new HashSet&lt;String&gt;();
+    private int[] favoriteNumbers;
+    private Set&lt;Toy&gt; favoriteToys = new HashSet&lt;Toy&gt;();
+    private Set&lt;Character&gt; characters = new HashSet&lt;Character&gt;();
+
+    @Id @GeneratedValue
+    public Integer getId() {
+        return id;
+    }
+
+    <span class="bold"><b>@CollectionOfElements
+    public Set&lt;String&gt;</b></span> getNickNames() {
+        return nickNames;
+    }
+
+    <span class="bold"><b>@CollectionOfElements
+    @JoinTable(
+            table=@Table(name="BoyFavoriteNumbers"),
+            joinColumns = @JoinColumn(name="BoyId")
+    )
+    @Column(name="favoriteNumber", nullable=false)</b></span>
+    @IndexColumn(name="nbr_index")
+    public int[] getFavoriteNumbers() {
+        return favoriteNumbers;
+    }
+
+    <span class="bold"><b>@CollectionOfElements
+    @AttributeOverride( name="element.serial", column=@Column(name="serial_nbr") )</b></span>
+    public Set&lt;Toy&gt; getFavoriteToys() {
+        return favoriteToys;
+    }
+
+    <span class="bold"><b>@CollectionOfElements
+    public Set&lt;Character&gt;</b></span> getCharacters() {
+        return characters;
+    }
+    ...
+}
+
+public enum Character {
+    GENTLE,
+    NORMAL,
+    AGGRESSIVE,
+    ATTENTIVE,
+    VIOLENT,
+    CRAFTY
+}
+
+@Embeddable
+public class Toy {
+    public String name;
+    public String serial;
+    public Boy owner;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getSerial() {
+        return serial;
+    }
+
+    public void setSerial(String serial) {
+        this.serial = serial;
+    }
+
+    <span class="bold"><b>@Parent</b></span>
+    public Boy getOwner() {
+        return owner;
+    }
+
+    public void setOwner(Boy owner) {
+        this.owner = owner;
+    }
+
+    public boolean equals(Object o) {
+        if ( this == o ) return true;
+        if ( o == null || getClass() != o.getClass() ) return false;
+
+        final Toy toy = (Toy) o;
+
+        if ( !name.equals( toy.name ) ) return false;
+        if ( !serial.equals( toy.serial ) ) return false;
+
+        return true;
+    }
+
+    public int hashCode() {
+        int result;
+        result = name.hashCode();
+        result = 29 * result + serial.hashCode();
+        return result;
+    }
+}</pre><p>Sur une collection d'objets embarquables, l'objet embarquable
+          peut avoir une propri&eacute;t&eacute; annot&eacute;e avec <tt class="literal">@Parent</tt>.
+          Cette propri&eacute;t&eacute; pointera alors vers l'entit&eacute; contenant la
+          collection.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>Les versions pr&eacute;c&eacute;dentes d'Hibernate Annotations utilisaient
+            <tt class="literal">@OneToMany</tt> pour marquer une collection
+            d'&eacute;l&eacute;ments. Suite &agrave; des incoh&eacute;rences s&eacute;mantiques, nous avons mis en
+            place l'annotation <tt class="literal">@CollectionOfElements</tt>. Pour
+            marquer des collections d'&eacute;l&eacute;ments, l'ancienne fa&ccedil;on fonctionne
+            encore mais elle est consid&eacute;r&eacute;e comme "deprecated" et ne sera plus
+            prise en charge dans les futures versions.</p></div></div></div></div><div class="sect2" lang="fr"><div class="titlepage"><div><div><h3 class="title"><a name="d0e2561"></a>2.4.7.&nbsp;Cache</h3></div></div><div></div></div><p>Pour optimiser vos acc&egrave;s &agrave; la base de donn&eacute;es, vous pouvez activer
+      le cache de second niveau d'Hibernate. Ce cache est configurable par
+      entit&eacute; et par collection.</p><p><tt class="literal">@org.hibernate.annotations.Cache</tt> d&eacute;finit la
+      strat&eacute;gie de cache et la r&eacute;gion du cache de second niveau donn&eacute;. Cette
+      annotation peut &ecirc;tre appliqu&eacute;e &agrave; une entit&eacute; racine (pas les entit&eacute;s
+      filles), et sur les collections.</p><pre class="programlisting">@Entity
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+public class Forest { ... }</pre><pre class="programlisting">    @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER)
+    @JoinColumn(name="CUST_ID")
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    public SortedSet&lt;Ticket&gt; getTickets() {
+        return tickets;
+    }</pre><p></p><div class="programlistingco"><pre class="programlisting">@Cache(
+    CacheConcurrencyStrategy usage();                 <span class="co">(1)</span>
+    String region() default "";                       <span class="co">(2)</span>
+    String include() default "all";                   <span class="co">(3)</span>
+)</pre><div class="calloutlist"><table border="0" summary="Callout list"><tr><td width="5%" valign="top" align="left">(1)</td><td valign="top" align="left"><p>usage : la strat&eacute;gie de concurrence du cache donn&eacute; (NONE,
+            READ_ONLY, NONSTRICT_READ_WRITE, READ_WRITE, TRANSACTIONAL) ;</p></td></tr><tr><td width="5%" valign="top" align="left">(2)</td><td valign="top" align="left"><p>region (optionnel) : la r&eacute;gion du cache (par d&eacute;faut le nom
+            complet de la classe avec le nom du package, ou le nom complet du
+            r&ocirc;le de la collection) ;</p></td></tr><tr><td width="5%" valign="top" align="left">(3)</td><td valign="top" align="left"><p><tt class="literal">include</tt> (optionnel) : "all" pour inclure
+            toutes les propri&eacute;t&eacute;s, "non-lazy" pour inclure seulement les
+            propri&eacute;t&eacute;s qui ne sont pas charg&eacute;es &agrave; la demande (valeur par
+            d&eacute;faut : all).</p></td></tr></table></div></div></div><div class="sect2" lang="fr"><div class="titlepage"><div><div><h3 class="title"><a name="entity-hibspec-filters"></a>2.4.8.&nbsp;Filtres</h3></div></div><div></div></div><p>Hibernate a la capacit&eacute; d'appliquer des filtres arbitraires &agrave; la
+      partie sup&eacute;rieure de vos donn&eacute;es. Ces filtres sont appliqu&eacute;s au moment de
+      l'ex&eacute;cution sur une session donn&eacute;e. Vous avez tout d'abord besoin de les
+      d&eacute;finir.</p><p><tt class="literal">@org.hibernate.annotations.FilterDef</tt> ou
+      <tt class="literal">@FilterDefs</tt> d&eacute;clarent des d&eacute;finitions de filtre
+      utilis&eacute;es par les filtres ayant le m&ecirc;me nom. Une d&eacute;finition de filtre a
+      un name() et un tableau de parameters(). Un param&egrave;tre vous permettra
+      d'ajuster le comportement du filtre au moment de l'ex&eacute;cution. Chaque
+      param&egrave;tre est d&eacute;fini par une <tt class="literal">@ParamDef</tt> qui a un nom et
+      un type. Vous pouvez aussi d&eacute;finir un param&egrave;tre defaultCondition() pour
+      une <tt class="literal">@ParamDef</tt> donn&eacute;e pour positionner la condition par
+      d&eacute;faut &agrave; utiliser lorsqu'aucune n'est d&eacute;finie dans chaque
+      <tt class="literal">@Filter</tt> individuelle. Une <tt class="literal">@FilterDef</tt>
+      peut &ecirc;tre d&eacute;finie au niveau de la classe ou du package.</p><p>Nous avons besoin de d&eacute;finir la clause du filtre SQL appliqu&eacute; au
+      chargement de l'entit&eacute; ou au chargement de la collection.
+      <tt class="literal">@Filter</tt> est utilis&eacute;e et plac&eacute;e sur l'entit&eacute; ou
+      l'&eacute;l&eacute;ment de la collection.</p><pre class="programlisting">@Entity
+@FilterDef(name="minLength", parameters=@ParamDef( name="minLength", type="integer" ) )
+@Filters( {
+    @Filter(name="betweenLength", condition=":minLength &lt;= length and :maxLength &gt;= length"),
+    @Filter(name="minLength", condition=":minLength &lt;= length")
+} )
+public class Forest { ... }</pre><p>Lorsque la collection utilise une table d'association comme
+      repr&eacute;sentation relationnelle, vous pourriez vouloir appliquer la condition
+      du filtre &agrave; la table de l'association elle-m&ecirc;me ou &agrave; la table de l'entit&eacute;
+      cible. Pour appliquer la contrainte sur l'entit&eacute; cible, utilisez
+      l'annotation habituelle <tt class="literal">@Filter</tt>. Cependant, si vous
+      voulez ciblez la table d'association, utilisez l'annotation
+      <tt class="literal">@FilterJoinTable</tt>.</p><pre class="programlisting">    @OneToMany
+    @JoinTable
+    // filtre sur la table de l'entit&eacute; cible
+    @Filter(name="betweenLength", condition=":minLength &lt;= length and :maxLength &gt;= length")
+    // filtre sur la table d'association
+    @FilterJoinTable(name="security", condition=":userlevel &gt;= requredLevel")
+    public Set&lt;Forest&gt; getForests() { ... }</pre></div><div class="sect2" lang="fr"><div class="titlepage"><div><div><h3 class="title"><a name="entity-hibspec-query"></a>2.4.9.&nbsp;Requ&ecirc;te</h3></div></div><div></div></div><p>Puisqu'Hibernate a plus de fonctionnalit&eacute;s sur les requ&ecirc;tes nomm&eacute;es
+      que d&eacute;finies dans la sp&eacute;cification EJB3,
+      <tt class="literal">@org.hibernate.annotations.NamedQuery</tt>,
+      <tt class="literal">@org.hibernate.annotations.NamedQueries</tt>,
+      <tt class="literal">@org.hibernate.annotations.NamedNativeQuery</tt> et
+      <tt class="literal">@org.hibernate.annotations.NamedNativeQueries</tt> ont &eacute;t&eacute;
+      mis en place. Elles ajoutent des attributs &agrave; la version standard et
+      peuvent &ecirc;tre utilis&eacute;es comme rempla&ccedil;ant :</p><div class="itemizedlist"><ul type="disc"><li><p>flushMode : d&eacute;finit le mode de flush de la requ&ecirc;te (Always,
+          Auto, Commit ou Manual)</p></li><li><p>cacheable : indique si la requ&ecirc;te devrait &ecirc;tre cach&eacute;e ou
+          non</p></li><li><p>cacheRegion : r&eacute;gion du cache utilis&eacute;e si la requ&ecirc;te est
+          cach&eacute;e</p></li><li><p>fetchSize : taille de l'expression de r&eacute;cup&eacute;ration JDBC pour
+          cette requ&ecirc;te</p></li><li><p>timeout : timeout de la requ&ecirc;te</p></li><li><p>callable : pour les requ&ecirc;tes natives seulement, mettre &agrave; true
+          pour les proc&eacute;dures stock&eacute;es</p></li><li><p>comment : si les commentaires sont activ&eacute;s, le commentaire vu
+          lorsque la requ&ecirc;te est envoy&eacute;e vers la base de donn&eacute;es</p></li><li><p>cacheMode : mode d'int&eacute;raction du cache (get, ignore, normal,
+          put ou refresh)</p></li><li><p>readOnly : indique si les &eacute;l&eacute;ments r&eacute;cup&eacute;r&eacute;s &agrave; partir de la
+          requ&ecirc;te sont en lecture seule ou pas</p></li></ul></div><p>Ces indications de fonctionnement peuvent &ecirc;tre positionn&eacute;es sur
+      les annotations standards <tt class="literal">@javax.persistence.NamedQuery</tt>
+      avec l'annotation <tt class="literal">@QueryHint</tt>. Un autre avantage clef
+      est la possibilit&eacute; de positionner ces annotations au niveau du
+      package.</p></div></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch01.html">Pr&eacute;c&eacute;dent</a>&nbsp;</td><td width="20%" align="center"><a accesskey="u" href="index.html">Niveau sup&eacute;rieur</a></td><td width="40%" align="right">&nbsp;<a accesskey="n" href="xml-overriding.html">Suivant</a></td></tr><tr><td width="40%" align="left" valign="top">Chapitre&nbsp;1.&nbsp;Configurer un projet avec des annotations&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td><td width="40%" align="right" valign="top">&nbsp;Chapitre&nbsp;3.&nbsp;Surcharger des m&eacute;ta-donn&eacute;es &agrave; travers du XML</td></tr></table></div></body></html>

@@ -1,0 +1,183 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>7.5.&nbsp;Bidirectional associations with join tables</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="associations.html" title="Chapter&nbsp;7.&nbsp;Association Mappings">
+      <link rel="prev" href="assoc-bidirectional.html" title="7.4.&nbsp;Bidirectional associations">
+      <link rel="next" href="assoc-complex.html" title="7.6.&nbsp;More complex association mappings">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">7.5.&nbsp;Bidirectional associations with join tables</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="assoc-bidirectional.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;7.&nbsp;Association Mappings</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="assoc-complex.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="assoc-bidirectional-join"></a>7.5.&nbsp;Bidirectional associations with join tables
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="assoc-bidirectional-join-12m"></a>7.5.1.&nbsp;one to many / many to one
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                           A <span class="emphasis"><em>bidirectional one-to-many association on a join table</em></span>.
+                           Note that the <code class="literal">inverse="true"</code> can go on either end of the
+                           association, on the collection, or on the join.
+                       
+            </p><pre class="programlisting">&lt;class name="Person"&gt;
+    &lt;id name="id" column="personId"&gt;
+        &lt;generator class="native"/&gt;
+    &lt;/id&gt;
+    &lt;set name="addresses" 
+        table="PersonAddress"&gt;
+        &lt;key column="personId"/&gt;
+        &lt;many-to-many column="addressId"
+            unique="true"
+            class="Address"/&gt;
+    &lt;/set&gt;
+&lt;/class&gt;
+
+&lt;class name="Address"&gt;
+    &lt;id name="id" column="addressId"&gt;
+        &lt;generator class="native"/&gt;
+    &lt;/id&gt;
+    &lt;join table="PersonAddress" 
+        inverse="true" 
+        optional="true"&gt;
+        &lt;key column="addressId"/&gt;
+        &lt;many-to-one name="person"
+            column="personId"
+            not-null="true"/&gt;
+    &lt;/join&gt;
+&lt;/class&gt;</pre><pre class="programlisting">
+create table Person ( personId bigint not null primary key )
+create table PersonAddress ( personId bigint not null, addressId bigint not null primary key )
+create table Address ( addressId bigint not null primary key )
+        </pre></div>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="assoc-bidirectional-join-121"></a>7.5.2.&nbsp;one to one
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                           A <span class="emphasis"><em>bidirectional one-to-one association on a join table</em></span> 
+                           is extremely unusual, but possible.
+                       
+            </p><pre class="programlisting">&lt;class name="Person"&gt;
+    &lt;id name="id" column="personId"&gt;
+        &lt;generator class="native"/&gt;
+    &lt;/id&gt;
+    &lt;join table="PersonAddress" 
+        optional="true"&gt;
+        &lt;key column="personId" 
+            unique="true"/&gt;
+        &lt;many-to-one name="address"
+            column="addressId" 
+            not-null="true"
+            unique="true"/&gt;
+    &lt;/join&gt;
+&lt;/class&gt;
+
+&lt;class name="Address"&gt;
+    &lt;id name="id" column="addressId"&gt;
+        &lt;generator class="native"/&gt;
+    &lt;/id&gt;
+    &lt;join table="PersonAddress" 
+        optional="true"
+        inverse="true"&gt;
+        &lt;key column="addressId" 
+            unique="true"/&gt;
+        &lt;many-to-one name="person"
+            column="personId" 
+            not-null="true"
+            unique="true"/&gt;
+    &lt;/join&gt;
+&lt;/class&gt;</pre><pre class="programlisting">
+create table Person ( personId bigint not null primary key )
+create table PersonAddress ( personId bigint not null primary key, addressId bigint not null unique )
+create table Address ( addressId bigint not null primary key )
+        </pre></div>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="assoc-bidirectional-join-m2m"></a>7.5.3.&nbsp;many to many
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                           Finally, we have a <span class="emphasis"><em>bidirectional many-to-many association</em></span>.
+                       
+            </p><pre class="programlisting">&lt;class name="Person"&gt;
+    &lt;id name="id" column="personId"&gt;
+        &lt;generator class="native"/&gt;
+    &lt;/id&gt;
+    &lt;set name="addresses" table="PersonAddress"&gt;
+        &lt;key column="personId"/&gt;
+        &lt;many-to-many column="addressId"
+            class="Address"/&gt;
+    &lt;/set&gt;
+&lt;/class&gt;
+
+&lt;class name="Address"&gt;
+    &lt;id name="id" column="addressId"&gt;
+        &lt;generator class="native"/&gt;
+    &lt;/id&gt;
+    &lt;set name="people" inverse="true" table="PersonAddress"&gt;
+        &lt;key column="addressId"/&gt;
+        &lt;many-to-many column="personId"
+            class="Person"/&gt;
+    &lt;/set&gt;
+&lt;/class&gt;</pre><pre class="programlisting">
+create table Person ( personId bigint not null primary key )
+create table PersonAddress ( personId bigint not null, addressId bigint not null, primary key (personId, addressId) )
+create table Address ( addressId bigint not null primary key )
+        </pre></div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="assoc-bidirectional.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="associations.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="assoc-complex.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">7.4.&nbsp;Bidirectional associations&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;7.6.&nbsp;More complex association mappings</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

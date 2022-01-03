@@ -1,0 +1,468 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Chapter 10. Ehcache</title><!-- HibernateDoc.Meta --><meta name="description" content="Hibernate OGM, JPA for NoSQL datastores - Reference Documentation" /><meta name="keywords" content="hibernate, ogm, hibernate ogm, nosql, jpa, infinispan, mongodb, neo4j, cassandra, couchdb, ehcache, redis" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://docs.jboss.org/hibernate/stable/ogm/reference/en-US/html_single/" /><!-- /HibernateDoc.Meta --><link rel="stylesheet" type="text/css" href="css/hibernate.css"/><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"/><link rel="home" href="index.html" title="Hibernate OGM Reference Guide"/><link rel="up" href="index.html" title="Hibernate OGM Reference Guide"/><link rel="prev" href="ch09.html" title="Chapter 9. Infinispan"/><link rel="next" href="ch11.html" title="Chapter 11. MongoDB"/><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/></head><body><p id="title"><a href="http://www.hibernate.org" class="site_href"><strong>Hibernate.org</strong></a><a href="http://hibernate.org/Documentation/DocumentationOverview" class="doc_href"><strong>Community Documentation</strong></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="ch09.html"><strong>Prev</strong></a></li><li class="next"><a accesskey="n" href="ch11.html"><strong>Next</strong></a></li></ul><div class="chapter" title="Chapter 10. Ehcache"><div class="titlepage"><div><div><h2 class="title"><a id="ogm-ehcache"/>Chapter 10. Ehcache</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="ch10.html#ogm-ehcache-configuration">10.1. Configure Ehcache</a></span></dt><dd><dl><dt><span class="section"><a href="ch10.html#ogm-ehcache-adddepencies">10.1.1. Adding Ehcache dependencies</a></span></dt><dt><span class="section"><a href="ch10.html#ogm-ehcache-configuration-properties">10.1.2. Ehcache specific configuration properties</a></span></dt><dt><span class="section"><a href="ch10.html#cache_names_used_by_hibernate_ogm_2">10.1.3. Cache names used by Hibernate OGM</a></span></dt></dl></dd><dt><span class="section"><a href="ch10.html#ogm-ehcache-storage-principles">10.2. Storage principles</a></span></dt><dd><dl><dt><span class="section"><a href="ch10.html#ogm-ehcache-built-in-types">10.2.1. Properties and built-in types</a></span></dt><dt><span class="section"><a href="ch10.html#identifiers_2">10.2.2. Identifiers</a></span></dt><dt><span class="section"><a href="ch10.html#entities_2">10.2.3. Entities</a></span></dt><dt><span class="section"><a href="ch10.html#associations_2">10.2.4. Associations</a></span></dt></dl></dd><dt><span class="section"><a href="ch10.html#ogm-ehcache-transactions">10.3. Transactions</a></span></dt></dl></div><p>When combined with Hibernate ORM, Ehcache is commonly used as a 2nd level cache
+to cache data whose primary storage is a relational database.
+When used with Hibernate OGM it is not "just a cache"
+but is the main storage engine for your data.</p><p>This is not the reference manual for Ehcache itself:
+we’re going to list only how Hibernate OGM should be configured to use Ehcache;
+for all the tuning and advanced options please refer to the
+<a class="link" href="http://www.ehcache.org/documentation">Ehcache Documentation</a>.</p><div class="section" title="10.1. Configure Ehcache"><div class="titlepage"><div><div><h2 class="title"><a id="ogm-ehcache-configuration"/>10.1. Configure Ehcache</h2></div></div></div><p>Two steps:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">Add the dependencies to classpath</li><li class="listitem"><p class="simpara">And then choose one of:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">Use the default Ehcache configuration (no action needed)</li><li class="listitem">Point to your own configuration resource name</li></ul></div></li></ul></div><div class="section" title="10.1.1. Adding Ehcache dependencies"><div class="titlepage"><div><div><h3 class="title"><a id="ogm-ehcache-adddepencies"/>10.1.1. Adding Ehcache dependencies</h3></div></div></div><p>To add the dependencies via some Maven-definitions-using tool,
+add the following module:</p><pre><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.hibernate.ogm&lt;/groupId&gt;
+    &lt;artifactId&gt;hibernate-ogm-ehcache&lt;/artifactId&gt;
+    &lt;version&gt;4.2.0.Final&lt;/version&gt;
+&lt;/dependency&gt;</code></pre><p>If you’re not using a dependency management tool,
+copy all the dependencies from the distribution in the directories:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">/lib/required</code></li><li class="listitem"><code class="literal">/lib/ehcache</code></li><li class="listitem">Optionally - depending on your container -
+you might need some of the jars from <code class="literal">/lib/provided</code></li></ul></div></div><div class="section" title="10.1.2. Ehcache specific configuration properties"><div class="titlepage"><div><div><h3 class="title"><a id="ogm-ehcache-configuration-properties"/>10.1.2. Ehcache specific configuration properties</h3></div></div></div><p>Hibernate OGM expects you to define an Ehcache configuration
+in its own configuration resource;
+all what we need to set it the resource name.</p><p>To use the default configuration provided by Hibernate OGM -
+which is a good starting point for new users - you don’t have to set any property.</p><div class="variablelist" title="Ehcache datastore configuration properties"><p class="title"><strong>Ehcache datastore configuration properties</strong></p><dl><dt><span class="term">hibernate.ogm.datastore.provider</span></dt><dd>To use Ehcache as a datastore provider set it to <code class="literal">ehcache</code>.</dd><dt><span class="term">hibernate.ogm.ehcache.configuration_resource_name</span></dt><dd>Should point to the resource name of an Ehcache configuration file.
+Defaults to <code class="literal">org/hibernate/ogm/datastore/ehcache/default-ehcache.xml</code>.</dd><dt><span class="term"><code class="literal">hibernate.ogm.datastore.keyvalue.cache_storage</code></span></dt><dd><p class="simpara">The strategy for persisting data in EhCache.
+The following two strategies exist (values of the <code class="literal">org.hibernate.ogm.datastore.keyvalue.options.CacheMappingType</code> enum):</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">CACHE_PER_TABLE</code>: A dedicated cache will be used for each entity type, association type and id source table.</li><li class="listitem"><code class="literal">CACHE_PER_KIND</code>: Three caches will be used: one cache for all entities, one cache for all associations and one cache for all id sources.</li></ul></div><p class="simpara">Defaults to <code class="literal">CACHE_PER_TABLE</code>. It is the recommended strategy as it makes it easier to target a specific cache for a given entity.</p></dd></dl></div><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>When bootstrapping a session factory or entity manager factory programmatically,
+you should use the constants accessible via <code class="literal">EhcacheProperties</code>
+when specifying the configuration properties listed above.</p><p>Common properties shared between stores are declared on <code class="literal">OgmProperties</code>
+(a super interface of <code class="literal">EhcacheProperties</code>).</p><p>For maximum portability between stores, use the most generic interface possible.</p></div></div><div class="section" title="10.1.3. Cache names used by Hibernate OGM"><div class="titlepage"><div><div><h3 class="title"><a id="cache_names_used_by_hibernate_ogm_2"/>10.1.3. Cache names used by Hibernate OGM</h3></div></div></div><p>Depending on the cache mapping approach, Hibernate OGM will either:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">store each entity type, association type and id source table in a dedicated cache
+very much like what Hibernate ORM would do. This is the <code class="literal">CACHE_PER_TABLE</code> approach.</li><li class="listitem"><p class="simpara">store data in three different caches when using the <code class="literal">CACHE_PER_KIND</code> approach:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">ENTITIES</code>: is going to be used to store the main attributes of all your entities.</li><li class="listitem"><code class="literal">ASSOCIATIONS</code>: stores the association information representing the links between entities.</li><li class="listitem"><code class="literal">IDENTIFIER_STORE</code>: contains internal metadata that Hibernate OGM needs
+to provide sequences and auto-incremental numbers for primary key generation.</li></ul></div></li></ul></div><p>The preferred strategy is <code class="literal">CACHE_PER_TABLE</code> as it offers both more fine grained configuration options
+and the ability to work on specific entities in a more simple fashion.</p></div></div><div class="section" title="10.2. Storage principles"><div class="titlepage"><div><div><h2 class="title"><a id="ogm-ehcache-storage-principles"/>10.2. Storage principles</h2></div></div></div><p>To describe things simply, each entity is stored under a single key.
+The value itself is a map containing the columns / values pair.</p><p>Each association from one entity instance to (a set of) another is stored under a single key.
+The value contains the navigational information to the (set of) entity.</p><div class="section" title="10.2.1. Properties and built-in types"><div class="titlepage"><div><div><h3 class="title"><a id="ogm-ehcache-built-in-types"/>10.2.1. Properties and built-in types</h3></div></div></div><p>Each entity is represented by a map.
+Each property or more precisely column is represented by an entry in this map,
+the key being the column name.</p><p>Hibernate OGM supports by default the following property types:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">java.lang.String</code></li><li class="listitem"><code class="literal">java.lang.Character</code> (or char primitive)</li><li class="listitem"><code class="literal">java.lang.Boolean</code> (or boolean primitive); Optionally the annotations <code class="literal">@Type(type = "true_false")</code>, <code class="literal">@Type(type = "yes_no")</code> and <code class="literal">@Type(type = "numeric_boolean")</code> can be used to map boolean properties to the characters 'T'/'F', 'Y'/'N' or the int values 0/1, respectively.</li><li class="listitem"><code class="literal">java.lang.Byte</code> (or byte primitive)</li><li class="listitem"><code class="literal">java.lang.Short</code> (or short primitive)</li><li class="listitem"><code class="literal">java.lang.Integer</code> (or integer primitive)</li><li class="listitem"><code class="literal">java.lang.Long</code> (or long primitive)</li><li class="listitem"><code class="literal">java.lang.Integer</code> (or integer primitive)</li><li class="listitem"><code class="literal">java.lang.Float</code> (or float primitive)</li><li class="listitem"><code class="literal">java.lang.Double</code> (or double primitive)</li><li class="listitem"><code class="literal">java.math.BigDecimal</code></li><li class="listitem"><code class="literal">java.math.BigInteger</code></li><li class="listitem"><code class="literal">java.util.Calendar</code></li><li class="listitem"><code class="literal">java.util.Date</code></li><li class="listitem"><code class="literal">java.util.UUID</code></li><li class="listitem"><code class="literal">java.util.URL</code></li></ul></div><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>Hibernate OGM doesn’t store null values in Ehcache,
+setting a value to null is the same as removing the corresponding entry
+from Ehcache.</p><p>This can have consequences when it comes to queries on null value.</p></div></div><div class="section" title="10.2.2. Identifiers"><div class="titlepage"><div><div><h3 class="title"><a id="identifiers_2"/>10.2.2. Identifiers</h3></div></div></div><p>Entity identifiers are used to build the key in which the entity is stored in the cache.</p><p>The key is comprised of the following information:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">the identifier column names</li><li class="listitem">the identifier column values</li><li class="listitem">the entity table (for the <code class="literal">CACHE_PER_KIND</code> strategy)</li></ul></div><p>In <code class="literal">CACHE_PER_TABLE</code>, the table name is inferred from the cache name.
+In <code class="literal">CACHE_PER_KIND</code>, the table name is necessary to identify the entity in the generic cache.</p><div class="example"><a id="d0e5691"/><p class="title"><strong>Example 10.1. Define an identifier as a primitive type</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Bookmark {
+
+    @Id
+    private Long id;
+
+    private String title;
+
+    // getters, setters ...
+}</code></pre><div class="table"><a id="d0e5696"/><p class="title"><strong>Table 10.1. Content of the <code class="literal">Bookmark</code> cache in <code class="literal">CACHE_PER_TABLE</code></strong></p><div class="table-contents"><table summary="Content of the Bookmark cache in CACHE_PER_TABLE" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="2" align="center" valign="middle"><p>["id"], [42]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>42</p></td></tr><tr><td align="left" valign="top"><p>title</p></td><td align="left" valign="top"><p>"Hibernate OGM documentation"</p></td></tr></tbody></table></div></div><br class="table-break"/><div class="table"><a id="d0e5732"/><p class="title"><strong>Table 10.2. Content of the <code class="literal">ENTITIES</code> cache in <code class="literal">CACHE_PER_KIND</code></strong></p><div class="table-contents"><table summary="Content of the ENTITIES cache in CACHE_PER_KIND" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="2" align="center" valign="middle"><p>"Bookmark", ["id"], [42]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>42</p></td></tr><tr><td align="left" valign="top"><p>title</p></td><td align="left" valign="top"><p>"Hibernate OGM documentation"</p></td></tr></tbody></table></div></div><br class="table-break"/></div></div><br class="example-break"/><div class="example"><a id="d0e5768"/><p class="title"><strong>Example 10.2. Define an identifier using @EmbeddedId</strong></p><div class="example-contents"><pre><code class="language-java">@Embeddable
+public class NewsID implements Serializable {
+
+    private String title;
+    private String author;
+
+    // getters, setters ...
+}
+
+@Entity
+public class News {
+
+    @EmbeddedId
+    private NewsID newsId;
+    private String content;
+
+    // getters, setters ...
+}</code></pre><div class="table"><a id="d0e5773"/><p class="title"><strong>Table 10.3. Content of the <code class="literal">News</code> cache in <code class="literal">CACHE_PER_TABLE</code></strong></p><div class="table-contents"><table summary="Content of the News cache in CACHE_PER_TABLE" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="3" align="center" valign="middle"><p>[newsId.author, newsId.title], ["Guillaume", "How to use Hibernate OGM ?"]</p></td><td align="left" valign="top"><p>newsId.author</p></td><td align="left" valign="top"><p>"Guillaume"</p></td></tr><tr><td align="left" valign="top"><p>newsId.title</p></td><td align="left" valign="top"><p>"How to use Hibernate OGM ?"</p></td></tr><tr><td align="left" valign="top"><p>content</p></td><td align="left" valign="top"><p>"Simple, just like ORM but with a NoSQL database"</p></td></tr></tbody></table></div></div><br class="table-break"/><div class="table"><a id="d0e5816"/><p class="title"><strong>Table 10.4. Content of the <code class="literal">ENTITIES</code> cache in <code class="literal">CACHE_PER_KIND</code></strong></p><div class="table-contents"><table summary="Content of the ENTITIES cache in CACHE_PER_KIND" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="3" align="center" valign="middle"><p>"News", [newsId.author, newsId.title], ["Guillaume", "How to use Hibernate OGM ?"]</p></td><td align="left" valign="top"><p>newsId.author</p></td><td align="left" valign="top"><p>"Guillaume"</p></td></tr><tr><td align="left" valign="top"><p>newsId.title</p></td><td align="left" valign="top"><p>"How to use Hibernate OGM ?"</p></td></tr><tr><td align="left" valign="top"><p>content</p></td><td align="left" valign="top"><p>"Simple, just like ORM but with a NoSQL database"</p></td></tr></tbody></table></div></div><br class="table-break"/></div></div><br class="example-break"/><div class="section" title="10.2.2.1. Identifier generation strategies"><div class="titlepage"><div><div><h4 class="title"><a id="identifier_generation_strategies_2"/>10.2.2.1. Identifier generation strategies</h4></div></div></div><p>Since Ehcache has not native sequence nor identity column support,
+these are simulated using the table strategy, however their default values vary.
+We highly recommend you explicitly use a <code class="literal">TABLE</code> strategy if you want to generate a monotonic identifier.</p><p>But if you can, use a pure in-memory and scalable strategy like a UUID generator.</p><div class="example"><a id="d0e5869"/><p class="title"><strong>Example 10.3. Id generation strategy TABLE using default values</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class GuitarPlayer {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.TABLE)
+    private long id;
+
+    private String name;
+
+    // getters, setters ...
+}</code></pre><div class="table"><a id="d0e5874"/><p class="title"><strong>Table 10.5. Content of the <code class="literal">hibernate_sequences</code> cache in <code class="literal">CACHE_PER_TABLE</code></strong></p><div class="table-contents"><table summary="Content of the hibernate_sequences cache in CACHE_PER_TABLE" border="1"><colgroup><col width="50*" class="col_1"/><col width="50*" class="col_2"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th align="center" valign="top">NEXT VALUE</th></tr></thead><tbody><tr><td align="left" valign="top"><p>["sequence_name"], ["default"]</p></td><td align="center" valign="middle"><p>2</p></td></tr></tbody></table></div></div><br class="table-break"/><div class="table"><a id="d0e5899"/><p class="title"><strong>Table 10.6. Content of the IDENTIFIERS cache in <code class="literal">CACHE_PER_KIND</code></strong></p><div class="table-contents"><table summary="Content of the IDENTIFIERS cache in CACHE_PER_KIND" border="1"><colgroup><col width="50*" class="col_1"/><col width="50*" class="col_2"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th align="center" valign="top">NEXT VALUE</th></tr></thead><tbody><tr><td align="left" valign="top"><p>"hibernate_sequences", ["sequence_name"], ["default"]</p></td><td align="center" valign="middle"><p>2</p></td></tr></tbody></table></div></div><br class="table-break"/></div></div><br class="example-break"/><p>As you can see, in <code class="literal">CACHE_PER_TABLE</code>, the key does not contain the id source table name.
+It is inferred by the cache name hosting that key.</p><div class="example"><a id="d0e5926"/><p class="title"><strong>Example 10.4. Id generation strategy TABLE using a custom table</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class GuitarPlayer {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "guitarGen")
+    @TableGenerator(
+        name = "guitarGen",
+        table = "GuitarPlayerSequence",
+        pkColumnName = "seq"
+        pkColumnValue = "guitarPlayer",
+    )
+    private long id;
+
+    // getters, setters ...
+}</code></pre><div class="table"><a id="d0e5931"/><p class="title"><strong>Table 10.7. Content of the <code class="literal">GuitarPlayerSequence</code> cache in <code class="literal">CACHE_PER_TABLE</code></strong></p><div class="table-contents"><table summary="Content of the GuitarPlayerSequence cache in CACHE_PER_TABLE" border="1"><colgroup><col width="50*" class="col_1"/><col width="50*" class="col_2"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th align="center" valign="top">NEXT VALUE</th></tr></thead><tbody><tr><td align="left" valign="top"><p>["seq"], ["guitarPlayer"]</p></td><td align="center" valign="middle"><p>2</p></td></tr></tbody></table></div></div><br class="table-break"/><div class="table"><a id="d0e5956"/><p class="title"><strong>Table 10.8. Content of the IDENTIFIERS cache in <code class="literal">CACHE_PER_KIND</code></strong></p><div class="table-contents"><table summary="Content of the IDENTIFIERS cache in CACHE_PER_KIND" border="1"><colgroup><col width="50*" class="col_1"/><col width="50*" class="col_2"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th align="center" valign="top">NEXT VALUE</th></tr></thead><tbody><tr><td align="left" valign="top"><p>"GuitarPlayerSequence", ["seq"], ["guitarPlayer"]</p></td><td align="center" valign="middle"><p>2</p></td></tr></tbody></table></div></div><br class="table-break"/></div></div><br class="example-break"/><div class="example"><a id="d0e5978"/><p class="title"><strong>Example 10.5. SEQUENCE id generation strategy</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Song {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "songSequenceGenerator")
+  @SequenceGenerator(
+      name = "songSequenceGenerator",
+      sequenceName = "song_sequence",
+      initialValue = 2,
+      allocationSize = 20
+  )
+  private Long id;
+
+  private String title;
+
+  // getters, setters ...
+}</code></pre><div class="table"><a id="d0e5983"/><p class="title"><strong>Table 10.9. Content of the <code class="literal">hibernate_sequences</code> cache in <code class="literal">CACHE_PER_TABLE</code></strong></p><div class="table-contents"><table summary="Content of the hibernate_sequences cache in CACHE_PER_TABLE" border="1"><colgroup><col width="50*" class="col_1"/><col width="50*" class="col_2"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th align="center" valign="top">NEXT VALUE</th></tr></thead><tbody><tr><td align="left" valign="top"><p>["sequence_name"], ["song_sequence"]</p></td><td align="center" valign="middle"><p>11</p></td></tr></tbody></table></div></div><br class="table-break"/><div class="table"><a id="d0e6008"/><p class="title"><strong>Table 10.10. Content of the <code class="literal">IDENTIFIERS</code> cache in <code class="literal">CACHE_PER_KIND</code></strong></p><div class="table-contents"><table summary="Content of the IDENTIFIERS cache in CACHE_PER_KIND" border="1"><colgroup><col width="50*" class="col_1"/><col width="50*" class="col_2"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th align="center" valign="top">NEXT VALUE</th></tr></thead><tbody><tr><td align="left" valign="top"><p>"hibernate_sequences", "["sequence_name"], ["song_sequence"]</p></td><td align="center" valign="middle"><p>11</p></td></tr></tbody></table></div></div><br class="table-break"/></div></div><br class="example-break"/></div></div><div class="section" title="10.2.3. Entities"><div class="titlepage"><div><div><h3 class="title"><a id="entities_2"/>10.2.3. Entities</h3></div></div></div><p>Entities are stored in the cache named after the entity name when using the <code class="literal">CACHE_PER_TABLE</code> strategy.
+In the <code class="literal">CACHE_PER_KIND</code> strategy, entities are stored in a single cache named <code class="literal">ENTITIES</code>.</p><p>The key is comprised of the following information:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">the identifier column names</li><li class="listitem">the identifier column values</li><li class="listitem">the entity table (for the <code class="literal">CACHE_PER_KIND</code> strategy)</li></ul></div><p>In <code class="literal">CACHE_PER_TABLE</code>, the table name is inferred from the cache name.
+In <code class="literal">CACHE_PER_KIND</code>, the table name is necessary to identify the entity in the generic cache.</p><p>The entry value is itself a map which contains all the entity properties -
+or to be specific columns.
+Each column name and value is stored as a key / value pair in the map.</p><div class="example"><a id="d0e6072"/><p class="title"><strong>Example 10.6. Default JPA mapping for an entity</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class News {
+
+    @Id
+    private String id;
+    private String title;
+
+    // getters, setters ...
+}</code></pre><div class="table"><a id="d0e6077"/><p class="title"><strong>Table 10.11. Content of the <code class="literal">News</code> cache in <code class="literal">CACHE_PER_TYPE</code></strong></p><div class="table-contents"><table summary="Content of the News cache in CACHE_PER_TYPE" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="2" align="center" valign="middle"><p>["id"], ["1234-5678"]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"1234-5678"</p></td></tr><tr><td align="left" valign="top"><p>title</p></td><td align="left" valign="top"><p>"On the merits of NoSQL"</p></td></tr></tbody></table></div></div><br class="table-break"/><div class="table"><a id="d0e6113"/><p class="title"><strong>Table 10.12. Content of the <code class="literal">ENTITIES</code> cache in <code class="literal">CACHE_PER_KIND</code></strong></p><div class="table-contents"><table summary="Content of the ENTITIES cache in CACHE_PER_KIND" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="2" align="center" valign="middle"><p>"News", ["id"], ["1234-5678"]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"1234-5678"</p></td></tr><tr><td align="left" valign="top"><p>title</p></td><td align="left" valign="top"><p>"On the merits of NoSQL"</p></td></tr></tbody></table></div></div><br class="table-break"/></div></div><br class="example-break"/><p>As you can see, the table name is not part of the key for <code class="literal">CACHE_PER_TYPE</code>.
+In the rest of this section we will no longer show the <code class="literal">CACHE_PER_KIND</code> strategy.</p><div class="example"><a id="d0e6157"/><p class="title"><strong>Example 10.7. Rename field and collection using @Table and @Column</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+@Table(name = "Article")
+public class News {
+
+    @Id
+    private String id;
+
+    @Column(name = "headline")
+    private String title;
+
+    // getters, setters ...
+}</code></pre><div class="table"><a id="d0e6162"/><p class="title"><strong>Table 10.13. Content of the <code class="literal">Article</code> cache</strong></p><div class="table-contents"><table summary="Content of the Article cache" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="2" align="center" valign="middle"><p>["id"], ["1234-5678"]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"1234-5678"</p></td></tr><tr><td align="left" valign="top"><p>headline</p></td><td align="left" valign="top"><p>"On the merits of NoSQL"</p></td></tr></tbody></table></div></div><br class="table-break"/></div></div><br class="example-break"/><div class="section" title="10.2.3.1. Embedded objects and collections"><div class="titlepage"><div><div><h4 class="title"><a id="embedded_objects_and_collections_2"/>10.2.3.1. Embedded objects and collections</h4></div></div></div><div class="example"><a id="d0e6199"/><p class="title"><strong>Example 10.8. Embedded object</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class News {
+
+    @Id
+    private String id;
+    private String title;
+
+    @Embedded
+    private NewsPaper paper;
+
+    // getters, setters ...
+}
+
+@Embeddable
+public class NewsPaper {
+
+    private String name;
+    private String owner;
+
+    // getters, setters ...
+}</code></pre><div class="table"><a id="d0e6204"/><p class="title"><strong>Table 10.14. Content of the <code class="literal">News</code> cache</strong></p><div class="table-contents"><table summary="Content of the News cache" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="4" align="center" valign="middle"><p>["id"], ["1234-5678"]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"1234-5678"</p></td></tr><tr><td align="left" valign="top"><p>title</p></td><td align="left" valign="top"><p>"On the merits of NoSQL"</p></td></tr><tr><td align="left" valign="top"><p>paper.name</p></td><td align="left" valign="top"><p>"NoSQL journal of prophecies"</p></td></tr><tr><td align="left" valign="top"><p>paper.owner</p></td><td align="left" valign="top"><p>"Delphy"</p></td></tr></tbody></table></div></div><br class="table-break"/></div></div><br class="example-break"/><div class="example"><a id="d0e6252"/><p class="title"><strong>Example 10.9. @ElementCollection with one attribute</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class GrandMother {
+
+    @Id
+    private String id;
+
+    @ElementCollection
+    private List&lt;GrandChild&gt; grandChildren = new ArrayList&lt;GrandChild&gt;();
+
+    // getters, setters ...
+}
+
+@Embeddable
+public class GrandChild {
+
+    private String name;
+
+    // getters, setters ...
+}</code></pre><div class="table"><a id="d0e6257"/><p class="title"><strong>Table 10.15. Content of the <code class="literal">GrandMother</code> cache</strong></p><div class="table-contents"><table summary="Content of the GrandMother cache" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td align="center" valign="middle"><p>["id"], ["granny"]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"granny"</p></td></tr></tbody></table></div></div><br class="table-break"/><div class="table"><a id="d0e6284"/><p class="title"><strong>Table 10.16. Content of the <code class="literal">associations_GrandMother_grandChildren</code> cache in <code class="literal">CACHE_PER_TYPE</code></strong></p><div class="table-contents"><table summary="Content of the associations_GrandMother_grandChildren cache in CACHE_PER_TYPE" border="1"><colgroup><col width="25*" class="col_1"/><col width="25*" class="col_2"/><col width="25*" class="col_3"/><col width="25*" class="col_4"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th align="center" valign="top">ROW KEY</th><th colspan="2" align="center" valign="top">ROW MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="4" align="center" valign="middle"><p>["GrandMother_id"], ["granny"]</p></td><td rowspan="2" align="center" valign="middle"><p>["GrandMother_id", "name"], ["granny", "Leia"]</p></td><td align="left" valign="top"><p>GrandMother_id</p></td><td align="left" valign="top"><p>"granny"</p></td></tr><tr><td align="left" valign="top"><p>name</p></td><td align="left" valign="top"><p>"Leia"</p></td></tr><tr><td rowspan="2" align="center" valign="middle"><p>["GrandMother_id", "name"], ["granny", "Luke"]</p></td><td align="left" valign="top"><p>GrandMother_id</p></td><td align="left" valign="top"><p>"granny"</p></td></tr><tr><td align="left" valign="top"><p>name</p></td><td align="left" valign="top"><p>"Luke"</p></td></tr></tbody></table></div></div><br class="table-break"/><div class="table"><a id="d0e6343"/><p class="title"><strong>Table 10.17. Content of the <code class="literal">ASSOCIATIONS</code> cache in <code class="literal">CACHE_PER_KIND</code></strong></p><div class="table-contents"><table summary="Content of the ASSOCIATIONS cache in CACHE_PER_KIND" border="1"><colgroup><col width="25*" class="col_1"/><col width="25*" class="col_2"/><col width="25*" class="col_3"/><col width="25*" class="col_4"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th align="center" valign="top">ROW KEY</th><th colspan="2" align="center" valign="top">ROW MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="4" align="center" valign="middle"><p>"GrandMother_grandChildren", ["GrandMother_id"], ["granny"]</p></td><td rowspan="2" align="center" valign="middle"><p>["GrandMother_id", "name"], ["granny", "Leia"]</p></td><td align="left" valign="top"><p>GrandMother_id</p></td><td align="left" valign="top"><p>"granny"</p></td></tr><tr><td align="left" valign="top"><p>name</p></td><td align="left" valign="top"><p>"Leia"</p></td></tr><tr><td rowspan="2" align="center" valign="middle"><p>["GrandMother_id", "name"], ["granny", "Luke"]</p></td><td align="left" valign="top"><p>GrandMother_id</p></td><td align="left" valign="top"><p>"granny"</p></td></tr><tr><td align="left" valign="top"><p>name</p></td><td align="left" valign="top"><p>"Luke"</p></td></tr></tbody></table></div></div><br class="table-break"/></div></div><br class="example-break"/><p>Here, we see that the collection of elements is stored in a separate cache and entry.
+The association key is made of:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">the foreign key column names pointing to the owner of this association</li><li class="listitem">the foreign key column values pointing to the owner of this association</li><li class="listitem">the association table name in the <code class="literal">CACHE_PER_KIND</code> approach where all associations share the same cache</li></ul></div><p>The association entry is a map containing the representation of each entry in the collection.
+The keys of that map are made of:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">the names of the columns uniquely identifying that specific collection entry
+(e.g. for a <code class="literal">Set</code> this is all of the columns)</li><li class="listitem">the values of the columns uniquely identifying that specific collection entry</li></ul></div><p>The value attack to that collection entry key is a Map containing the key value pairs column name / column value.</p><div class="example"><a id="d0e6431"/><p class="title"><strong>Example 10.10. @ElementCollection with @OrderColumn</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class GrandMother {
+
+    @Id
+    private String id;
+
+    @ElementCollection
+    @OrderColumn( name = "birth_order" )
+    private List&lt;GrandChild&gt; grandChildren = new ArrayList&lt;GrandChild&gt;();
+
+    // getters, setters ...
+}
+
+@Embeddable
+public class GrandChild {
+
+    private String name;
+
+    // getters, setters ...
+}</code></pre><div class="table"><a id="d0e6436"/><p class="title"><strong>Table 10.18. Content of the <code class="literal">GrandMother</code> cache</strong></p><div class="table-contents"><table summary="Content of the GrandMother cache" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td align="center" valign="middle"><p>["id"], ["granny"]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"granny"</p></td></tr></tbody></table></div></div><br class="table-break"/><div class="table"><a id="d0e6463"/><p class="title"><strong>Table 10.19. Content of the <code class="literal">GrandMother_grandChildren</code> cache</strong></p><div class="table-contents"><table summary="Content of the GrandMother_grandChildren cache" border="1"><colgroup><col width="25*" class="col_1"/><col width="25*" class="col_2"/><col width="25*" class="col_3"/><col width="25*" class="col_4"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th align="center" valign="top">ROW KEY</th><th colspan="2" align="center" valign="top">ROW MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="6" align="center" valign="middle"><p>["GrandMother_id"], ["granny"]</p></td><td rowspan="3" align="center" valign="middle"><p>["GrandMother_id", "birth_order"], ["granny", 0]</p></td><td align="left" valign="top"><p>GrandMother_id</p></td><td align="left" valign="top"><p>"granny"</p></td></tr><tr><td align="left" valign="top"><p>birth_order</p></td><td align="left" valign="top"><p>0</p></td></tr><tr><td align="left" valign="top"><p>name</p></td><td align="left" valign="top"><p>"Leia"</p></td></tr><tr><td rowspan="3" align="center" valign="middle"><p>["GrandMother_id", "birth_order"], ["granny", 1]</p></td><td align="left" valign="top"><p>GrandMother_id</p></td><td align="left" valign="top"><p>"granny"</p></td></tr><tr><td align="left" valign="top"><p>birth_order</p></td><td align="left" valign="top"><p>1</p></td></tr><tr><td align="left" valign="top"><p>name</p></td><td align="left" valign="top"><p>"Luke"</p></td></tr></tbody></table></div></div><br class="table-break"/></div></div><br class="example-break"/><p>Here we used an indexed collection and to identify the entry in the collection,
+only the owning entity id and the index value is enough.</p></div></div><div class="section" title="10.2.4. Associations"><div class="titlepage"><div><div><h3 class="title"><a id="associations_2"/>10.2.4. Associations</h3></div></div></div><p>Associations between entities are mapped like (collection of) embeddables
+except that the target entity is represented by its identifier(s).</p><div class="example"><a id="d0e6541"/><p class="title"><strong>Example 10.11. Unidirectional one-to-one</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Vehicule {
+
+    @Id
+    private String id;
+    private String brand;
+
+    // getters, setters ...
+}
+
+@Entity
+public class Wheel {
+
+    @Id
+    private String id;
+    private double diameter;
+
+    @OneToOne
+    private Vehicule vehicule;
+
+    // getters, setters ...
+}</code></pre><div class="table"><a id="d0e6546"/><p class="title"><strong>Table 10.20. Content of the <code class="literal">Vehicule</code> cache</strong></p><div class="table-contents"><table summary="Content of the Vehicule cache" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="2" align="center" valign="middle"><p>["id"], ["V_01"]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"V_01"</p></td></tr><tr><td align="left" valign="top"><p>brand</p></td><td align="left" valign="top"><p>"Mercedes"</p></td></tr></tbody></table></div></div><br class="table-break"/><div class="table"><a id="d0e6580"/><p class="title"><strong>Table 10.21. Content of the <code class="literal">Wheel</code> cache</strong></p><div class="table-contents"><table summary="Content of the Wheel cache" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="3" align="center" valign="middle"><p>["id"], ["W001"]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"W001"</p></td></tr><tr><td align="left" valign="top"><p>diameter</p></td><td align="left" valign="top"><p>0.0</p></td></tr><tr><td align="left" valign="top"><p>vehicule_id</p></td><td align="left" valign="top"><p>"V_01"</p></td></tr></tbody></table></div></div><br class="table-break"/></div></div><br class="example-break"/><div class="example"><a id="ehcache-in-entity-one-to-one-join-column"/><p class="title"><strong>Example 10.12. Unidirectional one-to-one with @JoinColumn</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Vehicule {
+
+    @Id
+    private String id;
+    private String brand;
+
+    // getters, setters ...
+}
+
+
+@Entity
+public class Wheel {
+
+    @Id
+    private String id;
+    private double diameter;
+
+    @OneToOne
+    @JoinColumn( name = "part_of" )
+    private Vehicule vehicule;
+
+    // getters, setters ...
+}</code></pre><div class="table"><a id="d0e6626"/><p class="title"><strong>Table 10.22. Content of the <code class="literal">Vehicle</code> cache</strong></p><div class="table-contents"><table summary="Content of the Vehicle cache" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="2" align="center" valign="middle"><p>["id"], ["V_01"]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"V_01"</p></td></tr><tr><td align="left" valign="top"><p>brand</p></td><td align="left" valign="top"><p>"Mercedes"</p></td></tr></tbody></table></div></div><br class="table-break"/><div class="table"><a id="d0e6660"/><p class="title"><strong>Table 10.23. Content of the <code class="literal">Wheel</code> cache</strong></p><div class="table-contents"><table summary="Content of the Wheel cache" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="3" align="center" valign="middle"><p>"Wheel", ["id"], ["W001"]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"W001"</p></td></tr><tr><td align="left" valign="top"><p>diameter</p></td><td align="left" valign="top"><p>0.0</p></td></tr><tr><td align="left" valign="top"><p>part_of</p></td><td align="left" valign="top"><p>"V_01"</p></td></tr></tbody></table></div></div><br class="table-break"/></div></div><br class="example-break"/><div class="example"><a id="d0e6701"/><p class="title"><strong>Example 10.13. Unidirectional one-to-one with @MapsId and @PrimaryKeyJoinColumn</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Vehicule {
+
+    @Id
+    private String id;
+    private String brand;
+
+    // getters, setters ...
+}
+
+@Entity
+public class Wheel {
+
+    @Id
+    private String id;
+    private double diameter;
+
+    @OneToOne
+    @PrimaryKeyJoinColumn
+    @MapsId
+    private Vehicule vehicule;
+
+    // getters, setters ...
+}</code></pre><div class="table"><a id="d0e6706"/><p class="title"><strong>Table 10.24. Content of the <code class="literal">Vehicle</code> cache</strong></p><div class="table-contents"><table summary="Content of the Vehicle cache" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="2" align="center" valign="middle"><p>["id"], ["V_01"]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"V_01"</p></td></tr><tr><td align="left" valign="top"><p>brand</p></td><td align="left" valign="top"><p>"Mercedes"</p></td></tr></tbody></table></div></div><br class="table-break"/><div class="table"><a id="d0e6740"/><p class="title"><strong>Table 10.25. Content of the <code class="literal">Wheel</code> cache</strong></p><div class="table-contents"><table summary="Content of the Wheel cache" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="2" align="center" valign="middle"><p>["vehicule_id"], ["V_01"]</p></td><td align="left" valign="top"><p>vehicule_id</p></td><td align="left" valign="top"><p>"V_01"</p></td></tr><tr><td align="left" valign="top"><p>diameter</p></td><td align="left" valign="top"><p>0.0</p></td></tr></tbody></table></div></div><br class="table-break"/></div></div><br class="example-break"/><div class="example"><a id="d0e6774"/><p class="title"><strong>Example 10.14. Bidirectional one-to-one</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Husband {
+
+    @Id
+    private String id;
+    private String name;
+
+    @OneToOne
+    private Wife wife;
+
+    // getters, setters ...
+}
+
+@Entity
+public class Wife {
+
+    @Id
+    private String id;
+    private String name;
+
+    @OneToOne(mappedBy="wife")
+    private Husband husband;
+
+    // getters, setters ...
+}</code></pre><div class="table"><a id="d0e6779"/><p class="title"><strong>Table 10.26. Content of the <code class="literal">Husband</code> cache</strong></p><div class="table-contents"><table summary="Content of the Husband cache" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="3" align="center" valign="middle"><p>["id"], ["alex"]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"alex"</p></td></tr><tr><td align="left" valign="top"><p>name</p></td><td align="left" valign="top"><p>"Alex"</p></td></tr><tr><td align="left" valign="top"><p>wife</p></td><td align="left" valign="top"><p>"bea"</p></td></tr></tbody></table></div></div><br class="table-break"/><div class="table"><a id="d0e6820"/><p class="title"><strong>Table 10.27. Content of the <code class="literal">Wife</code> cache</strong></p><div class="table-contents"><table summary="Content of the Wife cache" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="2" align="center" valign="middle"><p>["id"], ["bea"]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"bea"</p></td></tr><tr><td align="left" valign="top"><p>name</p></td><td align="left" valign="top"><p>"Bea"</p></td></tr></tbody></table></div></div><br class="table-break"/><div class="table"><a id="d0e6854"/><p class="title"><strong>Table 10.28. Content of the <code class="literal">associations_Husband</code> cache</strong></p><div class="table-contents"><table summary="Content of the associations_Husband cache" border="1"><colgroup><col width="25*" class="col_1"/><col width="25*" class="col_2"/><col width="25*" class="col_3"/><col width="25*" class="col_4"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th align="center" valign="top">ROW KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="2" align="center" valign="middle"><p>["wife"], ["bea"]</p></td><td rowspan="2" align="center" valign="middle"><p>["id", "wife"], ["alex", "bea"]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"alex"</p></td></tr><tr><td align="left" valign="top"><p>wife</p></td><td align="left" valign="top"><p>"bea"</p></td></tr></tbody></table></div></div><br class="table-break"/></div></div><br class="example-break"/><div class="example"><a id="d0e6894"/><p class="title"><strong>Example 10.15. Unidirectional one-to-many</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Basket {
+
+    @Id
+    private String id;
+
+    private String owner;
+
+    @OneToMany
+    private List&lt;Product&gt; products = new ArrayList&lt;Product&gt;();
+
+    // getters, setters ...
+}
+
+@Entity
+public class Product {
+
+    @Id
+    private String name;
+
+    private String description;
+
+    // getters, setters ...
+}</code></pre><div class="table"><a id="d0e6899"/><p class="title"><strong>Table 10.29. Content of the <code class="literal">Basket</code> cache</strong></p><div class="table-contents"><table summary="Content of the Basket cache" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="2" align="center" valign="middle"><p>["id"], ["davide_basket"]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"davide_basket"</p></td></tr><tr><td align="left" valign="top"><p>owner</p></td><td align="left" valign="top"><p>"Davide"</p></td></tr></tbody></table></div></div><br class="table-break"/><div class="table"><a id="d0e6933"/><p class="title"><strong>Table 10.30. Content of the <code class="literal">Product</code> cache</strong></p><div class="table-contents"><table summary="Content of the Product cache" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="2" align="center" valign="middle"><p>["name"], ["Beer"]</p></td><td align="left" valign="top"><p>name</p></td><td align="left" valign="top"><p>"Beer"</p></td></tr><tr><td align="left" valign="top"><p>description</p></td><td align="left" valign="top"><p>"Tactical Nuclear Penguin"</p></td></tr><tr><td rowspan="2" align="center" valign="middle"><p>["name"], ["Pretzel"]</p></td><td align="left" valign="top"><p>name</p></td><td align="left" valign="top"><p>"Pretzel"</p></td></tr><tr><td align="left" valign="top"><p>description</p></td><td align="left" valign="top"><p>"Glutino Pretzel Sticks"</p></td></tr></tbody></table></div></div><br class="table-break"/><div class="table"><a id="d0e6984"/><p class="title"><strong>Table 10.31. Content of the <code class="literal">associations_Basket_Product</code> cache</strong></p><div class="table-contents"><table summary="Content of the associations_Basket_Product cache" border="1"><colgroup><col width="25*" class="col_1"/><col width="25*" class="col_2"/><col width="25*" class="col_3"/><col width="25*" class="col_4"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th align="center" valign="top">ROW KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="4" align="center" valign="middle"><p>["Basket_id"], ["davide_basket"]</p></td><td rowspan="2" align="center" valign="middle"><p>["Basket_id", "products_name"], ["davide_basket", "Beer"]</p></td><td align="left" valign="top"><p>Basket_id</p></td><td align="left" valign="top"><p>"davide_basket"</p></td></tr><tr><td align="left" valign="top"><p>products_name</p></td><td align="left" valign="top"><p>"Beer"</p></td></tr><tr><td rowspan="2" align="center" valign="middle"><p>["Basket_id", "products_name"], ["davide_basket", "Pretzel"]</p></td><td align="left" valign="top"><p>Basket_id</p></td><td align="left" valign="top"><p>"davide_basket"</p></td></tr><tr><td align="left" valign="top"><p>products_name</p></td><td align="left" valign="top"><p>"Pretzel"</p></td></tr></tbody></table></div></div><br class="table-break"/></div></div><br class="example-break"/><div class="example"><a id="d0e7041"/><p class="title"><strong>Example 10.16. Unidirectional one-to-many with <code class="literal">@JoinTable</code></strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Basket {
+
+    @Id
+    private String id;
+
+    private String owner;
+
+    @OneToMany
+    @JoinTable( name = "BasketContent" )
+    private List&lt;Product&gt; products = new ArrayList&lt;Product&gt;();
+
+    // getters, setters ...
+}
+
+@Entity
+public class Product {
+
+    @Id
+    private String name;
+
+    private String description;
+
+    // getters, setters ...
+}</code></pre><div class="table"><a id="d0e7048"/><p class="title"><strong>Table 10.32. Content of the <code class="literal">Basket</code> cache</strong></p><div class="table-contents"><table summary="Content of the Basket cache" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="2" align="center" valign="middle"><p>["id"], ["davide_basket"]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"davide_basket"</p></td></tr><tr><td align="left" valign="top"><p>owner</p></td><td align="left" valign="top"><p>"Davide"</p></td></tr></tbody></table></div></div><br class="table-break"/><div class="table"><a id="d0e7082"/><p class="title"><strong>Table 10.33. Content of the <code class="literal">Basket</code> cache</strong></p><div class="table-contents"><table summary="Content of the Basket cache" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="2" align="center" valign="middle"><p>["name"], ["Beer"]</p></td><td align="left" valign="top"><p>name</p></td><td align="left" valign="top"><p>"Beer"</p></td></tr><tr><td align="left" valign="top"><p>description</p></td><td align="left" valign="top"><p>"Tactical Nuclear Penguin"</p></td></tr><tr><td rowspan="2" align="center" valign="middle"><p>["name"], ["Pretzel"]</p></td><td align="left" valign="top"><p>name</p></td><td align="left" valign="top"><p>"Pretzel"</p></td></tr><tr><td align="left" valign="top"><p>description</p></td><td align="left" valign="top"><p>"Glutino Pretzel Sticks"</p></td></tr></tbody></table></div></div><br class="table-break"/><div class="table"><a id="d0e7133"/><p class="title"><strong>Table 10.34. Content of the <code class="literal">associations_BasketContent</code> cache</strong></p><div class="table-contents"><table summary="Content of the associations_BasketContent cache" border="1"><colgroup><col width="25*" class="col_1"/><col width="25*" class="col_2"/><col width="25*" class="col_3"/><col width="25*" class="col_4"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th align="center" valign="top">ROW KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="4" align="center" valign="middle"><p>["Basket_id"], ["davide_basket"]</p></td><td rowspan="2" align="center" valign="middle"><p>["Basket_id", "products_name"], ["davide_basket", "Beer"]</p></td><td align="left" valign="top"><p>Basket_id</p></td><td align="left" valign="top"><p>"davide_basket"</p></td></tr><tr><td align="left" valign="top"><p>products_name</p></td><td align="left" valign="top"><p>"Beer"</p></td></tr><tr><td rowspan="2" align="center" valign="middle"><p>["Basket_id", "products_name"], ["davide_basket", "Pretzel"]</p></td><td align="left" valign="top"><p>Basket_id</p></td><td align="left" valign="top"><p>"davide_basket"</p></td></tr><tr><td align="left" valign="top"><p>products_name</p></td><td align="left" valign="top"><p>"Pretzel"</p></td></tr></tbody></table></div></div><br class="table-break"/></div></div><br class="example-break"/><div class="example"><a id="d0e7190"/><p class="title"><strong>Example 10.17. Unidirectional one-to-many using maps with defaults</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class User {
+
+    @Id
+    private String id;
+
+    @OneToMany
+    private Map&lt;String, Address&gt; addresses = new HashMap&lt;String, Address&gt;();
+
+    // getters, setters ...
+}
+
+@Entity
+public class Address {
+
+    @Id
+    private String id;
+    private String city;
+
+    // getters, setters ...
+}</code></pre><div class="table"><a id="d0e7195"/><p class="title"><strong>Table 10.35. Content of the <code class="literal">User</code> cache</strong></p><div class="table-contents"><table summary="Content of the User cache" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td align="center" valign="middle"><p>["id"], ["user_001"]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"user_001"</p></td></tr></tbody></table></div></div><br class="table-break"/><div class="table"><a id="d0e7222"/><p class="title"><strong>Table 10.36. Content of the <code class="literal">Address</code> cache</strong></p><div class="table-contents"><table summary="Content of the Address cache" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="2" align="center" valign="middle"><p>["id"], ["address_001"]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"address_001"</p></td></tr><tr><td align="left" valign="top"><p>city</p></td><td align="left" valign="top"><p>"Rome"</p></td></tr><tr><td rowspan="2" align="center" valign="middle"><p>["id"], ["address_002"]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"address_002"</p></td></tr><tr><td align="left" valign="top"><p>city</p></td><td align="left" valign="top"><p>"Paris"</p></td></tr></tbody></table></div></div><br class="table-break"/><div class="table"><a id="d0e7273"/><p class="title"><strong>Table 10.37. Content of the <code class="literal">associations_User_address</code> cache</strong></p><div class="table-contents"><table summary="Content of the associations_User_address cache" border="1"><colgroup><col width="25*" class="col_1"/><col width="25*" class="col_2"/><col width="25*" class="col_3"/><col width="25*" class="col_4"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th align="center" valign="top">ROW KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="6" align="center" valign="middle"><p>["User_id"], "user_001"]</p></td><td rowspan="3" align="center" valign="middle"><p>["User_id", "addresses_KEY"], ["user_001", "home"]</p></td><td align="left" valign="top"><p>User_id</p></td><td align="left" valign="top"><p>"user_001"</p></td></tr><tr><td align="left" valign="top"><p>addresses_KEY</p></td><td align="left" valign="top"><p>"home"</p></td></tr><tr><td align="left" valign="top"><p>addresses_id</p></td><td align="left" valign="top"><p>"address_001"</p></td></tr><tr><td rowspan="3" align="center" valign="middle"><p>["User_id", "addresses_KEY"], ["user_001", "work"]</p></td><td align="left" valign="top"><p>User_id</p></td><td align="left" valign="top"><p>"user_002"</p></td></tr><tr><td align="left" valign="top"><p>addresses_KEY</p></td><td align="left" valign="top"><p>"work"</p></td></tr><tr><td align="left" valign="top"><p>addresses_id</p></td><td align="left" valign="top"><p>"address_002"</p></td></tr></tbody></table></div></div><br class="table-break"/></div></div><br class="example-break"/><div class="example"><a id="d0e7344"/><p class="title"><strong>Example 10.18. Unidirectional one-to-many using maps with @MapKeyColumn</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class User {
+
+    @Id
+    private String id;
+
+    @OneToMany
+    @MapKeyColumn(name = "addressType")
+    private Map&lt;String, Address&gt; addresses = new HashMap&lt;String, Address&gt;();
+
+    // getters, setters ...
+}
+
+@Entity
+public class Address {
+
+    @Id
+    private String id;
+    private String city;
+
+    // getters, setters ...
+}</code></pre><div class="table"><a id="d0e7349"/><p class="title"><strong>Table 10.38. Content of the <code class="literal">User</code> cache</strong></p><div class="table-contents"><table summary="Content of the User cache" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td align="center" valign="middle"><p>["id"], ["user_001"]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"user_001"</p></td></tr></tbody></table></div></div><br class="table-break"/><div class="table"><a id="d0e7376"/><p class="title"><strong>Table 10.39. Content of the <code class="literal">Address</code> cache</strong></p><div class="table-contents"><table summary="Content of the Address cache" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="2" align="center" valign="middle"><p>["id"], ["address_001"]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"address_001"</p></td></tr><tr><td align="left" valign="top"><p>city</p></td><td align="left" valign="top"><p>"Rome"</p></td></tr><tr><td rowspan="2" align="center" valign="middle"><p>["id"], ["address_002"]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"address_002"</p></td></tr><tr><td align="left" valign="top"><p>city</p></td><td align="left" valign="top"><p>"Paris"</p></td></tr></tbody></table></div></div><br class="table-break"/><div class="table"><a id="d0e7427"/><p class="title"><strong>Table 10.40. Content of the <code class="literal">associations_User_address</code> cache</strong></p><div class="table-contents"><table summary="Content of the associations_User_address cache" border="1"><colgroup><col width="25*" class="col_1"/><col width="25*" class="col_2"/><col width="25*" class="col_3"/><col width="25*" class="col_4"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th align="center" valign="top">ROW KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="6" align="center" valign="middle"><p>["User_id"], "user_001"]</p></td><td rowspan="3" align="center" valign="middle"><p>["User_id", "addressType"], ["user_001", "home"]</p></td><td align="left" valign="top"><p>User_id</p></td><td align="left" valign="top"><p>"user_001"</p></td></tr><tr><td align="left" valign="top"><p>addressesType</p></td><td align="left" valign="top"><p>"home"</p></td></tr><tr><td align="left" valign="top"><p>addresses_id</p></td><td align="left" valign="top"><p>"address_001"</p></td></tr><tr><td rowspan="3" align="center" valign="middle"><p>["User_id", "addressType"], ["user_001", "work"]</p></td><td align="left" valign="top"><p>User_id</p></td><td align="left" valign="top"><p>"user_002"</p></td></tr><tr><td align="left" valign="top"><p>addressesType</p></td><td align="left" valign="top"><p>"work"</p></td></tr><tr><td align="left" valign="top"><p>addresses_id</p></td><td align="left" valign="top"><p>"address_002"</p></td></tr></tbody></table></div></div><br class="table-break"/></div></div><br class="example-break"/><div class="example"><a id="d0e7498"/><p class="title"><strong>Example 10.19. Unidirectional many-to-one</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class JavaUserGroup {
+
+    @Id
+    private String jugId;
+    private String name;
+
+    // getters, setters ...
+}
+
+@Entity
+public class Member {
+
+    @Id
+    private String id;
+    private String name;
+
+    @ManyToOne
+    private JavaUserGroup memberOf;
+
+    // getters, setters ...
+}</code></pre><div class="table"><a id="d0e7503"/><p class="title"><strong>Table 10.41. Content of the <code class="literal">JavaUserGroup</code> cache</strong></p><div class="table-contents"><table summary="Content of the JavaUserGroup cache" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="2" align="center" valign="middle"><p>["jugId"], ["summer_camp"]</p></td><td align="left" valign="top"><p>jugId</p></td><td align="left" valign="top"><p>"summer_camp"</p></td></tr><tr><td align="left" valign="top"><p>name</p></td><td align="left" valign="top"><p>"JUG Summer Camp"</p></td></tr></tbody></table></div></div><br class="table-break"/><div class="table"><a id="d0e7537"/><p class="title"><strong>Table 10.42. Content of the <code class="literal">Member</code> cache</strong></p><div class="table-contents"><table summary="Content of the Member cache" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="3" align="center" valign="middle"><p>["member_id"], ["emmanuel"]</p></td><td align="left" valign="top"><p>member_id</p></td><td align="left" valign="top"><p>"emmanuel"</p></td></tr><tr><td align="left" valign="top"><p>name</p></td><td align="left" valign="top"><p>"Emmanuel Bernard"</p></td></tr><tr><td align="left" valign="top"><p>memberOf_jug_id</p></td><td align="left" valign="top"><p>"summer_camp"</p></td></tr><tr><td rowspan="3" align="center" valign="middle"><p>["member_id"], ["jerome"]</p></td><td align="left" valign="top"><p>member_id</p></td><td align="left" valign="top"><p>"jerome"</p></td></tr><tr><td align="left" valign="top"><p>name</p></td><td align="left" valign="top"><p>"Jerome"</p></td></tr><tr><td align="left" valign="top"><p>memberOf_jug_id</p></td><td align="left" valign="top"><p>"summer_camp"</p></td></tr></tbody></table></div></div><br class="table-break"/></div></div><br class="example-break"/><div class="example"><a id="d0e7602"/><p class="title"><strong>Example 10.20. Bidirectional many-to-one</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class SalesForce {
+
+    @Id
+    private String id;
+    private String corporation;
+
+    @OneToMany(mappedBy = "salesForce")
+    private Set&lt;SalesGuy&gt; salesGuys = new HashSet&lt;SalesGuy&gt;();
+
+    // getters, setters ...
+}
+
+@Entity
+public class SalesGuy {
+    private String id;
+    private String name;
+
+    @ManyToOne
+    private SalesForce salesForce;
+
+    // getters, setters ...
+}</code></pre><div class="table"><a id="d0e7607"/><p class="title"><strong>Table 10.43. Content of the <code class="literal">SalesForce</code> cache</strong></p><div class="table-contents"><table summary="Content of the SalesForce cache" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="2" align="center" valign="middle"><p>["id"], ["red_hat"]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"red_hat"</p></td></tr><tr><td align="left" valign="top"><p>corporation</p></td><td align="left" valign="top"><p>"Red Hat"</p></td></tr></tbody></table></div></div><br class="table-break"/><div class="table"><a id="d0e7641"/><p class="title"><strong>Table 10.44. Content of the <code class="literal">SalesGuy</code> cache</strong></p><div class="table-contents"><table summary="Content of the SalesGuy cache" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="3" align="center" valign="middle"><p>["id"], ["eric"]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"eric"</p></td></tr><tr><td align="left" valign="top"><p>name</p></td><td align="left" valign="top"><p>"Eric"</p></td></tr><tr><td align="left" valign="top"><p>salesForce_id</p></td><td align="left" valign="top"><p>"red_hat"</p></td></tr><tr><td rowspan="3" align="center" valign="middle"><p>["id"], ["simon"]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"simon"</p></td></tr><tr><td align="left" valign="top"><p>name</p></td><td align="left" valign="top"><p>"Simon"</p></td></tr><tr><td align="left" valign="top"><p>salesForce_id</p></td><td align="left" valign="top"><p>"red_hat"</p></td></tr></tbody></table></div></div><br class="table-break"/><div class="table"><a id="d0e7706"/><p class="title"><strong>Table 10.45. Content of the <code class="literal">associations_SalesGuy</code> cache</strong></p><div class="table-contents"><table summary="Content of the associations_SalesGuy cache" border="1"><colgroup><col width="25*" class="col_1"/><col width="25*" class="col_2"/><col width="25*" class="col_3"/><col width="25*" class="col_4"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th align="center" valign="top">ROW KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="4" align="center" valign="middle"><p>["salesForce_id"], ["red_hat"]</p></td><td rowspan="2" align="center" valign="middle"><p>["salesForce_id", "id"], ["red_hat", "eric"]</p></td><td align="left" valign="top"><p>salesForce_id</p></td><td align="left" valign="top"><p>"red_hat"</p></td></tr><tr><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"eric"</p></td></tr><tr><td rowspan="2" align="center" valign="middle"><p>["salesForce_id", "id"], ["red_hat", "simon"]</p></td><td align="left" valign="top"><p>salesForce_id</p></td><td align="left" valign="top"><p>"red_hat"</p></td></tr><tr><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"simon"</p></td></tr></tbody></table></div></div><br class="table-break"/></div></div><br class="example-break"/><div class="example"><a id="d0e7763"/><p class="title"><strong>Example 10.21. Unidirectional many-to-many</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class Student {
+
+    @Id
+    private String id;
+    private String name;
+
+    // getters, setters ...
+}
+
+@Entity
+public class ClassRoom {
+
+    @Id
+    private long id;
+    private String lesson;
+
+    @ManyToMany
+    private List&lt;Student&gt; students = new ArrayList&lt;Student&gt;();
+
+    // getters, setters ...
+}</code></pre><p>The "Math" class has 2 students: John Doe and Mario Rossi</p><p>The "English" class has 2 students: Kate Doe and Mario Rossi</p><div class="table"><a id="d0e7772"/><p class="title"><strong>Table 10.46. Content of the <code class="literal">ClassRoom</code> cache</strong></p><div class="table-contents"><table summary="Content of the ClassRoom cache" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="2" align="center" valign="middle"><p>["id"], [1]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>1</p></td></tr><tr><td align="left" valign="top"><p>name</p></td><td align="left" valign="top"><p>"Math"</p></td></tr><tr><td rowspan="2" align="center" valign="middle"><p>["id"], [2]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>2</p></td></tr><tr><td align="left" valign="top"><p>name</p></td><td align="left" valign="top"><p>"English"</p></td></tr></tbody></table></div></div><br class="table-break"/><div class="table"><a id="d0e7823"/><p class="title"><strong>Table 10.47. Content of the <code class="literal">Student</code> cache</strong></p><div class="table-contents"><table summary="Content of the Student cache" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="2" align="center" valign="middle"><p>["id"], ["john"]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"john"</p></td></tr><tr><td align="left" valign="top"><p>name</p></td><td align="left" valign="top"><p>"John Doe"</p></td></tr><tr><td rowspan="2" align="center" valign="middle"><p>["id"], ["mario"]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"mario"</p></td></tr><tr><td align="left" valign="top"><p>name</p></td><td align="left" valign="top"><p>"Mario Rossi"</p></td></tr><tr><td rowspan="2" align="center" valign="middle"><p>["id"], ["kate"]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"kate"</p></td></tr><tr><td align="left" valign="top"><p>name</p></td><td align="left" valign="top"><p>"Kate Doe"</p></td></tr></tbody></table></div></div><br class="table-break"/><div class="table"><a id="d0e7891"/><p class="title"><strong>Table 10.48. Content of the <code class="literal">associations_ClassRoom_Student</code> cache</strong></p><div class="table-contents"><table summary="Content of the associations_ClassRoom_Student cache" border="1"><colgroup><col width="25*" class="col_1"/><col width="25*" class="col_2"/><col width="25*" class="col_3"/><col width="25*" class="col_4"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th align="center" valign="top">ROW KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="4" align="center" valign="middle"><p>["ClassRoom_id"], [1]</p></td><td rowspan="2" align="center" valign="middle"><p>["ClassRoom_id", "students_id"], [1, "mario"]</p></td><td align="left" valign="top"><p>ClassRoom_id</p></td><td align="left" valign="top"><p>1</p></td></tr><tr><td align="left" valign="top"><p>students_id</p></td><td align="left" valign="top"><p>"mario"</p></td></tr><tr><td rowspan="2" align="center" valign="middle"><p>["ClassRoom_id", "students_id"], [1, "john"]</p></td><td align="left" valign="top"><p>ClassRoom_id</p></td><td align="left" valign="top"><p>1</p></td></tr><tr><td align="left" valign="top"><p>students_id</p></td><td align="left" valign="top"><p>"john"</p></td></tr><tr><td rowspan="4" align="center" valign="middle"><p>["ClassRoom_id"], [2]</p></td><td rowspan="2" align="center" valign="middle"><p>["ClassRoom_id", "students_id"], [2, "kate"]</p></td><td align="left" valign="top"><p>ClassRoom_id</p></td><td align="left" valign="top"><p>2</p></td></tr><tr><td align="left" valign="top"><p>students_id</p></td><td align="left" valign="top"><p>"kate"</p></td></tr><tr><td rowspan="2" align="center" valign="middle"><p>["ClassRoom_id", "students_id"], [2, "mario"]</p></td><td align="left" valign="top"><p>ClassRoom_id</p></td><td align="left" valign="top"><p>2</p></td></tr><tr><td align="left" valign="top"><p>students_id</p></td><td align="left" valign="top"><p>"mario"</p></td></tr></tbody></table></div></div><br class="table-break"/></div></div><br class="example-break"/><div class="example"><a id="d0e7985"/><p class="title"><strong>Example 10.22. Bidirectional many-to-many</strong></p><div class="example-contents"><pre><code class="language-java">@Entity
+public class AccountOwner {
+
+    @Id
+    private String id;
+
+    private String SSN;
+
+    @ManyToMany
+    private Set&lt;BankAccount&gt; bankAccounts;
+
+    // getters, setters ...
+}
+
+@Entity
+public class BankAccount {
+
+    @Id
+    private String id;
+
+    private String accountNumber;
+
+    @ManyToMany( mappedBy = "bankAccounts" )
+    private Set&lt;AccountOwner&gt; owners = new HashSet&lt;AccountOwner&gt;();
+
+    // getters, setters ...
+}</code></pre><p>David owns 2 accounts: "012345" and "ZZZ-009"</p><div class="table"><a id="d0e7992"/><p class="title"><strong>Table 10.49. Content of the <code class="literal">AccountOwner</code> cache</strong></p><div class="table-contents"><table summary="Content of the AccountOwner cache" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="2" align="center" valign="middle"><p>["id"], ["David"]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"David"</p></td></tr><tr><td align="left" valign="top"><p>SSN</p></td><td align="left" valign="top"><p>"0123456"</p></td></tr></tbody></table></div></div><br class="table-break"/><div class="table"><a id="d0e8026"/><p class="title"><strong>Table 10.50. Content of the <code class="literal">BankAccount</code> cache</strong></p><div class="table-contents"><table summary="Content of the BankAccount cache" border="1"><colgroup><col width="33*" class="col_1"/><col width="33*" class="col_2"/><col width="33*" class="col_3"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="2" align="center" valign="middle"><p>["id"], ["account_1"]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"account_1"</p></td></tr><tr><td align="left" valign="top"><p>accountNumber</p></td><td align="left" valign="top"><p>"X2345000"</p></td></tr><tr><td rowspan="2" align="center" valign="middle"><p>["id"], ["account_2"]</p></td><td align="left" valign="top"><p>id</p></td><td align="left" valign="top"><p>"account_2"</p></td></tr><tr><td align="left" valign="top"><p>accountNumber</p></td><td align="left" valign="top"><p>"ZZZ-009"</p></td></tr></tbody></table></div></div><br class="table-break"/><div class="table"><a id="d0e8077"/><p class="title"><strong>Table 10.51. Content of the <code class="literal">AccountOwner_BankAccount</code> cache</strong></p><div class="table-contents"><table summary="Content of the AccountOwner_BankAccount cache" border="1"><colgroup><col width="25*" class="col_1"/><col width="25*" class="col_2"/><col width="25*" class="col_3"/><col width="25*" class="col_4"/></colgroup><thead><tr><th align="center" valign="top">KEY</th><th align="center" valign="top">ROW KEY</th><th colspan="2" align="center" valign="top">MAP ENTRIES</th></tr></thead><tbody><tr><td rowspan="2" align="center" valign="middle"><p>["bankAccounts_id"], ["account_1"]</p></td><td rowspan="2" align="center" valign="middle"><p>["bankAccounts_id", "owners_id"], ["account_1", "David"]</p></td><td align="left" valign="top"><p>bankAccounts_id</p></td><td align="left" valign="top"><p>"account_1"</p></td></tr><tr><td align="left" valign="top"><p>owners_id</p></td><td align="left" valign="top"><p>"David"</p></td></tr><tr><td rowspan="2" align="center" valign="middle"><p>["bankAccounts_id"], ["account_2"]</p></td><td rowspan="2" align="center" valign="middle"><p>["bankAccounts_id", "owners_id"], ["account_2", "David"]</p></td><td align="left" valign="top"><p>bankAccounts_id</p></td><td align="left" valign="top"><p>"account_2"</p></td></tr><tr><td align="left" valign="top"><p>owners_id</p></td><td align="left" valign="top"><p>"David"</p></td></tr><tr><td rowspan="4" align="center" valign="middle"><p>["owners_id"], ["David"]</p></td><td rowspan="2" align="center" valign="middle"><p>["owners_id", "banksAccounts_id"], ["David", "account_1"]</p></td><td align="left" valign="top"><p>bankAccounts_id</p></td><td align="left" valign="top"><p>"account_1"</p></td></tr><tr><td align="left" valign="top"><p>owners_id</p></td><td align="left" valign="top"><p>"David"</p></td></tr><tr><td rowspan="2" align="center" valign="middle"><p>["owners_id", "banksAccounts_id"], ["David", "account_2"]</p></td><td align="left" valign="top"><p>bankAccounts_id</p></td><td align="left" valign="top"><p>"account_2"</p></td></tr><tr><td align="left" valign="top"><p>owners_id</p></td><td align="left" valign="top"><p>"David"</p></td></tr></tbody></table></div></div><br class="table-break"/></div></div><br class="example-break"/></div></div><div class="section" title="10.3. Transactions"><div class="titlepage"><div><div><h2 class="title"><a id="ogm-ehcache-transactions"/>10.3. Transactions</h2></div></div></div><p>While Ehcache technically supports transactions,
+Hibernate OGM is currently unable to use them. Careful!</p><p>If you need this feature, it should be easy to implement:
+contributions welcome! See
+<a class="link" href="https://hibernate.onjira.com/browse/OGM-243">JIRA OGM-243</a>.</p></div></div><script xmlns="" xmlns:d="http://docbook.org/ns/docbook" type="text/javascript" src="highlight.js/highlight.pack.js"> </script><script xmlns="" xmlns:d="http://docbook.org/ns/docbook" type="text/javascript">hljs.initHighlightingOnLoad();</script><script type="text/javascript">
+dataLayer = [{'channel' : 'Hibernate', 'additional_tracking_code' : 'UA-45270411-3'}];
+(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NJWS5L');</script><noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-NJWS5L" height="0" width="0" style="display:none;visibility:hidden"> </iframe></noscript><hr xmlns="" xmlns:d="http://docbook.org/ns/docbook"/><a xmlns="" xmlns:d="http://docbook.org/ns/docbook" href="legalnotice.html"/><ul class="docnav"><li class="previous"><a accesskey="p" href="ch09.html"><strong>Prev</strong>Chapter 9. Infinispan</a></li><li class="up"><a accesskey="u" href="#"><strong>Up</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Home</strong></a></li><li class="next"><a accesskey="n" href="ch11.html"><strong>Next</strong>Chapter 11. MongoDB</a></li></ul><!-- HibernateDoc.OutdatedContent --><script src="//code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script><script src="/hibernate/_outdated-content/outdated-content.js" type="text/javascript"></script><script type="text/javascript">var jQuery_3_1 = $.noConflict(true); jQuery_3_1(document).ready(function() { HibernateDoc.OutdatedContent.install("ogm"); });</script><!-- /HibernateDoc.OutdatedContent --></body></html>

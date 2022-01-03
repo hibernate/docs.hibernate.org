@@ -1,0 +1,105 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>21.3.&nbsp;Cascading life cycle</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="example-parentchild.html" title="Chapter&nbsp;21.&nbsp;Example: Parent/Child">
+      <link rel="prev" href="example-parentchild-bidir.html" title="21.2.&nbsp;Bidirectional one-to-many">
+      <link rel="next" href="example-parentchild-update.html" title="21.4.&nbsp;Cascades and unsaved-value">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">21.3.&nbsp;Cascading life cycle</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="example-parentchild-bidir.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;21.&nbsp;Example: Parent/Child</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="example-parentchild-update.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="example-parentchild-cascades"></a>21.3.&nbsp;Cascading life cycle
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+                         The explicit call to <code class="literal">save()</code> is still annoying. We will address this by
+                         using cascades.
+                     
+         </p><pre class="programlisting">&lt;set name="children" inverse="true" cascade="all"&gt;
+    &lt;key column="parent_id"/&gt;
+    &lt;one-to-many class="Child"/&gt;
+&lt;/set&gt;</pre><p>
+                         This simplifies the code above to
+                     
+         </p><pre class="programlisting">Parent p = (Parent) session.load(Parent.class, pid);
+Child c = new Child();
+p.addChild(c);
+session.flush();</pre><p>
+                         Similarly, we don't need to iterate over the children when saving or deleting a <code class="literal">Parent</code>.
+                         The following removes <code class="literal">p</code> and all its children from the database.
+                     
+         </p><pre class="programlisting">Parent p = (Parent) session.load(Parent.class, pid);
+session.delete(p);
+session.flush();</pre><p>
+                         However, this code
+                     
+         </p><pre class="programlisting">Parent p = (Parent) session.load(Parent.class, pid);
+Child c = (Child) p.getChildren().iterator().next();
+p.getChildren().remove(c);
+c.setParent(null);
+session.flush();</pre><p>
+                         will not remove <code class="literal">c</code> from the database; it will ony remove the link to <code class="literal">p</code>
+                         (and cause a <code class="literal">NOT NULL</code> constraint violation, in this case). You need to explicitly
+                         <code class="literal">delete()</code> the <code class="literal">Child</code>.
+                     
+         </p><pre class="programlisting">Parent p = (Parent) session.load(Parent.class, pid);
+Child c = (Child) p.getChildren().iterator().next();
+p.getChildren().remove(c);
+session.delete(c);
+session.flush();</pre><p>
+                         Now, in our case, a <code class="literal">Child</code> can't really exist without its parent. So if we remove
+                         a <code class="literal">Child</code> from the collection, we really do want it to be deleted. For this, we must
+                         use <code class="literal">cascade="all-delete-orphan"</code>.
+                     
+         </p><pre class="programlisting">&lt;set name="children" inverse="true" cascade="all-delete-orphan"&gt;
+    &lt;key column="parent_id"/&gt;
+    &lt;one-to-many class="Child"/&gt;
+&lt;/set&gt;</pre><p>
+                         Note: even though the collection mapping specifies <code class="literal">inverse="true"</code>, cascades are 
+                         still processed by iterating the collection elements. So if you require that an object be saved, 
+                         deleted or updated by cascade, you must add it to the collection. It is not enough to simply call
+                         <code class="literal">setParent()</code>.
+                     
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="example-parentchild-bidir.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="example-parentchild.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="example-parentchild-update.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">21.2.&nbsp;Bidirectional one-to-many&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;21.4.&nbsp;Cascades and <code class="literal">unsaved-value</code></td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

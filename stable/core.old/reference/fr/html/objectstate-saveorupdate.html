@@ -1,0 +1,143 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>10.7.&nbsp;D&eacute;tection automatique d'un &eacute;tat</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="objectstate.html" title="Chapitre&nbsp;10.&nbsp;Travailler avec des objets">
+      <link rel="prev" href="objectstate-detached.html" title="10.6.&nbsp;Modifier des objets d&eacute;tach&eacute;s">
+      <link rel="next" href="objectstate-deleting.html" title="10.8.&nbsp;Suppression d'objets persistants">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">10.7.&nbsp;D&eacute;tection automatique d'un &eacute;tat</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="objectstate-detached.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;10.&nbsp;Travailler avec des objets</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="objectstate-deleting.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="objectstate-saveorupdate"></a>10.7.&nbsp;D&eacute;tection automatique d'un &eacute;tat
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Les utilisateurs d'Hibernate ont demand&eacute; une m&eacute;thode dont l'intention g&eacute;n&eacute;rale serait soit de sauvegarder une instance &eacute;ph&eacute;m&egrave;re
+            en g&eacute;n&eacute;rant un nouvel identifiant, soit mettre &agrave; jour/r&eacute;attacher les instances d&eacute;tach&eacute;es associ&eacute;es &agrave; l'identifiant courant.
+            La m&eacute;thode <code class="literal">saveOrUpdate()</code> impl&eacute;mente cette fonctionnalit&eacute;. 
+         </p><pre class="programlisting">// in the first session
+Cat cat = (Cat) firstSession.load(Cat.class, catID);
+
+// in a higher tier of the application
+Cat mate = new Cat();
+cat.setMate(mate);
+
+// later, in a new session
+secondSession.saveOrUpdate(cat);   // update existing state (cat has a non-null id)
+secondSession.saveOrUpdate(mate);  // save the new instance (mate has a null id)</pre><p>L'usage et la s&eacute;mantique de <code class="literal">saveOrUpdate()</code> semble &ecirc;tre confuse pour les nouveaux utilisateurs. Premi&egrave;rement, aussi longtemps que vous n'essayez pas d'utiliser des instances
+            d'une session dans une autre, vous ne devriez pas avoir besoin d'utiliser <code class="literal">update()</code>, <code class="literal">saveOrUpdate()</code>, ou <code class="literal">merge()</code>. Certaines applications n'utiliseront jamais ces m&eacute;thodes. 
+         </p>
+         <p>G&eacute;n&eacute;ralement <code class="literal">update()</code> ou <code class="literal">saveOrUpdate()</code> sont utilis&eacute;es dans le sc&eacute;nario suivant : 
+         </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p>l'application charge un objet dans la premi&egrave;re session </p>
+               </li>
+               <li>
+                  <p>l'objet est pass&eacute; &agrave; la couche utilisateur </p>
+               </li>
+               <li>
+                  <p>certaines modifications sont effectu&eacute;es sur l'objet </p>
+               </li>
+               <li>
+                  <p>l'objet est retourn&eacute; &agrave; la couche logique m&eacute;tier </p>
+               </li>
+               <li>
+                  <p>l'application persiste ces modifications en appelant <code class="literal">update()</code> dans une seconde sessin 
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p><code class="literal">saveOrUpdate()</code> s'utilise dans le cas suivant : 
+         </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p>si l'objet est d&eacute;j&agrave; persistant dans cette session, ne rien faire </p>
+               </li>
+               <li>
+                  <p>si un autre objet associ&eacute; &agrave; la session a le m&ecirc;me identifiant, lever une exception </p>
+               </li>
+               <li>
+                  <p>si l'objet n'a pas de propri&eacute;t&eacute; d'identifiant, appeler <code class="literal">save()</code> 
+                  </p>
+               </li>
+               <li>
+                  <p>si l'identifiant de l'objet a une valeur assign&eacute;e &agrave; un objet nouvellement instanci&eacute;, appeler <code class="literal">save()</code> 
+                  </p>
+               </li>
+               <li>
+                  <p>si l'objet est versionn&eacute; (par <code class="literal">&lt;version&gt;</code> ou <code class="literal">&lt;timestamp&gt;</code>), et la valeur de la propri&eacute;t&eacute; de version est la m&ecirc;me valeur que celle assign&eacute;e &agrave; un objet nouvellement instanci&eacute;, appeler
+                     <code class="literal">save()</code> 
+                  </p>
+               </li>
+               <li>
+                  <p>sinon mettre &agrave; jour l'objet avec <code class="literal">update()</code> 
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p>et <code class="literal">merge()</code> est tr&egrave;s diff&eacute;rent : 
+         </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p>s'il y a une instance persistante avec le m&ecirc;me identifiant couramment associ&eacute;e &agrave; la session, copier l'&eacute;tat de l'objet donn&eacute;
+                     dans l'instance persistante 
+                  </p>
+               </li>
+               <li>
+                  <p>s'il n'y a pas d'instance persistante associ&eacute;e &agrave; cette session, essayer de le charger &agrave; partir de la base de donn&eacute;es, ou cr&eacute;er
+                     une nouvelle instance persistante 
+                  </p>
+               </li>
+               <li>
+                  <p>l'instance persistante est retourn&eacute;e </p>
+               </li>
+               <li>
+                  <p>l'instance donn&eacute;e ne devient pas associ&eacute;e &agrave; la session, elle reste d&eacute;tach&eacute;e </p>
+               </li>
+            </ul>
+         </div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="objectstate-detached.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="objectstate.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="objectstate-deleting.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">10.6.&nbsp;Modifier des objets d&eacute;tach&eacute;s&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;10.8.&nbsp;Suppression d'objets persistants</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

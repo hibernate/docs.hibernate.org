@@ -1,0 +1,67 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>10.5.&nbsp;Modifier des objets persistants</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="objectstate.html" title="Chapitre&nbsp;10.&nbsp;Travailler avec des objets">
+      <link rel="prev" href="objectstate-querying.html" title="10.4.&nbsp;Requ&ecirc;tage">
+      <link rel="next" href="objectstate-detached.html" title="10.6.&nbsp;Modifier des objets d&eacute;tach&eacute;s">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">10.5.&nbsp;Modifier des objets persistants</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="objectstate-querying.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;10.&nbsp;Travailler avec des objets</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="objectstate-detached.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="objectstate-modifying"></a>10.5.&nbsp;Modifier des objets persistants
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Les <span class="emphasis"><em>instances persistantes transactionnelles</em></span> (c'est-&agrave;-dire des objets charg&eacute;s, sauvegard&eacute;s, cr&eacute;&eacute;s ou requ&ecirc;t&eacute;s par la <code class="literal">Session</code>) peuvent &ecirc;tre manipul&eacute;es par l'application et n'importe quel changement vers l'&eacute;tat persistant sera persist&eacute; lorsque la <code class="literal">Session</code> est <span class="emphasis"><em>"flush&eacute;e"</em></span> (trait&eacute; plus tard dans ce chapitre). Il n'y a pas besoin d'appeler une m&eacute;thode particuli&egrave;re (comme <code class="literal">update()</code>, qui a un but diff&eacute;rent) pour rendre vos modifications persistantes. Donc la mani&egrave;re la plus directe de mettre &agrave; jour l'&eacute;tat
+            d'un objet est de le charger avec <code class="literal">load()</code>, et puis le manipuler directement, tant que la <code class="literal">Session</code> est ouverte : 
+         </p><pre class="programlisting">DomesticCat cat = (DomesticCat) sess.load( Cat.class, new Long(69) );
+cat.setName("PK");
+sess.flush();  // changes to cat are automatically detected and persisted</pre><p>Parfois ce mod&egrave;le de programmation est inefficace puisqu'il n&eacute;cessiterait un <code class="literal">SELECT</code> SQL (pour charger l'objet) et un <code class="literal">UPDATE</code> SQL (pour persister son &eacute;tat mis &agrave; jour) dans la m&ecirc;me session. Aussi Hibernate offre une autre approche, en utilisant des
+            instances d&eacute;tach&eacute;es. 
+         </p>
+         <p>
+                        <span class="emphasis"><em>Note that Hibernate does not offer its own API for direct execution of <code class="literal">UPDATE</code> or <code class="literal">DELETE</code> statements. Hibernate is a <span class="emphasis"><em>state management</em></span> service, you don't have to think in <span class="emphasis"><em>statements</em></span> to use it. JDBC is a perfect API for executing SQL statements, you can get a JDBC <code class="literal">Connection</code> at any time by calling <code class="literal">session.connection()</code>. Furthermore, the notion of mass operations conflicts with object/relational mapping for online transaction processing-oriented
+                  applications. Future versions of Hibernate may however provide special mass operation functions. See <a href="batch.html" title="Chapitre&nbsp;13.&nbsp;Traitement par paquet">Chapitre&nbsp;13, <i xmlns:xlink="http://www.w3.org/1999/xlink">Traitement par paquet</i></a> for some possible batch operation tricks.</em></span>
+                    
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="objectstate-querying.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="objectstate.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="objectstate-detached.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">10.4.&nbsp;Requ&ecirc;tage&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;10.6.&nbsp;Modifier des objets d&eacute;tach&eacute;s</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

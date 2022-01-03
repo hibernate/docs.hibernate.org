@@ -1,0 +1,313 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>1.4.&nbsp;Part 3 - The EventManager web application</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="tutorial.html" title="Chapter&nbsp;1.&nbsp;Introduction to Hibernate">
+      <link rel="prev" href="tutorial-associations.html" title="1.3.&nbsp;Part 2 - Mapping associations">
+      <link rel="next" href="tutorial-summary.html" title="1.5.&nbsp;Summary">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">1.4.&nbsp;Part 3 - The EventManager web application</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="tutorial-associations.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;1.&nbsp;Introduction to Hibernate</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="tutorial-summary.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="tutorial-webapp"></a>1.4.&nbsp;Part 3 - The EventManager web application
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+                        Let's turn the following discussion into a small web application...
+                    
+         </p>
+         <p>
+                        A Hibernate web application uses <code class="literal">Session</code> and <code class="literal">Transaction</code>
+                        almost like a standalone application. However, some common patterns are useful. We now write
+                        an <code class="literal">EventManagerServlet</code>. This servlet can list all events stored in the
+                        database, and it provides an HTML form to enter new events.
+                    
+         </p>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="tutorial-webapp-servlet"></a>1.4.1.&nbsp;Writing the basic servlet
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                               Create a new class in your source directory, in the <code class="literal">events</code>
+                               package:
+                           
+            </p><pre class="programlisting">package events;
+
+// Imports
+
+public class EventManagerServlet extends HttpServlet {
+
+    // Servlet code
+}</pre><p>
+                               The servlet handles HTTP <code class="literal">GET</code> requests only, hence, the method
+                               we implement is <code class="literal">doGet()</code>:
+                           
+            </p><pre class="programlisting">protected void doGet(HttpServletRequest request,
+                     HttpServletResponse response)
+        throws ServletException, IOException {
+
+    SimpleDateFormat dateFormatter = new SimpleDateFormat("dd.MM.yyyy");
+
+    try {
+        // Begin unit of work
+        HibernateUtil.getSessionFactory()
+                .getCurrentSession().beginTransaction();
+
+        // Process request and render page...
+
+        // End unit of work
+        HibernateUtil.getSessionFactory()
+                .getCurrentSession().getTransaction().commit();
+
+    } catch (Exception ex) {
+        HibernateUtil.getSessionFactory()
+                .getCurrentSession().getTransaction().rollback();
+        throw new ServletException(ex);
+    }
+
+}</pre><p>
+                               The pattern we are applying here is called <span class="emphasis"><em>session-per-request</em></span>.
+                               When a request hits the servlet, a new Hibernate <code class="literal">Session</code> is
+                               opened through the first call to <code class="literal">getCurrentSession()</code> on the
+                               <code class="literal">SessionFactory</code>. Then a database transaction is started-all
+                               data access as to occur inside a transaction, no matter if data is read or written
+                               (we don't use the auto-commit mode in applications).
+                           
+            </p>
+            <p>
+                               Do <span class="emphasis"><em>not</em></span> use a new Hibernate <code class="literal">Session</code> for
+                               every database operation. Use one Hibernate <code class="literal">Session</code> that is
+                               scoped to the whole request. Use <code class="literal">getCurrentSession()</code>, so that
+                               it is automatically bound to the current Java thread.
+                           
+            </p>
+            <p>
+                               Next, the possible actions of the request are processed and the response HTML
+                               is rendered. We'll get to that part soon.
+                           
+            </p>
+            <p>
+                               Finally, the unit of work ends when processing and rendering is complete. If any
+                               problem occurred during processing or rendering, an exception will be thrown
+                               and the database transaction rolled back. This completes the
+                               <code class="literal">session-per-request</code> pattern. Instead of the transaction
+                               demarcation code in every servlet you could also write a servlet filter.
+                               See the Hibernate website and Wiki for more information about this pattern,
+                               called <span class="emphasis"><em>Open Session in View</em></span>-you'll need it as soon
+                               as you consider rendering your view in JSP, not in a servlet.
+                           
+            </p>
+         </div>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="tutorial-webapp-processing"></a>1.4.2.&nbsp;Processing and rendering
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                               Let's implement the processing of the request and rendering of the page.
+                           
+            </p><pre class="programlisting">// Write HTML header
+PrintWriter out = response.getWriter();
+out.println("&lt;html&gt;&lt;head&gt;&lt;title&gt;Event Manager&lt;/title&gt;&lt;/head&gt;&lt;body&gt;");
+
+// Handle actions
+if ( "store".equals(request.getParameter("action")) ) {
+
+    String eventTitle = request.getParameter("eventTitle");
+    String eventDate = request.getParameter("eventDate");
+
+    if ( "".equals(eventTitle) || "".equals(eventDate) ) {
+        out.println("&lt;b&gt;&lt;i&gt;Please enter event title and date.&lt;/i&gt;&lt;/b&gt;");
+    } else {
+        createAndStoreEvent(eventTitle, dateFormatter.parse(eventDate));
+        out.println("&lt;b&gt;&lt;i&gt;Added event.&lt;/i&gt;&lt;/b&gt;");
+    }
+}
+
+// Print page
+printEventForm(out);
+listEvents(out, dateFormatter);
+
+// Write HTML footer
+out.println("&lt;/body&gt;&lt;/html&gt;");
+out.flush();
+out.close();</pre><p>
+                               Granted, this coding style with a mix of Java and HTML would not scale
+                               in a more complex application-keep in mind that we are only illustrating
+                               basic Hibernate concepts in this tutorial. The code prints an HTML
+                               header and a footer. Inside this page, an HTML form for event entry and
+                               a list of all events in the database are printed. The first method is
+                               trivial and only outputs HTML:
+                           
+            </p><pre class="programlisting">private void printEventForm(PrintWriter out) {
+    out.println("&lt;h2&gt;Add new event:&lt;/h2&gt;");
+    out.println("&lt;form&gt;");
+    out.println("Title: &lt;input name='eventTitle' length='50'/&gt;&lt;br/&gt;");
+    out.println("Date (e.g. 24.12.2009): &lt;input name='eventDate' length='10'/&gt;&lt;br/&gt;");
+    out.println("&lt;input type='submit' name='action' value='store'/&gt;");
+    out.println("&lt;/form&gt;");
+}</pre><p>
+                               The <code class="literal">listEvents()</code> method uses the Hibernate
+                               <code class="literal">Session</code> bound to the current thread to execute
+                               a query:
+                           
+            </p><pre class="programlisting">private void listEvents(PrintWriter out, SimpleDateFormat dateFormatter) {
+
+    List result = HibernateUtil.getSessionFactory()
+                    .getCurrentSession().createCriteria(Event.class).list();
+    if (result.size() &gt; 0) {
+        out.println("&lt;h2&gt;Events in database:&lt;/h2&gt;");
+        out.println("&lt;table border='1'&gt;");
+        out.println("&lt;tr&gt;");
+        out.println("&lt;th&gt;Event title&lt;/th&gt;");
+        out.println("&lt;th&gt;Event date&lt;/th&gt;");
+        out.println("&lt;/tr&gt;");
+        for (Iterator it = result.iterator(); it.hasNext();) {
+            Event event = (Event) it.next();
+            out.println("&lt;tr&gt;");
+            out.println("&lt;td&gt;" + event.getTitle() + "&lt;/td&gt;");
+            out.println("&lt;td&gt;" + dateFormatter.format(event.getDate()) + "&lt;/td&gt;");
+            out.println("&lt;/tr&gt;");
+        }
+        out.println("&lt;/table&gt;");
+    }
+}</pre><p>
+                               Finally, the <code class="literal">store</code> action is dispatched to the
+                               <code class="literal">createAndStoreEvent()</code> method, which also uses
+                               the <code class="literal">Session</code> of the current thread:
+                           
+            </p><pre class="programlisting">protected void createAndStoreEvent(String title, Date theDate) {
+    Event theEvent = new Event();
+    theEvent.setTitle(title);
+    theEvent.setDate(theDate);
+
+    HibernateUtil.getSessionFactory()
+                    .getCurrentSession().save(theEvent);
+}</pre><p>
+                               That's it, the servlet is complete. A request to the servlet will be processed
+                               in a single <code class="literal">Session</code> and <code class="literal">Transaction</code>. As
+                               earlier in the standalone application, Hibernate can automatically bind these
+                               objects to the current thread of execution. This gives you the freedom to layer
+                               your code and access the <code class="literal">SessionFactory</code> in any way you like.
+                               Usually you'd use a more sophisticated design and move the data access code
+                               into data access objects (the DAO pattern). See the Hibernate Wiki for more
+                               examples.
+                           
+            </p>
+         </div>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="tutorial-webapp-deploy"></a>1.4.3.&nbsp;Deploying and testing
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                               To deploy this application you have to create a web archive, a WAR. Add the
+                               following Ant target to your <code class="literal">build.xml</code>:
+                           
+            </p><pre class="programlisting">&lt;target name="war" depends="compile"&gt;
+    &lt;war destfile="hibernate-tutorial.war" webxml="web.xml"&gt;
+        &lt;lib dir="${librarydir}"&gt;
+          &lt;exclude name="jsdk*.jar"/&gt;
+        &lt;/lib&gt;
+
+        &lt;classes dir="${targetdir}"/&gt;
+    &lt;/war&gt;
+&lt;/target&gt;</pre><p>
+                               This target creates a file called <code class="literal">hibernate-tutorial.war</code>
+                               in your project directory. It packages all libraries and the <code class="literal">web.xml</code>
+                               descriptor, which is expected in the base directory of your project:
+                           
+            </p><pre class="programlisting">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;web-app version="2.4"
+    xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"&gt;
+
+    &lt;servlet&gt;
+        &lt;servlet-name&gt;Event Manager&lt;/servlet-name&gt;
+        &lt;servlet-class&gt;events.EventManagerServlet&lt;/servlet-class&gt;
+    &lt;/servlet&gt;
+
+    &lt;servlet-mapping&gt;
+        &lt;servlet-name&gt;Event Manager&lt;/servlet-name&gt;
+        &lt;url-pattern&gt;/eventmanager&lt;/url-pattern&gt;
+    &lt;/servlet-mapping&gt;
+&lt;/web-app&gt;</pre><p>
+                               Before you compile and deploy the web application, note that an additional library
+                               is required: <code class="literal">jsdk.jar</code>. This is the Java servlet development kit,
+                               if you don't have this library already, get it from the Sun website and copy it to
+                               your library directory. However, it will be only used for compilation and excluded
+                               from the WAR package.
+                           
+            </p>
+            <p>
+                               To build and deploy call <code class="literal">ant war</code> in your project directory
+                               and copy the <code class="literal">hibernate-tutorial.war</code> file into your Tomcat
+                               <code class="literal">webapp</code> directory. If you don't have Tomcat installed, download
+                               it and follow the installation instructions. You don't have to change any Tomcat
+                               configuration to deploy this application though.
+                           
+            </p>
+            <p>
+                               Once deployed and Tomcat is running, access the application at
+                               <code class="literal">http://localhost:8080/hibernate-tutorial/eventmanager</code>. Make
+                               sure you watch the Tomcat log to see Hibernate initialize when the first
+                               request hits your servlet (the static initializer in <code class="literal">HibernateUtil</code>
+                               is called) and to get the detailed output if any exceptions occurs.
+                           
+            </p>
+         </div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="tutorial-associations.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="tutorial.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="tutorial-summary.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">1.3.&nbsp;Part 2 - Mapping associations&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;1.5.&nbsp;Summary</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

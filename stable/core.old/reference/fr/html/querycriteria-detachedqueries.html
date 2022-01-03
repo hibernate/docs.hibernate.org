@@ -1,0 +1,79 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>15.8.&nbsp;Requ&ecirc;tes et sous-requ&ecirc;tes d&eacute;tach&eacute;es</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="querycriteria.html" title="Chapitre&nbsp;15.&nbsp;Requ&ecirc;tes par crit&egrave;res">
+      <link rel="prev" href="querycriteria-projection.html" title="15.7.&nbsp;Projections, agr&eacute;gation et regroupement">
+      <link rel="next" href="query-criteria-naturalid.html" title="15.9.&nbsp;Requ&ecirc;tes par identifiant naturel">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">15.8.&nbsp;Requ&ecirc;tes et sous-requ&ecirc;tes d&eacute;tach&eacute;es</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="querycriteria-projection.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;15.&nbsp;Requ&ecirc;tes par crit&egrave;res</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="query-criteria-naturalid.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="querycriteria-detachedqueries"></a>15.8.&nbsp;Requ&ecirc;tes et sous-requ&ecirc;tes d&eacute;tach&eacute;es
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>La classe <code class="literal">DetachedCriteria</code> vous laisse cr&eacute;er une requ&ecirc;te en dehors de la port&eacute;e de la session, et puis l'ex&eacute;cuter plus tard en utilisant n'importe quelle
+            <code class="literal">Session</code> arbitraire. 
+         </p><pre class="programlisting">DetachedCriteria query = DetachedCriteria.forClass(Cat.class)
+    .add( Property.forName("sex").eq('F') );
+    
+Session session = ....;
+Transaction txn = session.beginTransaction();
+List results = query.getExecutableCriteria(session).setMaxResults(100).list();
+txn.commit();
+session.close();</pre><p>Une <code class="literal">DetachedCriteria</code> peut aussi &ecirc;tre utilis&eacute;e pour exprimer une sous-requ&ecirc;te. Des instances de criterion impliquant des sous-requ&ecirc;tes peuvent
+            &ecirc;tre obtenues via <code class="literal">Subqueries</code> ou <code class="literal">Property</code>. 
+         </p><pre class="programlisting">DetachedCriteria avgWeight = DetachedCriteria.forClass(Cat.class)
+    .setProjection( Property.forName("weight").avg() );
+session.createCriteria(Cat.class)
+    .add( Property.forName("weight").gt(avgWeight) )
+    .list();</pre><pre class="programlisting">DetachedCriteria weights = DetachedCriteria.forClass(Cat.class)
+    .setProjection( Property.forName("weight") );
+session.createCriteria(Cat.class)
+    .add( Subqueries.geAll("weight", weights) )
+    .list();</pre><p>M&ecirc;me des requ&ecirc;tes corr&eacute;l&eacute;es sont possibles : </p><pre class="programlisting">DetachedCriteria avgWeightForSex = DetachedCriteria.forClass(Cat.class, "cat2")
+    .setProjection( Property.forName("weight").avg() )
+    .add( Property.forName("cat2.sex").eqProperty("cat.sex") );
+session.createCriteria(Cat.class, "cat")
+    .add( Property.forName("weight").gt(avgWeightForSex) )
+    .list();</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="querycriteria-projection.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="querycriteria.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="query-criteria-naturalid.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">15.7.&nbsp;Projections, agr&eacute;gation et regroupement&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;15.9.&nbsp;Requ&ecirc;tes par identifiant naturel</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

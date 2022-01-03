@@ -1,0 +1,102 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>8.2.&nbsp;Collection d'objets d&eacute;pendants</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="components.html" title="Chapitre&nbsp;8.&nbsp;Mapping de composants">
+      <link rel="prev" href="components.html" title="Chapitre&nbsp;8.&nbsp;Mapping de composants">
+      <link rel="next" href="components-asmapindex.html" title="8.3.&nbsp;Utiliser les composants comme index de map">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">8.2.&nbsp;Collection d'objets d&eacute;pendants</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="components.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;8.&nbsp;Mapping de composants</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="components-asmapindex.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="components-incollections"></a>8.2.&nbsp;Collection d'objets d&eacute;pendants
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Les collections d'objets d&eacute;pendants sont support&eacute;s (exemple: un tableau de type <code class="literal">Name</code>). D&eacute;clarer la collection de composants en rempla&ccedil;ant le tag <code class="literal">&lt;element&gt;</code> par le tag <code class="literal">&lt;composite-element&gt;</code>. 
+         </p><pre class="programlisting">&lt;set name="someNames" table="some_names" lazy="true"&gt;
+    &lt;key column="id"/&gt;
+    &lt;composite-element class="eg.Name"&gt; &lt;!-- class attribute required --&gt;
+        &lt;property name="initial"/&gt;
+        &lt;property name="first"/&gt;
+        &lt;property name="last"/&gt;
+    &lt;/composite-element&gt;
+&lt;/set&gt;</pre><p>Remarque: Si vous d&eacute;finissez un <code class="literal">Set</code> d'&eacute;l&eacute;ment composite, il est tr&egrave;s important d'impl&eacute;menter la m&eacute;thode <code class="literal">equals()</code> et <code class="literal">hashCode()</code> correctement. 
+         </p>
+         <p>Les &eacute;lements composite peuvent aussi contenir des composants mais pas des collections. Si votre &eacute;l&eacute;ment composite contient
+            aussi des composants, utilisez l'&eacute;l&eacute;ment <code class="literal">&lt;nested-composite-element&gt;</code> . Une collections de composants qui ccontiennent eux-m&ecirc;mes des composants est un cas tr&egrave;s exotique. A ce stade demandez-vous
+            si une association un-&agrave;-plusieurs ne serait pas plus appropri&eacute;. Essayez de re remodeler votre &eacute;l&eacute;ment composite comme une
+            entit&eacute; ( Dans ce cas m&ecirc;me si le mod&egrave;le Java est le m&ecirc;me la logique de persitence et de relation sont tout de m&ecirc;me diff&eacute;rentes)
+            
+         </p>
+         <p>Remarque, le mapping d'&eacute;l&eacute;ments composites ne supporte pas la nullit&eacute; des propri&eacute;t&eacute;s lorsqu'on utilise un <code class="literal">&lt;set&gt;</code>. Hibernate lorsqu'il supprime un objet utilise chaque colonne pour identifier un objet (on ne peut pas utiliser des cl&eacute;s
+            primaires distinctes dans une table d'&eacute;l&eacute;ments composites), ce qui n'est pas possible avec des valeurs nulles. Vous devez
+            donc choisir d'interdire la nullit&eacute; des propri&eacute;t&eacute;s d'un &eacute;l&eacute;ment composite ou choisir un autre type de collection comme : <code class="literal">&lt;list&gt;</code>, <code class="literal">&lt;map&gt;</code>, <code class="literal">&lt;bag&gt;</code> ou <code class="literal">&lt;idbag&gt;</code>. 
+         </p>
+         <p>Un cas particulier d'&eacute;l&eacute;ment composite est un &eacute;l&eacute;ment composite qui inclut un &eacute;l&eacute;ment <code class="literal">&lt;many-to-one&gt;</code>. Un mapping comme celui-ci vous permet d'associer les colonnes d'une table d'association plusieurs &agrave; plusieurs (many-to-many)
+            &agrave; la classse de l'&eacute;l&eacute;ment composite. L'exemple suivant est une association plusieurs &agrave; plusieurs de <code class="literal">Order</code> &agrave; <code class="literal">Item</code> &agrave; <code class="literal">purchaseDate</code>, <code class="literal">price</code> et <code class="literal">quantity</code> sont des propri&eacute;t&eacute;s de l'association. 
+         </p><pre class="programlisting">&lt;class name="eg.Order" .... &gt;
+    ....
+    &lt;set name="purchasedItems" table="purchase_items" lazy="true"&gt;
+        &lt;key column="order_id"&gt;
+        &lt;composite-element class="eg.Purchase"&gt;
+            &lt;property name="purchaseDate"/&gt;
+            &lt;property name="price"/&gt;
+            &lt;property name="quantity"/&gt;
+            &lt;many-to-one name="item" class="eg.Item"/&gt; &lt;!-- class attribute is optional --&gt;
+        &lt;/composite-element&gt;
+    &lt;/set&gt;
+&lt;/class&gt;</pre><p>Bien s&ucirc;r, il ne peut pas y avoir de r&eacute;f&eacute;rence &agrave; l'achat (purchase) depuis l'article (item), pour pouvoir naviguer de fa&ccedil;on
+            bidirectionnelle dans l'association. N'oubliez pas que les composants sont de type valeurs et n'autorise pas les r&eacute;f&eacute;rences
+            partag&eacute;es. 
+         </p>
+         <p>M&ecirc;me les associations ternaires ou quaternaires sont possibles:</p><pre class="programlisting">&lt;class name="eg.Order" .... &gt;
+    ....
+    &lt;set name="purchasedItems" table="purchase_items" lazy="true"&gt;
+        &lt;key column="order_id"&gt;
+        &lt;composite-element class="eg.OrderLine"&gt;
+            &lt;many-to-one name="purchaseDetails class="eg.Purchase"/&gt;
+            &lt;many-to-one name="item" class="eg.Item"/&gt;
+        &lt;/composite-element&gt;
+    &lt;/set&gt;
+&lt;/class&gt;</pre><p>Les &eacute;l&eacute;ments composites peuvent appara&icirc;tre dans les requ&ecirc;tes en utilisant la m&ecirc;me syntaxe que associations </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="components.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="components.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="components-asmapindex.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">Chapitre&nbsp;8.&nbsp;Mapping de composants&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;8.3.&nbsp;Utiliser les composants comme index de map</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

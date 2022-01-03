@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Chapter 4. Configure and start Hibernate OGM</title><!-- HibernateDoc.Meta --><meta name="description" content="Hibernate OGM, JPA for NoSQL datastores - Reference Documentation" /><meta name="keywords" content="hibernate, ogm, hibernate ogm, nosql, jpa, infinispan, mongodb, neo4j, cassandra, couchdb, ehcache, redis" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://docs.jboss.org/hibernate/stable/ogm/reference/en-US/html_single/" /><!-- /HibernateDoc.Meta --><link rel="stylesheet" type="text/css" href="css/hibernate.css"/><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"/><link rel="home" href="index.html" title="Hibernate OGM Reference Guide"/><link rel="up" href="index.html" title="Hibernate OGM Reference Guide"/><link rel="prev" href="ch03.html" title="Chapter 3. Architecture"/><link rel="next" href="ch05.html" title="Chapter 5. Map your entities"/><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/></head><body><p id="title"><a href="http://www.hibernate.org" class="site_href"><strong>Hibernate.org</strong></a><a href="http://hibernate.org/Documentation/DocumentationOverview" class="doc_href"><strong>Community Documentation</strong></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="ch03.html"><strong>Prev</strong></a></li><li class="next"><a accesskey="n" href="ch05.html"><strong>Next</strong></a></li></ul><div class="chapter" title="Chapter 4. Configure and start Hibernate OGM"><div class="titlepage"><div><div><h2 class="title"><a id="ogm-configuration"/>Chapter 4. Configure and start Hibernate OGM</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="ch04.html#bootstrapping_hibernate_ogm">4.1. Bootstrapping Hibernate OGM</a></span></dt><dd><dl><dt><span class="section"><a href="ch04.html#using_jpa">4.1.1. Using JPA</a></span></dt><dt><span class="section"><a href="ch04.html#using_hibernate_orm_native_apis">4.1.2. Using Hibernate ORM native APIs</a></span></dt></dl></dd><dt><span class="section"><a href="ch04.html#ogm-configuration-environments">4.2. Environments</a></span></dt><dd><dl><dt><span class="section"><a href="ch04.html#ogm-configuration-environments-javaee">4.2.1. In a Java EE container</a></span></dt><dt><span class="section"><a href="ch04.html#ogm-configuration-environments-standalonejta">4.2.2. In a standalone JTA environment</a></span></dt><dt><span class="section"><a href="ch04.html#without_jta">4.2.3. Without JTA</a></span></dt></dl></dd><dt><span class="section"><a href="ch04.html#ogm-configuration-optionsogm-configuration-options">4.3. Configuration options</a></span></dt><dt><span class="section"><a href="ch04.html#configuring_hibernate_search">4.4. Configuring Hibernate Search</a></span></dt><dt><span class="section"><a href="ch04.html#ogm-configuration-jbossmodule">4.5. How to package Hibernate OGM applications for WildFly 9</a></span></dt><dd><dl><dt><span class="section"><a href="ch04.html#packaging_hibernate_ogm_applications_for_wildfly_9">4.5.1. Packaging Hibernate OGM applications for WildFly 9</a></span></dt><dt><span class="section"><a href="ch04.html#enabling_both_the_hibernate_search_and_hibernate_ogm_modules">4.5.2. Enabling both the Hibernate Search and Hibernate OGM modules</a></span></dt></dl></dd></dl></div><p>Hibernate OGM favors ease of use and convention over configuration.
+This makes its configuration quite simple by default.</p><div class="section" title="4.1. Bootstrapping Hibernate OGM"><div class="titlepage"><div><div><h2 class="title"><a id="bootstrapping_hibernate_ogm"/>4.1. Bootstrapping Hibernate OGM</h2></div></div></div><p>Hibernate OGM can be used via the Hibernate native APIs (<code class="literal">Session</code>)
+or via the JPA APIs (<code class="literal">EntityManager</code>).
+Depending of your choice, the bootstrapping strategy is slightly different.</p><div class="section" title="4.1.1. Using JPA"><div class="titlepage"><div><div><h3 class="title"><a id="using_jpa"/>4.1.1. Using JPA</h3></div></div></div><p>The good news is that if you use JPA as your primary API,
+the configuration is extremely simple.
+Hibernate OGM is seen as a persistence provider
+which you need to configure in your <code class="literal">persistence.xml</code>.
+That’s it!
+The provider name is <code class="literal">org.hibernate.ogm.jpa.HibernateOgmPersistence</code>.</p><div class="example"><a id="d0e869"/><p class="title"><strong>Example 4.1. persistence.xml file</strong></p><div class="example-contents"><pre><code class="language-xml">&lt;?xml version="1.0"?&gt;
+&lt;persistence xmlns="http://java.sun.com/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+             version="2.0"&gt;
+
+    &lt;persistence-unit name="org.hibernate.ogm.tutorial.jpa" transaction-type="JTA"&gt;
+        &lt;!-- Use Hibernate OGM provider: configuration will be transparent --&gt;
+        &lt;provider&gt;org.hibernate.ogm.jpa.HibernateOgmPersistence&lt;/provider&gt;
+        &lt;properties&gt;
+            &lt;property name="hibernate.transaction.jta.platform"
+                      value="org.hibernate.service.jta.platform.internal.JBossStandAloneJtaPlatform" /&gt;
+            &lt;property name="hibernate.ogm.datastore.provider"
+                      value="infinispan" /&gt;
+        &lt;/properties&gt;
+    &lt;/persistence-unit&gt;
+&lt;/persistence&gt;</code></pre></div></div><br class="example-break"/><p>There are a couple of things to notice:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">there is no JDBC dialect setting</li><li class="listitem">there is no JDBC setting except sometimes a <code class="literal">jta-data-source</code>
+(check <a class="xref" href="ch04.html#ogm-configuration-environments-javaee" title="4.2.1. In a Java EE container">Section 4.2.1, “In a Java EE container”</a> for more info)</li><li class="listitem">there is no DDL scheme generation options (<code class="literal">hbm2ddl</code>)
+as NoSQL generally do not require schemas</li><li class="listitem">if you use JTA (which we recommend), you will need to set the JTA platform</li></ul></div><p>You also need to configure which NoSQL datastore you want to use
+and how to connect to it.
+We will detail how to do that later in <a class="xref" href="ch08.html" title="Chapter 8. NoSQL datastores">Chapter 8, <em>NoSQL datastores</em></a>.
+In this case, we have used the defaults settings for Infinispan.</p><p>From there, simply bootstrap JPA the way you are used to with Hibernate ORM:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">via <code class="literal">Persistence.createEntityManagerFactory</code></li><li class="listitem">by injecting the <code class="literal">EntityManager</code> / <code class="literal">EntityManagerFactory</code> in a Java EE container</li><li class="listitem">by using your favorite injection framework (CDI - Weld, Spring, Guice)</li></ul></div></div><div class="section" title="4.1.2. Using Hibernate ORM native APIs"><div class="titlepage"><div><div><h3 class="title"><a id="using_hibernate_orm_native_apis"/>4.1.2. Using Hibernate ORM native APIs</h3></div></div></div><p>If you want to bootstrap Hibernate OGM using the native Hibernate APIs,
+use the class <code class="literal">org.hibernate.ogm.cfg.OgmConfiguration</code>.</p><div class="example"><a id="d0e929"/><p class="title"><strong>Example 4.2. Bootstrap Hibernate OGM with Hibernate ORM native APIs</strong></p><div class="example-contents"><pre><code class="language-java">Configuration cfg = new OgmConfiguration();
+
+//assuming you are using JTA in a non contained environment
+cfg.setProperty(environment.TRANSACTION_STRATEGY,
+                 "org.hibernate.transaction.JTATransactionFactory");
+//assuming JBoss TransactionManager in standalone mode
+cfg.setProperty(Environment.JTA_PLATFORM,
+     "org.hibernate.service.jta.platform.internal.JBossStandAloneJtaPlatform");
+
+//assuming the default infinispan settings
+cfg.setProperty("hibernate.ogm.datastore.provider",
+                "infinispan");
+
+//add your annotated classes
+cfg.addAnnotatedClass(Order.class)
+   .addAnnotatedClass(Item.class)
+
+//build the SessionFactory
+SessionFactory sf = cfg.buildSessionFactory();</code></pre></div></div><br class="example-break"/><p>There are a couple of things to notice:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">there is no DDL schema generation options (<code class="literal">hbm2ddl</code>)
+as Infinispan does not require schemas</li><li class="listitem">you need to set the right transaction strategy
+and the right transaction manager lookup strategy
+if you use a JTA based transaction strategy
+(see <a class="xref" href="ch04.html#ogm-configuration-environments" title="4.2. Environments">Section 4.2, “Environments”</a>)</li></ul></div><p>You also need to configure which NoSQL datastore you want to use
+and how to connect to it.
+We will detail how to do that later in <a class="xref" href="ch08.html" title="Chapter 8. NoSQL datastores">Chapter 8, <em>NoSQL datastores</em></a>.
+In this case, we have used the defaults settings for Infinispan.</p></div></div><div class="section" title="4.2. Environments"><div class="titlepage"><div><div><h2 class="title"><a id="ogm-configuration-environments"/>4.2. Environments</h2></div></div></div><p>Hibernate OGM runs in various environments,
+pretty much what you are used to with Hibernate ORM.
+There are however environments where it works better
+and has been more thoroughly tested.</p><div class="section" title="4.2.1. In a Java EE container"><div class="titlepage"><div><div><h3 class="title"><a id="ogm-configuration-environments-javaee"/>4.2.1. In a Java EE container</h3></div></div></div><p>You don’t have to do much in this case. You need three specific settings:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">the transaction factory</li><li class="listitem">the JTA platform</li><li class="listitem">a JTA datasource</li></ul></div><p>If you use JPA, simply set the <code class="literal">transaction-type</code> to <code class="literal">JTA</code>
+and the transaction factory will be set for you.</p><p>If you use Hibernate ORM native APIs only,
+then set <code class="literal">hibernate.transaction.factory_class</code> to either:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">org.hibernate.transaction.CMTTransactionFactory</code>
+if you use declarative transaction demarcation.</li><li class="listitem">or <code class="literal">org.hibernate.transaction.JTATransactionFactory</code>
+if you manually demarcate transaction boundaries</li></ul></div><p>Set the JTA platform to the right Java EE container.
+The property is <code class="literal">hibernate.transaction.transaction.jta.platform</code>
+and must contain the fully qualified class name of the lookup implementation.
+The list of available values are listed in
+<a class="link" href="http://docs.jboss.org/hibernate/orm/4.1/devguide/en-US/html_single/#services-JtaPlatform">Hibernate ORM’s configuration section</a>.
+For example, in WildFly,
+use <code class="literal">org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform</code>.</p><p>In your <code class="literal">persistence.xml</code>, you also need to define an existing datasource.
+It is not needed by Hibernate OGM
+and won’t be used but the JPA specification mandates this setting.</p><div class="example"><a id="d0e1013"/><p class="title"><strong>Example 4.3. persistence.xml file</strong></p><div class="example-contents"><pre><code class="language-xml">&lt;?xml version="1.0"?&gt;
+&lt;persistence xmlns="http://java.sun.com/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+             version="2.0"&gt;
+
+    &lt;persistence-unit name="org.hibernate.ogm.tutorial.jpa" transaction-type="JTA"&gt;
+        &lt;!-- Use Hibernate OGM provider: configuration will be transparent --&gt;
+        &lt;provider&gt;org.hibernate.ogm.jpa.HibernateOgmPersistence&lt;/provider&gt;
+        &lt;jta-data-source&gt;java:/DefaultDS&lt;/jta-data-source&gt;
+        &lt;properties&gt;
+            &lt;property name="hibernate.transaction.jta.platform"
+                      value="org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform" /&gt;
+            &lt;property name="hibernate.ogm.datastore.provider"
+                      value="infinispan" /&gt;
+        &lt;/properties&gt;
+    &lt;/persistence-unit&gt;
+&lt;/persistence&gt;</code></pre></div></div><br class="example-break"/><p><code class="literal">java:DefaultDS</code> will work for out of the box WildFly deployments.</p></div><div class="section" title="4.2.2. In a standalone JTA environment"><div class="titlepage"><div><div><h3 class="title"><a id="ogm-configuration-environments-standalonejta"/>4.2.2. In a standalone JTA environment</h3></div></div></div><p>There is a set of common misconceptions in the Java community about JTA:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">JTA is hard to use</li><li class="listitem">JTA is only needed when you need transactions spanning several databases</li><li class="listitem">JTA works in Java EE only</li><li class="listitem">JTA is slower than "simple" transactions</li></ul></div><p>None of that is true of course,
+let me show you how to use JBoss Transaction
+in a standalone environment with Hibernate OGM.</p><p>In Hibernate OGM, make sure to set the following properties:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">transaction-type</code> to <code class="literal">JTA</code> in your persistence.xml if you use JPA</li><li class="listitem">or <code class="literal">hibernate.transaction.factory_class</code> to <code class="literal">org.hibernate.transaction.JTATransactionFactory</code>
+if you use <code class="literal">OgmConfiguration</code> to bootstrap Hibernate OGM.</li><li class="listitem"><code class="literal">hibernate.transaction.jta.platform</code> to <code class="literal">org.hibernate.service.jta.platform.internal.JBossStandAloneJtaPlatform</code> in both cases.</li></ul></div><p>On the JBoss Transaction side, add JBoss Transaction in your classpath.
+If you use maven, it should look like this:</p><div class="example"><a id="d0e1075"/><p class="title"><strong>Example 4.4. JBoss Transaction dependency declaration</strong></p><div class="example-contents"><pre><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.jboss.jbossts&lt;/groupId&gt;
+    &lt;artifactId&gt;jbossjta&lt;/artifactId&gt;
+    &lt;version&gt;4.16.4.Final&lt;/version&gt;
+&lt;/dependency&gt;</code></pre></div></div><br class="example-break"/><p>The next step is you get access to the transaction manager.
+The easiest solution is to do as the following example:</p><pre><code class="language-java">TransactionManager transactionManager =
+   com.arjuna.ats.jta.TransactionManager.transactionmanager();</code></pre><p>Then use the standard JTA APIs to demarcate your transaction and you are done!</p><div class="example"><a id="d0e1086"/><p class="title"><strong>Example 4.5. Demarcate your transaction with standalone JTA</strong></p><div class="example-contents"><pre><code class="language-java">//note that you must start the transaction before creating the EntityManager
+//or else call entityManager.joinTransaction()
+transactionManager.begin();
+
+final EntityManager em = emf.createEntityManager();
+
+Poem poem = new Poem();
+poem.setName("L'albatros");
+em.persist(poem);
+
+transactionManager.commit();
+
+em.clear();
+
+transactionManager.begin();
+
+poem = em.find(Poem.class, poem.getId());
+assertThat(poem).isNotNull();
+assertThat(poem.getName()).isEqualTo("L'albatros");
+em.remove(poem );
+
+transactionManager.commit();
+
+em.close();</code></pre></div></div><br class="example-break"/><p>That was not too hard, was it?
+Note that application frameworks like Seam
+or Spring Framework should be able to initialize the transaction manager
+and call it to demarcate transactions for you.
+Check their respective documentation.</p></div><div class="section" title="4.2.3. Without JTA"><div class="titlepage"><div><div><h3 class="title"><a id="without_jta"/>4.2.3. Without JTA</h3></div></div></div><p>While this approach works today, it does not ensure that works are done transactionally
+and hence won’t be able to rollback your work.
+This will change in the future but in the mean time,
+such an environment is not recommended.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h2>Note</h2><p>For NoSQL datastores not supporting transactions, this is less of a concern.</p></div></div></div><div class="section" title="4.3. Configuration options"><div class="titlepage"><div><div><h2 class="title"><a id="ogm-configuration-optionsogm-configuration-options"/>4.3. Configuration options</h2></div></div></div><p>The most important options when configuring Hibernate OGM are related to the datastore.
+They are explained in <a class="xref" href="ch08.html" title="Chapter 8. NoSQL datastores">Chapter 8, <em>NoSQL datastores</em></a>.</p><p>Otherwise, most options from Hibernate ORM and Hibernate Search are applicable
+when using Hibernate OGM.
+You can pass them as you are used to do
+either in your <code class="literal">persistence.xml</code> file, your <code class="literal">hibernate.cfg.xml</code> file
+or programmatically.</p><p>More interesting is a list of options that do <span class="emphasis"><em>not</em></span> apply to Hibernate OGM
+and that should not be set:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><code class="literal">hibernate.dialect</code></li><li class="listitem"><code class="literal">hibernate.connection.*</code> and in particular <code class="literal">hibernate.connection.provider_class</code></li><li class="listitem"><code class="literal">hibernate.show_sql</code> and <code class="literal">hibernate.format_sql</code></li><li class="listitem"><code class="literal">hibernate.default_schema</code> and <code class="literal">hibernate.default_catalog</code></li><li class="listitem"><code class="literal">hibernate.use_sql_comments</code></li><li class="listitem"><code class="literal">hibernate.jdbc.*</code></li><li class="listitem"><code class="literal">hibernate.hbm2ddl.auto</code> and <code class="literal">hibernate.hbm2ddl.import_file</code></li></ul></div></div><div class="section" title="4.4. Configuring Hibernate Search"><div class="titlepage"><div><div><h2 class="title"><a id="configuring_hibernate_search"/>4.4. Configuring Hibernate Search</h2></div></div></div><p>Hibernate Search integrates with Hibernate OGM just like it does with Hibernate ORM.
+The Hibernate Search version tested is 5.2.0.Final.
+Add the dependency to your project - the group id is <code class="literal">org.hibernate</code> and artifact id <code class="literal">hibernate-search-orm</code>.</p><p>Then configure where you want to store your indexes,
+map your entities with the relevant index annotations and you are good to go.
+For more information, simply check the
+<a class="link" href="http://docs.jboss.org/hibernate/stable/search/reference/en-US/html_single/">Hibernate Search reference documentation</a>.</p><p>In <a class="xref" href="ch09.html#ogm-infinispan-indexstorage" title="9.6. Storing a Lucene index in Infinispan">Section 9.6, “Storing a Lucene index in Infinispan”</a> we’ll discuss how to store your Lucene indexes in Infinispan.
+This is useful even if you don’t plan to use Infinispan as your primary data store.</p></div><div class="section" title="4.5. How to package Hibernate OGM applications for WildFly 9"><div class="titlepage"><div><div><h2 class="title"><a id="ogm-configuration-jbossmodule"/>4.5. How to package Hibernate OGM applications for WildFly 9</h2></div></div></div><p>Provided you’re deploying on WildFly,
+there is an additional way to add the OGM dependencies to your application.</p><p>In WildFly, class loading is based on modules; this system defines explicit, non-transitive dependencies on other modules.</p><p>Modules allow to share the same artifacts across multiple applications,
+making deployments smaller and quicker, and also making it possible to deploy multiple different versions of any library.</p><p>More details about modules are described in
+<a class="link" href="https://docs.jboss.org/author/display/WFLY9/Class+Loading+in+WildFly">Class Loading in WildFly</a>.</p><p>If you apply the following instructions you can create super small deployments which do not include any dependency.</p><div class="section" title="4.5.1. Packaging Hibernate OGM applications for WildFly 9"><div class="titlepage"><div><div><h3 class="title"><a id="packaging_hibernate_ogm_applications_for_wildfly_9"/>4.5.1. Packaging Hibernate OGM applications for WildFly 9</h3></div></div></div><p>You can download the pre-packaged module ZIP for this version of Hibernate OGM from:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><a class="link" href="https://downloads.sourceforge.net/project/hibernate/hibernate-ogm/4.2.0.Final/hibernate-ogm-modules-wildfly9-4.2.0.Final.zip">Sourceforge</a></li><li class="listitem"><a class="link" href="https://repository.jboss.org/nexus/service/local/artifact/maven/redirect?r=central&amp;g=org.hibernate.ogm&amp;a=hibernate-ogm-modules-wildfly9&amp;v=4.2.0.Final&amp;e=zip">JBoss’s Maven repository</a></li></ul></div><p>Unpack the archive into the <code class="literal">modules</code> folder of your WildFly 9 installation.
+The modules included are:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><span class="emphasis"><em>org.hibernate:ogm</em></span>, the core Hibernate OGM library and the Infinispan datastore provider.</li><li class="listitem"><span class="emphasis"><em>org.hibernate.ogm.&lt;%DATASTORE%&gt;:main</em></span>, one module for each datastore, with <span class="emphasis"><em>&lt;%DATASTORE%&gt;</em></span> being one of <span class="emphasis"><em>ehcache</em></span>, <span class="emphasis"><em>mongodb</em></span> etc.</li><li class="listitem">Several shared dependencies such as <span class="emphasis"><em>org.hibernate.hql:&lt;%VERSION%&gt;</em></span> (containing the query parser) and others</li></ul></div><p>There are two ways to include the dependencies in your project:</p><div class="variablelist"><dl><dt><span class="term">Using the manifest</span></dt><dd>Add this entry to the MANIFEST.MF in your archive (replace <span class="emphasis"><em>&lt;%DATASTORE%&gt;</em></span> with the right value for your chosen datastore):</dd></dl></div><pre class="screen">Dependencies: org.hibernate:ogm services, org.hibernate.ogm.&lt;%DATASTORE%&gt;:main services</pre><div class="variablelist"><dl><dt><span class="term">Using jboss-deployment-structure.xml</span></dt><dd>This is a JBoss-specific descriptor.
+Add a <code class="literal">WEB-INF/jboss-deployment-structure.xml</code> in your archive with the following content (replace <span class="emphasis"><em>&lt;%DATASTORE%&gt;</em></span> with the right value for your chosen datastore):</dd></dl></div><pre><code class="language-xml">&lt;jboss-deployment-structure&gt;
+    &lt;deployment&gt;
+        &lt;dependencies&gt;
+            &lt;module name="org.hibernate" slot="ogm" services="export" /&gt;
+            &lt;module name="org.hibernate.ogm.&lt;%DATASTORE%&gt;" slot="main" services="export" /&gt;
+        &lt;/dependencies&gt;
+    &lt;/deployment&gt;
+&lt;/jboss-deployment-structure&gt;</code></pre><p>More information about the descriptor can be found in the
+<a class="link" href="https://docs.jboss.org/author/display/WFLY9/Class+Loading+in+WildFly">WildFly documentation</a>.</p></div><div class="section" title="4.5.2. Enabling both the Hibernate Search and Hibernate OGM modules"><div class="titlepage"><div><div><h3 class="title"><a id="enabling_both_the_hibernate_search_and_hibernate_ogm_modules"/>4.5.2. Enabling both the Hibernate Search and Hibernate OGM modules</h3></div></div></div><p>A compatible Hibernate Search module is included in WildFly 9: all you have to do is activate the dependency.</p><p>When using WildFly, no library is available to your deployments unless you explicitly request it, or unless it is the implementation for a JavaEE service which your application is using.
+For example, Hibernate ORM will be available by default to your application if you are including the definition of a persistence unit,
+although there are options to prevent that, for example to use a different JPA implementor or to use a different version of Hibernate ORM.</p><p>Hibernate Search is not automatically provided, so you have to make it available explicitly either via the <code class="literal">MANIFEST.MF</code> or via a custom <code class="literal">jboss-deployment-structure.xml</code>.</p><p>To do that, the <code class="literal">MANIFEST.MF</code> of your deployment will look like:</p><div class="example"><a id="d0e1297"/><p class="title"><strong>Example 4.6. Example MANIFEST.MF for an application using Hibernate OGM for CouchDB and also Hibernate Search</strong></p><div class="example-contents"><pre class="screen">org.hibernate:ogm services, org.hibernate.ogm.couchdb services, org.hibernate.search.orm services</pre></div></div><br class="example-break"/><p>Optionally you could download a different version of the Hibernate Search modules, provided it is compatible with the Hibernate OGM version you plan to use.
+For example you might want to download a more recent micro version of what is included in WildFly 9 at the time of publishing this documentation.</p><p>The Hibernate Search documentation explains the details of downloading and deploying a custom version: <a class="link" href="http://docs.jboss.org/hibernate/search/5.2/reference/en-US/html/search-configuration.html#_update_and_activate_latest_hibernate_search_version_in_wildfly">Update and activate latest Hibernate Search version in WildFly</a>.</p><p>This approach might require you to make changes to the XML definitions of the Hibernate OGM modules to change the references to the Hibernate Search slot
+to the slot version that you plan to use.</p></div></div></div><script xmlns="" xmlns:d="http://docbook.org/ns/docbook" type="text/javascript" src="highlight.js/highlight.pack.js"> </script><script xmlns="" xmlns:d="http://docbook.org/ns/docbook" type="text/javascript">hljs.initHighlightingOnLoad();</script><script type="text/javascript">
+dataLayer = [{'channel' : 'Hibernate', 'additional_tracking_code' : 'UA-45270411-3'}];
+(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NJWS5L');</script><noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-NJWS5L" height="0" width="0" style="display:none;visibility:hidden"> </iframe></noscript><hr xmlns="" xmlns:d="http://docbook.org/ns/docbook"/><a xmlns="" xmlns:d="http://docbook.org/ns/docbook" href="legalnotice.html"/><ul class="docnav"><li class="previous"><a accesskey="p" href="ch03.html"><strong>Prev</strong>Chapter 3. Architecture</a></li><li class="up"><a accesskey="u" href="#"><strong>Up</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Home</strong></a></li><li class="next"><a accesskey="n" href="ch05.html"><strong>Next</strong>Chapter 5. Map your entities</a></li></ul><!-- HibernateDoc.OutdatedContent --><script src="//code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script><script src="/hibernate/_outdated-content/outdated-content.js" type="text/javascript"></script><script type="text/javascript">var jQuery_3_1 = $.noConflict(true); jQuery_3_1(document).ready(function() { HibernateDoc.OutdatedContent.install("ogm"); });</script><!-- /HibernateDoc.OutdatedContent --></body></html>

@@ -1,0 +1,77 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>19.4.&nbsp;Le cache de requ&ecirc;tes</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="performance.html" title="Chapitre&nbsp;19.&nbsp;Am&eacute;liorer les performances">
+      <link rel="prev" href="performance-sessioncache.html" title="19.3.&nbsp;G&eacute;rer les caches">
+      <link rel="next" href="performance-collections.html" title="19.5.&nbsp;Comprendre les performances des Collections">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">19.4.&nbsp;Le cache de requ&ecirc;tes</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="performance-sessioncache.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;19.&nbsp;Am&eacute;liorer les performances</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="performance-collections.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="performance-querycache"></a>19.4.&nbsp;Le cache de requ&ecirc;tes
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Les r&eacute;sultats d'une requ&ecirc;te peuvent aussi &ecirc;tre plac&eacute;s en cache. Ceci n'est utile que pour les requ&ecirc;tes qui sont ex&eacute;cut&eacute;es
+            avec les m&ecirc;mes param&egrave;tres. Pour utiliser le cache de requ&ecirc;tes, vous devez d'abord l'activer : 
+         </p><pre class="programlisting">hibernate.cache.use_query_cache true</pre><p>Ce param&egrave;tre am&egrave;ne la cr&eacute;ation de deux nouvelles r&eacute;gions dans le cache, une qui va conserver le r&eacute;sultat des requ&ecirc;tes mises
+            en cache (<code class="literal">org.hibernate.cache.StandardQueryCache</code>) et l'autre qui va conserver l'horodatage des mises &agrave; jour les plus r&eacute;centes effectu&eacute;es sur les tables requ&ecirc;tables (<code class="literal">org.hibernate.cache.UpdateTimestampsCache</code>). Il faut noter que le cache de requ&ecirc;te ne conserve pas l'&eacute;tat des entit&eacute;s, il met en cache uniquement les valeurs de l'identifiant
+            et les valeurs de types de base (?). Le cache de requ&ecirc;te doit toujours &ecirc;tre utilis&eacute; avec le cache de second niveau pour &ecirc;tre
+            efficace. 
+         </p>
+         <p>La plupart des requ&ecirc;tes ne retirent pas de b&eacute;n&eacute;fice pas du cache, donc par d&eacute;faut les requ&ecirc;tes ne sont pas mises en cache.
+            Pour activer le cache, appelez <code class="literal">Query.setCacheable(true)</code>. Cet appel permet de v&eacute;rifier si les r&eacute;sultats sont en cache ou non, voire d'ajouter ces r&eacute;sultats si la requ&ecirc;te est ex&eacute;cut&eacute;e.
+            
+         </p>
+         <p>Si vous avez besoin de contr&ocirc;ler finement les d&eacute;lais d'expiration du cache, vous pouvez sp&eacute;cifier une r&eacute;gion de cache nomm&eacute;e
+            pour une requ&ecirc;te particuli&egrave;re en appelant <code class="literal">Query.setCacheRegion()</code>. 
+         </p><pre class="programlisting">List blogs = sess.createQuery("from Blog blog where blog.blogger = :blogger")
+    .setEntity("blogger", blogger)
+    .setMaxResults(15)
+    .setCacheable(true)
+    .setCacheRegion("frontpages")
+    .list();</pre><p>Si une requ&ecirc;te doit forcer le rafra&icirc;chissement de sa r&eacute;gion de cache, vous devez appeler <code class="literal">Query.setCacheMode(CacheMode.REFRESH)</code>. C'est particuli&egrave;rement utile lorsque les donn&eacute;es peuvent avoir &eacute;t&eacute; mises &agrave; jour par un processus s&eacute;par&eacute; (e.g. elles n'ont
+            pas &eacute;t&eacute; modifi&eacute;es par Hibernate). Cela permet &agrave; l'application de rafra&icirc;chir de mani&egrave;re s&eacute;lective les r&eacute;sultats d'une requ&ecirc;te
+            particuli&egrave;re. Il s'agit d'une alternative plus efficace &agrave; l'&eacute;viction d'une r&eacute;gion du cache &agrave; l'aide de la m&eacute;thode <code class="literal">SessionFactory.evictQueries()</code>. 
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="performance-sessioncache.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="performance.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="performance-collections.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">19.3.&nbsp;G&eacute;rer les caches&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;19.5.&nbsp;Comprendre les performances des Collections</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

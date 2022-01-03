@@ -1,0 +1,203 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>10.7.&nbsp;Automatic state detection</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="objectstate.html" title="Chapter&nbsp;10.&nbsp;Working with objects">
+      <link rel="prev" href="objectstate-detached.html" title="10.6.&nbsp;Modifying detached objects">
+      <link rel="next" href="objectstate-deleting.html" title="10.8.&nbsp;Deleting persistent objects">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">10.7.&nbsp;Automatic state detection</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="objectstate-detached.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;10.&nbsp;Working with objects</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="objectstate-deleting.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="objectstate-saveorupdate"></a>10.7.&nbsp;Automatic state detection
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+            Hibernate users have requested a general purpose method that either saves a
+            transient instance by generating a new identifier or updates/reattaches
+                        the detached instances associated with its current identifier.
+                        The <code class="literal">saveOrUpdate()</code> method implements this functionality.
+                    
+         </p><pre class="programlisting">// in the first session
+Cat cat = (Cat) firstSession.load(Cat.class, catID);
+
+// in a higher tier of the application
+Cat mate = new Cat();
+cat.setMate(mate);
+
+// later, in a new session
+secondSession.saveOrUpdate(cat);   // update existing state (cat has a non-null id)
+secondSession.saveOrUpdate(mate);  // save the new instance (mate has a null id)</pre><p>
+                        The usage and semantics of <code class="literal">saveOrUpdate()</code> seems to be confusing
+                        for new users. Firstly, so long as you are not trying to use instances from one session
+                        in another new session, you should not need to use <code class="literal">update()</code>,
+                        <code class="literal">saveOrUpdate()</code>, or <code class="literal">merge()</code>. Some whole
+                        applications will never use either of these methods.
+                    
+         </p>
+         <p>
+                        Usually <code class="literal">update()</code> or <code class="literal">saveOrUpdate()</code> are used in
+                        the following scenario:
+                    
+         </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p>
+                                         the application loads an object in the first session
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         the object is passed up to the UI tier
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         some modifications are made to the object
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         the object is passed back down to the business logic tier
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         the application persists these modifications by calling
+                                         <code class="literal">update()</code> in a second session
+                                     
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p>
+                        <code class="literal">saveOrUpdate()</code> does the following:
+                    
+         </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p>
+                                         if the object is already persistent in this session, do nothing
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         if another object associated with the session has the same identifier, 
+                                         throw an exception
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         if the object has no identifier property, <code class="literal">save()</code> it
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         if the object's identifier has the value assigned to a newly instantiated
+                                         object, <code class="literal">save()</code> it
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         if the object is versioned (by a <code class="literal">&lt;version&gt;</code> or
+                                         <code class="literal">&lt;timestamp&gt;</code>), and the version property value
+                                         is the same value assigned to a newly instantiated object, 
+                                         <code class="literal">save()</code> it
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         otherwise <code class="literal">update()</code> the object
+                                     
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p>
+                        and <code class="literal">merge()</code> is very different:
+                    
+         </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p>
+                                         if there is a persistent instance with the same identifier currently 
+                                         associated with the session, copy the state of the given object onto 
+                                         the persistent instance
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         if there is no persistent instance currently associated with the session, 
+                                         try to load it from the database, or create a new persistent instance
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         the persistent instance is returned
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         the given instance does not become associated with the session, it
+                                         remains detached
+                                     
+                  </p>
+               </li>
+            </ul>
+         </div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="objectstate-detached.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="objectstate.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="objectstate-deleting.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">10.6.&nbsp;Modifying detached objects&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;10.8.&nbsp;Deleting persistent objects</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

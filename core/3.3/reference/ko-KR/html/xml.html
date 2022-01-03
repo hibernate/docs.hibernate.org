@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory">18장. XML 매핑</title><link rel="stylesheet" href="css/hibernate.css" type="text/css"/><meta xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" name="generator" content="DocBook XSL Stylesheets V1.72.0"/><link rel="start" href="index.html" title="HIBERNATE - 개성있는 자바를 위한 관계 영속"/><link rel="up" href="index.html" title="HIBERNATE - 개성있는 자바를 위한 관계 영속"/><link rel="prev" href="filters.html" title="17장. 데이터 필터링하기"/><link rel="next" href="performance.html" title="19장. 퍼포먼스 개선하기"/><link rel="copyright" href="ln-Legal_Notice.html" title="Legal Notice"/></head><body><p id="title"><a href="http://www.hibernate.org" class="site_href"><strong>Hibernate.org</strong></a><a href="http://hibernate.org/Documentation/DocumentationOverview" class="doc_href"><strong>Community Documentation</strong></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="filters.html"><strong>이전</strong></a></li><li class="next"><a accesskey="n" href="performance.html"><strong>다음</strong></a></li></ul><div class="chapter" lang="ko-KR"><div class="titlepage"><div><div><h2 class="title"><a id="xml"/>18장. XML 매핑</h2></div></div></div><div class="toc"><dl><dt><span class="sect1"><a href="xml.html#xml-intro">18.1. XML 데이터로 작업하기</a></span></dt><dd><dl><dt><span class="sect2"><a href="xml.html#xml-intro-mapping">18.1.1. XML과 클래스 매핑을 함께 지정하기</a></span></dt><dt><span class="sect2"><a href="xml.html#xml-onlyxml">18.1.2. XML 매핑만을 지정하기</a></span></dt></dl></dd><dt><span class="sect1"><a href="xml.html#xml-mapping">18.2. XML 매핑 메타데이터</a></span></dt><dt><span class="sect1"><a href="xml.html#xml-manipulation">18.3. XML 데이터 처리하기</a></span></dt></dl></div><p><span class="emphasis"><em>XML Mapping is an experimental feature in Hibernate 3.0 and is currently under active development. </em></span></p><div class="sect1" lang="ko-KR"><div class="titlepage"><div><div><h2 class="title"><a id="xml-intro"/>18.1. XML 데이터로 작업하기</h2></div></div></div><p>Hibernate allows you to work with persistent XML data in much the same way you work with persistent POJOs. A parsed XML tree can be thought of as another way of representing the relational data at the object level, instead of POJOs. </p><p>Hibernate는 XML 트리들을 처리하는 API로서 dom4j를 지원한다. 당신은 데이터베이스로부터 dom4j 트리들을 검색하고 당신이 그 트리를 데이터베이스와 자동적으로 동기화시키기 위해 어떤 변경을 행하도록 하는 질의들을 작성할 수 있다. 당신은 심지어 XML 문서를 취하고, dom4j를 사용하여 그것을 파싱하고, Hibernate의 다음 기본적인 오퍼레이션들 중 어떤 것으로서 그것을 데이터베이스에 저장시킬 수 있다: <code class="literal">persist(), saveOrUpdate(), merge(), delete(), replicate()</code>(merging(병합)은 아직 지원되지 않는다). </p><p>이 특징은 데이터 가져오기/내보내기,JMS 또는 SOAP 그리고 XSLT-기반의 레포팅을 통한 엔티티 데이터의 구체화를 포함하는 많은 어플리케이션들을 갖는다. </p><p>A single mapping can be used to simultaneously map properties of a class and nodes of an XML document to the database, or, if there is no class to map, it can be used to map just the XML. </p><div class="sect2" lang="ko-KR"><div class="titlepage"><div><div><h3 class="title"><a id="xml-intro-mapping"/>18.1.1. XML과 클래스 매핑을 함께 지정하기</h3></div></div></div><p>다음은 POJO와 XML을 동시에 매핑시키는 예제이다 : </p><pre class="programlisting">&lt;class name="Account" 
+        table="ACCOUNTS" 
+        node="account"&gt;
+        
+    &lt;id name="accountId" 
+            column="ACCOUNT_ID" 
+            node="@id"/&gt;
+            
+    &lt;many-to-one name="customer" 
+            column="CUSTOMER_ID" 
+            node="customer/@id" 
+            embed-xml="false"/&gt;
+            
+    &lt;property name="balance" 
+            column="BALANCE" 
+            node="balance"/&gt;
+            
+    ...
+    
+&lt;/class&gt;</pre></div><div class="sect2" lang="ko-KR"><div class="titlepage"><div><div><h3 class="title"><a id="xml-onlyxml"/>18.1.2. XML 매핑만을 지정하기</h3></div></div></div><p>다음은 POJO 클래스가 존재하지 않는 예제이다: </p><pre class="programlisting">&lt;class entity-name="Account" 
+        table="ACCOUNTS" 
+        node="account"&gt;
+        
+    &lt;id name="id" 
+            column="ACCOUNT_ID" 
+            node="@id" 
+            type="string"/&gt;
+            
+    &lt;many-to-one name="customerId" 
+            column="CUSTOMER_ID" 
+            node="customer/@id" 
+            embed-xml="false" 
+            entity-name="Customer"/&gt;
+            
+    &lt;property name="balance" 
+            column="BALANCE" 
+            node="balance" 
+            type="big_decimal"/&gt;
+            
+    ...
+    
+&lt;/class&gt;</pre><p>This mapping allows you to access the data as a dom4j tree, or as a graph of property name/value pairs or java <code class="literal">Map</code>s. The property names are purely logical constructs that can be referred to in HQL queries. </p></div></div><div class="sect1" lang="ko-KR"><div class="titlepage"><div><div><h2 class="title"><a id="xml-mapping"/>18.2. XML 매핑 메타데이터</h2></div></div></div><p>A range of Hibernate mapping elements accept the <code class="literal">node</code> attribute. This lets you specify the name of an XML attribute or element that holds the property or entity data. The format of the <code class="literal">node</code> attribute must be one of the following: </p><div class="itemizedlist"><ul compact="compact"><li><p><code class="literal">"element-name"</code>: map to the named XML element</p></li><li><p><code class="literal">"@attribute-name"</code>: map to the named XML attribute</p></li><li><p><code class="literal">"."</code>: map to the parent element</p></li><li><p><code class="literal">"element-name/@attribute-name"</code>: map to the named attribute of the named element </p></li></ul></div><p>For collections and single valued associations, there is an additional <code class="literal">embed-xml</code> attribute. If <code class="literal">embed-xml="true"</code>, the default, the XML tree for the associated entity (or collection of value type) will be embedded directly in the XML tree for the entity that owns the association. Otherwise, if <code class="literal">embed-xml="false"</code>, then only the referenced identifier value will appear in the XML for single point associations and collections will not appear at all. </p><p>Do not leave <code class="literal">embed-xml="true"</code> for too many associations, since XML does not deal well with circularity. </p><pre class="programlisting">&lt;class name="Customer" 
+        table="CUSTOMER" 
+        node="customer"&gt;
+        
+    &lt;id name="id" 
+            column="CUST_ID" 
+            node="@id"/&gt;
+            
+    &lt;map name="accounts" 
+            node="." 
+            embed-xml="true"&gt;
+        &lt;key column="CUSTOMER_ID" 
+                not-null="true"/&gt;
+        &lt;map-key column="SHORT_DESC" 
+                node="@short-desc" 
+                type="string"/&gt;
+        &lt;one-to-many entity-name="Account"
+                embed-xml="false" 
+                node="account"/&gt;
+    &lt;/map&gt;
+    
+    &lt;component name="name" 
+            node="name"&gt;
+        &lt;property name="firstName" 
+                node="first-name"/&gt;
+        &lt;property name="initial" 
+                node="initial"/&gt;
+        &lt;property name="lastName" 
+                node="last-name"/&gt;
+    &lt;/component&gt;
+    
+    ...
+    
+&lt;/class&gt;</pre><p>In this case, the collection of account ids is embedded, but not the actual account data. The following HQL query: </p><pre class="programlisting">from Customer c left join fetch c.accounts where c.lastName like :lastName</pre><p>would return datasets such as this: </p><pre class="programlisting">&lt;customer id="123456789"&gt;
+    &lt;account short-desc="Savings"&gt;987632567&lt;/account&gt;
+    &lt;account short-desc="Credit Card"&gt;985612323&lt;/account&gt;
+    &lt;name&gt;
+        &lt;first-name&gt;Gavin&lt;/first-name&gt;
+        &lt;initial&gt;A&lt;/initial&gt;
+        &lt;last-name&gt;King&lt;/last-name&gt;
+    &lt;/name&gt;
+    ...
+&lt;/customer&gt;</pre><p>만일 당신이 <code class="literal">&lt;one-to-many&gt;</code> 매핑에 대해 <code class="literal">embed-xml="true"</code>를 설정할 경우, 데이터는 다음과 같이 보일 수도 있다: </p><pre class="programlisting">&lt;customer id="123456789"&gt;
+    &lt;account id="987632567" short-desc="Savings"&gt;
+        &lt;customer id="123456789"/&gt;
+        &lt;balance&gt;100.29&lt;/balance&gt;
+    &lt;/account&gt;
+    &lt;account id="985612323" short-desc="Credit Card"&gt;
+        &lt;customer id="123456789"/&gt;
+        &lt;balance&gt;-2370.34&lt;/balance&gt;
+    &lt;/account&gt;
+    &lt;name&gt;
+        &lt;first-name&gt;Gavin&lt;/first-name&gt;
+        &lt;initial&gt;A&lt;/initial&gt;
+        &lt;last-name&gt;King&lt;/last-name&gt;
+    &lt;/name&gt;
+    ...
+&lt;/customer&gt;</pre></div><div class="sect1" lang="ko-KR"><div class="titlepage"><div><div><h2 class="title"><a id="xml-manipulation"/>18.3. XML 데이터 처리하기</h2></div></div></div><p>You can also re-read and update XML documents in the application. You can do this by obtaining a dom4j session: </p><pre class="programlisting">Document doc = ....;
+       
+Session session = factory.openSession();
+Session dom4jSession = session.getSession(EntityMode.DOM4J);
+Transaction tx = session.beginTransaction();
+
+List results = dom4jSession
+    .createQuery("from Customer c left join fetch c.accounts where c.lastName like :lastName")
+    .list();
+for ( int i=0; i&lt;results.size(); i++ ) {
+    //add the customer data to the XML document
+    Element customer = (Element) results.get(i);
+    doc.add(customer);
+}
+
+tx.commit();
+session.close();</pre><pre class="programlisting">Session session = factory.openSession();
+Session dom4jSession = session.getSession(EntityMode.DOM4J);
+Transaction tx = session.beginTransaction();
+
+Element cust = (Element) dom4jSession.get("Customer", customerId);
+for ( int i=0; i&lt;results.size(); i++ ) {
+    Element customer = (Element) results.get(i);
+    //change the customer name in the XML and database
+    Element name = customer.element("name");
+    name.element("first-name").setText(firstName);
+    name.element("initial").setText(initial);
+    name.element("last-name").setText(lastName);
+}
+
+tx.commit();
+session.close();</pre><p>When implementing XML-based data import/export, it is useful to combine this feature with Hibernate's <code class="literal">replicate()</code> operation. </p></div></div><HR xmlns=""/><a xmlns="" href="legalnotice.html"><p xmlns="http://www.w3.org/1999/xhtml" class="copyright">저작권 © 2004 Red Hat Middleware, LLC.</p></a><ul class="docnav"><li class="previous"><a accesskey="p" href="filters.html"><strong>이전</strong>17장. 데이터 필터링하기</a></li><li class="up"><a accesskey="u" href="#"><strong>위로</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>처음으로</strong></a></li><li class="next"><a accesskey="n" href="performance.html"><strong>다음</strong>19장. 퍼포먼스 개선하기</a></li></ul></body></html>

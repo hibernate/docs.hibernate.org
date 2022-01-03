@@ -1,0 +1,122 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>3.5.&nbsp;Tracer</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="session-configuration.html" title="Chapitre&nbsp;3.&nbsp;Configuration">
+      <link rel="prev" href="configuration-optional.html" title="3.4.&nbsp;Propri&eacute;t&eacute;s de configuration optionnelles">
+      <link rel="next" href="configuration-namingstrategy.html" title="3.6.&nbsp;Impl&eacute;menter une NamingStrategy">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">3.5.&nbsp;Tracer</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="configuration-optional.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;3.&nbsp;Configuration</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="configuration-namingstrategy.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="configuration-logging"></a>3.5.&nbsp;Tracer
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Hibernate utilizes <a xmlns:xlink="http://www.w3.org/1999/xlink" href="http://www.slf4j.org/" target="_top">Simple Logging Facade for Java</a> (SLF4J) in order to log various system events. SLF4J can direct your logging output to several logging frameworks (NOP, Simple,
+            log4j version 1.2, JDK 1.4 logging, JCL or logback) depending on your chosen binding. In order to setup logging properly you
+            will need <code class="filename">slf4j-api.jar</code> in your classpath together with the jar file for your preferred binding - <code class="filename">slf4j-log4j12.jar</code> in the case of Log4J. See the SLF4J <a xmlns:xlink="http://www.w3.org/1999/xlink" href="http://www.slf4j.org/manual.html" target="_top">documentation</a> for more detail. To use Log4j you will also need to place a <code class="filename">log4j.properties</code> file in your classpath, an example properties file is distributed with Hibernate in the <code class="literal">src/</code> directory. 
+         </p>
+         <p>Nous vous recommandons fortement de vous familiariser avec les messages des traces d'Hibernate. Beaucoup de soins a &eacute;t&eacute; apport&eacute;
+            pour donner le plus de d&eacute;tails possible sans les rendre illisibles. C'est un outil essentiel en cas de soucis. Les cat&eacute;gories
+            de trace les plus int&eacute;ressantes sont les suivantes : 
+         </p>
+         <div class="table"><a name="log-categories"></a><p class="title"><b>Tableau&nbsp;3.9.&nbsp;Cat&eacute;gories de trace d'Hibernate</b></p>
+            <div class="table-contents">
+               <table summary="Cat&eacute;gories de trace d'Hibernate" border="1">
+                  <colgroup>
+                     <col>
+                     <col>
+                  </colgroup>
+                  <thead>
+                     <tr>
+                        <th>Cat&eacute;gorie</th>
+                        <th>Fonction</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     <tr>
+                        <td><code class="literal">org.hibernate.SQL</code></td>
+                        <td>Trace toutes les requ&ecirc;ts SQL de type DML (gestion des donn&eacute;es) qui sont ex&eacute;cut&eacute;es</td>
+                     </tr>
+                     <tr>
+                        <td><code class="literal">org.hibernate.type</code></td>
+                        <td>Trace tous les param&egrave;tres JDBC</td>
+                     </tr>
+                     <tr>
+                        <td><code class="literal">org.hibernate.tool.hbm2ddl</code></td>
+                        <td>Trace toutes les requ&ecirc;ts SQL de type DDL (gestion de la structure de la base) qui sont ex&eacute;cut&eacute;es</td>
+                     </tr>
+                     <tr>
+                        <td><code class="literal">org.hibernate.pretty</code></td>
+                        <td>Trace l'&eacute;tat de toutes les entit&eacute;s (20 entit&eacute;s maximum) qui sont associ&eacute;es avec la session hibernate au moment du flush </td>
+                     </tr>
+                     <tr>
+                        <td><code class="literal">org.hibernate.cache</code></td>
+                        <td>Trace toute l'activit&eacute; du cache de second niveau</td>
+                     </tr>
+                     <tr>
+                        <td><code class="literal">org.hibernate.transaction</code></td>
+                        <td>Trace toute l'activit&eacute; relative aux transactions</td>
+                     </tr>
+                     <tr>
+                        <td><code class="literal">org.hibernate.jdbc</code></td>
+                        <td>Trace toute acquisition de ressource JDBC</td>
+                     </tr>
+                     <tr>
+                        <td><code class="literal">org.hibernate.hql.ast.AST</code></td>
+                        <td>Trace l'arbre syntaxique des requ&ecirc;tes HQL et SQL durant l'analyse syntaxique des requ&ecirc;tes </td>
+                     </tr>
+                     <tr>
+                        <td><code class="literal">org.hibernate.secure</code></td>
+                        <td>Trace toutes les demandes d'autorisation JAAS</td>
+                     </tr>
+                     <tr>
+                        <td><code class="literal">org.hibernate</code></td>
+                        <td>Trace tout (beaucoupe d'informations, mais tr&egrave;s utile pour r&eacute;soudre les probl&egrave;mes). </td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+         </div><br class="table-break"><p>Lorsque vous d&eacute;veloppez des applications avec Hibernate, vous devriez quasiment toujours travailler avec le niveau <code class="literal">debug</code> activ&eacute; pour la cat&eacute;gorie <code class="literal">org.hibernate.SQL</code>, ou sinon avec la propri&eacute;t&eacute; <code class="literal">hibernate.show_sql</code> activ&eacute;e. 
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="configuration-optional.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="session-configuration.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="configuration-namingstrategy.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">3.4.&nbsp;Propri&eacute;t&eacute;s de configuration optionnelles&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;3.6.&nbsp;Impl&eacute;menter une <code class="literal">NamingStrategy</code></td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

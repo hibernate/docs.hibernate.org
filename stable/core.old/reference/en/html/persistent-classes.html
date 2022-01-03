@@ -1,0 +1,293 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>Chapter&nbsp;4.&nbsp;Persistent Classes</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="prev" href="configuration-j2ee.html" title="3.8.&nbsp;J2EE Application Server integration">
+      <link rel="next" href="persistent-classes-inheritance.html" title="4.2.&nbsp;Implementing inheritance">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">Chapter&nbsp;4.&nbsp;Persistent Classes</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="configuration-j2ee.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">&nbsp;</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="persistent-classes-inheritance.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="chapter" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title"><a name="persistent-classes"></a>Chapter&nbsp;4.&nbsp;Persistent Classes
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+            Persistent classes are classes in an application that implement the entities
+            of the business problem (e.g. Customer and Order in an E-commerce application).
+            Not all instances of a persistent class are considered to be in the persistent 
+                    state - an instance may instead be transient or detached.
+                
+         </p>
+         <p>
+                    Hibernate works best if these classes follow some simple rules, also known
+                    as the Plain Old Java Object (POJO) programming model. However, none of these
+                    rules are hard requirements. Indeed, Hibernate3 assumes very little about
+                    the nature of your persistent objects. You may express a domain model in other 
+                    ways: using trees of <code class="literal">Map</code> instances, for example.
+                
+         </p>
+         <div class="sect1" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="persistent-classes-pojo"></a>4.1.&nbsp;A simple POJO example
+                     </h2>
+                  </div>
+               </div>
+            </div>
+            <p>
+                           Most Java applications require a persistent class representing felines.
+                       
+            </p><pre class="programlisting">package eg;
+import java.util.Set;
+import java.util.Date;
+
+public class Cat {
+    private Long id; // identifier
+
+    private Date birthdate;
+    private Color color;
+    private char sex;
+    private float weight;
+    private int litterId;
+
+    private Cat mother;
+    private Set kittens = new HashSet();
+
+    private void setId(Long id) {
+        this.id=id;
+    }
+    public Long getId() {
+        return id;
+    }
+
+    void setBirthdate(Date date) {
+        birthdate = date;
+    }
+    public Date getBirthdate() {
+        return birthdate;
+    }
+
+    void setWeight(float weight) {
+        this.weight = weight;
+    }
+    public float getWeight() {
+        return weight;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+    void setColor(Color color) {
+        this.color = color;
+    }
+
+    void setSex(char sex) {
+        this.sex=sex;
+    }
+    public char getSex() {
+        return sex;
+    }
+
+    void setLitterId(int id) {
+        this.litterId = id;
+    }
+    public int getLitterId() {
+        return litterId;
+    }
+
+    void setMother(Cat mother) {
+        this.mother = mother;
+    }
+    public Cat getMother() {
+        return mother;
+    }
+    void setKittens(Set kittens) {
+        this.kittens = kittens;
+    }
+    public Set getKittens() {
+        return kittens;
+    }
+    
+    // addKitten not needed by Hibernate
+    public void addKitten(Cat kitten) {
+    	kitten.setMother(this);
+	kitten.setLitterId( kittens.size() ); 
+        kittens.add(kitten);
+    }
+}</pre><p>
+                           There are four main rules to follow here:
+                       
+            </p>
+            <div class="sect2" lang="en-US">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="persistent-classes-pojo-constructor"></a>4.1.1.&nbsp;Implement a no-argument constructor
+                        </h3>
+                     </div>
+                  </div>
+               </div>
+               <p>
+                                  <code class="literal">Cat</code> has a no-argument constructor. All persistent classes must 
+                                  have a default constructor (which may be non-public) so that Hibernate can instantiate 
+                                  them using <code class="literal">Constructor.newInstance()</code>. We strongly recommend having a 
+                                  default constructor with at least <span class="emphasis"><em>package</em></span> visibility for runtime proxy 
+                                  generation in Hibernate.
+                              
+               </p>
+            </div>
+            <div class="sect2" lang="en-US">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="persistent-classes-pojo-identifier"></a>4.1.2.&nbsp;Provide an identifier property (optional)
+                        </h3>
+                     </div>
+                  </div>
+               </div>
+               <p>
+                                  <code class="literal">Cat</code> has a property called <code class="literal">id</code>. This property 
+                                  maps to the primary key column of a database table. The property might have been called
+                                  anything, and its type might have been any primitive type, any primitive "wrapper" 
+                                  type, <code class="literal">java.lang.String</code> or <code class="literal">java.util.Date</code>. (If 
+                                  your legacy database table has composite keys, you can even use a user-defined class 
+                                  with properties of these types - see the section on composite identifiers later.)
+                              
+               </p>
+               <p>
+                                  The identifier property is strictly optional. You can leave them off and let Hibernate 
+                                  keep track of object identifiers internally. We do not recommend this, however.
+                              
+               </p>
+               <p>
+                                  In fact, some functionality is available only to classes which declare an
+                                  identifier property:
+                              
+               </p>
+               <div class="itemizedlist">
+                  <ul type="disc" compact>
+                     <li>
+                        <p>
+                                                   Transitive reattachment for detached objects (cascade update or cascade
+                                                   merge) - see <a href="objectstate-transitive.html" title="10.11.&nbsp;Transitive persistence">Section&nbsp;10.11, &#8220;Transitive persistence&#8221;</a>
+                                               
+                        </p>
+                     </li>
+                     <li>
+                        <p>
+                                                   <code class="literal">Session.saveOrUpdate()</code>
+                                               
+                        </p>
+                     </li>
+                     <li>
+                        <p>
+                                                   <code class="literal">Session.merge()</code>
+                                               
+                        </p>
+                     </li>
+                  </ul>
+               </div>
+               <p>
+                                  We recommend you declare consistently-named identifier properties on persistent
+                                  classes. We further recommend that you use a nullable (ie. non-primitive) type.
+                              
+               </p>
+            </div>
+            <div class="sect2" lang="en-US">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="persistent-classes-pojo-final"></a>4.1.3.&nbsp;Prefer non-final classes (optional)
+                        </h3>
+                     </div>
+                  </div>
+               </div>
+               <p>
+                                  A central feature of Hibernate, <span class="emphasis"><em>proxies</em></span>, depends upon the
+                                  persistent class being either non-final, or the implementation of an interface
+                                  that declares all public methods.
+                              
+               </p>
+               <p>
+                                  You can persist <code class="literal">final</code> classes that do not implement an interface
+                                  with Hibernate, but you won't be able to use proxies for lazy association fetching -
+                                  which will limit your options for performance tuning.
+                              
+               </p>
+               <p>
+                                  You should also avoid declaring <code class="literal">public final</code> methods on the 
+                                  non-final classes. If you want to use a class with a <code class="literal">public final</code> 
+                                  method, you must explicitly disable proxying by setting <code class="literal">lazy="false"</code>.
+                              
+               </p>
+            </div>
+            <div class="sect2" lang="en-US">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="persistent-classes-pojo-accessors"></a>4.1.4.&nbsp;Declare accessors and mutators for persistent fields (optional)
+                        </h3>
+                     </div>
+                  </div>
+               </div>
+               <p>
+                                  <code class="literal">Cat</code> declares accessor methods for all its persistent fields.
+                                  Many other ORM tools directly persist instance variables. We believe it is 
+                                  better to provide an indirection between the relational schema and internal
+                                  data structures of the class. By default, Hibernate persists JavaBeans style 
+                                  properties, and recognizes method names of the form <code class="literal">getFoo</code>, 
+                                  <code class="literal">isFoo</code> and <code class="literal">setFoo</code>. You may switch to direct 
+                                  field access for particular properties, if needed.
+                              
+               </p>
+               <p>
+                                  Properties need <span class="emphasis"><em>not</em></span> be declared public - Hibernate can
+                                  persist a property with a default, <code class="literal">protected</code> or 
+                                  <code class="literal">private</code> get / set pair.
+                              
+               </p>
+            </div>
+         </div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="configuration-j2ee.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center">&nbsp;</td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="persistent-classes-inheritance.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">3.8.&nbsp;J2EE Application Server integration&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;4.2.&nbsp;Implementing inheritance</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

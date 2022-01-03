@@ -1,0 +1,108 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>15.7.&nbsp;Projections, agr&eacute;gation et regroupement</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="querycriteria.html" title="Chapitre&nbsp;15.&nbsp;Requ&ecirc;tes par crit&egrave;res">
+      <link rel="prev" href="querycriteria-examples.html" title="15.6.&nbsp;Requ&ecirc;tes par l'exemple">
+      <link rel="next" href="querycriteria-detachedqueries.html" title="15.8.&nbsp;Requ&ecirc;tes et sous-requ&ecirc;tes d&eacute;tach&eacute;es">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">15.7.&nbsp;Projections, agr&eacute;gation et regroupement</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="querycriteria-examples.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;15.&nbsp;Requ&ecirc;tes par crit&egrave;res</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="querycriteria-detachedqueries.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="querycriteria-projection"></a>15.7.&nbsp;Projections, agr&eacute;gation et regroupement
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>La classe <code class="literal">org.hibernate.criterion.Projections</code> est une fabrique d'instances de <code class="literal">Projection</code>. Nous appliquons une projection sur une requ&ecirc;te en appelant <code class="literal">setProjection()</code>. 
+         </p><pre class="programlisting">List results = session.createCriteria(Cat.class)
+    .setProjection( Projections.rowCount() )
+    .add( Restrictions.eq("color", Color.BLACK) )
+    .list();</pre><pre class="programlisting">List results = session.createCriteria(Cat.class)
+    .setProjection( Projections.projectionList()
+        .add( Projections.rowCount() )
+        .add( Projections.avg("weight") )
+        .add( Projections.max("weight") )
+        .add( Projections.groupProperty("color") )
+    )
+    .list();</pre><p>Il n'y a pas besoin de "group by" explicite dans une requ&ecirc;te par crit&egrave;re. Certains types de projection sont d&eacute;finis pour &ecirc;tre
+            des <span class="emphasis"><em>projections de regroupement</em></span>, lesquels apparaissent aussi dans la clause <code class="literal">group by</code> SQL. 
+         </p>
+         <p>Un alias peut optionnellement &ecirc;tre assign&eacute; &agrave; une projection, ainsi la valeur projet&eacute;e peut &ecirc;tre r&eacute;f&eacute;renc&eacute;e dans des restrictions
+            ou des tris. Voici deux fa&ccedil;ons diff&eacute;rentes de faire &ccedil;a : 
+         </p><pre class="programlisting">List results = session.createCriteria(Cat.class)
+    .setProjection( Projections.alias( Projections.groupProperty("color"), "colr" ) )
+    .addOrder( Order.asc("colr") )
+    .list();</pre><pre class="programlisting">List results = session.createCriteria(Cat.class)
+    .setProjection( Projections.groupProperty("color").as("colr") )
+    .addOrder( Order.asc("colr") )
+    .list();</pre><p>Les m&eacute;thodes <code class="literal">alias()</code> et <code class="literal">as()</code> enveloppe simplement une instance de projection dans une autre instance (alias&eacute;e) de <code class="literal">Projection</code>. Comme un raccourci, vous pouvez assignez un alias lorsque vous ajoutez la projection &agrave; la liste de projections : 
+         </p><pre class="programlisting">List results = session.createCriteria(Cat.class)
+    .setProjection( Projections.projectionList()
+        .add( Projections.rowCount(), "catCountByColor" )
+        .add( Projections.avg("weight"), "avgWeight" )
+        .add( Projections.max("weight"), "maxWeight" )
+        .add( Projections.groupProperty("color"), "color" )
+    )
+    .addOrder( Order.desc("catCountByColor") )
+    .addOrder( Order.desc("avgWeight") )
+    .list();</pre><pre class="programlisting">List results = session.createCriteria(Domestic.class, "cat")
+    .createAlias("kittens", "kit")
+    .setProjection( Projections.projectionList()
+        .add( Projections.property("cat.name"), "catName" )
+        .add( Projections.property("kit.name"), "kitName" )
+    )
+    .addOrder( Order.asc("catName") )
+    .addOrder( Order.asc("kitName") )
+    .list();</pre><p>Vous pouvez aussi utiliser <code class="literal">Property.forName()</code> pour formuler des projections : 
+         </p><pre class="programlisting">List results = session.createCriteria(Cat.class)
+    .setProjection( Property.forName("name") )
+    .add( Property.forName("color").eq(Color.BLACK) )
+    .list();</pre><pre class="programlisting">List results = session.createCriteria(Cat.class)
+    .setProjection( Projections.projectionList()
+        .add( Projections.rowCount().as("catCountByColor") )
+        .add( Property.forName("weight").avg().as("avgWeight") )
+        .add( Property.forName("weight").max().as("maxWeight") )
+        .add( Property.forName("color").group().as("color" )
+    )
+    .addOrder( Order.desc("catCountByColor") )
+    .addOrder( Order.desc("avgWeight") )
+    .list();</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="querycriteria-examples.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="querycriteria.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="querycriteria-detachedqueries.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">15.6.&nbsp;Requ&ecirc;tes par l'exemple&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;15.8.&nbsp;Requ&ecirc;tes et sous-requ&ecirc;tes d&eacute;tach&eacute;es</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

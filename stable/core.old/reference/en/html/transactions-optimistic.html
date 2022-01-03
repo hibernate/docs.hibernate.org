@@ -1,0 +1,276 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>11.3.&nbsp;Optimistic concurrency control</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="transactions.html" title="Chapter&nbsp;11.&nbsp;Transactions And Concurrency">
+      <link rel="prev" href="transactions-demarcation.html" title="11.2.&nbsp;Database transaction demarcation">
+      <link rel="next" href="transactions-locking.html" title="11.4.&nbsp;Pessimistic Locking">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">11.3.&nbsp;Optimistic concurrency control</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="transactions-demarcation.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;11.&nbsp;Transactions And Concurrency</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="transactions-locking.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="transactions-optimistic"></a>11.3.&nbsp;Optimistic concurrency control
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+            The only approach that is consistent with high concurrency and high
+            scalability is optimistic concurrency control with versioning. Version
+            checking uses version numbers, or timestamps, to detect conflicting updates
+            (and to prevent lost updates). Hibernate provides for three possible approaches
+            to writing application code that uses optimistic concurrency. The use cases
+            we show are in the context of long conversations, but version checking
+                        also has the benefit of preventing lost updates in single database transactions.
+                    
+         </p>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="transactions-optimistic-manual"></a>11.3.1.&nbsp;Application version checking
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                               In an implementation without much help from Hibernate, each interaction with the
+                               database occurs in a new <code class="literal">Session</code> and the developer is responsible
+                               for reloading all persistent instances from the database before manipulating them.
+                               This approach forces the application to carry out its own version checking to ensure
+                               conversation transaction isolation. This approach is the least efficient in terms of
+                               database access. It is the approach most similar to entity EJBs.
+                           
+            </p><pre class="programlisting">// foo is an instance loaded by a previous Session
+session = factory.openSession();
+Transaction t = session.beginTransaction();
+
+int oldVersion = foo.getVersion();
+session.load( foo, foo.getKey() ); // load the current state
+if ( oldVersion != foo.getVersion() ) throw new StaleObjectStateException();
+foo.setProperty("bar");
+
+t.commit();
+session.close();</pre><p>
+                               The <code class="literal">version</code> property is mapped using <code class="literal">&lt;version&gt;</code>,
+                               and Hibernate will automatically increment it during flush if the entity is
+                               dirty.
+                           
+            </p>
+            <p>
+                               Of course, if you are operating in a low-data-concurrency environment and don't
+                               require version checking, you may use this approach and just skip the version
+                               check. In that case, <span class="emphasis"><em>last commit wins</em></span> will be the default
+                               strategy for your long conversations. Keep in mind that this might
+                               confuse the users of the application, as they might experience lost updates without
+                               error messages or a chance to merge conflicting changes.
+                           
+            </p>
+            <p>
+                               Clearly, manual version checking is only feasible in very trivial circumstances
+                               and not practical for most applications. Often not only single instances, but
+                               complete graphs of modified objects have to be checked. Hibernate offers automatic
+                               version checking with either an extended <code class="literal">Session</code> or detached instances
+                               as the design paradigm.
+                           
+            </p>
+         </div>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="transactions-optimistic-longsession"></a>11.3.2.&nbsp;Extended session and automatic versioning
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                               A single <code class="literal">Session</code> instance and its persistent instances are
+                               used for the whole conversation, known as <span class="emphasis"><em>session-per-conversation</em></span>.
+                               Hibernate checks instance versions at flush time, throwing an exception if concurrent
+                               modification is detected. It's up to the developer to catch and handle this exception
+                               (common options are the opportunity for the user to merge changes or to restart the
+                               business conversation with non-stale data).
+                           
+            </p>
+            <p>
+                               The <code class="literal">Session</code> is disconnected from any underlying JDBC connection
+                               when waiting for user interaction. This approach is the most efficient in terms
+                               of database access. The application need not concern itself with version checking or
+                               with reattaching detached instances, nor does it have to reload instances in every
+                               database transaction.
+                           
+            </p><pre class="programlisting">// foo is an instance loaded earlier by the old session
+Transaction t = session.beginTransaction(); // Obtain a new JDBC connection, start transaction
+
+foo.setProperty("bar");
+
+session.flush();    // Only for last transaction in conversation
+t.commit();         // Also return JDBC connection
+session.close();    // Only for last transaction in conversation</pre><p>
+                               The <code class="literal">foo</code> object still knows which <code class="literal">Session</code> it was
+                               loaded in. Beginning a new database transaction on an old session obtains a new connection
+                               and resumes the session. Committing a database transaction disconnects a session
+                               from the JDBC connection and returns the connection to the pool. After reconnection, to
+                               force a version check on data  you aren't updating, you may call <code class="literal">Session.lock()</code>
+                               with <code class="literal">LockMode.READ</code> on any objects that might have been updated by another
+                               transaction. You don't need to lock any data that you <span class="emphasis"><em>are</em></span> updating.
+                               Usually you would set <code class="literal">FlushMode.MANUAL</code> on an extended <code class="literal">Session</code>,
+                               so that only the last database transaction cycle is allowed to actually persist all
+                               modifications made in this conversation. Hence, only this last database transaction
+                               would include the <code class="literal">flush()</code> operation, and then also
+                               <code class="literal">close()</code> the session to end the conversation.
+                           
+            </p>
+            <p>
+                               This pattern is problematic if the <code class="literal">Session</code> is too big to
+                               be stored during user think time, e.g. an <code class="literal">HttpSession</code> should
+                               be kept as small as possible. As the <code class="literal">Session</code> is also the
+                               (mandatory) first-level cache and contains all loaded objects, we can probably
+                               use this strategy only for a few request/response cycles. You should use a
+                               <code class="literal">Session</code> only for a single conversation, as it will soon also
+                               have stale data.
+                           
+            </p>
+            <p>
+                               (Note that earlier Hibernate versions required explicit disconnection and reconnection
+                               of a <code class="literal">Session</code>. These methods are deprecated, as beginning and
+                               ending a transaction has the same effect.)
+                           
+            </p>
+            <p>
+                               Also note that you should keep the disconnected <code class="literal">Session</code> close
+                               to the persistence layer. In other words, use an EJB stateful session bean to
+                               hold the <code class="literal">Session</code> in a three-tier environment, and don't transfer
+                               it to the web layer (or even serialize it to a separate tier) to store it in the
+                               <code class="literal">HttpSession</code>.
+                           
+            </p>
+            <p>
+                               The extended session pattern, or <span class="emphasis"><em>session-per-conversation</em></span>, is
+                               more difficult to implement with automatic current session context management.
+                               You need to supply your own implementation of the <code class="literal">CurrentSessionContext</code>
+                               for this, see the Hibernate Wiki for examples.
+                           
+            </p>
+         </div>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="transactions-optimistic-detached"></a>11.3.3.&nbsp;Detached objects and automatic versioning
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                               Each interaction with the persistent store occurs in a new <code class="literal">Session</code>.
+                               However, the same persistent instances are reused for each interaction with the database.
+                               The application manipulates the state of detached instances originally loaded in another
+                               <code class="literal">Session</code> and then reattaches them using <code class="literal">Session.update()</code>,
+                               <code class="literal">Session.saveOrUpdate()</code>, or <code class="literal">Session.merge()</code>.
+                           
+            </p><pre class="programlisting">// foo is an instance loaded by a previous Session
+foo.setProperty("bar");
+session = factory.openSession();
+Transaction t = session.beginTransaction();
+session.saveOrUpdate(foo); // Use merge() if "foo" might have been loaded already
+t.commit();
+session.close();</pre><p>
+                               Again, Hibernate will check instance versions during flush, throwing an
+                               exception if conflicting updates occurred.
+                           
+            </p>
+            <p>
+                               You may also call <code class="literal">lock()</code> instead of <code class="literal">update()</code>
+                               and use <code class="literal">LockMode.READ</code> (performing a version check, bypassing all
+                               caches) if you are sure that the object has not been modified.
+                           
+            </p>
+         </div>
+         <div class="sect2" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h3 class="title"><a name="transactions-optimistic-customizing"></a>11.3.4.&nbsp;Customizing automatic versioning
+                     </h3>
+                  </div>
+               </div>
+            </div>
+            <p>
+                               You may disable Hibernate's automatic version increment for particular properties and 
+                               collections by setting the <code class="literal">optimistic-lock</code> mapping attribute to 
+                               <code class="literal">false</code>. Hibernate will then no longer increment versions if the 
+                               property is dirty.
+                           
+            </p>
+            <p>
+                               Legacy database schemas are often static and can't be modified. Or, other applications
+                               might also access the same database and don't know how to handle version numbers or
+                               even timestamps. In both cases, versioning can't rely on a particular column in a table.
+                               To force a version check without a version or timestamp property mapping, with a
+                               comparison of the state of all fields in a row, turn on <code class="literal">optimistic-lock="all"</code>
+                               in the <code class="literal">&lt;class&gt;</code> mapping. Note that this conceptually only works
+                               if Hibernate can compare the old and new state, i.e. if you use a single long
+                               <code class="literal">Session</code> and not session-per-request-with-detached-objects.
+                           
+            </p>
+            <p>
+                               Sometimes concurrent modification can be permitted as long as the changes that have been
+                               made don't overlap. If you set <code class="literal">optimistic-lock="dirty"</code> when mapping the
+                               <code class="literal">&lt;class&gt;</code>, Hibernate will only compare dirty fields during flush.
+                           
+            </p>
+            <p>
+                               In both cases, with dedicated version/timestamp columns or with full/dirty field
+                               comparison, Hibernate uses a single <code class="literal">UPDATE</code> statement (with an
+                               appropriate <code class="literal">WHERE</code> clause) per entity to execute the version check
+                               and update the information. If you use transitive persistence to cascade reattachment
+                               to associated entities, Hibernate might execute unnecessary updates. This is usually
+                               not a problem, but <span class="emphasis"><em>on update</em></span> triggers in the database might be
+                               executed even when no changes have been made to detached instances. You can customize
+                               this behavior by setting  <code class="literal">select-before-update="true"</code> in the
+                               <code class="literal">&lt;class&gt;</code> mapping, forcing Hibernate to <code class="literal">SELECT</code>
+                               the instance to ensure that changes did actually occur, before updating the row.
+                           
+            </p>
+         </div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="transactions-demarcation.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="transactions.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="transactions-locking.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">11.2.&nbsp;Database transaction demarcation&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;11.4.&nbsp;Pessimistic Locking</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

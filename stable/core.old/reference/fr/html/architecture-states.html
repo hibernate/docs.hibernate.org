@@ -1,0 +1,80 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>2.2.&nbsp;Etats des instances</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="architecture.html" title="Chapitre&nbsp;2.&nbsp;Architecture">
+      <link rel="prev" href="architecture.html" title="Chapitre&nbsp;2.&nbsp;Architecture">
+      <link rel="next" href="architecture-jmx.html" title="2.3.&nbsp;Int&eacute;gration JMX">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">2.2.&nbsp;Etats des instances</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="architecture.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;2.&nbsp;Architecture</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="architecture-jmx.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="architecture-states"></a>2.2.&nbsp;Etats des instances
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Une instance d'une classe persistante peut &ecirc;tre dans l'un des trois &eacute;tats suivants, d&eacute;finis par rapport &agrave; un <span class="emphasis"><em>contexte de persistance</em></span>. L'objet <code class="literal">Session</code> d'hibernate correspond &agrave; ce concept de contexte de persistance : 
+         </p>
+         <div class="variablelist">
+            <dl>
+               <dt><span class="term">passager (transient)</span></dt>
+               <dd>
+                  <p>L'instance n'est pas et n'a jamais &eacute;t&eacute; associ&eacute;e &agrave; un contexte de persistance. Elle ne poss&egrave;de pas d'identit&eacute; persistante (valeur
+                     de cl&eacute; primaire) 
+                  </p>
+               </dd>
+               <dt><span class="term">persistant</span></dt>
+               <dd>
+                  <p>L'instance est associ&eacute;e au contexte de persistance. Elle poss&egrave;de une identit&eacute; persistante (valeur de cl&eacute; primaire) et, peut-&ecirc;tre,
+                     un enregistrement correspondant dans la base. Pour un contexte de persistance particulier, Hibernate <span class="emphasis"><em>garantit</em></span> que l'identit&eacute; persistante est &eacute;quivalente &agrave; l'identit&eacute; Java (emplacement m&eacute;moire de l'objet) 
+                  </p>
+               </dd>
+               <dt><span class="term">d&eacute;tach&eacute;</span></dt>
+               <dd>
+                  <p>The instance was once associated with a persistence context, but that context was closed, or the instance was serialized to
+                     another process. It has a persistent identity and, perhaps, a corresponding row in the database. For detached instances, Hibernate
+                     makes no guarantees about the relationship between persistent identity and Java identity. 
+                  </p>
+               </dd>
+            </dl>
+         </div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="architecture.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="architecture.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="architecture-jmx.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">Chapitre&nbsp;2.&nbsp;Architecture&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;2.3.&nbsp;Int&eacute;gration JMX</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

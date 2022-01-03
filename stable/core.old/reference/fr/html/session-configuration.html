@@ -1,0 +1,112 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>Chapitre&nbsp;3.&nbsp;Configuration</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="prev" href="architecture-current-session.html" title="2.5.&nbsp;Sessions Contextuelles">
+      <link rel="next" href="configuration-sessionfactory.html" title="3.2.&nbsp;Obtenir une SessionFactory">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">Chapitre&nbsp;3.&nbsp;Configuration</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="architecture-current-session.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">&nbsp;</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="configuration-sessionfactory.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="chapter" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title"><a name="session-configuration"></a>Chapitre&nbsp;3.&nbsp;Configuration
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Parce qu'Hibernate est con&ccedil;u pour fonctionner dans diff&eacute;rents environnements, il existe beaucoup de param&egrave;tres de configuration.
+            Heureusement, la plupart ont des valeurs par d&eacute;faut appropri&eacute;es et la distribution d'Hibernate contient un exemple de fichier
+            <code class="literal">hibernate.properties</code> dans le r&eacute;pertoire <code class="literal">etc/</code> qui montre les diff&eacute;rentes options. Vous n'avez qu'&agrave; placer ce fichier dans votre classpath et &agrave; l'adapter. 
+         </p>
+         <div class="sect1" lang="fr-FR">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="configuration-programmatic"></a>3.1.&nbsp;Configuration par programmation
+                     </h2>
+                  </div>
+               </div>
+            </div>
+            <p>An instance of <code class="classname">org.hibernate.cfg.Configuration</code> represents an entire set of mappings of an application's Java types to an SQL database. The <code class="classname">org.hibernate.cfg.Configuration</code> is used to build an (immutable) <code class="interfacename">org.hibernate.SessionFactory</code>. The mappings are compiled from various XML mapping files. 
+            </p>
+            <p>You may obtain a <code class="classname">org.hibernate.cfg.Configuration</code> instance by instantiating it directly and specifying XML mapping documents. If the mapping files are in the classpath, use
+               <code class="literal">addResource()</code>: 
+            </p><pre class="programlisting">Configuration cfg = new Configuration()
+    .addResource("Item.hbm.xml")
+    .addResource("Bid.hbm.xml");</pre><p>Une alternative (parfois meilleure) est de sp&eacute;cifier les classes mapp&eacute;es et de laisser Hibernate trouver les documents de
+               mapping pour vous : 
+            </p><pre class="programlisting">Configuration cfg = new Configuration()
+    .addClass(org.hibernate.auction.Item.class)
+    .addClass(org.hibernate.auction.Bid.class);</pre><p>Then Hibernate will look for mapping files named <code class="filename">/org/hibernate/auction/Item.hbm.xml</code> and <code class="filename">/org/hibernate/auction/Bid.hbm.xml</code> in the classpath. This approach eliminates any hardcoded filenames. 
+            </p>
+            <p>A <code class="classname">org.hibernate.cfg.Configuration</code> also allows you to specify configuration properties: 
+            </p><pre class="programlisting">Configuration cfg = new Configuration()
+    .addClass(org.hibernate.auction.Item.class)
+    .addClass(org.hibernate.auction.Bid.class)
+    .setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLInnoDBDialect")
+    .setProperty("hibernate.connection.datasource", "java:comp/env/jdbc/test")
+    .setProperty("hibernate.order_updates", "true");</pre><p>Ce n'est pas le seul moyen de passer des propri&eacute;t&eacute;s de configuration &agrave; Hibernate. Les diff&eacute;rentes options sont : </p>
+            <div class="orderedlist">
+               <ol type="1" compact>
+                  <li>
+                     <p>Pass an instance of <code class="classname">java.util.Properties</code> to <code class="literal">Configuration.setProperties()</code>. 
+                     </p>
+                  </li>
+                  <li>
+                     <p>Place a file named <code class="filename">hibernate.properties</code> in a root directory of the classpath. 
+                     </p>
+                  </li>
+                  <li>
+                     <p>Positionner les propri&eacute;t&eacute;s <code class="literal">System</code> en utilisant <code class="literal">java -Dproperty=value</code>. 
+                     </p>
+                  </li>
+                  <li>
+                     <p>Inclure des &eacute;l&eacute;ments <code class="literal">&lt;property&gt;</code> dans le fichier <code class="literal">hibernate.cfg.xml</code> (voir plus loin). 
+                     </p>
+                  </li>
+               </ol>
+            </div>
+            <p><code class="filename">hibernate.properties</code> is the easiest approach if you want to get started quickly. 
+            </p>
+            <p>The <code class="classname">org.hibernate.cfg.Configuration</code> is intended as a startup-time object, to be discarded once a <code class="literal">SessionFactory</code> is created. 
+            </p>
+         </div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="architecture-current-session.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center">&nbsp;</td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="configuration-sessionfactory.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">2.5.&nbsp;Sessions Contextuelles&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;3.2.&nbsp;Obtenir une SessionFactory</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

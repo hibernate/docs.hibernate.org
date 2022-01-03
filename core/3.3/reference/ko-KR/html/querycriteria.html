@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory">15장. Criteria 질의들</title><link rel="stylesheet" href="css/hibernate.css" type="text/css"/><meta xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" name="generator" content="DocBook XSL Stylesheets V1.72.0"/><link rel="start" href="index.html" title="HIBERNATE - 개성있는 자바를 위한 관계 영속"/><link rel="up" href="index.html" title="HIBERNATE - 개성있는 자바를 위한 관계 영속"/><link rel="prev" href="queryhql.html" title="14장. HQL: 하이버네이트 질의 언어(Hibernate Query Language)"/><link rel="next" href="querysql.html" title="16장. Native SQL"/><link rel="copyright" href="ln-Legal_Notice.html" title="Legal Notice"/></head><body><p id="title"><a href="http://www.hibernate.org" class="site_href"><strong>Hibernate.org</strong></a><a href="http://hibernate.org/Documentation/DocumentationOverview" class="doc_href"><strong>Community Documentation</strong></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="queryhql.html"><strong>이전</strong></a></li><li class="next"><a accesskey="n" href="querysql.html"><strong>다음</strong></a></li></ul><div class="chapter" lang="ko-KR"><div class="titlepage"><div><div><h2 class="title"><a id="querycriteria"/>15장. Criteria 질의들</h2></div></div></div><div class="toc"><dl><dt><span class="sect1"><a href="querycriteria.html#querycriteria-creating">15.1. <code class="literal">Criteria</code> 인스턴스 생성하기</a></span></dt><dt><span class="sect1"><a href="querycriteria.html#querycriteria-narrowing">15.2. 결과 셋 제한하기</a></span></dt><dt><span class="sect1"><a href="querycriteria.html#querycriteria-ordering">15.3. 결과들을 순서지우기(ordering)</a></span></dt><dt><span class="sect1"><a href="querycriteria.html#querycriteria-associations">15.4. 연관들</a></span></dt><dt><span class="sect1"><a href="querycriteria.html#querycriteria-dynamicfetching">15.5. 동적인 연관 페칭</a></span></dt><dt><span class="sect1"><a href="querycriteria.html#querycriteria-examples">15.6. 예제 질의들</a></span></dt><dt><span class="sect1"><a href="querycriteria.html#querycriteria-projection">15.7. Projections, aggregation 그리고 grouping</a></span></dt><dt><span class="sect1"><a href="querycriteria.html#querycriteria-detachedqueries">15.8. Detached 질의들과 서브질의들</a></span></dt><dt><span class="sect1"><a href="querycriteria.html#query-criteria-naturalid">15.9. natural 식별자에 의한 질의들</a></span></dt></dl></div><p>Hibernate는 직관적인, 확장 가능한 criteria query API를 특징 짓는다. </p><div class="sect1" lang="ko-KR"><div class="titlepage"><div><div><h2 class="title"><a id="querycriteria-creating"/>15.1. <code class="literal">Criteria</code> 인스턴스 생성하기</h2></div></div></div><p><code class="literal">org.hibernate.Criteria</code>인터페이스는 특정 영속 클래스에 대한 질의를 표현한다. <code class="literal">Session</code>은 <code class="literal">Criteria</code> 인스턴스들에 대한 팩토리이다. </p><pre class="programlisting">Criteria crit = sess.createCriteria(Cat.class);
+crit.setMaxResults(50);
+List cats = crit.list();</pre></div><div class="sect1" lang="ko-KR"><div class="titlepage"><div><div><h2 class="title"><a id="querycriteria-narrowing"/>15.2. 결과 셋 제한하기</h2></div></div></div><p>개별적인 질의 기준은 <code class="literal">org.hibernate.criterion.Criterion</code> 인터페이스의 인스턴스이다. <code class="literal">org.hibernate.criterion.Restrictions</code> 클래스는 어떤 미리 만들어진 <code class="literal">Criterion</code> 타입들을 얻는 팩토리 메소드들을 정의한다. </p><pre class="programlisting">List cats = sess.createCriteria(Cat.class)
+    .add( Restrictions.like("name", "Fritz%") )
+    .add( Restrictions.between("weight", minWeight, maxWeight) )
+    .list();</pre><p>Restrictions can be grouped logically. </p><pre class="programlisting">List cats = sess.createCriteria(Cat.class)
+    .add( Restrictions.like("name", "Fritz%") )
+    .add( Restrictions.or(
+        Restrictions.eq( "age", new Integer(0) ),
+        Restrictions.isNull("age")
+    ) )
+    .list();</pre><pre class="programlisting">List cats = sess.createCriteria(Cat.class)
+    .add( Restrictions.in( "name", new String[] { "Fritz", "Izi", "Pk" } ) )
+    .add( Restrictions.disjunction()
+        .add( Restrictions.isNull("age") )
+        .add( Restrictions.eq("age", new Integer(0) ) )
+        .add( Restrictions.eq("age", new Integer(1) ) )
+        .add( Restrictions.eq("age", new Integer(2) ) )
+    ) )
+    .list();</pre><p>There are a range of built-in criterion types (<code class="literal">Restrictions</code> subclasses). One of the most useful allows you to specify SQL directly. </p><pre class="programlisting">List cats = sess.createCriteria(Cat.class)
+    .add( Restrictions.sqlRestriction("lower({alias}.name) like lower(?)", "Fritz%", Hibernate.STRING) )
+    .list();</pre><p>질의된 엔티티의 행 alias에 의해 대체된 <code class="literal">{alias}</code> placeholder. </p><p>You can also obtain a criterion from a <code class="literal">Property</code> instance. You can create a <code class="literal">Property</code> by calling <code class="literal">Property.forName()</code>: </p><pre class="programlisting">
+Property age = Property.forName("age");
+List cats = sess.createCriteria(Cat.class)
+    .add( Restrictions.disjunction()
+        .add( age.isNull() )
+        .add( age.eq( new Integer(0) ) )
+        .add( age.eq( new Integer(1) ) )
+        .add( age.eq( new Integer(2) ) )
+    ) )
+    .add( Property.forName("name").in( new String[] { "Fritz", "Izi", "Pk" } ) )
+    .list();</pre></div><div class="sect1" lang="ko-KR"><div class="titlepage"><div><div><h2 class="title"><a id="querycriteria-ordering"/>15.3. 결과들을 순서지우기(ordering)</h2></div></div></div><p>You can order the results using <code class="literal">org.hibernate.criterion.Order</code>. </p><pre class="programlisting">List cats = sess.createCriteria(Cat.class)
+    .add( Restrictions.like("name", "F%")
+    .addOrder( Order.asc("name") )
+    .addOrder( Order.desc("age") )
+    .setMaxResults(50)
+    .list();</pre><pre class="programlisting">List cats = sess.createCriteria(Cat.class)
+    .add( Property.forName("name").like("F%") )
+    .addOrder( Property.forName("name").asc() )
+    .addOrder( Property.forName("age").desc() )
+    .setMaxResults(50)
+    .list();</pre></div><div class="sect1" lang="ko-KR"><div class="titlepage"><div><div><h2 class="title"><a id="querycriteria-associations"/>15.4. 연관들</h2></div></div></div><p>By navigating associations using <code class="literal">createCriteria()</code> you can specify constraints upon related entities: </p><pre class="programlisting">List cats = sess.createCriteria(Cat.class)
+    .add( Restrictions.like("name", "F%") )
+    .createCriteria("kittens")
+        .add( Restrictions.like("name", "F%") )
+    .list();</pre><p>The second <code class="literal">createCriteria()</code> returns a new instance of <code class="literal">Criteria</code> that refers to the elements of the <code class="literal">kittens</code> collection. </p><p>There is also an alternate form that is useful in certain circumstances: </p><pre class="programlisting">List cats = sess.createCriteria(Cat.class)
+    .createAlias("kittens", "kt")
+    .createAlias("mate", "mt")
+    .add( Restrictions.eqProperty("kt.name", "mt.name") )
+    .list();</pre><p>(<code class="literal">createAlias()</code>는 <code class="literal">Criteria</code>의 새로운 인스턴스를 생성시키지 않는다.) </p><p>The kittens collections held by the <code class="literal">Cat</code> instances returned by the previous two queries are <span class="emphasis"><em>not</em></span> pre-filtered by the criteria. If you want to retrieve just the kittens that match the criteria, you must use a <code class="literal">ResultTransformer</code>. </p><pre class="programlisting">List cats = sess.createCriteria(Cat.class)
+    .createCriteria("kittens", "kt")
+        .add( Restrictions.eq("name", "F%") )
+    .setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
+    .list();
+Iterator iter = cats.iterator();
+while ( iter.hasNext() ) {
+    Map map = (Map) iter.next();
+    Cat cat = (Cat) map.get(Criteria.ROOT_ALIAS);
+    Cat kitten = (Cat) map.get("kt");
+}</pre></div><div class="sect1" lang="ko-KR"><div class="titlepage"><div><div><h2 class="title"><a id="querycriteria-dynamicfetching"/>15.5. 동적인 연관 페칭</h2></div></div></div><p>You can specify association fetching semantics at runtime using <code class="literal">setFetchMode()</code>. </p><pre class="programlisting">List cats = sess.createCriteria(Cat.class)
+    .add( Restrictions.like("name", "Fritz%") )
+    .setFetchMode("mate", FetchMode.EAGER)
+    .setFetchMode("kittens", FetchMode.EAGER)
+    .list();</pre><p>이 질의는 outer 조인으로 <code class="literal">mate</code>와 <code class="literal">kittens</code> 모두를 페치할 것이다. 추가 정보는 <a href="performance.html#performance-fetching" title="19.1. 페칭 방도들">19.1절. “페칭 방도들”</a>을 보라. </p></div><div class="sect1" lang="ko-KR"><div class="titlepage"><div><div><h2 class="title"><a id="querycriteria-examples"/>15.6. 예제 질의들</h2></div></div></div><p><code class="literal">org.hibernate.criterion.Example</code> 클래스는 주어진 인스턴스로부터 질의 기준(criterion)을 구조화 시키는 것을 당신에게 허용해준다. </p><pre class="programlisting">Cat cat = new Cat();
+cat.setSex('F');
+cat.setColor(Color.BLACK);
+List results = session.createCriteria(Cat.class)
+    .add( Example.create(cat) )
+    .list();</pre><p>버전 프로퍼티들, 식별자들, 연관관계들이 무시된다. 디폴트로 null 값 프로퍼티들이 제외된다. </p><p>당신은 <code class="literal">Example</code>이 적용되는 방법을 조정할 수 있다. </p><pre class="programlisting">Example example = Example.create(cat)
+    .excludeZeroes()           //exclude zero valued properties
+    .excludeProperty("color")  //exclude the property named "color"
+    .ignoreCase()              //perform case insensitive string comparisons
+    .enableLike();             //use like for string comparisons
+List results = session.createCriteria(Cat.class)
+    .add(example)
+    .list();</pre><p>당신은 연관된 객체들에 대한 criteria(기준)을 위치지우는데 examples를 사용할 수 있다. </p><pre class="programlisting">List results = session.createCriteria(Cat.class)
+    .add( Example.create(cat) )
+    .createCriteria("mate")
+        .add( Example.create( cat.getMate() ) )
+    .list();</pre></div><div class="sect1" lang="ko-KR"><div class="titlepage"><div><div><h2 class="title"><a id="querycriteria-projection"/>15.7. Projections, aggregation 그리고 grouping</h2></div></div></div><p>The class <code class="literal">org.hibernate.criterion.Projections</code> is a factory for <code class="literal">Projection</code> instances. You can apply a projection to a query by calling <code class="literal">setProjection()</code>. </p><pre class="programlisting">List results = session.createCriteria(Cat.class)
+    .setProjection( Projections.rowCount() )
+    .add( Restrictions.eq("color", Color.BLACK) )
+    .list();</pre><pre class="programlisting">List results = session.createCriteria(Cat.class)
+    .setProjection( Projections.projectionList()
+        .add( Projections.rowCount() )
+        .add( Projections.avg("weight") )
+        .add( Projections.max("weight") )
+        .add( Projections.groupProperty("color") )
+    )
+    .list();</pre><p>criteria 질의 내에서는 명시적인 "group by"가 필수적이지 않다. 어떤 projection 타입들은 <span class="emphasis"><em>grouping projections</em></span>들이게끔 정의되고, 그것은 또한 SQL <code class="literal">group by</code> 절 속에 나타난다. </p><p>An alias can be assigned to a projection so that the projected value can be referred to in restrictions or orderings. Here are two different ways to do this: </p><pre class="programlisting">List results = session.createCriteria(Cat.class)
+    .setProjection( Projections.alias( Projections.groupProperty("color"), "colr" ) )
+    .addOrder( Order.asc("colr") )
+    .list();</pre><pre class="programlisting">List results = session.createCriteria(Cat.class)
+    .setProjection( Projections.groupProperty("color").as("colr") )
+    .addOrder( Order.asc("colr") )
+    .list();</pre><p><code class="literal">alias()</code> 메소드와 <code class="literal">as()</code> 메소드는 또 다른 alias 된 <code class="literal">Projection</code>의 인스턴스 내에 하나의 projection 인스턴스를 간단하게 포장한다. 지름길로서, 당신이 projection을 projection 리스트에 추가할 때 당신은 alias를 할당할 수 있다: </p><pre class="programlisting">List results = session.createCriteria(Cat.class)
+    .setProjection( Projections.projectionList()
+        .add( Projections.rowCount(), "catCountByColor" )
+        .add( Projections.avg("weight"), "avgWeight" )
+        .add( Projections.max("weight"), "maxWeight" )
+        .add( Projections.groupProperty("color"), "color" )
+    )
+    .addOrder( Order.desc("catCountByColor") )
+    .addOrder( Order.desc("avgWeight") )
+    .list();</pre><pre class="programlisting">List results = session.createCriteria(Domestic.class, "cat")
+    .createAlias("kittens", "kit")
+    .setProjection( Projections.projectionList()
+        .add( Projections.property("cat.name"), "catName" )
+        .add( Projections.property("kit.name"), "kitName" )
+    )
+    .addOrder( Order.asc("catName") )
+    .addOrder( Order.asc("kitName") )
+    .list();</pre><p>당신은 또한 projection들을 표현하는데 <code class="literal">Property.forName()</code>을 사용할 수 있다: </p><pre class="programlisting">List results = session.createCriteria(Cat.class)
+    .setProjection( Property.forName("name") )
+    .add( Property.forName("color").eq(Color.BLACK) )
+    .list();</pre><pre class="programlisting">List results = session.createCriteria(Cat.class)
+    .setProjection( Projections.projectionList()
+        .add( Projections.rowCount().as("catCountByColor") )
+        .add( Property.forName("weight").avg().as("avgWeight") )
+        .add( Property.forName("weight").max().as("maxWeight") )
+        .add( Property.forName("color").group().as("color" )
+    )
+    .addOrder( Order.desc("catCountByColor") )
+    .addOrder( Order.desc("avgWeight") )
+    .list();</pre></div><div class="sect1" lang="ko-KR"><div class="titlepage"><div><div><h2 class="title"><a id="querycriteria-detachedqueries"/>15.8. Detached 질의들과 서브질의들</h2></div></div></div><p>The <code class="literal">DetachedCriteria</code> class allows you to create a query outside the scope of a session and then execute it using an arbitrary <code class="literal">Session</code>. </p><pre class="programlisting">DetachedCriteria query = DetachedCriteria.forClass(Cat.class)
+    .add( Property.forName("sex").eq('F') );
+    
+Session session = ....;
+Transaction txn = session.beginTransaction();
+List results = query.getExecutableCriteria(session).setMaxResults(100).list();
+txn.commit();
+session.close();</pre><p>A <code class="literal">DetachedCriteria</code> can also be used to express a subquery. Criterion instances involving subqueries can be obtained via <code class="literal">Subqueries</code> or <code class="literal">Property</code>. </p><pre class="programlisting">DetachedCriteria avgWeight = DetachedCriteria.forClass(Cat.class)
+    .setProjection( Property.forName("weight").avg() );
+session.createCriteria(Cat.class)
+    .add( Property.forName("weight").gt(avgWeight) )
+    .list();</pre><pre class="programlisting">DetachedCriteria weights = DetachedCriteria.forClass(Cat.class)
+    .setProjection( Property.forName("weight") );
+session.createCriteria(Cat.class)
+    .add( Subqueries.geAll("weight", weights) )
+    .list();</pre><p>Correlated subqueries are also possible: </p><pre class="programlisting">DetachedCriteria avgWeightForSex = DetachedCriteria.forClass(Cat.class, "cat2")
+    .setProjection( Property.forName("weight").avg() )
+    .add( Property.forName("cat2.sex").eqProperty("cat.sex") );
+session.createCriteria(Cat.class, "cat")
+    .add( Property.forName("weight").gt(avgWeightForSex) )
+    .list();</pre></div><div class="sect1" lang="ko-KR"><div class="titlepage"><div><div><h2 class="title"><a id="query-criteria-naturalid"/>15.9. natural 식별자에 의한 질의들</h2></div></div></div><p>For most queries, including criteria queries, the query cache is not efficient because query cache invalidation occurs too frequently. However, there is a special kind of query where you can optimize the cache invalidation algorithm: lookups by a constant natural key. In some applications, this kind of query occurs frequently. The criteria API provides special provision for this use case. </p><p>First, map the natural key of your entity using <code class="literal">&lt;natural-id&gt;</code> and enable use of the second-level cache. </p><pre class="programlisting">&lt;class name="User"&gt;
+    &lt;cache usage="read-write"/&gt;
+    &lt;id name="id"&gt;
+        &lt;generator class="increment"/&gt;
+    &lt;/id&gt;
+    &lt;natural-id&gt;
+        &lt;property name="name"/&gt;
+        &lt;property name="org"/&gt;
+    &lt;/natural-id&gt;
+    &lt;property name="password"/&gt;
+&lt;/class&gt;</pre><p>This functionality is not intended for use with entities with <span class="emphasis"><em>mutable</em></span> natural keys. </p><p>Once you have enabled the Hibernate query cache, the <code class="literal">Restrictions.naturalId()</code> allows you to make use of the more efficient cache algorithm. </p><pre class="programlisting">session.createCriteria(User.class)
+    .add( Restrictions.naturalId()
+        .set("name", "gavin")
+        .set("org", "hb") 
+    ).setCacheable(true)
+    .uniqueResult();</pre></div></div><HR xmlns=""/><a xmlns="" href="legalnotice.html"><p xmlns="http://www.w3.org/1999/xhtml" class="copyright">저작권 © 2004 Red Hat Middleware, LLC.</p></a><ul class="docnav"><li class="previous"><a accesskey="p" href="queryhql.html"><strong>이전</strong>14장. HQL: 하이버네이트 질의 언어(Hibernate Query Language)</a></li><li class="up"><a accesskey="u" href="#"><strong>위로</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>처음으로</strong></a></li><li class="next"><a accesskey="n" href="querysql.html"><strong>다음</strong>16장. Native SQL</a></li></ul></body></html>

@@ -1,0 +1,87 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>15.8.&nbsp;Detached queries and subqueries</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="querycriteria.html" title="Chapter&nbsp;15.&nbsp;Criteria Queries">
+      <link rel="prev" href="querycriteria-projection.html" title="15.7.&nbsp;Projections, aggregation and grouping">
+      <link rel="next" href="query-criteria-naturalid.html" title="15.9.&nbsp;Queries by natural identifier">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">15.8.&nbsp;Detached queries and subqueries</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="querycriteria-projection.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;15.&nbsp;Criteria Queries</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="query-criteria-naturalid.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="querycriteria-detachedqueries"></a>15.8.&nbsp;Detached queries and subqueries
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+                        The <code class="literal">DetachedCriteria</code> class lets you create a query outside the scope 
+                        of a session, and then later execute it using some arbitrary <code class="literal">Session</code>.
+                    
+         </p><pre class="programlisting">DetachedCriteria query = DetachedCriteria.forClass(Cat.class)
+    .add( Property.forName("sex").eq('F') );
+    
+Session session = ....;
+Transaction txn = session.beginTransaction();
+List results = query.getExecutableCriteria(session).setMaxResults(100).list();
+txn.commit();
+session.close();</pre><p>
+                        A <code class="literal">DetachedCriteria</code> may also be used to express a subquery. Criterion
+                        instances involving subqueries may be obtained via <code class="literal">Subqueries</code> or
+                        <code class="literal">Property</code>.            
+                    
+         </p><pre class="programlisting">DetachedCriteria avgWeight = DetachedCriteria.forClass(Cat.class)
+    .setProjection( Property.forName("weight").avg() );
+session.createCriteria(Cat.class)
+    .add( Property.forName("weight").gt(avgWeight) )
+    .list();</pre><pre class="programlisting">DetachedCriteria weights = DetachedCriteria.forClass(Cat.class)
+    .setProjection( Property.forName("weight") );
+session.createCriteria(Cat.class)
+    .add( Subqueries.geAll("weight", weights) )
+    .list();</pre><p>
+                        Even correlated subqueries are possible:
+                    
+         </p><pre class="programlisting">DetachedCriteria avgWeightForSex = DetachedCriteria.forClass(Cat.class, "cat2")
+    .setProjection( Property.forName("weight").avg() )
+    .add( Property.forName("cat2.sex").eqProperty("cat.sex") );
+session.createCriteria(Cat.class, "cat")
+    .add( Property.forName("weight").gt(avgWeightForSex) )
+    .list();</pre></div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="querycriteria-projection.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="querycriteria.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="query-criteria-naturalid.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">15.7.&nbsp;Projections, aggregation and grouping&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;15.9.&nbsp;Queries by natural identifier</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

@@ -1,0 +1,120 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>Chapter&nbsp;21.&nbsp;Example: Parent/Child</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="prev" href="toolsetguide.html" title="Chapter&nbsp;20.&nbsp;Toolset Guide">
+      <link rel="next" href="example-parentchild-bidir.html" title="21.2.&nbsp;Bidirectional one-to-many">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">Chapter&nbsp;21.&nbsp;Example: Parent/Child</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="toolsetguide.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">&nbsp;</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="example-parentchild-bidir.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="chapter" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title"><a name="example-parentchild"></a>Chapter&nbsp;21.&nbsp;Example: Parent/Child
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+            One of the very first things that new users try to do with Hibernate is to model a parent / child type 
+            relationship. There are two different approaches to this. For various reasons the most convenient 
+                    approach, especially for new users, is to model both <code class="literal">Parent</code> and <code class="literal">Child</code> 
+                    as entity classes with a <code class="literal">&lt;one-to-many&gt;</code> association from <code class="literal">Parent</code> 
+                    to <code class="literal">Child</code>. (The alternative approach is to declare the <code class="literal">Child</code> as a 
+                    <code class="literal">&lt;composite-element&gt;</code>.) Now, it turns out that default semantics of a one to many 
+                    association (in Hibernate) are much less close to the usual semantics of a parent / child relationship than 
+                    those of a composite element mapping. We will explain how to use a <span class="emphasis"><em>bidirectional one to many 
+                          association with cascades</em></span> to model a parent / child relationship efficiently and elegantly. 
+                    It's not at all difficult!
+                
+         </p>
+         <div class="sect1" lang="en-US">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="example-parentchild-collections"></a>21.1.&nbsp;A note about collections
+                     </h2>
+                  </div>
+               </div>
+            </div>
+            <p>
+                           Hibernate collections are considered to be a logical part of their owning entity; never of the
+                           contained entities. This is a crucial distinction! It has the following consequences:
+                       
+            </p>
+            <div class="itemizedlist">
+               <ul type="disc">
+                  <li>
+                     <p>
+                                        When we remove / add an object from / to a collection, the version number of the collection owner
+                                        is incremented.
+                                    
+                     </p>
+                  </li>
+                  <li>
+                     <p>
+                                        If an object that was removed from a collection is an instance of a value type (eg, a composite
+                                        element), that object will cease to be persistent and its state will be completely removed from
+                                        the database. Likewise, adding a value type instance to the collection will cause its state to be
+                                        immediately persistent.
+                                    
+                     </p>
+                  </li>
+                  <li>
+                     <p>
+                                        On the other hand, if an entity is removed from a collection (a one-to-many or many-to-many
+                                        association), it will not be deleted, by default. This behaviour is completely consistent - a
+                                        change to the internal state of another entity should not cause the associated entity to vanish!
+                                        Likewise, adding an entity to a collection does not cause that entity to become persistent, by
+                                        default.
+                                    
+                     </p>
+                  </li>
+               </ul>
+            </div>
+            <p>
+                           Instead, the default behaviour is that adding an entity to a collection merely creates a link between
+                           the two entities, while removing it removes the link. This is very appropriate for all sorts of cases.
+                           Where it is not appropriate at all is the case of a parent / child relationship, where the life of the
+                           child is bound to the life cycle of the parent.
+                       
+            </p>
+         </div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="toolsetguide.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center">&nbsp;</td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="example-parentchild-bidir.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">Chapter&nbsp;20.&nbsp;Toolset Guide&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;21.2.&nbsp;Bidirectional one-to-many</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

@@ -1,0 +1,114 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>11.4.&nbsp;Verouillage pessimiste</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="transactions.html" title="Chapitre&nbsp;11.&nbsp;Transactions et acc&egrave;s concurrents">
+      <link rel="prev" href="transactions-optimistic.html" title="11.3.&nbsp;Contr&ocirc;le de consurrence optimiste">
+      <link rel="next" href="transactions-connection-release.html" title="11.5.&nbsp;Mode de lib&eacute;ration de Connection">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">11.4.&nbsp;Verouillage pessimiste</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="transactions-optimistic.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapitre&nbsp;11.&nbsp;Transactions et acc&egrave;s concurrents</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="transactions-connection-release.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="transactions-locking"></a>11.4.&nbsp;Verouillage pessimiste
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>It is not intended that users spend much time worrying about locking strategies. It's usually enough to specify an isolation
+            level for the JDBC connections and then simply let the database do all the work. However, advanced users may sometimes wish
+            to obtain exclusive pessimistic locks, or re-obtain locks at the start of a new transaction. 
+         </p>
+         <p>Hibernate utilisera toujours le m&eacute;canisme de verrouillage de la base de donn&eacute;es et ne verrouillera jamais les objets en m&eacute;moire!
+            
+         </p>
+         <p>La classe <code class="literal">LockMode</code> d&eacute;finit les diff&eacute;rents niveaux de verrouillage pouvant &ecirc;tre obtenus par Hibernate. Le verrouillage est obtenu par les m&eacute;canismes
+            suivants: 
+         </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p><code class="literal">LockMode.WRITE</code> est obtenu automatiquement quand Hibernate actualise ou insert un enregistrement. 
+                  </p>
+               </li>
+               <li>
+                  <p><code class="literal">LockMode.UPGRADE</code> peut &ecirc;tre obtenu de mani&egrave;re explicite via la requ&ecirc;te en utilisant <code class="literal">SELECT ... FOR UPDATE</code> sur une base de donn&eacute;es supportant cette syntaxe. 
+                  </p>
+               </li>
+               <li>
+                  <p><code class="literal">LockMode.UPGRADE_NOWAIT</code> peut &ecirc;tre obtenu de mani&egrave;re explicite en utilisant <code class="literal">SELECT ... FOR UPDATE NOWAIT</code> sur Oracle. 
+                  </p>
+               </li>
+               <li>
+                  <p><code class="literal">LockMode.READ</code> est obtenu automatiquement quand Hibernate lit des donn&eacute;es dans un contexte d'isolation <code class="literal">Repeatable Read</code> ou <code class="literal">Serializable</code> . Peut &ecirc;tre r&eacute;obtenu explicitement via une requ&ecirc;te. 
+                  </p>
+               </li>
+               <li>
+                  <p><code class="literal">LockMode.NONE</code> repr&eacute;sente l'absence de verouillage. Tous les objets migrent vers ce mode a la fin d'une <code class="literal">Transaction</code> . Les objets associ&eacute;s &agrave; une session via un appel &agrave; <code class="literal">saveOrUpdate()</code> commencent &eacute;galement leur cycle de vie dans cet &eacute;tat. 
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p>Les niveaux de verrouillage peuvent &ecirc;tre explicitement obtenus de l'une des mani&egrave;res suivantes: </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p>Un appel &agrave; <code class="literal">Session.load()</code> , en sp&eacute;cifiant un niveau verrouillage <code class="literal">LockMode</code> . 
+                  </p>
+               </li>
+               <li>
+                  <p>Un appel &agrave; <code class="literal">Session.lock()</code> . 
+                  </p>
+               </li>
+               <li>
+                  <p>Une appel &agrave; <code class="literal">Query.setLockMode()</code> . 
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p>Si <code class="literal">Session.load()</code> est appel&eacute; avec le param&egrave;tre de niveau de verouillage <code class="literal">UPGRADE</code> ou <code class="literal">UPGRADE_NOWAIT</code> et que l'objet demand&eacute; n'est pas pr&eacute;sent dans la session, celui-ci sera charg&eacute; &agrave; l'aide d'une requ&ecirc;te <code class="literal">SELECT ... FOR UPDATE</code> . Si la m&eacute;thode <code class="literal">load()</code> est appel&eacute;e pour un objet d&eacute;j&agrave; en session avec un verrouillage moindre que celui demand&eacute;, Hibernate appellera la m&eacute;thode
+            <code class="literal">lock()</code> pour cet objet. 
+         </p>
+         <p><code class="literal">Session.lock()</code> effectue une v&eacute;rification de version si le niveau de verrouillage est <code class="literal">READ</code> , <code class="literal">UPGRADE</code> ou <code class="literal">UPGRADE_NOWAIT</code> . (Dans le cas des niveaux <code class="literal">UPGRADE</code> ou <code class="literal">UPGRADE_NOWAIT</code> , une requ&ecirc;te <code class="literal">SELECT ... FOR UPDATE</code> sera utilis&eacute;e.) 
+         </p>
+         <p>Si une base de donn&eacute;es ne supporte pas le niveau de verrouillage demand&eacute;, Hibernate utilisera un niveau alternatif convenable
+            au lieux de lancer une exception. Ceci assurera la portabilit&eacute; de votre application. 
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="transactions-optimistic.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="transactions.html">Niveau sup&eacute;rieur</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="transactions-connection-release.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">11.3.&nbsp;Contr&ocirc;le de consurrence optimiste&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;11.5.&nbsp;Mode de lib&eacute;ration de Connection</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

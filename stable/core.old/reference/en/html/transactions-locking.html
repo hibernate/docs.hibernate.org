@@ -1,0 +1,162 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>11.4.&nbsp;Pessimistic Locking</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Relational Persistence for Idiomatic Java">
+      <link rel="up" href="transactions.html" title="Chapter&nbsp;11.&nbsp;Transactions And Concurrency">
+      <link rel="prev" href="transactions-optimistic.html" title="11.3.&nbsp;Optimistic concurrency control">
+      <link rel="next" href="transactions-connection-release.html" title="11.5.&nbsp;Connection Release Modes">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">11.4.&nbsp;Pessimistic Locking</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="transactions-optimistic.html">Prev</a>&nbsp;
+               </td>
+               <th width="60%" align="center">Chapter&nbsp;11.&nbsp;Transactions And Concurrency</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="transactions-connection-release.html">Next</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="sect1" lang="en-US">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title" style="clear: both"><a name="transactions-locking"></a>11.4.&nbsp;Pessimistic Locking
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>
+            It is not intended that users spend much time worrying about locking strategies. It's usually
+            enough to specify an isolation level for the JDBC connections and then simply let the
+            database do all the work. However, advanced users may sometimes wish to obtain
+                        exclusive pessimistic locks, or re-obtain locks at the start of a new transaction.
+                    
+         </p>
+         <p>
+                        Hibernate will always use the locking mechanism of the database, never lock objects
+                        in memory!
+                    
+         </p>
+         <p>
+                        The <code class="literal">LockMode</code> class defines the different lock levels that may be acquired
+                        by Hibernate. A lock is obtained by the following mechanisms:
+                    
+         </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p>
+                                         <code class="literal">LockMode.WRITE</code> is acquired automatically when Hibernate updates or inserts
+                                         a row.
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         <code class="literal">LockMode.UPGRADE</code> may be acquired upon explicit user request using
+                                         <code class="literal">SELECT ... FOR UPDATE</code> on databases which support that syntax.
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         <code class="literal">LockMode.UPGRADE_NOWAIT</code> may be acquired upon explicit user request using a
+                                         <code class="literal">SELECT ... FOR UPDATE NOWAIT</code> under Oracle.
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         <code class="literal">LockMode.READ</code> is acquired automatically when Hibernate reads data
+                                         under Repeatable Read or Serializable isolation level. May be re-acquired by explicit user
+                                         request.
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                 <code class="literal">LockMode.NONE</code> represents the absence of a lock. All objects switch to this
+                                 lock mode at the end of a <code class="literal">Transaction</code>. Objects associated with the session
+                                 via a call to <code class="literal">update()</code> or <code class="literal">saveOrUpdate()</code> also start out
+                                 in this lock mode.
+                             
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p>
+                        The "explicit user request" is expressed in one of the following ways:
+                    
+         </p>
+         <div class="itemizedlist">
+            <ul type="disc" compact>
+               <li>
+                  <p>
+                                         A call to <code class="literal">Session.load()</code>, specifying a <code class="literal">LockMode</code>.
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         A call to <code class="literal">Session.lock()</code>.
+                                     
+                  </p>
+               </li>
+               <li>
+                  <p>
+                                         A call to <code class="literal">Query.setLockMode()</code>.
+                                     
+                  </p>
+               </li>
+            </ul>
+         </div>
+         <p>
+                        If <code class="literal">Session.load()</code> is called with <code class="literal">UPGRADE</code> or
+                        <code class="literal">UPGRADE_NOWAIT</code>, and the requested object was not yet loaded by
+                        the session, the object is loaded using <code class="literal">SELECT ... FOR UPDATE</code>.
+                        If <code class="literal">load()</code> is called for an object that is already loaded with
+                        a less restrictive lock than the one requested, Hibernate calls
+                        <code class="literal">lock()</code> for that object.
+                    
+         </p>
+         <p>
+                        <code class="literal">Session.lock()</code> performs a version number check if the specified lock
+                        mode is <code class="literal">READ</code>, <code class="literal">UPGRADE</code> or
+                        <code class="literal">UPGRADE_NOWAIT</code>. (In the case of <code class="literal">UPGRADE</code> or
+                        <code class="literal">UPGRADE_NOWAIT</code>, <code class="literal">SELECT ... FOR UPDATE</code> is used.)
+                    
+         </p>
+         <p>
+                        If the database does not support the requested lock mode, Hibernate will use an appropriate
+                        alternate mode (instead of throwing an exception). This ensures that applications will
+                        be portable.
+                    
+         </p>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="transactions-optimistic.html">Prev</a>&nbsp;
+               </td>
+               <td width="20%" align="center"><a accesskey="u" href="transactions.html">Up</a></td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="transactions-connection-release.html">Next</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">11.3.&nbsp;Optimistic concurrency control&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;11.5.&nbsp;Connection Release Modes</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

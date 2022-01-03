@@ -1,0 +1,244 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   
+      <title>Chapitre&nbsp;4.&nbsp;Classes persistantes</title>
+      <link rel="stylesheet" href="css/html.css" type="text/css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.72.0">
+      <link rel="start" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="up" href="index.html" title="HIBERNATE - Persistance relationnelle en Java standard">
+      <link rel="prev" href="configuration-j2ee.html" title="3.8.&nbsp;Int&eacute;gration &agrave; un serveur d'application J2EE">
+      <link rel="next" href="persistent-classes-inheritance.html" title="4.2.&nbsp;Impl&eacute;menter l'h&eacute;ritage">
+   </head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      <div class="navheader">
+         <table width="100%" summary="Navigation header">
+            <tr>
+               <th colspan="3" align="center">Chapitre&nbsp;4.&nbsp;Classes persistantes</th>
+            </tr>
+            <tr>
+               <td width="20%" align="left"><a accesskey="p" href="configuration-j2ee.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <th width="60%" align="center">&nbsp;</th>
+               <td width="20%" align="right">&nbsp;<a accesskey="n" href="persistent-classes-inheritance.html">Suivant</a></td>
+            </tr>
+         </table>
+         <hr>
+      </div>
+      <div class="chapter" lang="fr-FR">
+         <div class="titlepage">
+            <div>
+               <div>
+                  <h2 class="title"><a name="persistent-classes"></a>Chapitre&nbsp;4.&nbsp;Classes persistantes
+                  </h2>
+               </div>
+            </div>
+         </div>
+         <p>Les classes persistantes sont les classes d'une application qui impl&eacute;mentent les entit&eacute;s d'un probl&egrave;me m&eacute;tier (ex. Client
+            et Commande dans une application de commerce &eacute;lectronique). Toutes les instances d'une classe persistante ne sont pas forc&eacute;ment
+            dans l'&eacute;tat persistant - au lieu de cela, une instance peut &ecirc;tre &eacute;ph&eacute;m&egrave;re (NdT : transient) ou d&eacute;tach&eacute;e. 
+         </p>
+         <p>Hibernate fonctionne de mani&egrave;re optimale lorsque ces classes suivent quelques r&egrave;gles simples, aussi connues comme le mod&egrave;le
+            de programmation Plain Old Java Object (POJO). Cependant, aucune de ces r&egrave;gles ne sont des besoins absolus. En effet, Hibernate3
+            suppose tr&egrave;s peu de choses &agrave; propos de la nature de vos objets persistants. Vous pouvez exprimer un mod&egrave;le de domaine par
+            d'autres moyens : utiliser des arbres d'instances de <code class="literal">Map</code>, par exemple. 
+         </p>
+         <div class="sect1" lang="fr-FR">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title" style="clear: both"><a name="persistent-classes-pojo"></a>4.1.&nbsp;Un exemple simple de POJO
+                     </h2>
+                  </div>
+               </div>
+            </div>
+            <p>Toute bonne application Java n&eacute;cessite une classe persistante repr&eacute;sentant les f&eacute;lins. </p><pre class="programlisting">package eg;
+import java.util.Set;
+import java.util.Date;
+
+public class Cat {
+    private Long id; // identifier
+
+    private Date birthdate;
+    private Color color;
+    private char sex;
+    private float weight;
+    private int litterId;
+
+    private Cat mother;
+    private Set kittens = new HashSet();
+
+    private void setId(Long id) {
+        this.id=id;
+    }
+    public Long getId() {
+        return id;
+    }
+
+    void setBirthdate(Date date) {
+        birthdate = date;
+    }
+    public Date getBirthdate() {
+        return birthdate;
+    }
+
+    void setWeight(float weight) {
+        this.weight = weight;
+    }
+    public float getWeight() {
+        return weight;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+    void setColor(Color color) {
+        this.color = color;
+    }
+
+    void setSex(char sex) {
+        this.sex=sex;
+    }
+    public char getSex() {
+        return sex;
+    }
+
+    void setLitterId(int id) {
+        this.litterId = id;
+    }
+    public int getLitterId() {
+        return litterId;
+    }
+
+    void setMother(Cat mother) {
+        this.mother = mother;
+    }
+    public Cat getMother() {
+        return mother;
+    }
+    void setKittens(Set kittens) {
+        this.kittens = kittens;
+    }
+    public Set getKittens() {
+        return kittens;
+    }
+    
+    // addKitten not needed by Hibernate
+    public void addKitten(Cat kitten) {
+            kitten.setMother(this);
+        kitten.setLitterId( kittens.size() ); 
+        kittens.add(kitten);
+    }
+}</pre><p>Il y a quatre r&egrave;gles &agrave; suivre ici : </p>
+            <div class="sect2" lang="fr-FR">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="persistent-classes-pojo-constructor"></a>4.1.1.&nbsp;Impl&eacute;menter un constructeur sans argument
+                        </h3>
+                     </div>
+                  </div>
+               </div>
+               <p><code class="literal">Cat</code> a un constructeur sans argument. Toutes les classes persistantes doivent avoir un constructeur par d&eacute;faut (lequel peut ne
+                  pas &ecirc;tre public) pour qu'Hibernate puissent les instancier en utilisant <code class="literal">Constructor.newInstance()</code>. Nous recommandons fortement d'avoir un constructeur par d&eacute;faut avec au moins une visibilit&eacute; <span class="emphasis"><em>paquet</em></span> pour la g&eacute;n&eacute;ration du proxy &agrave; l'ex&eacute;cution dans Hibernate. 
+               </p>
+            </div>
+            <div class="sect2" lang="fr-FR">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="persistent-classes-pojo-identifier"></a>4.1.2.&nbsp;Fournir une propri&eacute;t&eacute; d'indentifiant (optionnel)
+                        </h3>
+                     </div>
+                  </div>
+               </div>
+               <p><code class="literal">Cat</code> poss&egrave;de une propri&eacute;t&eacute; appel&eacute;e <code class="literal">id</code>. Cette propri&eacute;t&eacute; mappe la valeur de la colonne de cl&eacute; primaire de la table d'une base de donn&eacute;es.La propri&eacute;t&eacute; aurait pu s'appeler
+                  compl&egrave;tement autrement, et son type aurait pu &ecirc;tre n'importe quel type primitif, n'importe quel "encapsuleur" de type primitif,
+                  <code class="literal">java.lang.String</code> ou <code class="literal">java.util.Date</code>. (Si votre base de donn&eacute;es h&eacute;rit&eacute;e poss&egrave;de des cl&eacute;s composites, elles peuvent &ecirc;tre mapp&eacute;es en utilisant une classe d&eacute;finie
+                  par l'utilisateur et poss&eacute;dant les propri&eacute;t&eacute;s associ&eacute;es aux types de la cl&eacute; composite - voir la section concernant les identifiants
+                  composites plus tard). 
+               </p>
+               <p>La propri&eacute;t&eacute; d'identifiant est strictement optionnelle. Vous pouver l'oublier et laisser Hibernate s'occuper des identifiants
+                  de l'objet en interne. Toutefois, nous ne le recommandons pas. 
+               </p>
+               <p>En fait, quelques fonctionnalit&eacute;s ne sont disponibles que pour les classes d&eacute;clarant un identifiant de propri&eacute;t&eacute; : </p>
+               <div class="itemizedlist">
+                  <ul type="disc" compact>
+                     <li>
+                        <p>Transitive reattachment for detached objects (cascade update or cascade merge) - see <a href="objectstate-transitive.html" title="10.11.&nbsp;Persistance transitive">Section&nbsp;10.11, &laquo;&nbsp;Persistance transitive&nbsp;&raquo;</a> 
+                        </p>
+                     </li>
+                     <li>
+                        <p>
+                                                   <code class="literal">Session.saveOrUpdate()</code>
+                                               
+                        </p>
+                     </li>
+                     <li>
+                        <p>
+                                                   <code class="literal">Session.merge()</code>
+                                               
+                        </p>
+                     </li>
+                  </ul>
+               </div>
+               <p>Nous recommandons que vous d&eacute;clariez les propri&eacute;t&eacute;s d'identifiant de mani&egrave;re uniforme. Nous recommandons &eacute;galement que vous
+                  utilisiez un type nullable (ie. non primitif). 
+               </p>
+            </div>
+            <div class="sect2" lang="fr-FR">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="persistent-classes-pojo-final"></a>4.1.3.&nbsp;Favoriser les classes non finales (optionnel)
+                        </h3>
+                     </div>
+                  </div>
+               </div>
+               <p>Une fonctionnalit&eacute; clef d'Hibernate, les <span class="emphasis"><em>proxies</em></span>, n&eacute;cessitent que la classe persistente soit non finale ou qu'elle soit l'impl&eacute;mentation d'une interface qui d&eacute;clare toutes
+                  les m&eacute;thodes publiques. 
+               </p>
+               <p>Vous pouvez persister, gr&acirc;ce &agrave; Hibernate, les classes <code class="literal">final</code> qui n'impl&eacute;mentent pas d'interface, mais vous ne pourrez pas utiliser les proxies pour les chargements d'associations paresseuses
+                  - ce qui limitera vos possibilit&eacute;s d'ajustement des performances. 
+               </p>
+               <p>Vous devriez aussi &eacute;viter de d&eacute;clarer des m&eacute;thodes <code class="literal">public final</code> sur des classes non-finales. Si vous voulez utiliser une classe avec une m&eacute;thode <code class="literal">public final</code>, vous devez explicitement d&eacute;sactiver les proxies en param&eacute;trant <code class="literal">lazy="false"</code>. 
+               </p>
+            </div>
+            <div class="sect2" lang="fr-FR">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="persistent-classes-pojo-accessors"></a>4.1.4.&nbsp;D&eacute;clarer les accesseurs et mutateurs des attributs persistants (optionnel)
+                        </h3>
+                     </div>
+                  </div>
+               </div>
+               <p><code class="literal">Cat</code> d&eacute;clare des mutateurs pour toutes ses champs persistants. Beaucoup d'autres solutions de mapping Objet/relationnel persistent
+                  directement les variables d'instance. Nous pensons qu'il est bien mieux de fournir une indirection entre le sch&eacute;ma relationnel
+                  et les structures de donn&eacute;es internes de la classe. Par d&eacute;faut, Hibernate persiste les propri&eacute;t&eacute;s suivant le style JavaBean,
+                  et reconna&icirc;t les noms de m&eacute;thodes de la forme <code class="literal"> getFoo</code>, <code class="literal">isFoo</code> et <code class="literal">setFoo</code>. Nous pouvons changer pour un acc&egrave;s direct aux champs pour des propri&eacute;t&eacute;s particuli&egrave;res, si besoin est. 
+               </p>
+               <p>Les propri&eacute;t&eacute;s <span class="emphasis"><em>n'ont pas</em></span> &agrave; &ecirc;tre d&eacute;clar&eacute;es publiques - Hibernate peut persister une propri&eacute;t&eacute; avec un paire de getter/setter de visibilit&eacute; par d&eacute;fault,
+                  <code class="literal">protected</code> ou <code class="literal"> private</code>. 
+               </p>
+            </div>
+         </div>
+      </div>
+      <div class="navfooter">
+         <hr>
+         <table width="100%" summary="Navigation footer">
+            <tr>
+               <td width="40%" align="left"><a accesskey="p" href="configuration-j2ee.html">Pr&eacute;c&eacute;dent</a>&nbsp;
+               </td>
+               <td width="20%" align="center">&nbsp;</td>
+               <td width="40%" align="right">&nbsp;<a accesskey="n" href="persistent-classes-inheritance.html">Suivant</a></td>
+            </tr>
+            <tr>
+               <td width="40%" align="left" valign="top">3.8.&nbsp;Int&eacute;gration &agrave; un serveur d'application J2EE&nbsp;</td>
+               <td width="20%" align="center"><a accesskey="h" href="index.html">Sommaire</a></td>
+               <td width="40%" align="right" valign="top">&nbsp;4.2.&nbsp;Impl&eacute;menter l'h&eacute;ritage</td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>
