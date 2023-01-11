@@ -441,7 +441,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="header">
 <h1>Generated Values</h1>
 <div class="details">
-<span id="revnumber">version 6.0.0.Beta3</span>
+<span id="revnumber">version 6.0.0.CR1</span>
 </div>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
@@ -488,9 +488,9 @@ issues a select afterwards to retrieve the generated values.</p>
 <pre class="prettyprint highlight"><code data-lang="JAVA">@Entity
 public class Document {
     ...
-    @Generated(INSERT)
+    @Generated
     private Date created;
-    @Generated(ALWAYS)
+    @Generated(event={INSERT,UPDATE})
     private Date lastModified;
 }</code></pre>
 </div>
@@ -554,7 +554,7 @@ public interface ValueGeneration {
 
     /**
      * Obtain the in-VM value generator.
-     * &lt;p/&gt;
+     * &lt;p&gt;
      * May return {@code null}.  In fact for values that are generated
      * "in the database" via execution of the INSERT/UPDATE statement, the
      * expectation is that {@code null} be returned here
@@ -567,7 +567,7 @@ public interface ValueGeneration {
      * For values which are generated in the database (i.e,
      * {@link #getValueGenerator()} == {@code null}), should the column
      * be referenced in the INSERT / UPDATE SQL?
-     * &lt;p/&gt;
+     * &lt;p&gt;
      * This will be false most often to have a DDL-defined DEFAULT value
      * be applied on INSERT
      *
@@ -581,9 +581,9 @@ public interface ValueGeneration {
      * referenced in the SQL (i.e.,
      * {@link #referenceColumnInSql()} == {@code true}), what value should be
      * used in the SQL as the column value.
-     * &lt;p/&gt;
+     * &lt;p&gt;
      * Generally this will be a function call or a marker (DEFAULTS).
-     * &lt;p/&gt;
+     * &lt;p&gt;
      * NOTE : for in-VM generation, this will not be called and the column
      * value will implicitly be a JDBC parameter ('?')
      *
@@ -751,8 +751,8 @@ public class Document {
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 6.0.0.Beta3<br>
-Last updated 2021-12-10 13:38:54 -0600
+Version 6.0.0.CR1<br>
+Last updated 2022-12-22 23:11:51 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">

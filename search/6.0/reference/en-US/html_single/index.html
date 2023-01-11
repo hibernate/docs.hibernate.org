@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.16">
-<title>Hibernate Search 6.0.8.Final: Reference Documentation</title>
+<title>Hibernate Search 6.0.10.Final: Reference Documentation</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -558,9 +558,9 @@ table.CodeRay td.code{padding:0 0 0 .75em}
 </head>
 <body class="book toc2 toc-left">
 <div id="header">
-<h1>Hibernate Search 6.0.8.Final: Reference Documentation</h1>
+<h1>Hibernate Search 6.0.10.Final: Reference Documentation</h1>
 <div class="details">
-<span id="revdate">2022-01-05</span>
+<span id="revdate">2022-08-23</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -1546,7 +1546,7 @@ Thus, it is recommended to override Spring Boot&#8217;s defaults at least for so
 you still have problems (e.g. <code>NoClassDefFoundError</code>) with some of Hibernate Search&#8217;s dependencies,
 look for the version of that dependency in
 <a href="https://search.maven.org/artifact/org.springframework.boot/spring-boot-dependencies/2.4.0/pom">Spring Boot&#8217;s POM</a>
-and <a href="https://search.maven.org/artifact/org.hibernate.search/hibernate-search-parent/6.0.8.Final/pom">Hibernate Search&#8217;s POM</a>:
+and <a href="https://search.maven.org/artifact/org.hibernate.search/hibernate-search-parent/6.0.10.Final/pom">Hibernate Search&#8217;s POM</a>:
 there will probably be a mistmatch,
 and generally overriding Spring Boot&#8217;s version to match Hibernate Search&#8217;s version will work fine.</p>
 </div>
@@ -1600,7 +1600,7 @@ Hibernate Search works just fine with plenty of other frameworks.</p>
 <div class="paragraph">
 <p>If you do not want to, or cannot, fetch the JARs from a Maven repository,
 you can get them from the
-<a href="http://sourceforge.net/projects/hibernate/files/hibernate-search/6.0.8.Final/">distribution bundle hosted at Sourceforge</a>.</p>
+<a href="http://sourceforge.net/projects/hibernate/files/hibernate-search/6.0.10.Final/">distribution bundle hosted at Sourceforge</a>.</p>
 </div>
 <div class="paragraph">
 <p>In order to use Hibernate Search, you will need at least two direct dependencies:</p>
@@ -1633,12 +1633,12 @@ storing the index on the local filesystem.</p>
 <pre class="CodeRay highlight"><code data-lang="XML"><span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-mapper-orm<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>6.0.8.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>6.0.10.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span>
 <span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-backend-lucene<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>6.0.8.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>6.0.10.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -1660,12 +1660,12 @@ storing the index on a remote Elasticsearch cluster (to be configured separately
 <pre class="CodeRay highlight"><code data-lang="XML"><span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-mapper-orm<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>6.0.8.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>6.0.10.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span>
 <span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-backend-elasticsearch<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>6.0.8.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>6.0.10.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -2765,11 +2765,11 @@ and <a href="#mapper-orm-indexing-massindexer">mass indexing</a>.</p>
 <ul>
 <li>
 <p>The <a href="https://github.com/quarkusio/quarkus-quickstarts/tree/main/hibernate-search-orm-elasticsearch-quickstart">Quarkus quickstart</a>,
-a sample application using Hibernate Search with the [Quarkus](<a href="https://quarkus.io/" class="bare">https://quarkus.io/</a>) framework.</p>
+a sample application using Hibernate Search with the <a href="https://quarkus.io/">Quarkus</a> framework.</p>
 </li>
 <li>
 <p>The <a href="https://github.com/hibernate/hibernate-search/tree/main/integrationtest/showcase/library">"Library" showcase</a>,
-a sample application using Hibernate Search with the [Spring Boot](<a href="https://spring.io/projects/spring-boot" class="bare">https://spring.io/projects/spring-boot</a>) framework.</p>
+a sample application using Hibernate Search with the <a href="https://spring.io/projects/spring-boot">Spring Boot</a> framework.</p>
 </li>
 </ul>
 </div>
@@ -3385,12 +3385,12 @@ If you&#8217;re interested, see for example <a href="#search-dsl-predicate-exten
 <pre class="CodeRay highlight"><code data-lang="XML"><span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-mapper-orm<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>6.0.8.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>6.0.10.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span>
 <span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-backend-lucene<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>6.0.8.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>6.0.10.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -3483,12 +3483,12 @@ where two transactions simultaneously trigger reindexing of the same entity inst
 <pre class="CodeRay highlight"><code data-lang="XML"><span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-mapper-orm<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>6.0.8.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>6.0.10.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span>
 <span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-backend-elasticsearch<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>6.0.8.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>6.0.10.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -15898,7 +15898,7 @@ As for other implementations, they can also be used, but will require
 <pre class="CodeRay highlight"><code data-lang="XML"><span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-mapper-orm-batch-jsr352-jberet<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>6.0.8.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>6.0.10.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -15910,7 +15910,7 @@ As for other implementations, they can also be used, but will require
 <pre class="CodeRay highlight"><code data-lang="XML"><span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-mapper-orm-batch-jsr352-core<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>6.0.8.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>6.0.10.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -21166,7 +21166,7 @@ but using the Lucene extension so that Lucene-specific options are available.</t
 <div class="sect4">
 <h5 id="search-dsl-predicate-extensions-elasticsearch-from-json"><a class="anchor" href="#search-dsl-predicate-extensions-elasticsearch-from-json"></a>Elasticsearch: <code>fromJson</code></h5>
 <div class="paragraph">
-<p><code>.fromLuceneQuery(&#8230;&#8203;)</code> turns JSON representing an Elasticsearch query into a Hibernate Search predicate.</p>
+<p><code>.fromJson(&#8230;&#8203;)</code> turns JSON representing an Elasticsearch query into a Hibernate Search predicate.</p>
 </div>
 <div class="admonitionblock warning">
 <table>
@@ -26820,7 +26820,7 @@ you can enable it with an additional dependency and a little bit of configuratio
 <pre class="CodeRay highlight"><code data-lang="XML"><span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-backend-elasticsearch-aws<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>6.0.8.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>6.0.10.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -28760,7 +28760,7 @@ available in particular in our <a href="https://github.com/hibernate/hibernate-s
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-01-05 08:15:51 UTC
+Last updated 2022-08-23 13:21:23 UTC
 </div>
 </div>
 <!-- Google Analytics -->

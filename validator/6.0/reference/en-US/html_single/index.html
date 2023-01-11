@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 1.5.6.1">
 <meta name="author" content="Hardy Ferentschik, Gunnar Morling, Guillaume Smet">
-<title>Hibernate Validator 6.0.22.Final - JSR 380 Reference Implementation: Reference Guide</title>
+<title>Hibernate Validator 6.0.23.Final - JSR 380 Reference Implementation: Reference Guide</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /* Asciidoctor default stylesheet | MIT License | http://asciidoctor.org */
@@ -436,12 +436,12 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </head>
 <body class="book toc2 toc-left">
 <div id="header">
-<h1>Hibernate Validator 6.0.22.Final - JSR 380 Reference Implementation: Reference Guide</h1>
+<h1>Hibernate Validator 6.0.23.Final - JSR 380 Reference Implementation: Reference Guide</h1>
 <div class="details">
 <span id="author" class="author">Hardy Ferentschik</span><br>
 <span id="author2" class="author">Gunnar Morling</span><br>
 <span id="author3" class="author">Guillaume Smet</span><br>
-<span id="revdate">2020-12-16</span>
+<span id="revdate">2022-02-09</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -751,7 +751,7 @@ your <em>pom.xml</em>:</p>
 <pre class="prettyprint highlight"><code class="language-XML" data-lang="XML">&lt;dependency&gt;
     &lt;groupId&gt;org.hibernate.validator&lt;/groupId&gt;
     &lt;artifactId&gt;hibernate-validator&lt;/artifactId&gt;
-    &lt;version&gt;6.0.22.Final&lt;/version&gt;
+    &lt;version&gt;6.0.23.Final&lt;/version&gt;
 &lt;/dependency&gt;</code></pre>
 </div>
 </div>
@@ -819,7 +819,7 @@ Validator CDI portable extension by adding the following Maven dependency to you
 <pre class="prettyprint highlight"><code class="language-XML" data-lang="XML">&lt;dependency&gt;
     &lt;groupId&gt;org.hibernate.validator&lt;/groupId&gt;
     &lt;artifactId&gt;hibernate-validator-cdi&lt;/artifactId&gt;
-    &lt;version&gt;6.0.22.Final&lt;/version&gt;
+    &lt;version&gt;6.0.23.Final&lt;/version&gt;
 &lt;/dependency&gt;</code></pre>
 </div>
 </div>
@@ -843,7 +843,7 @@ The following shows how to do this via a <a href="http://docs.oracle.com/javase/
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-XML" data-lang="XML">grant codeBase "file:path/to/hibernate-validator-6.0.22.Final.jar" {
+<pre class="prettyprint highlight"><code class="language-XML" data-lang="XML">grant codeBase "file:path/to/hibernate-validator-6.0.23.Final.jar" {
     permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
     permission java.lang.RuntimePermission "accessDeclaredMembers";
     permission java.lang.RuntimePermission "setContextClassLoader";
@@ -855,7 +855,7 @@ The following shows how to do this via a <a href="http://docs.oracle.com/javase/
 };
 
 grant codeBase "file:path/to/validation-api-2.0.1.Final.jar" {
-    permission java.io.FilePermission "path/to/hibernate-validator-6.0.22.Final.jar", "read";
+    permission java.io.FilePermission "path/to/hibernate-validator-6.0.23.Final.jar", "read";
 };
 
 grant codeBase "file:path/to/jboss-logging-3.3.2.Final.jar" {
@@ -892,7 +892,7 @@ In order to update the server modules for Bean Validation API and Hibernate Vali
 <pre class="prettyprint highlight"><code class="language-XML" data-lang="XML">&lt;dependency&gt;
     &lt;groupId&gt;org.hibernate.validator&lt;/groupId&gt;
     &lt;artifactId&gt;hibernate-validator-modules&lt;/artifactId&gt;
-    &lt;version&gt;6.0.22.Final&lt;/version&gt;
+    &lt;version&gt;6.0.23.Final&lt;/version&gt;
     &lt;classifier&gt;wildfly-17.0.1.Final-patch&lt;/classifier&gt;
     &lt;type&gt;zip&lt;/type&gt;
 &lt;/dependency&gt;</code></pre>
@@ -911,7 +911,7 @@ In order to update the server modules for Bean Validation API and Hibernate Vali
 <pre class="prettyprint highlight"><code class="language-XML" data-lang="XML">&lt;dependency&gt;
     &lt;groupId&gt;org.hibernate.validator&lt;/groupId&gt;
     &lt;artifactId&gt;hibernate-validator-modules&lt;/artifactId&gt;
-    &lt;version&gt;6.0.22.Final&lt;/version&gt;
+    &lt;version&gt;6.0.23.Final&lt;/version&gt;
     &lt;classifier&gt;wildfly-16.0.0.Final-patch&lt;/classifier&gt;
     &lt;type&gt;zip&lt;/type&gt;
 &lt;/dependency&gt;</code></pre>
@@ -927,7 +927,7 @@ In order to update the server modules for Bean Validation API and Hibernate Vali
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code>$JBOSS_HOME/bin/jboss-cli.sh patch apply hibernate-validator-modules-6.0.22.Final-wildfly-17.0.1.Final-patch.zip</code></pre>
+<pre class="prettyprint highlight"><code>$JBOSS_HOME/bin/jboss-cli.sh patch apply hibernate-validator-modules-6.0.23.Final-wildfly-17.0.1.Final-patch.zip</code></pre>
 </div>
 </div>
 </div>
@@ -952,7 +952,7 @@ In order to update the server modules for Bean Validation API and Hibernate Vali
 <div class="sect3">
 <h4 id="validator-gettingstarted-java9"><a class="anchor" href="#validator-gettingstarted-java9"></a>1.1.5. Running on Java 9</h4>
 <div class="paragraph">
-<p>As of Hibernate Validator 6.0.22.Final, support for Java 9 and the Java Platform Module System (JPMS) is experimental.
+<p>As of Hibernate Validator 6.0.23.Final, support for Java 9 and the Java Platform Module System (JPMS) is experimental.
 There are no JPMS module descriptors provided yet, but Hibernate Validator is usable as automatic modules.</p>
 </div>
 <div class="paragraph">
@@ -11353,7 +11353,7 @@ annotations are incorrectly used.</p>
 <p>You can find the Hibernate Validator Annotation Processor as part of the distribution bundle on
 <a href="http://sourceforge.net/projects/hibernate/files/hibernate-validator">Sourceforge</a> or in the
 usual Maven repositories such as Maven Central under the GAV
-<code>org.hibernate.validator:hibernate-validator-annotation-processor:6.0.22.Final</code>.</p>
+<code>org.hibernate.validator:hibernate-validator-annotation-processor:6.0.23.Final</code>.</p>
 </div>
 </td>
 </tr>
@@ -11370,7 +11370,7 @@ Platform.</p>
 <div class="sect2">
 <h3 id="validator-annotationprocessor-features"><a class="anchor" href="#validator-annotationprocessor-features"></a>13.2. Features</h3>
 <div class="paragraph">
-<p>As of Hibernate Validator 6.0.22.Final the Hibernate Validator Annotation Processor checks that:</p>
+<p>As of Hibernate Validator 6.0.23.Final the Hibernate Validator Annotation Processor checks that:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -11473,7 +11473,7 @@ NetBeans).</p>
                         &lt;path&gt;
                             &lt;groupId&gt;org.hibernate.validator&lt;/groupId&gt;
                             &lt;artifactId&gt;hibernate-validator-annotation-processor&lt;/artifactId&gt;
-                            &lt;version&gt;6.0.22.Final&lt;/version&gt;
+                            &lt;version&gt;6.0.23.Final&lt;/version&gt;
                         &lt;/path&gt;
                     &lt;/annotationProcessorPaths&gt;
                 &lt;/configuration&gt;
@@ -11505,7 +11505,7 @@ for <a href="http://ant.apache.org/">Apache Ant</a>:</p>
        destdir="build/classes"
        classpath="/path/to/validation-api-2.0.1.Final.jar"&gt;
        &lt;compilerarg value="-processorpath" /&gt;
-       &lt;compilerarg value="/path/to/hibernate-validator-annotation-processor-6.0.22.Final.jar"/&gt;
+       &lt;compilerarg value="/path/to/hibernate-validator-annotation-processor-6.0.23.Final.jar"/&gt;
 &lt;/javac&gt;</code></pre>
 </div>
 </div>
@@ -11517,7 +11517,7 @@ for <a href="http://ant.apache.org/">Apache Ant</a>:</p>
 <div class="paragraph">
 <p>When compiling on the command line using
 <a href="http://docs.oracle.com/javase/8/docs/technotes/guides/javac/index.html">javac</a>, specify the JAR
-<em>hibernate-validator-annotation-processor-6.0.22.Final.jar</em> using the "processorpath" option as shown in
+<em>hibernate-validator-annotation-processor-6.0.23.Final.jar</em> using the "processorpath" option as shown in
 the following listing. The processor will be detected automatically by the compiler and invoked
 during compilation.</p>
 </div>
@@ -11528,7 +11528,7 @@ during compilation.</p>
 <div class="content">
 <pre>javac src/main/java/org/hibernate/validator/ap/demo/Car.java \
    -cp /path/to/validation-api-2.0.1.Final.jar \
-   -processorpath /path/to/hibernate-validator-annotation-processor-6.0.22.Final.jar</pre>
+   -processorpath /path/to/hibernate-validator-annotation-processor-6.0.23.Final.jar</pre>
 </div>
 </div>
 </div>
@@ -11560,7 +11560,7 @@ Otherwise the processor won&#8217;t be activated</p>
 </li>
 <li>
 <p>Go to "Java Compiler - Annotation Processing - Factory Path" and add the JAR
-hibernate-validator-annotation-processor-6.0.22.Final.jar</p>
+hibernate-validator-annotation-processor-6.0.23.Final.jar</p>
 </li>
 <li>
 <p>Confirm the workspace rebuild</p>
@@ -11593,7 +11593,7 @@ hibernate-validator-annotation-processor-6.0.22.Final.jar</p>
 </li>
 <li>
 <p>Choose "Enable annotation processing" and enter the following as "Processor path":
-/path/to/hibernate-validator-annotation-processor-6.0.22.Final.jar</p>
+/path/to/hibernate-validator-annotation-processor-6.0.23.Final.jar</p>
 </li>
 <li>
 <p>Add the processor&#8217;s fully qualified name org.hibernate.validator.ap.ConstraintValidationProcessor
@@ -11625,7 +11625,7 @@ annotation processors within the IDE build. To do so, do the following:</p>
 <p>Right-click your project, choose "Properties"</p>
 </li>
 <li>
-<p>Go to "Libraries", tab "Processor", and add the JAR hibernate-validator-annotation-processor-6.0.22.Final.jar</p>
+<p>Go to "Libraries", tab "Processor", and add the JAR hibernate-validator-annotation-processor-6.0.23.Final.jar</p>
 </li>
 <li>
 <p>Go to "Build - Compiling", select "Enable Annotation Processing" and "Enable Annotation Processing
@@ -11711,7 +11711,7 @@ Feedback is always welcome!</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-12-16 15:27:46 UTC
+Last updated 2022-02-09 08:41:25 UTC
 </div>
 </div>
 <!-- Google Analytics -->

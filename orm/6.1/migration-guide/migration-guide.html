@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.10">
+<title>6.1 Migration Guide</title>
+<link rel="stylesheet" href="./css/hibernate.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body class="article">
+<div id="header">
+<h1>6.1 Migration Guide</h1>
+<div class="details">
+<span id="revnumber">version 6.1.6.Final</span>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_basic_arraycollection_mapping">Basic array/collection mapping</a></li>
+<li><a href="#_enum_mapping_changes">Enum mapping changes</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>This guide discusses migration from Hibernate ORM version 6.1. For migration from
+earlier versions, see any other pertinent migration guides as well.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/hibernate/hibernate-orm/blob/6.0/migration-guide.adoc">6.0 Migration guide</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_basic_arraycollection_mapping">Basic array/collection mapping</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Basic arrays, other than <code>byte[]</code>/Byte[] and <code>char[]</code>/<code>Character[]</code>, and basic collections (only subtypes of <code>Collection</code>)
+now map to the type code <code>SqlTypes.ARRAY</code> by default, which maps to the SQL standard <code>array</code> type if possible,
+as determined via the new methods <code>getArrayTypeName</code> and <code>supportsStandardArrays</code> of <code>org.hibernate.dialect.Dialect</code>.
+If SQL standard array types are not available, data will be modeled as <code>SqlTypes.JSON</code>, <code>SqlTypes.XML</code> or <code>SqlTypes.VARBINARY</code>,
+depending on the database support as determined via the new method <code>org.hibernate.dialect.Dialect.getPreferredSqlTypeCodeForArray</code>.</p>
+</div>
+<div class="paragraph">
+<p>Due to this change, schema validation errors could occur as 5.x and 6.0 used the type code <code>SqlTypes.VARBINARY</code> unconditionally
+and serialized the contents with Java serialization. The migration to native array or JSON/XML types is non-trivial and requires
+that the data is first read through the Java serialization mechanism and then written back through the respective JDBC method for the type.</p>
+</div>
+<div class="paragraph">
+<p>A possible migration could involve the following steps in a migration script:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Execute <code>alter table tbl rename column array_col to array_col_old</code> to have the old format available</p>
+</li>
+<li>
+<p>Execute <code>alter table tbl add column array_col DATATYPE array</code> to add the column like the new mapping expects it to be</p>
+</li>
+<li>
+<p>Run the query <code>select t.primary_key, t.array_col_old from table t</code></p>
+</li>
+<li>
+<p>For every result, deserialize the old representation via e.g. <code>org.hibernate.internal.util.SerializationHelper.deserialize(java.io.InputStream)</code></p>
+</li>
+<li>
+<p>For every result, load the Hibernate entity by primary key and set the deserialized value</p>
+</li>
+<li>
+<p>Finally, drop the old column <code>alter table tbl drop column array_col_old</code></p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_enum_mapping_changes">Enum mapping changes</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Enums now map to the type code <code>SqlType.SMALLINT</code> by default, whereas before it mapped to <code>TINYINT</code>.
+This mapping was not quite correct as Java effectively allows up to 32K enum entries, but <code>TINYINT</code> is only a 1 byte type.</p>
+</div>
+<div class="paragraph">
+<p>In practice, this isn&#8217;t a big issue though for two reasons. A lot of databases do not support a 1 byte integer DDL type,
+so Hibernate falls back to the 2+ byte integer type as DDL type. Apart from that, enums in ORM models usually do not exceed the 255 value limit.
+Note that the migration is not required as schema validation is able to handle the use of <code>SMALLINT</code> when the DDL type is <code>TINYINT</code>.</p>
+</div>
+<div class="paragraph">
+<p>The migration usually requires running only a simple alter command <code>alter table tbl alter column enum_col smallint</code>
+or <code>alter table tbl modify column enum_col smallint</code>, depending on your database dialect.</p>
+</div>
+<div class="paragraph">
+<p>The following dialects currently have DDL types registered for <code>TINYINT</code> and might produce a different schema now:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Cachè</p>
+</li>
+<li>
+<p>Ingres</p>
+</li>
+<li>
+<p>Teradata</p>
+</li>
+<li>
+<p>TimesTen</p>
+</li>
+<li>
+<p>H2</p>
+</li>
+<li>
+<p>HSQL</p>
+</li>
+<li>
+<p>MySQL</p>
+</li>
+<li>
+<p>MariaDB</p>
+</li>
+<li>
+<p>Oracle</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 6.1.6.Final<br>
+Last updated 2022-12-07 14:31:01 UTC
+</div>
+</div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/run_prettify.min.js"></script>
+</body>
+</html>

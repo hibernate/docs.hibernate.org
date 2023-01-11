@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory">Chapter 3. Creating custom constraints</title><link rel="stylesheet" href="css/hibernate.css" type="text/css"/><meta xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" name="generator" content="DocBook XSL Stylesheets V1.74.0"/><link rel="home" href="index.html" title="Hibernate Validator"/><link rel="up" href="index.html" title="Hibernate Validator"/><link rel="prev" href="validator-usingvalidator.html" title="Chapter 2. Validation step by step"/><link rel="next" href="validator-xmlconfiguration.html" title="Chapter 4. XML configuration"/></head><body><p id="title"><a href="http://www.hibernate.org" class="site_href"><strong>Hibernate.org</strong></a><a href="http://hibernate.org/Documentation/DocumentationOverview" class="doc_href"><strong>Community Documentation</strong></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="validator-usingvalidator.html"><strong>Prev</strong></a></li><li class="next"><a accesskey="n" href="validator-xmlconfiguration.html"><strong>Next</strong></a></li></ul><div class="chapter" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="validator-customconstraints"/>Chapter 3. Creating custom constraints</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="validator-customconstraints.html#validator-customconstraints-simple">3.1. Creating a simple constraint</a></span></dt><dd><dl><dt><span class="section"><a href="validator-customconstraints.html#validator-customconstraints-constraintannotation">3.1.1. The constraint annotation</a></span></dt><dt><span class="section"><a href="validator-customconstraints.html#validator-customconstraints-validator">3.1.2. The constraint
+      validator</a></span></dt><dt><span class="section"><a href="validator-customconstraints.html#validator-customconstraints-errormessage">3.1.3. The error message</a></span></dt><dt><span class="section"><a href="validator-customconstraints.html#validator-customconstraints-using">3.1.4. Using the constraint</a></span></dt></dl></dd><dt><span class="section"><a href="validator-customconstraints.html#validator-customconstraints-compound">3.2. Constraint composition</a></span></dt></dl></div><p>Though the Bean Validation API defines a whole set of standard
+  constraint annotations one can easily think of situations in which these
+  standard annotations won't suffice. For these cases you are able to create
+  custom constraints tailored to your specific validation requirements in a
+  simple manner.</p><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="validator-customconstraints-simple"/>3.1. Creating a simple constraint</h2></div></div></div><p>To create a custom constraint, the following three steps are
+    required:</p><div class="itemizedlist"><ul><li><p>Create a constraint annotation</p></li><li><p>Implement a validator</p></li><li><p>Define a default error message</p></li></ul></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h3 class="title"><a id="validator-customconstraints-constraintannotation"/>3.1.1. The constraint annotation</h3></div></div></div><p>Let's write a constraint annotation, that can be used to express
+      that a given string shall either be upper case or lower case. We'll
+      apply it later on to the <span class="property">licensePlate</span> field of the
+      <code class="classname">Car</code> class from <a class="xref" href="validator-gettingstarted.html" title="Chapter 1. Getting started">Chapter 1, <i>Getting started</i></a> to ensure, that the field is
+      always an upper-case string.</p><p>First we need a way to express the two case modes. We might use
+      <code class="classname">String</code> constants, but a better way to go is to
+      use a Java 5 enum for that purpose:</p><div class="example"><a id="d0e1552"/><p class="title"><b>Example 3.1. Enum <code class="classname">CaseMode</code> to express upper vs. lower
+        case</b></p><div class="example-contents"><pre class="programlisting">package com.mycompany;
+
+public enum CaseMode {
+    UPPER, 
+    LOWER;
+}</pre></div></div><br class="example-break"/><p>Now we can define the actual constraint annotation. If you've
+      never designed an annotation before, this may look a bit scary, but
+      actually it's not that hard:</p><div class="example"><a id="d0e1562"/><p class="title"><b>Example 3.2. Defining CheckCase constraint annotation</b></p><div class="example-contents"><pre class="programlisting">package com.mycompany;
+
+import static java.lang.annotation.ElementType.*;
+import static java.lang.annotation.RetentionPolicy.*;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import javax.validation.Constraint;
+import javax.validation.ConstraintPayload;
+
+@Target( { METHOD, FIELD, ANNOTATION_TYPE })
+@Retention(RUNTIME)
+@Constraint(validatedBy = CheckCaseValidator.class)
+@Documented
+public @interface CheckCase {
+
+    String message() default "{com.mycompany.constraints.checkcase}";
+
+    Class&lt;?&gt;[] groups() default {};
+
+    Class&lt;? extends Payload&gt;[] payload() default {};
+    
+    CaseMode value();
+
+}</pre></div></div><br class="example-break"/><p>An annotation type is defined using the <code class="code">@interface</code>
+      keyword. All attributes of an annotation type are declared in a
+      method-like manner. The specification of the Bean Validation API
+      demands, that any constraint annotation defines</p><div class="itemizedlist"><ul><li><p>an attribute <span class="property">message</span> that returns the
+          default key for creating error messages in case the constraint is
+          violated</p></li><li><p>an attribute <span class="property">groups</span> that allows the
+          specification of validation groups, to which this constraint belongs
+          (see <a class="xref" href="validator-usingvalidator.html#validator-usingvalidator-validationgroups" title="2.3. Validating groups">Section 2.3, “Validating groups”</a>).
+          This must default to an empty array of type
+          <code class="classname">Class&lt;?&gt;</code>.</p></li><li><p>an attribute <code class="classname">payload</code> that can be used
+          by clients of the Bean Validation API to asign custom payload
+          objects to a constraint. This attribute is not used by the API
+          itself. </p><div xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="tip"><h2>Tip</h2><p>An examle for a custom payload could be the definition of
+              a severity. </p><pre class="programlisting">public class Severity {
+    public static class Info extends ConstraintPayload {};
+    public static class Error extends ConstraintPayload {};
+}
+
+public class ContactDetails {
+    @NotNull(message="Name is mandatory", payload=Severity.Error.class)
+    private String name;
+
+    @NotNull(message="Phone number not specified, but not mandatory", payload=Severity.Info.class)
+    private String phoneNumber;
+
+    // ...
+}</pre><p>Now a client can after the validation of a
+              <code class="classname">ContactDetails</code> instance access the
+              severity of a constraint using
+              <code class="methodname">ConstraintViolation.getConstraintDescriptor().getPayload()</code>
+              and adjust its behaviour depending on the severity.</p></div></li></ul></div><p>Besides those three mandatory attributes
+      (<span class="property">messge</span>, <span class="property">groups</span> and
+      <span class="property">payload</span>) we add another one allowing for the
+      required case mode to be specified. The name <span class="property">value</span>
+      is a special one, which can be omitted upon using the annotation, if it
+      is the only attribute specified, as e.g. in
+      <code class="code">@CheckCase(CaseMode.UPPER)</code>.</p><p>In addition we annotate the annotation type with a couple of
+      so-called meta annotations:</p><div class="itemizedlist"><ul><li><p><code class="code">@Target({ METHOD, FIELD, ANNOTATION_TYPE })</code>:
+          Says, that methods, fields and annotation declarations may be
+          annotated with @CheckCase (but not type declarations e.g.)</p></li><li><p><code class="code">@Retention(RUNTIME)</code>: Specifies, that annotations
+          of this type will be available at runtime by the means of
+          reflection</p></li><li><p><code class="code">@Constraint(validatedBy =
+          CheckCaseValidator.class)</code>: Specifies the validator to be used
+          to validate elements annotated with @CheckCase</p></li><li><p><code class="code">@Documented</code>: Says, that the use of
+          <code class="code">@CheckCase</code> will be contained in the JavaDoc of elements
+          annotated with it</p></li></ul></div></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h3 class="title"><a id="validator-customconstraints-validator"/>3.1.2. The constraint
+      validator</h3></div></div></div><p>Next, we need to implement a constraint validator, that's able to
+      validate elements with a <code class="classname">@CheckCase</code> annotation.
+      To do so, we implement the interface ConstraintValidator as shown
+      below:</p><div class="example"><a id="d0e1659"/><p class="title"><b>Example 3.3. Implementing a constraint validator for the constraint
+        <code class="classname">CheckCase</code></b></p><div class="example-contents"><pre class="programlisting">package com.mycompany;
+
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+
+public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, String&gt; {
+
+    private CaseMode caseMode;
+
+    public void initialize(CheckCase constraintAnnotation) {
+        this.caseMode = constraintAnnotation.value();
+    }
+
+    public boolean isValid(String object, ConstraintValidatorContext constraintContext) {
+
+        if (object == null)
+            return true;
+
+        if (caseMode == CaseMode.UPPER)
+            return object.equals(object.toUpperCase());
+        else
+            return object.equals(object.toLowerCase());
+    }
+
+}</pre></div></div><br class="example-break"/><p>The <code class="classname">ConstraintValidator</code> interface defines
+      two type parameters, which we set in our implementation. The first one
+      specifies the annotation type to be validated (in our example
+      <code class="classname">CheckCase</code>), the second one the type of elements,
+      which the validator can handle (here
+      <code class="classname">String</code>).</p><p>In case a constraint annotation is allowed at elements of
+      different types, a <code class="classname">ConstraintValidator</code> for each
+      allowed type has to be implemented and registered at the constraint
+      annotation as shown above.</p><p>The implementation of the validator is straightforward. The
+      <code class="methodname">initialize()</code> method gives us access to the
+      attribute values of the annotation to be validated. In the example we
+      store the <code class="classname">CaseMode</code> in a field of the validator
+      for further usage.</p><p>In the <code class="methodname">isValid()</code> method we implement the
+      logic, that determines, whether a <code class="classname">String</code> is valid
+      according to a given <code class="classname">@CheckCase</code> annotation or
+      not. This decision depends on the case mode retrieved in
+      <code class="classname">initialize()</code>. As the Bean Validation
+      specification recommends, we consider <code class="code">null</code> values as being
+      valid. If <code class="code">null</code> is not a valid value for an element, it
+      should be annotated with <code class="code">@NotNull</code> explicitely.</p><p>The passed-in <code class="classname">ConstraintValidatorContext</code>
+      could be used to raise any custom validation errors, but as we are fine
+      with the default behavior, we can ignore that parameter for now.</p></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h3 class="title"><a id="validator-customconstraints-errormessage"/>3.1.3. The error message</h3></div></div></div><p>Finally we need to specify the error message, that shall be used,
+      in case a <code class="classname">@CheckCase</code> constraint is violated. To
+      do so, we add the following to our custom
+      <code class="filename">ValidationMessages.properties</code> (see also <a class="xref" href="validator-usingvalidator.html#section-message-interpolation" title="2.2.4. Message interpolation">Section 2.2.4, “Message interpolation”</a>)</p><div class="example"><a id="d0e1731"/><p class="title"><b>Example 3.4. Defining a custom error message for the
+        <code class="classname">CheckCase</code> constraint</b></p><div class="example-contents"><pre class="programlisting">com.mycompany.constraints.CheckCase.message=Case mode must be {value}.</pre></div></div><br class="example-break"/><p>If a validation error occurs, the validation runtime will use the
+      default value, that we specified for the message attribute of the
+      <code class="classname">@CheckCase</code> annotation to look up the error
+      message in this file.</p></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h3 class="title"><a id="validator-customconstraints-using"/>3.1.4. Using the constraint</h3></div></div></div><p>Now that our first custom constraint is completed, we can use it
+      in the <code class="classname">Car</code> class from the <a class="xref" href="validator-gettingstarted.html" title="Chapter 1. Getting started">Chapter 1, <i>Getting started</i></a> chapter to specify that the
+      <span class="property">licensePlate</span> field shall only contain upper-case
+      strings:</p><div class="example"><a id="example-car-with-checkcase"/><p class="title"><b>Example 3.5. Applying the <code class="classname">CheckCase</code>
+        constraint</b></p><div class="example-contents"><pre class="programlisting">package com.mycompany;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+public class Car {
+
+    @NotNull
+    private String manufacturer;
+
+    @NotNull
+    @Size(min = 2, max = 14)
+    @CheckCase(CaseMode.UPPER)
+    private String licensePlate;
+
+    @Min(2)
+    private int seatCount;
+    
+    public Car(String manufacturer, String licencePlate, int seatCount) {
+
+        this.manufacturer = manufacturer;
+        this.licensePlate = licencePlate;
+        this.seatCount = seatCount;
+    }
+
+    //getters and setters ...
+
+}</pre></div></div><br class="example-break"/><p>Finally let's demonstrate in a little test that the
+      <code class="classname">@CheckCase</code> constraint is properly
+      validated:</p><div class="example"><a id="d0e1770"/><p class="title"><b>Example 3.6. Testcase demonstrating the <code class="classname">CheckCase</code>
+        validation</b></p><div class="example-contents"><pre class="programlisting">package com.mycompany;
+
+import static org.junit.Assert.*;
+
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+public class CarTest {
+
+    private static Validator validator;
+
+    @BeforeClass
+    public static void setUp() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
+    }
+
+    @Test
+    public void testLicensePlateNotUpperCase() {
+
+        Car car = new Car("Morris", "dd-ab-123", 4);
+
+        Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations =
+            validator.validate(car);
+        assertEquals(1, constraintViolations.size());
+        assertEquals(
+            "Case mode must be UPPER.", 
+            constraintViolations.iterator().next().getMessage());
+    }
+
+    @Test
+    public void carIsValid() {
+
+        Car car = new Car("Morris", "DD-AB-123", 4);
+
+        Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations =
+            validator.validate(car);
+
+        assertEquals(0, constraintViolations.size());
+    }
+}</pre></div></div><br class="example-break"/></div></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="validator-customconstraints-compound"/>3.2. Constraint composition</h2></div></div></div><p>Looking at the <span class="property">licensePlate</span> field of the
+    <code class="classname">Car</code> class in <a class="xref" href="validator-customconstraints.html#example-car-with-checkcase" title="Example 3.5. Applying the CheckCase constraint">Example 3.5, “Applying the CheckCase
+        constraint”</a>, we see three constraint
+    annotations already. In complexer scenarios, where even more constraints
+    could be applied to one element, this might become a bit confusing easily.
+    Furthermore, if we had a <span class="property">licensePlate</span> field in
+    another class, we would have to copy all constraint declarations to the
+    other class as well, violating the DRY principle.</p><p>This problem can be tackled using compound constraints. In the
+    following we create a new constraint annotation
+    <code class="classname">@ValidLicensePlate</code>, that comprises the constraints
+    <code class="classname">@NotNull</code>, <code class="classname">@Size</code> and
+    <code class="classname">@CheckCase</code>:</p><div class="example"><a id="d0e1808"/><p class="title"><b>Example 3.7. Creating a composing constraint
+      <code class="classname">ValidLicensePlate</code></b></p><div class="example-contents"><pre class="programlisting">package com.mycompany;
+
+import static java.lang.annotation.ElementType.*;
+import static java.lang.annotation.RetentionPolicy.*;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import javax.validation.Constraint;
+import javax.validation.ConstraintPayload;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+@NotNull
+@Size(min = 2, max = 14)
+@CheckCase(CaseMode.UPPER)
+@Target( { METHOD, FIELD, ANNOTATION_TYPE })
+@Retention(RUNTIME)
+@Constraint(validatedBy = {})
+@Documented
+public @interface ValidLicensePlate {
+
+    String message() default "{com.mycompany.constraints.validlicenseplate}";
+
+    Class&lt;?&gt;[] groups() default {};
+
+    Class&lt;? extends Payload&gt;[] payload() default {};
+
+}</pre></div></div><br class="example-break"/><p>To do so, we just have to annotate the constraint declaration with
+    its comprising constraints (btw. that's exactly why we allowed annotation
+    types as target for the <code class="classname">@CheckCase</code> annotation). As
+    no additional validation is required for the
+    <code class="classname">@ValidLicensePlate</code> annotation itself, we don't
+    declare a validator within the <code class="classname">@Constraint </code>meta
+    annotation.</p><p>Using the new compound constraint at the
+    <span class="property">licensePlate</span> field now is fully equivalent to the
+    previous version, where we declared the three constraints directly at the
+    field itself:</p><div class="example"><a id="d0e1831"/><p class="title"><b>Example 3.8. Application of composing constraint
+      <code class="classname">ValidLicensePlate</code></b></p><div class="example-contents"><pre class="programlisting">package com.mycompany;
+
+public class Car {
+
+    @ValidLicensePlate
+    private String licensePlate;
+
+    //...
+
+}</pre></div></div><br class="example-break"/><p>The set of <code class="classname">ConstraintViolations</code> retrieved
+    when validating a <code class="classname">Car</code> instance will contain an
+    entry for each violated composing constraint of the
+    <code class="classname">@ValidLicensePlate</code> constraint. If you rather prefer
+    a single <code class="classname">ConstraintViolation</code> in case any of the
+    composing constraints is violated, the
+    <code class="classname">@ReportAsSingleViolation</code> meta constraint can be
+    used as follows:</p><div class="example"><a id="d0e1855"/><p class="title"><b>Example 3.9. Usage of <code class="classname">@ReportAsSingleViolation</code></b></p><div class="example-contents"><pre class="programlisting">//...
+@ReportAsSingleViolation
+public @interface ValidLicensePlate {
+
+    String message() default "{com.mycompany.constraints.validlicenseplate}";
+
+    Class&lt;?&gt;[] groups() default {};
+
+    Class&lt;? extends Payload&gt;[] payload() default {};
+
+}</pre></div></div><br class="example-break"/></div></div><HR xmlns=""/><a xmlns="" href=""><p xmlns="http://www.w3.org/1999/xhtml" class="copyright">Copyright © 2009 Red Hat Middleware, LLC. &amp; Gunnar Morling</p></a><ul class="docnav"><li class="previous"><a accesskey="p" href="validator-usingvalidator.html"><strong>Prev</strong>Chapter 2. Validation step by step</a></li><li class="up"><a accesskey="u" href="#"><strong>Top of page</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Front page</strong></a></li><li class="next"><a accesskey="n" href="validator-xmlconfiguration.html"><strong>Next</strong>Chapter 4. XML configuration</a></li></ul></body></html>

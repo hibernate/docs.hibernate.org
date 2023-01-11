@@ -1,0 +1,205 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>Chapter&nbsp;1.&nbsp;Defining constraints</title><link rel="stylesheet" href="../shared/css/html.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.65.1"><link rel="home" href="index.html" title="Hibernate Validator"><link rel="up" href="index.html" title="Hibernate Validator"><link rel="previous" href="preface.html" title="Preface"><link rel="next" href="validator-checkconstraints.html" title="Chapter&nbsp;2.&nbsp;Using the Validator framework"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter&nbsp;1.&nbsp;Defining constraints</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="preface.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="validator-checkconstraints.html">Next</a></td></tr></table><hr></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="validator-defineconstraints"></a>Chapter&nbsp;1.&nbsp;Defining constraints</h2></div></div><div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="validator-defineconstraints-definition"></a>1.1.&nbsp;What is a constraint?</h2></div></div><div></div></div><p>A constraint is a rule that a given element (field, property or
+    bean) has to comply to. The rule semantic is expressed by an annotation. A
+    constraint usually has some attributes used to parameterize the
+    constraints limits. The constraint applies to the annotated
+    element.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="validator-defineconstraints-builtin"></a>1.2.&nbsp;Built in constraints</h2></div></div><div></div></div><p>Hibernate Validator comes with some built-in constraints, which
+    covers most basic data checks. As we'll see later, you're not limited to
+    them, you can literally in a minute write your own constraints.</p><div class="table"><a name="d0e46"></a><p class="title"><b>Table&nbsp;1.1.&nbsp;Built-in constraints</b></p><table summary="Built-in constraints" border="1"><colgroup><col align="center"><col><col><col></colgroup><thead><tr><th align="center">Annotation</th><th>Apply on</th><th>Runtime checking</th><th>Hibernate Metadata impact</th></tr></thead><tbody><tr><td align="center">@Length(min=, max=)</td><td>property (String)</td><td>check if the string length match the range</td><td>Column length will be set to max</td></tr><tr><td align="center">@Max(value=)</td><td>property (numeric or string representation of a
+            numeric)</td><td>check if the value is less than or equals to max</td><td>Add a check constraint on the column</td></tr><tr><td align="center">@Min(value=)</td><td>property (numeric or string representation of a
+            numeric)</td><td>check if the value is more than or equals to min</td><td>Add a check constraint on the column</td></tr><tr><td align="center">@NotNull</td><td>property</td><td>check if the value is not null</td><td>Column(s) are not null</td></tr><tr><td align="center">@NotEmpty</td><td>property</td><td>check if the string is not null nor empty. Check if the
+            connection is not null nor empty</td><td>Column(s) are not null (for String)</td></tr><tr><td align="center">@Past</td><td>property (date or calendar)</td><td>check if the date is in the past</td><td>Add a check constraint on the column</td></tr><tr><td align="center">@Future</td><td>property (date or calendar)</td><td>check if the date is in the future</td><td>none</td></tr><tr><td align="center">@Pattern(regex="regexp", flag=) or @Patterns(
+            {@Pattern(...)} )</td><td>property (string)</td><td>check if the property match the regular expression given a
+            match flag (see <tt class="classname">java.util.regex.Pattern </tt>
+            )</td><td>none</td></tr><tr><td align="center">@Range(min=, max=)</td><td>property (numeric or string representation of a
+            numeric)</td><td>check if the value is between min and max
+            (included)</td><td>Add a check constraint on the column</td></tr><tr><td align="center">@Size(min=, max=)</td><td>property (array, collection, map)</td><td>check if the element size is between min and max
+            (included)</td><td>none</td></tr><tr><td align="center">@AssertFalse</td><td>property</td><td>check that the method evaluates to false (useful for
+            constraints expressed in code rather than annotations)</td><td>none</td></tr><tr><td align="center">@AssertTrue</td><td>property</td><td>check that the method evaluates to true (useful for
+            constraints expressed in code rather than annotations)</td><td>none</td></tr><tr><td align="center">@Valid</td><td>property (object)</td><td>perform validation recursively on the associated object. If
+            the object is a Collection or an array, the elements are validated
+            recursively. If the object is a Map, the value elements are
+            validated recursively.</td><td>none</td></tr><tr><td align="center">@Email</td><td>property (String)</td><td>check whether the string is conform to the email address
+            specification</td><td>none</td></tr><tr><td align="center">@CreditCardNumber</td><td>property (String)</td><td>check whether the string is a well formated credit card
+            number (derivative of the Luhn algorithm)</td><td>none</td></tr><tr><td align="center">@Digits</td><td>property (numeric or string representation of a
+            numeric)</td><td>check whether the property is a number having up to
+            <tt class="literal">integerDigits</tt> integer digits and
+            <tt class="literal">fractionalDigits</tt> fractonal digits</td><td>define column precision and scale</td></tr><tr><td align="center">@EAN</td><td>property (string)</td><td>check whether the string is a properly formated EAN or
+            UPC-A code</td><td>none</td></tr></tbody></table></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="validator-defineconstraints-error"></a>1.3.&nbsp;Error messages</h2></div></div><div></div></div><p>Hibernate Validator comes with a default set of error messages
+    translated in about ten languages (if yours is not part of it, please sent
+    us a patch). You can override those messages by creating a
+    <tt class="filename">ValidatorMessages.properties</tt> or (
+    <tt class="filename">ValidatorMessages_loc.properties</tt> ) and override the
+    needed keys. You can even add your own additional set of messages while
+    writing your validator annotations. If Hibernate Validator cannot resolve
+    a key from your resourceBundle nor from ValidatorMessage, it falls back to
+    the default built-in values.</p><p>Alternatively you can provide a
+    <tt class="classname">ResourceBundle</tt> while checking programmatically the
+    validation rules on a bean or if you want a completly different
+    interpolation mechanism, you can provide an implementation of
+    <tt class="literal">org.hibernate.validator.MessageInterpolator</tt> (check the
+    JavaDoc for more informations).</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="validator-defineconstraints-own"></a>1.4.&nbsp;Writing your own constraints</h2></div></div><div></div></div><p>Extending the set of built-in constraints is extremely easy. Any
+    constraint consists of two pieces: the constraint
+    <span class="emphasis"><em>descriptor</em></span> (the annotation) and the constraint
+    <span class="emphasis"><em>validator</em></span> (the implementation class). Here is a
+    simple user-defined descriptor:</p><pre class="programlisting">@ValidatorClass(CapitalizedValidator.class)
+@Target(METHOD)
+@Retention(RUNTIME)
+@Documented
+public @interface Capitalized {
+    CapitalizeType type() default Capitalize.FIRST;
+    String message() default "has incorrect capitalization"
+}        </pre><p><tt class="literal">type</tt> is a parameter describing how the property
+    should to be capitalized. This is a user parameter fully dependant on the
+    annotation business.</p><p><tt class="literal">message</tt> is the default string used to describe
+    the constraint violation and is mandatory. You can hard code the string or
+    you can externalize part/all of it through the Java ResourceBundle
+    mechanism. Parameters values are going to be injected inside the message
+    when the <tt class="literal">{parameter}</tt> string is found (in our example
+    <tt class="literal">Capitalization is not {type}</tt> would generate
+    <tt class="literal">Capitalization is not FIRST</tt> ), externalizing the whole
+    string in <tt class="filename">ValidatorMessages.properties</tt> is considered
+    good practice. See <a href="validator-defineconstraints.html#validator-defineconstraints-error">Error messages</a>
+    .</p><pre class="programlisting">@ValidatorClass(CapitalizedValidator.class)
+@Target(METHOD)
+@Retention(RUNTIME)
+@Documented
+public @interface Capitalized {
+    CapitalizeType type() default Capitalize.FIRST;
+    String message() default "{validator.capitalized}";
+}
+
+
+#in ValidatorMessages.properties
+validator.capitalized = <tt class="literal">Capitalization is not {type}</tt>
+        </pre><p>As you can see the {} notation is recursive.</p><p>To link a descriptor to its validator implementation, we use the
+    <tt class="literal">@ValidatorClass</tt> meta-annotation. The validator class
+    parameter must name a class which implements
+    <tt class="literal">Validator&lt;ConstraintAnnotation&gt;</tt> .</p><p>We now have to implement the validator (ie. the rule checking
+    implementation). A validation implementation can check the value of the a
+    property (by implementing <tt class="literal">PropertyConstraint</tt> ) and/or
+    can modify the hibernate mapping metadata to express the constraint at the
+    database level (by implementing
+    <tt class="literal">PersistentClassConstraint</tt> )</p><pre class="programlisting">public class CapitalizedValidator
+        implements Validator&lt;Capitalized&gt;, PropertyConstraint {
+    private CapitalizeType type;
+
+    //part of the Validator&lt;Annotation&gt; contract,
+    //allows to get and use the annotation values
+    public void initialize(Capitalized parameters) {
+        type = parameters.type();
+    }
+
+    //part of the property constraint contract
+    public boolean isValid(Object value) {
+        if (value==null) return true;
+        if ( !(value instanceof String) ) return false;
+        String string = (String) value;
+        if (type == CapitalizeType.ALL) {
+            return string.equals( string.toUpperCase() );
+        }
+        else {
+            String first = string.substring(0,1);
+            return first.equals( first.toUpperCase();
+        }
+    }
+}        </pre><p>The <tt class="literal">isValid()</tt> method should return false if the
+    constraint has been violated. For more examples, refer to the built-in
+    validator implementations.</p><p>We only have seen property level validation, but you can write a
+    Bean level validation annotation. Instead of receiving the return instance
+    of a property, the bean itself will be passed to the validator. To
+    activate the validation checking, just annotated the bean itself instead.
+    A small sample can be found in the unit test suite.</p><p>If your constraint can be applied multiple times (with different
+    parameters) on the same property or type, you can use the following
+    annotation form:</p><pre class="programlisting">@Target(METHOD)
+@Retention(RUNTIME)
+@Documented
+<span class="bold"><b>public @interface Patterns {</b></span>
+    Pattern[] value();
+}
+
+@Target(METHOD)
+@Retention(RUNTIME)
+@Documented
+@ValidatorClass(PatternValidator.class)
+public @interface Pattern {
+    String regexp();
+}</pre><p>Basically an annotation containing the value attribute as an array
+    of validator annotations.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="d0e319"></a>1.5.&nbsp;Annotating your domain model</h2></div></div><div></div></div><p>Since you are already familiar with annotations now, the syntax
+    should be very familiar</p><pre class="programlisting">public class Address {
+    private String line1;
+    private String line2;
+    private String zip;
+    private String state;
+    private String country;
+    private long id;
+
+    // a not null string of 20 characters maximum
+    @Length(max=20)
+    @NotNull
+    public String getCountry() {
+        return country;
+    }
+
+    // a non null string
+    @NotNull
+    public String getLine1() {
+        return line1;
+    }
+
+    //no constraint
+    public String getLine2() {
+        return line2;
+    }
+
+    // a not null string of 3 characters maximum
+    @Length(max=3) @NotNull
+    public String getState() {
+        return state;
+    }
+
+    // a not null numeric string of 5 characters maximum
+    // if the string is longer, the message will
+    //be searched in the resource bundle at key 'long'
+    @Length(max=5, message="{long}")
+    @Pattern(regex="[0-9]+")
+    @NotNull
+    public String getZip() {
+        return zip;
+    }
+
+    // should always be true
+    @AssertTrue
+    public boolean isValid() {
+        return true;
+    }
+
+    // a numeric between 1 and 2000
+    @Id @Min(1)
+    @Range(max=2000)
+    public long getId() {
+        return id;
+    }
+}        </pre><p>While the example only shows public property validation, you can
+    also annotate fields of any kind of visibility</p><pre class="programlisting">@MyBeanConstraint(max=45
+public class Dog {
+    @AssertTrue private boolean isMale;
+    @NotNull protected String getName() { ... };
+    ...
+}        </pre><p>You can also annotate interfaces. Hibernate Validator will check all
+    superclasses and interfaces extended or implemented by a given bean to
+    read the appropriate validator annotations.</p><pre class="programlisting">public interface Named {
+    @NotNull String getName();
+    ...
+}
+
+public class Dog implements Named {
+
+    @AssertTrue private boolean isMale;
+
+    public String getName() { ... };
+
+}
+        </pre><p>The name property will be checked for nullity when the Dog bean is
+    validated.</p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="preface.html">Prev</a>&nbsp;</td><td width="20%" align="center"><a accesskey="u" href="index.html">Up</a></td><td width="40%" align="right">&nbsp;<a accesskey="n" href="validator-checkconstraints.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Preface&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;Chapter&nbsp;2.&nbsp;Using the Validator framework</td></tr></table></div></body></html>

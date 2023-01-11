@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.10">
+<title>6.2 Migration Guide</title>
+<link rel="stylesheet" href="./css/hibernate.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body class="article">
+<div id="header">
+<h1>6.2 Migration Guide</h1>
+<div class="details">
+<span id="revnumber">version 6.0.0.CR1</span>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#ddl-changes">DDL type changes</a>
+<ul class="sectlevel2">
+<li><a href="#ddl-uuid-mariadv">UUID mapping changes on MariaDB</a></li>
+<li><a href="#ddl-uuid-sqlserver">UUID mapping changes on SQL Server</a></li>
+<li><a href="#ddl-json-oracle">JSON mapping changes on Oracle</a></li>
+<li><a href="#ddl-implicit-datatype-enum">Datatype for enums</a></li>
+<li><a href="#ddl-timezones">Timezone and offset storage</a></li>
+<li><a href="#ddl-check">Check constraints for boolean and enum mappings</a></li>
+</ul>
+</li>
+<li><a href="#logical-1-1-unique">UNIQUE constraint for optional one-to-one mappings</a></li>
+<li><a href="#oracle-number">Column type inference for <code>number(n,0)</code> in native SQL queries on Oracle</a></li>
+<li><a href="#database-versions">Removal of support for legacy database versions</a></li>
+<li><a href="#enhancement">Change enhancement defaults and deprecation</a></li>
+<li><a href="#api-internal">API / SPI / Internal distinction</a>
+<ul class="sectlevel2">
+<li><a href="#api-internal-cfg">org.hibernate.cfg package</a></li>
+<li><a href="#api-internal-loader">org.hibernate.loader package</a></li>
+</ul>
+</li>
+<li><a href="#spi">Changes in integration contracts (SPIs)</a>
+<ul class="sectlevel2">
+<li><a href="#spi-lock">EntityPersister#lock</a></li>
+<li><a href="#spi-multiLoad">EntityPersister#multiLoad</a></li>
+<li><a href="#spi-afterDeserialize">Executable#afterDeserialize</a></li>
+<li><a href="#spi-JdbcType">JdbcType#getJdbcRecommendedJavaTypeMapping()</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>This guide discusses migration to Hibernate ORM version 6.2. For migration from
+earlier versions, see any other pertinent migration guides as well.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://docs.jboss.org/hibernate/orm/6.1/migration-guide/migration-guide.html">6.1 Migration guide</a></p>
+</li>
+<li>
+<p><a href="https://docs.jboss.org/hibernate/orm/6.0/migration-guide/migration-guide.html">6.0 Migration guide</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="ddl-changes">DDL type changes</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="ddl-uuid-mariadv">UUID mapping changes on MariaDB</h3>
+<div class="paragraph">
+<p>On MariaDB, the type code <code>SqlTypes.UUID</code> now by default refers to the DDL type <code>uuid</code>, whereas before it was using <code>binary(16)</code>.
+Due to this change, schema validation errors could occur on existing databases.</p>
+</div>
+<div class="paragraph">
+<p>The migration to <code>uuid</code> requires a migration expression like <code>cast(old as uuid)</code>.</p>
+</div>
+<div class="paragraph">
+<p>To retain backwards compatibility, configure the setting <code>hibernate.type.preferred_uuid_jdbc_type</code> to <code>BINARY</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="ddl-uuid-sqlserver">UUID mapping changes on SQL Server</h3>
+<div class="paragraph">
+<p>On SQL Server, the type code <code>SqlTypes.UUID</code> now by default refers to the DDL type <code>uniqueidentifier</code>, whereas before it was using <code>binary(16)</code>.
+Due to this change, schema validation errors could occur on existing databases.</p>
+</div>
+<div class="paragraph">
+<p>The migration to <code>uuid</code> requires a migration expression like <code>cast(old as uuid)</code>.</p>
+</div>
+<div class="paragraph">
+<p>To retain backwards compatibility, configure the setting <code>hibernate.type.preferred_uuid_jdbc_type</code> to <code>BINARY</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="ddl-json-oracle">JSON mapping changes on Oracle</h3>
+<div class="paragraph">
+<p>On Oracle 12.1+, the type code <code>SqlTypes.JSON</code> now by default refers to the DDL type <code>blob</code> and on 21+ to <code>json</code>, whereas before it was using <code>clob</code>.
+Due to this change, schema validation errors could occur on existing databases.</p>
+</div>
+<div class="paragraph">
+<p>The migration to <code>blob</code> and <code>json</code> requires a migration expression like <code>cast(old as blob)</code> and <code>cast(old as json)</code> respectively.</p>
+</div>
+<div class="paragraph">
+<p>To get the old behavior, annotate the column with <code>@Column(definition = "clob")</code>.</p>
+</div>
+<div class="paragraph">
+<p>This change was done because <code>blob</code> and <code>json</code> are way more efficient and because we don&#8217;t expect wide usage of <code>SqlTypes.JSON</code> yet.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="ddl-implicit-datatype-enum">Datatype for enums</h3>
+<div class="paragraph">
+<p>Hibernate 6.1 changed the implicit SQL datatype for mapping enums from <code>TINYINT</code> to <code>SMALLINT</code> to account for
+Java supporting up to 32K enum entries which would overflow a <code>TINYINT</code>.  However, almost no one is developing
+enums with that many entries.  Starting in 6.2, the choice of implicit SQL datatype for storing enums is sensitive
+to the number of entries defined on the enum class.  Enums with more than 128 entries are stored as <code>SMALLINT</code> implicitly,
+otherwise <code>TINYINT</code> is used.</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">NOTE</dt>
+<dd>
+<p>On MySQL, enums are now stored using the <code>ENUM</code> datatype by default</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="ddl-timezones">Timezone and offset storage</h3>
+<div class="paragraph">
+<p><code>OffsetDateTime</code> and <code>ZonedDateTime</code> now always map to <code>TIMESTAMP WITH TIME ZONE</code> by default</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="ddl-check">Check constraints for boolean and enum mappings</h3>
+<div class="paragraph">
+<p>Check constraints now correctly generated for boolean and enum mappings</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="logical-1-1-unique">UNIQUE constraint for optional one-to-one mappings</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Previous versions of Hibernate did not create a UNIQUE constraint on the database for
+logical<sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup> one-to-one associations marked as optional.  That is not correct
+from a modeling perspective as the foreign-key should be constrained as unique.  Starting in
+6.2, those UNIQUE constraints are now created.</p>
+</div>
+<div class="paragraph">
+<p>If this causes problems for an application, creation of the UNIQUE constraint can be skipped
+using <code>@jakarta.persistence.ForeignKey(NO_CONSTRAINT)</code>.</p>
+</div>
+<div class="paragraph">
+<p>Often the association can also be remapped using <code>@ManyToOne</code> + <code>@UniqueConstraint</code> instead.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="oracle-number">Column type inference for <code>number(n,0)</code> in native SQL queries on Oracle</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Since Hibernate 6.0, columns of type <code>number</code> with scale 0 on Oracle were interpreted as <code>boolean</code>, <code>tinyint</code>, <code>smallint</code>, <code>int</code>, or <code>bigint</code>,
+depending on the precision.</p>
+</div>
+<div class="paragraph">
+<p>Now, columns of type <code>number</code> with scale 0 are interpreted as <code>int</code> or <code>bigint</code> depending on the precision.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="database-versions">Removal of support for legacy database versions</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This version introduces the concept of minimum supported database version for most of the database dialects that Hibernate supports. This implies that the legacy code for versions that are no longer supported by their vendors, has been removed from the hibernate-core module. It is, however, still available in the hibernate-community-dialects module.</p>
+</div>
+<div class="paragraph">
+<p>The minimum supported dialect versions are as follows:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Dialect</th>
+<th class="tableblock halign-left valign-top">Minimum supported version</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MySQL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5.7</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SQL Server 2008</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DB2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10.5</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DB2i</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">7.1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DB2z</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">12.1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MariaDB</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10.3</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">H2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1.4.197</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Derby</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10.14.2</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sybase</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">16.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CockroachDB</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">21.1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PostgreSQL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Oracle</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">11.2</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HSQLDB</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.6.1</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="enhancement">Change enhancement defaults and deprecation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <code>enableLazyInitialization</code> and <code>enableDirtyTracking</code> enhancement tooling options in the ANT task, Maven Plugin and Gradle Plugin,
+as well as the respective <code>hibernate.enhancer.enableLazyInitialization</code> and <code>hibernate.enhancer.enableDirtyTracking</code> configuration settings,
+switched their default values to <code>true</code> and the settings are now deprecated for removal without replacement.
+See <a href="https://hibernate.atlassian.net/browse/HHH-15641">HHH-15641</a> for details.</p>
+</div>
+<div class="paragraph">
+<p>The global property <code>hibernate.bytecode.use_reflection_optimizer</code> switched the default value to <code>true</code>
+and the setting is now deprecated for removal without replacement. See <a href="https://hibernate.atlassian.net/browse/HHH-15631">HHH-15631</a> for details.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="api-internal">API / SPI / Internal distinction</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Dating back to Hibernate 5.x, we have been cleaning up packages to make the distinction between contracts
+which are considered an API, SPI and internal.  We&#8217;ve done some more work on that in 6.2 as well.</p>
+</div>
+<div class="sect2">
+<h3 id="api-internal-cfg">org.hibernate.cfg package</h3>
+<div class="paragraph">
+<p>The <code>org.hibernate.cfg</code> package has been especially egregious in mixing APIs and internals historically.  The only
+true API contracts in this package include <code>org.hibernate.cfg.AvailableSettings</code> and <code>org.hibernate.cfg.Configuration</code>
+which have been left in place.</p>
+</div>
+<div class="paragraph">
+<p>Additionally, while it is considered an internal detail, <code>org.hibernate.cfg.Environment</code> has also been left in place
+as many applications have historically used it rather than <code>org.hibernate.cfg.AvailableSettings</code>.</p>
+</div>
+<div class="paragraph">
+<p>A number of contracts are considered deprecated and have been left in place.</p>
+</div>
+<div class="paragraph">
+<p>The rest have been moved under the <code>org.hibernate.boot</code> package where they more properly belong.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="api-internal-loader">org.hibernate.loader package</h3>
+<div class="paragraph">
+<p>Most of the <code>org.hibernate.loader</code> package is really an SPI centered around <code>org.hibernate.loader.ast</code>
+which supports loading entities and collections by various types of keys - primary-key, unique-key,
+foreign-key and natural-key.  <code>org.hibernate.loader.ast</code> has already been previously well-defined
+in terms of SPI / internal split.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="spi">Changes in integration contracts (SPIs)</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>SPI is a category of interfaces that we strive to maintain with more stability than internal APIs, but which might change from minor to minor
+upgrades as the project needs a bit of flexibility.</p>
+</div>
+<div class="paragraph">
+<p>These are not considered public API so should not affect end-user (application developer&#8217;s) code but such changes might break integration
+with other libraries which integrate with Hibernate ORM.</p>
+</div>
+<div class="paragraph">
+<p>During the development of Hibernate ORM 6.2 the following SPIs have seen some modifications:</p>
+</div>
+<div class="sect2">
+<h3 id="spi-lock">EntityPersister#lock</h3>
+<div class="paragraph">
+<p>Changed from <code>EntityPersister#lock(Object, Object, Object, LockMode, SharedSessionContractImplementor)</code> to <code>EntityPersister#lock(Object, Object, Object, LockMode, EventSource)</code>.
+This should be trivial to fix as <code>EventSource</code> and <code>SharedSessionContractImplementor</code> are both contracts of the <code>SessionImpl</code>; to help transition we recommend using
+the methods <code>isEventSource</code> and <code>asEventSource</code>, available on the `SharedSessionContractImplementor`contract.</p>
+</div>
+<div class="paragraph">
+<p>N.B. method <code>asEventSource</code> will throw an exception for non-compatible type; but because of previous restrictions all invocations to <code>lock</code> actually had to be compatible:
+this is now made cleared with the signature change.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="spi-multiLoad">EntityPersister#multiLoad</h3>
+<div class="paragraph">
+<p>The same change was applieed to <code>multiLoad(Object[] ids, SharedSessionContractImplementor session, MultiIdLoadOptions loadOptions)</code>,
+now migrated to <code>multiLoad(Object[] ids, EventSource session, MultiIdLoadOptions loadOptions)</code></p>
+</div>
+<div class="paragraph">
+<p>The same conversion can be safely applied.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="spi-afterDeserialize">Executable#afterDeserialize</h3>
+<div class="paragraph">
+<p>As in the previous two cases, the parameter now accepts <code>EventSource</code> instead of <code>SharedSessionContractImplementor</code>.</p>
+</div>
+<div class="paragraph">
+<p>The same conversion can be safely applied.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="spi-JdbcType">JdbcType#getJdbcRecommendedJavaTypeMapping()</h3>
+<div class="paragraph">
+<p>The return type of <code>JdbcType#getJdbcRecommendedJavaTypeMapping()</code> was changed from <code>BasicJavaType</code> to <code>JavaType</code>.
+Even though this is a source compatible change, it breaks binary backwards compatibility.
+We decided that it is fine to do this though, as this is a new minor version.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<hr>
+<div class="footnote" id="_footnotedef_1">
+<a href="#_footnoteref_1">1</a>. A "true" one-to-one mapping is one in which both sides use the same primary-key value and the foreign-key is defined on the primary-key column to the other primary-key column.  A "logical" one-to-one is really a many-to-one with a UNIQUE contraint on the key-side of the foreign-key.  See link:https://docs.jboss.org/hibernate/orm/6.2/userguide/html_single/Hibernate_User_Guide.html#associations for more information
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 6.0.0.CR1<br>
+Last updated 2022-12-22 23:11:52 UTC
+</div>
+</div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/run_prettify.min.js"></script>
+</body>
+</html>

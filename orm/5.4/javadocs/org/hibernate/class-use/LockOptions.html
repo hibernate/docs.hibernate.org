@@ -374,8 +374,8 @@
 &nbsp;</td>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code><a href="../../../org/hibernate/SimpleNaturalIdLoadAccess.html" title="interface in org.hibernate">SimpleNaturalIdLoadAccess</a>&lt;<a href="../../../org/hibernate/SimpleNaturalIdLoadAccess.html" title="type parameter in SimpleNaturalIdLoadAccess">T</a>&gt;</code></td>
-<td class="colLast"><span class="typeNameLabel">SimpleNaturalIdLoadAccess.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/SimpleNaturalIdLoadAccess.html#with-org.hibernate.LockOptions-">with</a></span>(<a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code>
+<td class="colFirst"><code><a href="../../../org/hibernate/IdentifierLoadAccess.html" title="interface in org.hibernate">IdentifierLoadAccess</a>&lt;<a href="../../../org/hibernate/IdentifierLoadAccess.html" title="type parameter in IdentifierLoadAccess">T</a>&gt;</code></td>
+<td class="colLast"><span class="typeNameLabel">IdentifierLoadAccess.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/IdentifierLoadAccess.html#with-org.hibernate.LockOptions-">with</a></span>(<a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code>
 <div class="block">Specify the <a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate"><code>LockOptions</code></a> to use when retrieving the entity.</div>
 </td>
 </tr>
@@ -386,14 +386,14 @@
 </td>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code><a href="../../../org/hibernate/NaturalIdLoadAccess.html" title="interface in org.hibernate">NaturalIdLoadAccess</a>&lt;<a href="../../../org/hibernate/NaturalIdLoadAccess.html" title="type parameter in NaturalIdLoadAccess">T</a>&gt;</code></td>
-<td class="colLast"><span class="typeNameLabel">NaturalIdLoadAccess.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/NaturalIdLoadAccess.html#with-org.hibernate.LockOptions-">with</a></span>(<a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code>
+<td class="colFirst"><code><a href="../../../org/hibernate/SimpleNaturalIdLoadAccess.html" title="interface in org.hibernate">SimpleNaturalIdLoadAccess</a>&lt;<a href="../../../org/hibernate/SimpleNaturalIdLoadAccess.html" title="type parameter in SimpleNaturalIdLoadAccess">T</a>&gt;</code></td>
+<td class="colLast"><span class="typeNameLabel">SimpleNaturalIdLoadAccess.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/SimpleNaturalIdLoadAccess.html#with-org.hibernate.LockOptions-">with</a></span>(<a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code>
 <div class="block">Specify the <a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate"><code>LockOptions</code></a> to use when retrieving the entity.</div>
 </td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><code><a href="../../../org/hibernate/IdentifierLoadAccess.html" title="interface in org.hibernate">IdentifierLoadAccess</a>&lt;<a href="../../../org/hibernate/IdentifierLoadAccess.html" title="type parameter in IdentifierLoadAccess">T</a>&gt;</code></td>
-<td class="colLast"><span class="typeNameLabel">IdentifierLoadAccess.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/IdentifierLoadAccess.html#with-org.hibernate.LockOptions-">with</a></span>(<a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code>
+<td class="colFirst"><code><a href="../../../org/hibernate/NaturalIdLoadAccess.html" title="interface in org.hibernate">NaturalIdLoadAccess</a>&lt;<a href="../../../org/hibernate/NaturalIdLoadAccess.html" title="type parameter in NaturalIdLoadAccess">T</a>&gt;</code></td>
+<td class="colLast"><span class="typeNameLabel">NaturalIdLoadAccess.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/NaturalIdLoadAccess.html#with-org.hibernate.LockOptions-">with</a></span>(<a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code>
 <div class="block">Specify the <a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate"><code>LockOptions</code></a> to use when retrieving the entity.</div>
 </td>
 </tr>
@@ -431,8 +431,11 @@
 <tbody>
 <tr class="altColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
-<td class="colLast"><span class="typeNameLabel">SQLServer2005Dialect.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/dialect/SQLServer2005Dialect.html#appendLockHint-org.hibernate.LockOptions-java.lang.String-">appendLockHint</a></span>(<a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions,
-              <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;tableName)</code>&nbsp;</td>
+<td class="colLast"><span class="typeNameLabel">Dialect.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/dialect/Dialect.html#appendLockHint-org.hibernate.LockOptions-java.lang.String-">appendLockHint</a></span>(<a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions,
+              <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;tableName)</code>
+<div class="block">Some dialects support an alternative means to <tt>SELECT FOR UPDATE</tt>,
+ whereby a "lock hint" is appended to the table name in the from clause.</div>
+</td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
@@ -441,11 +444,8 @@
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
-<td class="colLast"><span class="typeNameLabel">Dialect.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/dialect/Dialect.html#appendLockHint-org.hibernate.LockOptions-java.lang.String-">appendLockHint</a></span>(<a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions,
-              <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;tableName)</code>
-<div class="block">Some dialects support an alternative means to <tt>SELECT FOR UPDATE</tt>,
- whereby a "lock hint" is appended to the table name in the from clause.</div>
-</td>
+<td class="colLast"><span class="typeNameLabel">SQLServer2005Dialect.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/dialect/SQLServer2005Dialect.html#appendLockHint-org.hibernate.LockOptions-java.lang.String-">appendLockHint</a></span>(<a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions,
+              <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;tableName)</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
@@ -460,18 +460,18 @@
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
-<td class="colLast"><span class="typeNameLabel">SybaseASE157Dialect.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/dialect/SybaseASE157Dialect.html#applyLocksToSql-java.lang.String-org.hibernate.LockOptions-java.util.Map-">applyLocksToSql</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;sql,
-               <a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;aliasedLockOptions,
-               <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>[]&gt;&nbsp;keyColumnNames)</code>&nbsp;</td>
-</tr>
-<tr class="altColor">
-<td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
 <td class="colLast"><span class="typeNameLabel">Dialect.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/dialect/Dialect.html#applyLocksToSql-java.lang.String-org.hibernate.LockOptions-java.util.Map-">applyLocksToSql</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;sql,
                <a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;aliasedLockOptions,
                <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>[]&gt;&nbsp;keyColumnNames)</code>
 <div class="block">Modifies the given SQL by applying the appropriate updates for the specified
  lock modes and key columns.</div>
 </td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
+<td class="colLast"><span class="typeNameLabel">SybaseASE157Dialect.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/dialect/SybaseASE157Dialect.html#applyLocksToSql-java.lang.String-org.hibernate.LockOptions-java.util.Map-">applyLocksToSql</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;sql,
+               <a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;aliasedLockOptions,
+               <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>[]&gt;&nbsp;keyColumnNames)</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
@@ -481,17 +481,7 @@
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
-<td class="colLast"><span class="typeNameLabel">AbstractHANADialect.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/dialect/AbstractHANADialect.html#getForUpdateString-java.lang.String-org.hibernate.LockOptions-">getForUpdateString</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;aliases,
-                  <a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code>&nbsp;</td>
-</tr>
-<tr class="rowColor">
-<td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
 <td class="colLast"><span class="typeNameLabel">PostgreSQL81Dialect.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/dialect/PostgreSQL81Dialect.html#getForUpdateString-java.lang.String-org.hibernate.LockOptions-">getForUpdateString</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;aliases,
-                  <a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code>&nbsp;</td>
-</tr>
-<tr class="altColor">
-<td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
-<td class="colLast"><span class="typeNameLabel">CockroachDB192Dialect.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/dialect/CockroachDB192Dialect.html#getForUpdateString-java.lang.String-org.hibernate.LockOptions-">getForUpdateString</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;aliases,
                   <a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
@@ -501,6 +491,16 @@
 <div class="block">Get the <tt>FOR UPDATE OF column_list</tt> fragment appropriate for this
  dialect given the aliases of the columns to be write locked.</div>
 </td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
+<td class="colLast"><span class="typeNameLabel">AbstractHANADialect.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/dialect/AbstractHANADialect.html#getForUpdateString-java.lang.String-org.hibernate.LockOptions-">getForUpdateString</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;aliases,
+                  <a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
+<td class="colLast"><span class="typeNameLabel">CockroachDB192Dialect.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/dialect/CockroachDB192Dialect.html#getForUpdateString-java.lang.String-org.hibernate.LockOptions-">getForUpdateString</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;aliases,
+                  <a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code>&nbsp;</td>
 </tr>
 </tbody>
 </table>
@@ -609,16 +609,16 @@
        <a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
+<td class="colFirst"><code><a href="../../../org/hibernate/engine/spi/NamedSQLQueryDefinitionBuilder.html" title="class in org.hibernate.engine.spi">NamedSQLQueryDefinitionBuilder</a></code></td>
+<td class="colLast"><span class="typeNameLabel">NamedSQLQueryDefinitionBuilder.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/engine/spi/NamedSQLQueryDefinitionBuilder.html#setLockOptions-org.hibernate.LockOptions-">setLockOptions</a></span>(<a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><span class="typeNameLabel">QueryParameters.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/engine/spi/QueryParameters.html#setLockOptions-org.hibernate.LockOptions-">setLockOptions</a></span>(<a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code><a href="../../../org/hibernate/engine/spi/NamedQueryDefinitionBuilder.html" title="class in org.hibernate.engine.spi">NamedQueryDefinitionBuilder</a></code></td>
 <td class="colLast"><span class="typeNameLabel">NamedQueryDefinitionBuilder.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/engine/spi/NamedQueryDefinitionBuilder.html#setLockOptions-org.hibernate.LockOptions-">setLockOptions</a></span>(<a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code>&nbsp;</td>
-</tr>
-<tr class="rowColor">
-<td class="colFirst"><code><a href="../../../org/hibernate/engine/spi/NamedSQLQueryDefinitionBuilder.html" title="class in org.hibernate.engine.spi">NamedSQLQueryDefinitionBuilder</a></code></td>
-<td class="colLast"><span class="typeNameLabel">NamedSQLQueryDefinitionBuilder.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/engine/spi/NamedSQLQueryDefinitionBuilder.html#setLockOptions-org.hibernate.LockOptions-">setLockOptions</a></span>(<a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code>&nbsp;</td>
 </tr>
 </tbody>
 </table>
@@ -720,19 +720,19 @@
 <tbody>
 <tr class="altColor">
 <td class="colFirst"><code><a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a></code></td>
-<td class="colLast"><span class="typeNameLabel">LockEvent.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/event/spi/LockEvent.html#getLockOptions--">getLockOptions</a></span>()</code>&nbsp;</td>
-</tr>
-<tr class="rowColor">
-<td class="colFirst"><code><a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a></code></td>
 <td class="colLast"><span class="typeNameLabel">LoadEvent.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/event/spi/LoadEvent.html#getLockOptions--">getLockOptions</a></span>()</code>&nbsp;</td>
-</tr>
-<tr class="altColor">
-<td class="colFirst"><code><a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a></code></td>
-<td class="colLast"><span class="typeNameLabel">ResolveNaturalIdEvent.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/event/spi/ResolveNaturalIdEvent.html#getLockOptions--">getLockOptions</a></span>()</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code><a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a></code></td>
 <td class="colLast"><span class="typeNameLabel">RefreshEvent.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/event/spi/RefreshEvent.html#getLockOptions--">getLockOptions</a></span>()</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code><a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a></code></td>
+<td class="colLast"><span class="typeNameLabel">LockEvent.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/event/spi/LockEvent.html#getLockOptions--">getLockOptions</a></span>()</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a></code></td>
+<td class="colLast"><span class="typeNameLabel">ResolveNaturalIdEvent.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/event/spi/ResolveNaturalIdEvent.html#getLockOptions--">getLockOptions</a></span>()</code>&nbsp;</td>
 </tr>
 </tbody>
 </table>
@@ -858,14 +858,14 @@
 <td class="colLast"><span class="typeNameLabel">Loader.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/loader/Loader.html#determineFollowOnLockMode-org.hibernate.LockOptions-">determineFollowOnLockMode</a></span>(<a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
+<td class="colFirst"><code>protected <a href="../../../org/hibernate/LockMode.html" title="enum in org.hibernate">LockMode</a>[]</code></td>
+<td class="colLast"><span class="typeNameLabel">OuterJoinLoader.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/loader/OuterJoinLoader.html#getLockModes-org.hibernate.LockOptions-">getLockModes</a></span>(<a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><code>protected abstract <a href="../../../org/hibernate/LockMode.html" title="enum in org.hibernate">LockMode</a>[]</code></td>
 <td class="colLast"><span class="typeNameLabel">Loader.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/loader/Loader.html#getLockModes-org.hibernate.LockOptions-">getLockModes</a></span>(<a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code>
 <div class="block">What lock options does this load entities with?</div>
 </td>
-</tr>
-<tr class="altColor">
-<td class="colFirst"><code>protected <a href="../../../org/hibernate/LockMode.html" title="enum in org.hibernate">LockMode</a>[]</code></td>
-<td class="colLast"><span class="typeNameLabel">OuterJoinLoader.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/loader/OuterJoinLoader.html#getLockModes-org.hibernate.LockOptions-">getLockModes</a></span>(<a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>protected void</code></td>
@@ -1020,18 +1020,25 @@
                       <a href="../../../org/hibernate/engine/spi/LoadQueryInfluencers.html" title="class in org.hibernate.engine.spi">LoadQueryInfluencers</a>&nbsp;influencers)</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><code>default <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></code></td>
-<td class="colLast"><span class="typeNameLabel">UniqueEntityLoader.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/loader/entity/UniqueEntityLoader.html#load-java.lang.Object-org.hibernate.engine.spi.SharedSessionContractImplementor-org.hibernate.LockOptions-">load</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;id,
-    <a href="../../../org/hibernate/engine/spi/SharedSessionContractImplementor.html" title="interface in org.hibernate.engine.spi">SharedSessionContractImplementor</a>&nbsp;session,
-    <a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code>&nbsp;</td>
-</tr>
-<tr class="altColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></code></td>
 <td class="colLast"><span class="typeNameLabel">AbstractEntityLoader.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/loader/entity/AbstractEntityLoader.html#load-java.lang.Object-org.hibernate.engine.spi.SharedSessionContractImplementor-org.hibernate.LockOptions-">load</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;id,
     <a href="../../../org/hibernate/engine/spi/SharedSessionContractImplementor.html" title="interface in org.hibernate.engine.spi">SharedSessionContractImplementor</a>&nbsp;session,
     <a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code>&nbsp;</td>
 </tr>
+<tr class="altColor">
+<td class="colFirst"><code>default <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></code></td>
+<td class="colLast"><span class="typeNameLabel">UniqueEntityLoader.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/loader/entity/UniqueEntityLoader.html#load-java.lang.Object-org.hibernate.engine.spi.SharedSessionContractImplementor-org.hibernate.LockOptions-">load</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;id,
+    <a href="../../../org/hibernate/engine/spi/SharedSessionContractImplementor.html" title="interface in org.hibernate.engine.spi">SharedSessionContractImplementor</a>&nbsp;session,
+    <a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code>&nbsp;</td>
+</tr>
 <tr class="rowColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></code></td>
+<td class="colLast"><span class="typeNameLabel">AbstractEntityLoader.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/loader/entity/AbstractEntityLoader.html#load-java.io.Serializable-java.lang.Object-org.hibernate.engine.spi.SharedSessionContractImplementor-org.hibernate.LockOptions-">load</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/io/Serializable.html?is-external=true" title="class or interface in java.io">Serializable</a>&nbsp;id,
+    <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;optionalObject,
+    <a href="../../../org/hibernate/engine/spi/SharedSessionContractImplementor.html" title="interface in org.hibernate.engine.spi">SharedSessionContractImplementor</a>&nbsp;session,
+    <a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></code></td>
 <td class="colLast"><span class="typeNameLabel">UniqueEntityLoader.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/loader/entity/UniqueEntityLoader.html#load-java.io.Serializable-java.lang.Object-org.hibernate.engine.spi.SharedSessionContractImplementor-org.hibernate.LockOptions-">load</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/io/Serializable.html?is-external=true" title="class or interface in java.io">Serializable</a>&nbsp;id,
     <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;optionalObject,
@@ -1040,24 +1047,17 @@
 <div class="block">Load an entity instance by id.</div>
 </td>
 </tr>
-<tr class="altColor">
-<td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></code></td>
-<td class="colLast"><span class="typeNameLabel">AbstractEntityLoader.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/loader/entity/AbstractEntityLoader.html#load-java.io.Serializable-java.lang.Object-org.hibernate.engine.spi.SharedSessionContractImplementor-org.hibernate.LockOptions-">load</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/io/Serializable.html?is-external=true" title="class or interface in java.io">Serializable</a>&nbsp;id,
-    <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;optionalObject,
-    <a href="../../../org/hibernate/engine/spi/SharedSessionContractImplementor.html" title="interface in org.hibernate.engine.spi">SharedSessionContractImplementor</a>&nbsp;session,
-    <a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code>&nbsp;</td>
-</tr>
 <tr class="rowColor">
-<td class="colFirst"><code>default <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></code></td>
-<td class="colLast"><span class="typeNameLabel">UniqueEntityLoader.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/loader/entity/UniqueEntityLoader.html#load-java.io.Serializable-java.lang.Object-org.hibernate.engine.spi.SharedSessionContractImplementor-org.hibernate.LockOptions-java.lang.Boolean-">load</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/io/Serializable.html?is-external=true" title="class or interface in java.io">Serializable</a>&nbsp;id,
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></code></td>
+<td class="colLast"><span class="typeNameLabel">AbstractEntityLoader.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/loader/entity/AbstractEntityLoader.html#load-java.io.Serializable-java.lang.Object-org.hibernate.engine.spi.SharedSessionContractImplementor-org.hibernate.LockOptions-java.lang.Boolean-">load</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/io/Serializable.html?is-external=true" title="class or interface in java.io">Serializable</a>&nbsp;id,
     <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;optionalObject,
     <a href="../../../org/hibernate/engine/spi/SharedSessionContractImplementor.html" title="interface in org.hibernate.engine.spi">SharedSessionContractImplementor</a>&nbsp;session,
     <a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions,
     <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Boolean.html?is-external=true" title="class or interface in java.lang">Boolean</a>&nbsp;readOnly)</code>&nbsp;</td>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></code></td>
-<td class="colLast"><span class="typeNameLabel">AbstractEntityLoader.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/loader/entity/AbstractEntityLoader.html#load-java.io.Serializable-java.lang.Object-org.hibernate.engine.spi.SharedSessionContractImplementor-org.hibernate.LockOptions-java.lang.Boolean-">load</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/io/Serializable.html?is-external=true" title="class or interface in java.io">Serializable</a>&nbsp;id,
+<td class="colFirst"><code>default <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></code></td>
+<td class="colLast"><span class="typeNameLabel">UniqueEntityLoader.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/loader/entity/UniqueEntityLoader.html#load-java.io.Serializable-java.lang.Object-org.hibernate.engine.spi.SharedSessionContractImplementor-org.hibernate.LockOptions-java.lang.Boolean-">load</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/io/Serializable.html?is-external=true" title="class or interface in java.io">Serializable</a>&nbsp;id,
     <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;optionalObject,
     <a href="../../../org/hibernate/engine/spi/SharedSessionContractImplementor.html" title="interface in org.hibernate.engine.spi">SharedSessionContractImplementor</a>&nbsp;session,
     <a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions,
@@ -1134,7 +1134,7 @@
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>protected <a href="../../../org/hibernate/loader/entity/UniqueEntityLoader.html" title="interface in org.hibernate.loader.entity">UniqueEntityLoader</a></code></td>
-<td class="colLast"><span class="typeNameLabel">PaddedBatchingEntityLoaderBuilder.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/loader/entity/plan/PaddedBatchingEntityLoaderBuilder.html#buildBatchingLoader-org.hibernate.persister.entity.OuterJoinLoadable-int-org.hibernate.LockOptions-org.hibernate.engine.spi.SessionFactoryImplementor-org.hibernate.engine.spi.LoadQueryInfluencers-">buildBatchingLoader</a></span>(<a href="../../../org/hibernate/persister/entity/OuterJoinLoadable.html" title="interface in org.hibernate.persister.entity">OuterJoinLoadable</a>&nbsp;persister,
+<td class="colLast"><span class="typeNameLabel">DynamicBatchingEntityLoaderBuilder.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/loader/entity/plan/DynamicBatchingEntityLoaderBuilder.html#buildBatchingLoader-org.hibernate.persister.entity.OuterJoinLoadable-int-org.hibernate.LockOptions-org.hibernate.engine.spi.SessionFactoryImplementor-org.hibernate.engine.spi.LoadQueryInfluencers-">buildBatchingLoader</a></span>(<a href="../../../org/hibernate/persister/entity/OuterJoinLoadable.html" title="interface in org.hibernate.persister.entity">OuterJoinLoadable</a>&nbsp;persister,
                    int&nbsp;batchSize,
                    <a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions,
                    <a href="../../../org/hibernate/engine/spi/SessionFactoryImplementor.html" title="interface in org.hibernate.engine.spi">SessionFactoryImplementor</a>&nbsp;factory,
@@ -1142,7 +1142,7 @@
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>protected <a href="../../../org/hibernate/loader/entity/UniqueEntityLoader.html" title="interface in org.hibernate.loader.entity">UniqueEntityLoader</a></code></td>
-<td class="colLast"><span class="typeNameLabel">DynamicBatchingEntityLoaderBuilder.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/loader/entity/plan/DynamicBatchingEntityLoaderBuilder.html#buildBatchingLoader-org.hibernate.persister.entity.OuterJoinLoadable-int-org.hibernate.LockOptions-org.hibernate.engine.spi.SessionFactoryImplementor-org.hibernate.engine.spi.LoadQueryInfluencers-">buildBatchingLoader</a></span>(<a href="../../../org/hibernate/persister/entity/OuterJoinLoadable.html" title="interface in org.hibernate.persister.entity">OuterJoinLoadable</a>&nbsp;persister,
+<td class="colLast"><span class="typeNameLabel">PaddedBatchingEntityLoaderBuilder.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/loader/entity/plan/PaddedBatchingEntityLoaderBuilder.html#buildBatchingLoader-org.hibernate.persister.entity.OuterJoinLoadable-int-org.hibernate.LockOptions-org.hibernate.engine.spi.SessionFactoryImplementor-org.hibernate.engine.spi.LoadQueryInfluencers-">buildBatchingLoader</a></span>(<a href="../../../org/hibernate/persister/entity/OuterJoinLoadable.html" title="interface in org.hibernate.persister.entity">OuterJoinLoadable</a>&nbsp;persister,
                    int&nbsp;batchSize,
                    <a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions,
                    <a href="../../../org/hibernate/engine/spi/SessionFactoryImplementor.html" title="interface in org.hibernate.engine.spi">SessionFactoryImplementor</a>&nbsp;factory,
@@ -1389,15 +1389,6 @@
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></code></td>
-<td class="colLast"><span class="typeNameLabel">EntityPersister.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/persister/entity/EntityPersister.html#load-java.io.Serializable-java.lang.Object-org.hibernate.LockOptions-org.hibernate.engine.spi.SharedSessionContractImplementor-">load</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/io/Serializable.html?is-external=true" title="class or interface in java.io">Serializable</a>&nbsp;id,
-    <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;optionalObject,
-    <a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions,
-    <a href="../../../org/hibernate/engine/spi/SharedSessionContractImplementor.html" title="interface in org.hibernate.engine.spi">SharedSessionContractImplementor</a>&nbsp;session)</code>
-<div class="block">Load an instance of the persistent class.</div>
-</td>
-</tr>
-<tr class="rowColor">
-<td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></code></td>
 <td class="colLast"><span class="typeNameLabel">AbstractEntityPersister.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/persister/entity/AbstractEntityPersister.html#load-java.io.Serializable-java.lang.Object-org.hibernate.LockOptions-org.hibernate.engine.spi.SharedSessionContractImplementor-">load</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/io/Serializable.html?is-external=true" title="class or interface in java.io">Serializable</a>&nbsp;id,
     <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;optionalObject,
     <a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions,
@@ -1406,17 +1397,26 @@
  depending upon the value of the <tt>lock</tt> parameter</div>
 </td>
 </tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></code></td>
+<td class="colLast"><span class="typeNameLabel">EntityPersister.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/persister/entity/EntityPersister.html#load-java.io.Serializable-java.lang.Object-org.hibernate.LockOptions-org.hibernate.engine.spi.SharedSessionContractImplementor-">load</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/io/Serializable.html?is-external=true" title="class or interface in java.io">Serializable</a>&nbsp;id,
+    <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;optionalObject,
+    <a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions,
+    <a href="../../../org/hibernate/engine/spi/SharedSessionContractImplementor.html" title="interface in org.hibernate.engine.spi">SharedSessionContractImplementor</a>&nbsp;session)</code>
+<div class="block">Load an instance of the persistent class.</div>
+</td>
+</tr>
 <tr class="altColor">
-<td class="colFirst"><code>default <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></code></td>
-<td class="colLast"><span class="typeNameLabel">EntityPersister.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/persister/entity/EntityPersister.html#load-java.io.Serializable-java.lang.Object-org.hibernate.LockOptions-org.hibernate.engine.spi.SharedSessionContractImplementor-java.lang.Boolean-">load</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/io/Serializable.html?is-external=true" title="class or interface in java.io">Serializable</a>&nbsp;id,
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></code></td>
+<td class="colLast"><span class="typeNameLabel">AbstractEntityPersister.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/persister/entity/AbstractEntityPersister.html#load-java.io.Serializable-java.lang.Object-org.hibernate.LockOptions-org.hibernate.engine.spi.SharedSessionContractImplementor-java.lang.Boolean-">load</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/io/Serializable.html?is-external=true" title="class or interface in java.io">Serializable</a>&nbsp;id,
     <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;optionalObject,
     <a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions,
     <a href="../../../org/hibernate/engine/spi/SharedSessionContractImplementor.html" title="interface in org.hibernate.engine.spi">SharedSessionContractImplementor</a>&nbsp;session,
     <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Boolean.html?is-external=true" title="class or interface in java.lang">Boolean</a>&nbsp;readOnly)</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></code></td>
-<td class="colLast"><span class="typeNameLabel">AbstractEntityPersister.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/persister/entity/AbstractEntityPersister.html#load-java.io.Serializable-java.lang.Object-org.hibernate.LockOptions-org.hibernate.engine.spi.SharedSessionContractImplementor-java.lang.Boolean-">load</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/io/Serializable.html?is-external=true" title="class or interface in java.io">Serializable</a>&nbsp;id,
+<td class="colFirst"><code>default <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></code></td>
+<td class="colLast"><span class="typeNameLabel">EntityPersister.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/persister/entity/EntityPersister.html#load-java.io.Serializable-java.lang.Object-org.hibernate.LockOptions-org.hibernate.engine.spi.SharedSessionContractImplementor-java.lang.Boolean-">load</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/io/Serializable.html?is-external=true" title="class or interface in java.io">Serializable</a>&nbsp;id,
     <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;optionalObject,
     <a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions,
     <a href="../../../org/hibernate/engine/spi/SharedSessionContractImplementor.html" title="interface in org.hibernate.engine.spi">SharedSessionContractImplementor</a>&nbsp;session,
@@ -1439,19 +1439,27 @@
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/io/Serializable.html?is-external=true" title="class or interface in java.io">Serializable</a></code></td>
+<td class="colLast"><span class="typeNameLabel">AbstractEntityPersister.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/persister/entity/AbstractEntityPersister.html#loadEntityIdByNaturalId-java.lang.Object:A-org.hibernate.LockOptions-org.hibernate.engine.spi.SharedSessionContractImplementor-">loadEntityIdByNaturalId</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>[]&nbsp;naturalIdValues,
+                       <a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions,
+                       <a href="../../../org/hibernate/engine/spi/SharedSessionContractImplementor.html" title="interface in org.hibernate.engine.spi">SharedSessionContractImplementor</a>&nbsp;session)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/io/Serializable.html?is-external=true" title="class or interface in java.io">Serializable</a></code></td>
 <td class="colLast"><span class="typeNameLabel">EntityPersister.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/persister/entity/EntityPersister.html#loadEntityIdByNaturalId-java.lang.Object:A-org.hibernate.LockOptions-org.hibernate.engine.spi.SharedSessionContractImplementor-">loadEntityIdByNaturalId</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>[]&nbsp;naturalIdValues,
                        <a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions,
                        <a href="../../../org/hibernate/engine/spi/SharedSessionContractImplementor.html" title="interface in org.hibernate.engine.spi">SharedSessionContractImplementor</a>&nbsp;session)</code>
 <div class="block">Load the id for the entity based on the natural id.</div>
 </td>
 </tr>
-<tr class="rowColor">
-<td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/io/Serializable.html?is-external=true" title="class or interface in java.io">Serializable</a></code></td>
-<td class="colLast"><span class="typeNameLabel">AbstractEntityPersister.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/persister/entity/AbstractEntityPersister.html#loadEntityIdByNaturalId-java.lang.Object:A-org.hibernate.LockOptions-org.hibernate.engine.spi.SharedSessionContractImplementor-">loadEntityIdByNaturalId</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>[]&nbsp;naturalIdValues,
-                       <a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions,
-                       <a href="../../../org/hibernate/engine/spi/SharedSessionContractImplementor.html" title="interface in org.hibernate.engine.spi">SharedSessionContractImplementor</a>&nbsp;session)</code>&nbsp;</td>
-</tr>
 <tr class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><span class="typeNameLabel">AbstractEntityPersister.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/persister/entity/AbstractEntityPersister.html#lock-java.io.Serializable-java.lang.Object-java.lang.Object-org.hibernate.LockOptions-org.hibernate.engine.spi.SharedSessionContractImplementor-">lock</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/io/Serializable.html?is-external=true" title="class or interface in java.io">Serializable</a>&nbsp;id,
+    <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;version,
+    <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;object,
+    <a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions,
+    <a href="../../../org/hibernate/engine/spi/SharedSessionContractImplementor.html" title="interface in org.hibernate.engine.spi">SharedSessionContractImplementor</a>&nbsp;session)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><span class="typeNameLabel">EntityPersister.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/persister/entity/EntityPersister.html#lock-java.io.Serializable-java.lang.Object-java.lang.Object-org.hibernate.LockOptions-org.hibernate.engine.spi.SharedSessionContractImplementor-">lock</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/io/Serializable.html?is-external=true" title="class or interface in java.io">Serializable</a>&nbsp;id,
     <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;version,
@@ -1460,14 +1468,6 @@
     <a href="../../../org/hibernate/engine/spi/SharedSessionContractImplementor.html" title="interface in org.hibernate.engine.spi">SharedSessionContractImplementor</a>&nbsp;session)</code>
 <div class="block">Do a version check (optional operation)</div>
 </td>
-</tr>
-<tr class="rowColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><span class="typeNameLabel">AbstractEntityPersister.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/persister/entity/AbstractEntityPersister.html#lock-java.io.Serializable-java.lang.Object-java.lang.Object-org.hibernate.LockOptions-org.hibernate.engine.spi.SharedSessionContractImplementor-">lock</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/io/Serializable.html?is-external=true" title="class or interface in java.io">Serializable</a>&nbsp;id,
-    <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;version,
-    <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;object,
-    <a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions,
-    <a href="../../../org/hibernate/engine/spi/SharedSessionContractImplementor.html" title="interface in org.hibernate.engine.spi">SharedSessionContractImplementor</a>&nbsp;session)</code>&nbsp;</td>
 </tr>
 </tbody>
 </table>
@@ -1497,12 +1497,12 @@
 </tr>
 <tbody>
 <tr class="altColor">
-<td class="colFirst"><code><a href="../../../org/hibernate/query/NativeQuery.html" title="interface in org.hibernate.query">NativeQuery</a>&lt;<a href="../../../org/hibernate/query/NativeQuery.html" title="type parameter in NativeQuery">T</a>&gt;</code></td>
-<td class="colLast"><span class="typeNameLabel">NativeQuery.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/query/NativeQuery.html#setLockOptions-org.hibernate.LockOptions-">setLockOptions</a></span>(<a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code>&nbsp;</td>
-</tr>
-<tr class="rowColor">
 <td class="colFirst"><code><a href="../../../org/hibernate/query/Query.html" title="interface in org.hibernate.query">Query</a>&lt;<a href="../../../org/hibernate/query/Query.html" title="type parameter in Query">R</a>&gt;</code></td>
 <td class="colLast"><span class="typeNameLabel">Query.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/query/Query.html#setLockOptions-org.hibernate.LockOptions-">setLockOptions</a></span>(<a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="../../../org/hibernate/query/NativeQuery.html" title="interface in org.hibernate.query">NativeQuery</a>&lt;<a href="../../../org/hibernate/query/NativeQuery.html" title="type parameter in NativeQuery">T</a>&gt;</code></td>
+<td class="colLast"><span class="typeNameLabel">NativeQuery.</span><code><span class="memberNameLink"><a href="../../../org/hibernate/query/NativeQuery.html#setLockOptions-org.hibernate.LockOptions-">setLockOptions</a></span>(<a href="../../../org/hibernate/LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code>&nbsp;</td>
 </tr>
 </tbody>
 </table>
@@ -1645,6 +1645,6 @@
 <!--   -->
 </a></div>
 <!-- ======== END OF BOTTOM NAVBAR ======= -->
-<p class="legalCopy"><small>Copyright &copy; 2001-2021 <a href="http://redhat.com">Red Hat, Inc.</a>  All Rights Reserved.</small></p>
+<p class="legalCopy"><small>Copyright &copy; 2001-2022 <a href="http://redhat.com">Red Hat, Inc.</a>  All Rights Reserved.</small></p>
 </body>
 </html>

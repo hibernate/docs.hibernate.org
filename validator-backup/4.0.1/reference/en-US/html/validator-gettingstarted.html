@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory">Chapter 1. Getting started</title><link rel="stylesheet" href="css/hibernate.css" type="text/css"/><meta xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" name="generator" content="DocBook XSL Stylesheets V1.74.0"/><link rel="home" href="index.html" title="Hibernate Validator"/><link rel="up" href="index.html" title="Hibernate Validator"/><link rel="prev" href="preface.html" title="Preface"/><link rel="next" href="validator-usingvalidator.html" title="Chapter 2. Validation step by step"/></head><body><p id="title"><a href="http://www.hibernate.org" class="site_href"><strong>Hibernate.org</strong></a><a href="http://hibernate.org/Documentation/DocumentationOverview" class="doc_href"><strong>Community Documentation</strong></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="preface.html"><strong>Prev</strong></a></li><li class="next"><a accesskey="n" href="validator-usingvalidator.html"><strong>Next</strong></a></li></ul><div class="chapter" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="validator-gettingstarted"/>Chapter 1. Getting started</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="validator-gettingstarted.html#validator-gettingstarted-createproject">1.1. Setting up a new Maven project</a></span></dt><dt><span class="section"><a href="validator-gettingstarted.html#validator-gettingstarted-createmodel">1.2. Applying constraints</a></span></dt><dt><span class="section"><a href="validator-gettingstarted.html#d0e158">1.3. Validating constraints</a></span></dt><dt><span class="section"><a href="validator-gettingstarted.html#validator-gettingstarted-whatsnext">1.4. Where to go next?</a></span></dt></dl></div><p>This chapter will show you how to get started with Hibernate
+  Validator, the reference implementation (RI) of Bean Validation. For the
+  following quickstart you need:</p><div class="itemizedlist"><ul><li><p>A JDK &gt;= 5</p></li><li><p><a class="ulink" href="http://maven.apache.org/">Apache Maven</a></p></li><li><p>An Internet connection (Maven has to download all required
+      libraries)</p></li><li><p>A properly configured remote repository. Add the following to your
+      <code class="filename">settings.xml</code>: </p><div class="example"><a id="d0e67"/><p class="title"><b>Example 1.1. Configuring the JBoss Maven repository in
+          <code class="filename">settings.xml</code></b></p><div class="example-contents"><pre class="programlisting">&lt;repositories&gt;
+    &lt;repository&gt;
+        &lt;id&gt;jboss&lt;/id&gt;
+        &lt;url&gt;http://repository.jboss.com/maven2&lt;/url&gt;
+        &lt;releases&gt;
+            &lt;enabled&gt;true&lt;/enabled&gt;
+        &lt;/releases&gt;
+        &lt;snapshots&gt;
+            &lt;enabled&gt;false&lt;/enabled&gt;
+        &lt;/snapshots&gt;
+    &lt;/repository&gt;
+&lt;/repositories&gt;</pre></div></div><p><br class="example-break"/>More information about <code class="filename">settings.xml</code> can
+      be found in the <a class="ulink" href="http://maven.apache.org/ref/2.0.8/maven-settings/settings.html">Maven
+      Local Settings Model</a>.</p></li></ul></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="validator-gettingstarted-createproject"/>1.1. Setting up a new Maven project</h2></div></div></div><p>Start by creating new Maven project using the Maven archetype plugin
+    as follows:</p><div class="example"><a id="d0e87"/><p class="title"><b>Example 1.2. Using Maven's archetype plugin to create a sample project using
+        Hibernate Validator</b></p><div class="example-contents"><pre class="programlisting">mvn archetype:generate \
+  -DarchetypeCatalog=http://repository.jboss.com/maven2/archetype-catalog.xml \
+  -DgroupId=com.mycompany \
+  -DartifactId=beanvalidation-gettingstarted \
+  -Dversion=1.0-SNAPSHOT \
+  -Dpackage=com.mycompany</pre></div></div><p><br class="example-break"/></p><p>When presented with the list of available archetypes in the JBoss
+    Maven Repository select the
+    <span class="emphasis"><em>hibernate-validator-quickstart-archetype. </em></span>After Maven
+    has downloaded all dependencies confirm the settings by just pressing
+    enter. Maven will create your project in the directory
+    <code class="filename">beanvalidation-gettingstarted</code>. Change into this
+    directory and run:</p><pre class="programlisting">mvn test</pre><p>Maven will compile the
+    example code and run the implemented unit tests. Let's have a look at the
+    actual code.</p></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="validator-gettingstarted-createmodel"/>1.2. Applying constraints</h2></div></div></div><p>Open the project in the IDE of your choice and have a look at the
+    class <code class="classname">Car</code>:</p><div class="example"><a id="example-class-car"/><p class="title"><b>Example 1.3. Class Car annotated with constraints</b></p><div class="example-contents"><pre class="programlisting">package com.mycompany;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+public class Car {
+
+    <span class="bold"><strong>@NotNull</strong></span>
+    private String manufacturer;
+
+    <span class="bold"><strong>@NotNull</strong></span>
+    <span class="bold"><strong>@Size(min = 2, max = 14)</strong></span>
+    private String licensePlate;
+
+    <span class="bold"><strong>@Min(2)</strong></span>
+    private int seatCount;
+    
+    public Car(String manufacturer, String licencePlate, int seatCount) {
+        this.manufacturer = manufacturer;
+        this.licensePlate = licencePlate;
+        this.seatCount = seatCount;
+    }
+
+    //getters and setters ...
+}</pre></div></div><p><br class="example-break"/><code class="classname">@NotNull</code>, <code class="classname">@Size</code>
+    and <code class="classname">@Min</code> are so-called constraint annotations, that
+    we use to declare constraints, which shall be applied to the fields of a
+    <code class="classname">Car</code> instance:</p><div class="itemizedlist"><ul><li><p><span class="property">manufacturer</span> shall never be null</p></li><li><p><span class="property">licensePlate</span> shall never be null and must
+        be between 2 and 14 characters long</p></li><li><p><span class="property">seatCount</span> shall be at least 2.</p></li></ul></div></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="d0e158"/>1.3. Validating constraints</h2></div></div></div><p>To perform a validation of these constraints, we use a
+    <code class="classname">Validator</code> instance. Let's have a look at the
+    <code class="classname">CarTest</code> class:</p><div class="example"><a id="d0e169"/><p class="title"><b>Example 1.4. Class CarTest showing validation examples</b></p><div class="example-contents"><pre class="programlisting">package com.mycompany;
+
+import static org.junit.Assert.*;
+
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+public class CarTest {
+
+    private static Validator validator;
+
+    @BeforeClass
+    public static void setUp() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
+    }
+
+    @Test
+    public void manufacturerIsNull() {
+        Car car = new Car(null, "DD-AB-123", 4);
+
+        Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations =
+            validator.validate(car);
+
+        assertEquals(1, constraintViolations.size());
+        assertEquals("may not be null", constraintViolations.iterator().next().getMessage());
+    }
+
+    @Test
+    public void licensePlateTooShort() {
+        Car car = new Car("Morris", "D", 4);
+
+        Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations = 
+            validator.validate(car);
+
+        assertEquals(1, constraintViolations.size());
+        assertEquals("size must be between 2 and 14", constraintViolations.iterator().next().getMessage());
+    }
+    
+    @Test
+    public void seatCountTooLow() {
+        Car car = new Car("Morris", "DD-AB-123", 1);
+
+        Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations =
+            validator.validate(car);
+
+        assertEquals(1, constraintViolations.size());
+        assertEquals("must be greater than or equal to 2", constraintViolations.iterator().next().getMessage());
+    }
+
+    @Test
+    public void carIsValid() {
+        Car car = new Car("Morris", "DD-AB-123", 2);
+
+        Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations =
+            validator.validate(car);
+
+        assertEquals(0, constraintViolations.size());
+    }
+}</pre></div></div><br class="example-break"/><p>In the <code class="methodname">setUp()</code> method we get a
+    <code class="classname">Validator</code> instance from the
+    <code class="classname">ValidatorFactory</code>. A
+    <code class="classname">Validator</code> instance is thread-safe and may be reused
+    multiple times. For this reason we store it as field of our test class. We
+    can use the <code class="classname">Validator</code> now to validate the different
+    car instances in the test methods.</p><p>The <code class="methodname">validate()</code> method returns a set of
+    <code class="classname">ConstraintViolation</code> instances, which we can iterate
+    in order to see which validation errors occurred. The first three test
+    methods show some expected constraint violations:</p><div class="itemizedlist"><ul><li><p>The <code class="classname">@NotNull</code> constraint on manufacturer
+        is violated in <code class="methodname">manufacturerIsNull()</code></p></li><li><p>The <code class="classname">@Size</code> constraint on licensePlate is
+        violated in <code class="methodname">licensePlateTooShort()</code></p></li><li><p>The <code class="classname">@Min</code> constraint on seatCount is
+        violated in <code class="methodname">seatCountTooLow()</code></p></li></ul></div><p>If the object validates successfully,
+    <code class="methodname">validate()</code> returns an empty set.</p><p>Note that we only use classes from the package
+    <span class="package">javax.validation</span> from the Bean Validation API. As we
+    don't reference any classes of the RI directly, it would be no problem to
+    switch to another implementation of the API, should that need
+    arise.</p></div><div class="section" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="validator-gettingstarted-whatsnext"/>1.4. Where to go next?</h2></div></div></div><p>That concludes our 5 minute tour through the world of Hibernate
+    Validator. Continue exploring the code or look at further examples
+    referenced in <a class="xref" href="ch07.html#chapter-further-reading">Chapter 7, <i>Further reading</i></a>. To get a deeper
+    understanding of the Bean Validation just continue reading.<a class="xref" href="validator-usingvalidator.html" title="Chapter 2. Validation step by step">Chapter 2, <i>Validation step by step</i></a>. In case your application has
+    specific validation requirements have a look at <a class="xref" href="validator-customconstraints.html" title="Chapter 3. Creating custom constraints">Chapter 3, <i>Creating custom constraints</i></a>.</p></div></div><HR xmlns=""/><a xmlns="" href=""><p xmlns="http://www.w3.org/1999/xhtml" class="copyright">Copyright © 2009 Red Hat Middleware, LLC. &amp; Gunnar Morling</p></a><ul class="docnav"><li class="previous"><a accesskey="p" href="preface.html"><strong>Prev</strong>Preface</a></li><li class="up"><a accesskey="u" href="#"><strong>Top of page</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Front page</strong></a></li><li class="next"><a accesskey="n" href="validator-usingvalidator.html"><strong>Next</strong>Chapter 2. Validation step by step</a></li></ul></body></html>

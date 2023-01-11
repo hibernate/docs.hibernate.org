@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory">Chapter 7. Programmatic constraint definition</title><link rel="stylesheet" href="css/hibernate.css" type="text/css"/><meta xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" name="generator" content="DocBook XSL Stylesheets V1.74.0"/><link rel="home" href="index.html" title="Hibernate Validator"/><link rel="up" href="index.html" title="Hibernate Validator"/><link rel="prev" href="validator-checkconstraints.html" title="Chapter 6. Integration with other frameworks"/><link rel="next" href="ch08.html" title="Chapter 8. Annotation Processor (EXPERIMENTAL)"/></head><body><p id="title"><a href="http://www.hibernate.org" class="site_href"><strong>Hibernate.org</strong></a><a href="http://hibernate.org/Documentation/DocumentationOverview" class="doc_href"><strong>Community Documentation</strong></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="validator-checkconstraints.html"><strong>Prev</strong></a></li><li class="next"><a accesskey="n" href="ch08.html"><strong>Next</strong></a></li></ul><div class="chapter" lang="en-US"><div class="titlepage"><div><div><h2 class="title"><a id="programmaticapi"/>Chapter 7. Programmatic constraint definition</h2></div></div></div><div xmlns:rf="java:org.jboss.highlight.XhtmlRendererFactory" class="note"><h2>Note</h2><p>Use of the features described in the following sections is not
+    portable between Bean Validation providers/implementations.</p></div><p>Hibernate Validator allows to configure constraints not only via
+  annotations and xml, but also via a programmatic API. This API can be used
+  exclusively or in combination with annotations and xml. If used in
+  combination programmatic constraints are additive to otherwise configured
+  constraints.</p><p>The programmatic API is centered around the
+  <code class="classname">ConstraintMapping</code> class which can be found together
+  with its supporting classes in the
+  <span class="package">org.hibernate.validator.cfg</span> package.
+  <code class="classname">ConstraintMapping</code> is the entry point to a fluent API
+  allowing the definition of constraints. <a class="xref" href="programmaticapi.html#example-constraint-mapping" title="Example 7.1. Programmatic constraint definition">Example 7.1, “Programmatic constraint definition”</a> shows how the API can be
+  used.</p><div class="example"><a id="example-constraint-mapping"/><p class="title"><b>Example 7.1. Programmatic constraint definition</b></p><div class="example-contents"><pre class="programlisting">ConstraintMapping mapping = new ConstraintMapping();
+mapping.type( Car.class )
+    .property( "manufacturer", FIELD )
+        .constraint( NotNullDef.class )
+    .property( "licensePlate", FIELD )
+        .constraint( NotNullDef.class )
+        .constraint( SizeDef.class )
+            .min( 2 )
+            .max( 14 )
+    .property( "seatCount", FIELD )
+        .constraint( MinDef.class )
+            .value ( 2 )
+.type( RentalCar.class )
+    .property( "rentalStation", METHOD)
+        .constraint( NotNullDef.class );      </pre></div></div><p><br class="example-break"/></p><p>As you can see you can configure constraints on multiple classes and
+  properties using method chaining. The constraint definition classes
+  <code class="classname">NotNullDef</code>, <code class="classname">SizeDef</code> and
+  <code class="classname">MinDef</code> are helper classes which allow to configure
+  constraint parameters in a type-safe fashion. Definition classes exists for
+  all built-in constraints in the
+  <code class="classname">org.hibernate.validator.cfg.defs</code> package. For a
+  custom constraint you can either create your own definition class extending
+  <code class="classname">ConstraintDef</code> or you can use
+  <code class="classname">GenericConstraintDef</code> as seen in <a class="xref" href="programmaticapi.html#example-generic-constraint-mapping" title="Example 7.2. Programmatic constraint definition using GenericConstraintDef">Example 7.2, “Programmatic constraint definition using
+      GenericConstraintDef”</a>.</p><div class="example"><a id="example-generic-constraint-mapping"/><p class="title"><b>Example 7.2. Programmatic constraint definition using
+      <code class="classname">GenericConstraintDef</code></b></p><div class="example-contents"><pre class="programlisting">ConstraintMapping mapping = new ConstraintMapping();
+mapping.type( Car.class )
+    .property( "licensePlate", FIELD )
+        .constraint( GenericConstraintDef.class )
+            .constraintType( CheckCase.class )
+            .param( "value", CaseMode.UPPER );   </pre></div></div><p><br class="example-break"/></p><p>Last but not least, you can also define cascading constraints as well
+  as the default group sequence of an entity.</p><div class="example"><a id="d0e2684"/><p class="title"><b>Example 7.3. Cascading constraints and group redefinition</b></p><div class="example-contents"><pre class="programlisting">ConstraintMapping mapping = new ConstraintMapping();
+mapping.type( Car.class )
+    .valid( "driver", FIELD )
+.type( RentalCar.class)
+    .defaultGroupSequence( RentalCar.class, CarChecks.class ); </pre></div></div><p><br class="example-break"/></p><p>Once you have your <code class="classname">ConstraintMapping</code> you will
+  have to pass it to the configuration. Since the programmatic configuration
+  is not part of the official Bean Validation specification you will have to
+  get hold of the Hibernate Validator specific configuration instance. See
+  <a class="xref" href="programmaticapi.html#example-hibernate-specific-config" title="Example 7.4. Creating a Hibernate Validator specific configuration">Example 7.4, “Creating a Hibernate Validator specific configuration”</a>.</p><div class="example"><a id="example-hibernate-specific-config"/><p class="title"><b>Example 7.4. Creating a Hibernate Validator specific configuration</b></p><div class="example-contents"><pre class="programlisting">ConstraintMapping mapping = new ConstraintMapping();
+// configure mapping instance
+
+HibernateValidatorConfiguration config = Validation.byProvider( HibernateValidator.class ).configure();
+config.addMapping( mapping );
+ValidatorFactory factory = config.buildValidatorFactory();
+Validator validator = factory.getValidator();</pre></div></div><p><br class="example-break"/></p></div><HR xmlns=""/><a xmlns="" href=""><p xmlns="http://www.w3.org/1999/xhtml" class="copyright">Copyright © 2009, 2010 Red Hat, Inc. &amp; Gunnar Morling</p></a><ul class="docnav"><li class="previous"><a accesskey="p" href="validator-checkconstraints.html"><strong>Prev</strong>Chapter 6. Integration with other frameworks</a></li><li class="up"><a accesskey="u" href="#"><strong>Top of page</strong></a></li><li class="home"><a accesskey="h" href="index.html"><strong>Front page</strong></a></li><li class="next"><a accesskey="n" href="ch08.html"><strong>Next</strong>Chapter 8. Annotation Processor (EXPERIMENTAL)</a></li></ul></body></html>

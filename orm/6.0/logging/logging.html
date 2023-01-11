@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.10">
+<title>Hibernate logging</title>
+<link rel="stylesheet" href="./css/hibernate.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body class="article">
+<div id="header">
+<h1>Hibernate logging</h1>
+<div class="details">
+<span id="revnumber">version 6.0.0.CR1</span>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="_sub_system_logging">Sub-system logging</h2>
+<div class="sectionbody">
+<div id="envers_boot" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.envers.boot</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>EnversBootLogger</code></p>
+</li>
+<li>
+<p>Description = Logging related to bootstrapping an Envers (currently just its in-flight generation of <code>hbm.xml</code> mappings for Hibernate ORM to process)</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="beans" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.beans</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>BeansMessageLogger</code></p>
+</li>
+<li>
+<p>Description = Logging related to Hibernate&#8217;s support for managed beans (CDI, etc)</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="boot" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.boot</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>BootLogging</code></p>
+</li>
+<li>
+<p>Description = Logging related to bootstrapping of a SessionFactory / EntityManagerFactory</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="boot_jaxb" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.boot.jaxb</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>JaxbLogger</code></p>
+</li>
+<li>
+<p>Description = Logging related to JAXB processing</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="boot_query" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.boot.query</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>BootQueryLogging</code></p>
+</li>
+<li>
+<p>Description = Logging related to processing of named-queries</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="cache" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.cache</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>SecondLevelCacheLogger</code></p>
+</li>
+<li>
+<p>Description = Logging related to Hibernate second-level caching</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="connections_access" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.connections.access</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>ConnectionAccessLogger</code></p>
+</li>
+<li>
+<p>Description = Used to log details around use of <code>JdbcConnectionAccess</code></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="connections_pooling" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.connections.pooling</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>ConnectionPoolingLogger</code></p>
+</li>
+<li>
+<p>Description = Logging related to connection pooling</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="connections_pooling_c3p0" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.connections.pooling.c3p0</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>C3P0MessageLogger</code></p>
+</li>
+<li>
+<p>Description = Logging related to the C3P0 connection pool</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="connections_pooling_proxool" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.connections.pooling.proxool</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>ProxoolMessageLogger</code></p>
+</li>
+<li>
+<p>Description = Logs details related to Proxool connection pooling</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="deprecation" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.deprecation</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>DeprecationLogger</code></p>
+</li>
+<li>
+<p>Description = Logging related to uses of deprecated features</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="graph_parsing" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.graph.parsing</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>GraphParserLogging</code></p>
+</li>
+<li>
+<p>Description = Logging related to Hibernate&#8217;s <code>GraphParser</code> for parsing entity-graphs from String representations</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="idgen_factory" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.idgen.factory</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>IdGenFactoryLogging</code></p>
+</li>
+<li>
+<p>Description = Logging related to creation of IdentifierGenerator instances</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="jdbc" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.jdbc</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>JdbcLogging</code></p>
+</li>
+<li>
+<p>Description = Logging related to JDBC interactions</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="jdbc_batch" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.jdbc.batch</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>JdbcBatchLogging</code></p>
+</li>
+<li>
+<p>Description = Logging related to JDBC batch execution</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="jdbc_bind" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.jdbc.bind</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>JdbcBindingLogging</code></p>
+</li>
+<li>
+<p>Description = Logging of JDBC parameter value binding</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="jdbc_extract" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.jdbc.extract</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>JdbcExtractingLogging</code></p>
+</li>
+<li>
+<p>Description = Logging of JDBC value extraction</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="jdbc_mutation" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.jdbc.mutation</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>ModelMutationLogging</code></p>
+</li>
+<li>
+<p>Description = Logging related to entity and collection mutations stemming from persistence-context events</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="loader" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.loader</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>LoaderLogging</code></p>
+</li>
+<li>
+<p>Description = Logging related to loaders of domain model references (<code>org.hibernate.loader.ast.spi.Loader</code>); see also <code>org.hibernate.orm.results</code></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="mapping_natural_id" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.mapping.natural_id</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>NaturalIdLogging</code></p>
+</li>
+<li>
+<p>Description = Logging related to handling of natural-id mappings</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="model_mapping_creation" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.model.mapping.creation</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>MappingModelCreationLogger</code></p>
+</li>
+<li>
+<p>Description = Logging related to building of Hibernate&#8217;s runtime metamodel descriptors of the domain model</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="query" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.query</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>QueryLogging</code></p>
+</li>
+<li>
+<p>Description = Logging related to Query processing</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="query_hql" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.query.hql</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>HqlLogging</code></p>
+</li>
+<li>
+<p>Description = Logging related to HQL parsing</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="results" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.results</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>ResultsLogger</code></p>
+</li>
+<li>
+<p>Description = Logging related to <code>DomainResult</code> graphs which build individual parts of the domain model from JDBC or from cache</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="results_graph_AST" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.results.graph.AST</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>Logging</code></p>
+</li>
+<li>
+<p>Description = Logging of <code>DomainResult</code> graphs</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="results_loading" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.results.loading</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>LoadingLogger</code></p>
+</li>
+<li>
+<p>Description = Logging related to building parts of the domain model from JDBC or from cache</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="results_loading_collection" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.results.loading.collection</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>CollectionLoadingLogger</code></p>
+</li>
+<li>
+<p>Description = Logging related to collection loading</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="results_loading_embeddable" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.results.loading.embeddable</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>EntityLoadingLogging</code></p>
+</li>
+<li>
+<p>Description = Logging related to entity loading</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="sql_ast_create" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.sql.ast.create</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>SqlTreeCreationLogger</code></p>
+</li>
+<li>
+<p>Description = Logging related to the creation of SQL AST trees</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="sql_ast_tree" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.sql.ast.tree</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>SqlAstTreeLogger</code></p>
+</li>
+<li>
+<p>Description = Logging related to the processing of SQL AST trees</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="sql_exec" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.sql.exec</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>SqlExecLogger</code></p>
+</li>
+<li>
+<p>Description = Logging related to the execution of SQL statements</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="url" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.url</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>UrlMessageBundle</code></p>
+</li>
+<li>
+<p>Description = Logging related to URL handling</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="ormbytecode" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.ormbytecode</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>BytecodeLogging</code></p>
+</li>
+<li>
+<p>Description = Logging related to bytecode handling</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="ormbytecode_interceptor" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.ormbytecode.interceptor</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>BytecodeInterceptorLogging</code></p>
+</li>
+<li>
+<p>Description = Logging related to bytecode-based interception</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="spatial" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.spatial</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>HSMessageLogger</code></p>
+</li>
+<li>
+<p>Description = Base logging for Hibernate Spatial</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 6.0.0.CR1<br>
+Last updated 2022-12-22 23:14:50 UTC
+</div>
+</div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/run_prettify.min.js"></script>
+</body>
+</html>

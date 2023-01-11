@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.16">
-<title>Hibernate Search 6.0.8.Final: Migration Guide from 5.11</title>
+<title>Hibernate Search 6.0.10.Final: Migration Guide from 5.11</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -558,9 +558,9 @@ table.CodeRay td.code{padding:0 0 0 .75em}
 </head>
 <body class="book toc2 toc-left">
 <div id="header">
-<h1>Hibernate Search 6.0.8.Final: Migration Guide from 5.11</h1>
+<h1>Hibernate Search 6.0.10.Final: Migration Guide from 5.11</h1>
 <div class="details">
-<span id="revdate">2022-01-05</span>
+<span id="revdate">2022-08-23</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -975,7 +975,7 @@ of Hibernate Search.</p>
 <pre class="CodeRay highlight"><code data-lang="XML"><span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-v5migrationhelper-orm<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>6.0.8.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>6.0.10.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -1106,6 +1106,9 @@ refer to the section below.</p>
 <li>
 <p><code>org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings</code></p>
 </li>
+<li>
+<p><code>org.hibernate.search.backend.elasticsearch.aws.cfg.ElasticsearchAwsBackendSettings</code></p>
+</li>
 </ul>
 </div>
 </div>
@@ -1160,6 +1163,37 @@ and hold documents in memory until the transaction commit.</p>
 </div>
 <div class="paragraph">
 <p>See also <a href="https://docs.jboss.org/hibernate/search/6.0/reference/en-US/html_single/#mapper-orm-indexing-manual">this section of the documentation</a>.</p>
+</div>
+</dd>
+<dt class="hdlist1"><code>hibernate.search.default.elasticsearch.aws.*</code></dt>
+<dd>
+<p>The syntax for configuring AWS authentication changed slightly in Hibernate Search 6.</p>
+<div class="paragraph">
+<p>In short, the following configuration in Hibernate Search 5:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code>hibernate.search.default.elasticsearch.aws.signing.enabled = true
+hibernate.search.default.elasticsearch.aws.region = us-east-1
+hibernate.search.default.elasticsearch.aws.access_key = AKIDEXAMPLE
+hibernate.search.default.elasticsearch.aws.secret_key = wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Will look like this in Hibernate Search 6:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code>hibernate.search.backend.aws.signing.enabled = true
+hibernate.search.backend.aws.region = us-east-1
+hibernate.search.backend.aws.credentials.type = static
+hibernate.search.backend.aws.credentials.access_key_id = AKIDEXAMPLE
+hibernate.search.backend.aws.credentials.secret_access_key = wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Other types of credentials are available in Hibernate Search 6,
+see <a href="https://docs.jboss.org/hibernate/search/6.0/reference/en-US/html_single/#backend-elasticsearch-configuration-aws">this section of the documentation</a></p>
 </div>
 </dd>
 <dt class="hdlist1"><code>hibernate.search.default.elasticsearch.connection_timeout</code></dt>
@@ -3521,7 +3555,10 @@ you can simply call <code>searchSession.toEntityManager()</code>/<code>searchSes
 <p><code>fullTextSession.purge(entity)</code> is equivalent to <code>searchSession.indexingPlan().delete(entity)</code>;</p>
 </li>
 <li>
-<p><code>fullTextSession.purge(entityType, id)</code> is equivalent to <code>searchSession.indexingPlan().purge(entityType, id)</code>;</p>
+<p><code>fullTextSession.purge(entityType, id)</code> is equivalent to <code>searchSession.indexingPlan().purge(entityType, id, null)</code>
+(if you don&#8217;t use <a href="#sharding">sharding</a>)
+or <code>searchSession.indexingPlan().purge(entityType, id, routingKey)</code>
+(if you do use <a href="#sharding">sharding</a>).</p>
 </li>
 </ul>
 </div>
@@ -3541,7 +3578,7 @@ In Hibernate Search 6, <code>addOrUpdate</code> will also trigger reindexing of 
 (through <code>@IndexedEmbedded</code> for example).</p>
 </li>
 <li>
-<p>In Hibernate Search 5, passing <code>null</code> to <code>purge</code> used to trigger removal of all entities from the index.
+<p>In Hibernate Search 5, passing a <code>null</code> identifier to <code>purge</code> used to trigger removal of all entities from the index.
 In Hibernate Search 6, passing <code>null</code> to <code>delete</code>/<code>purge</code> will result in an exception being thrown.
 To remove all entities from the index, see <a href="#fulltextsession-purgeall"><code>FullTextSession.purgeAll(&#8230;&#8203;)</code></a>.</p>
 </li>
@@ -3796,7 +3833,7 @@ and instructions to migrate from the Hibernate Search 5 Query DSL in <a href="#q
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="JAVA">MySearchParameters params = ...;
+<pre class="CodeRay highlight"><code data-lang="JAVA">MySearchParameters searchParameters = ...;
 FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager( em );
 QueryBuilder qb = fullTextEntityManager.getSearchFactory()
         .buildQueryBuilder().forEntity( <span class="predefined-type">Book</span>.class ).get();
@@ -3810,13 +3847,17 @@ junction.must(qb.all().createQuery());
             .matching( searchParameters.getSearchTerms() )
             .createQuery() );
 }
-<span class="keyword">if</span> ( searchParameters.getGenre() != <span class="predefined-constant">null</span> ) {
-    junction.must( qb.keyword().onField( <span class="string"><span class="delimiter">&quot;</span><span class="content">genre</span><span class="delimiter">&quot;</span></span> )
-            .matching( searchParameters.getGenre() ) );
-}
 <span class="keyword">if</span> ( searchParameters.getMaxBookLength() != <span class="predefined-constant">null</span> ) {
     junction.must( qb.range().onField( <span class="string"><span class="delimiter">&quot;</span><span class="content">pageCount</span><span class="delimiter">&quot;</span></span> )
             .below( searchParameters.getMaxBookLength() ) );
+}
+<span class="keyword">if</span> ( !searchParameters.getGenres().isEmpty() ) {
+    BooleanJunction junction2 = qb.bool();
+    <span class="keyword">for</span> ( Genre genre : searchParameters.getGenres() ) {
+        junction2.should( qb.keyword().onField( <span class="string"><span class="delimiter">&quot;</span><span class="content">genre</span><span class="delimiter">&quot;</span></span> )
+                .matching( genre ) );
+    }
+    junction.must( junction2.createQuery() );
 }
 
 org.apache.lucene.search.Query luceneQuery = junction.createQuery();
@@ -3833,7 +3874,7 @@ fullTextQuery.setMaxResults( params.getPageSize() );
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="JAVA">MySearchParameters params = ...;
+<pre class="CodeRay highlight"><code data-lang="JAVA">MySearchParameters searchParameters = ...;
 SearchSession session = Search.session( entityManager );
 <span class="predefined-type">List</span>&lt;<span class="predefined-type">Book</span>&gt; hits = searchSession.search( <span class="predefined-type">Book</span>.class )
         .where( f -&gt; f.bool( b -&gt; {
@@ -3843,16 +3884,21 @@ SearchSession session = Search.session( entityManager );
                         .matching( searchParameters.getSearchTerms() )
                         .defaultOperator( BooleanOperator.AND ) );
             }
-            <span class="keyword">if</span> ( searchParameters.getGenre() != <span class="predefined-constant">null</span> ) {
-                b.must( f.match().field( <span class="string"><span class="delimiter">&quot;</span><span class="content">genre</span><span class="delimiter">&quot;</span></span> )
-                        .matching( searchParameters.getGenre() ) );
-            }
             <span class="keyword">if</span> ( searchParameters.getMaxBookLength() != <span class="predefined-constant">null</span> ) {
                 b.must( f.range().field( <span class="string"><span class="delimiter">&quot;</span><span class="content">pageCount</span><span class="delimiter">&quot;</span></span> )
                         .atMost( searchParameters.getMaxBookLength() ) );
             }
+            <span class="keyword">if</span> ( !searchParameters.getGenres().isEmpty() ) {
+                b.must( f.bool( b2 -&gt; {
+                    <span class="keyword">for</span> ( Genre genre : searchParameters.getGenres() ) {
+                        b2.should( f.match().field( <span class="string"><span class="delimiter">&quot;</span><span class="content">genre</span><span class="delimiter">&quot;</span></span> )
+                                .matching( genre ) );
+                    }
+                } ) );
+            }
         } ) )
-        .fetchHits( params.getPageIndex() * params.getPageSize(), params.getPageSize() );</code></pre>
+        .fetchHits( searchParameters.getPageIndex() * searchParameters.getPageSize(),
+                searchParameters.getPageSize() );</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -3860,7 +3906,7 @@ SearchSession session = Search.session( entityManager );
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="JAVA">MySearchParameters params = ...;
+<pre class="CodeRay highlight"><code data-lang="JAVA">MySearchParameters searchParameters = ...;
 SearchSession session = Search.session( entityManager );
 SearchPredicateFactory pf = session.scope( <span class="predefined-type">Book</span>.class ).predicate();
 <span class="predefined-type">List</span>&lt;SearchPredicate&gt; predicates = <span class="keyword">new</span> <span class="predefined-type">ArrayList</span>&lt;&gt;();
@@ -3871,25 +3917,32 @@ SearchPredicateFactory pf = session.scope( <span class="predefined-type">Book</s
             .defaultOperator( BooleanOperator.AND )
             .toPredicate() );
 }
-<span class="keyword">if</span> ( searchParameters.getGenre() != <span class="predefined-constant">null</span> ) {
-    predicates.add( pf.match().field( <span class="string"><span class="delimiter">&quot;</span><span class="content">genre</span><span class="delimiter">&quot;</span></span> )
-            .matching( searchParameters.getGenre() )
-            .toPredicate() );
-}
 <span class="keyword">if</span> ( searchParameters.getMaxBookLength() != <span class="predefined-constant">null</span> ) {
     predicates.add( pf.range().field( <span class="string"><span class="delimiter">&quot;</span><span class="content">pageCount</span><span class="delimiter">&quot;</span></span> )
             .atMost( searchParameters.getMaxBookLength() )
             .toPredicate() );
 }
+<span class="keyword">if</span> ( !searchParameters.getGenres().isEmpty() ) {
+    predicates.add( f.bool( b -&gt; {
+        <span class="keyword">for</span> ( Genre genre : searchParameters.getGenres() ) {
+            b.should( f.match().field( <span class="string"><span class="delimiter">&quot;</span><span class="content">genre</span><span class="delimiter">&quot;</span></span> )
+                    .matching( genre ) );
+        }
+    } )
+            .toPredicate() );
+}
+
+SearchPredicate topLevelPredicate = pf.bool( b -&gt; {
+    b.must( f.matchAll() );
+    <span class="keyword">for</span> ( SearchPredicate predicate : predicates ) {
+        b.must( predicate );
+    }
+} );
 
 <span class="predefined-type">List</span>&lt;<span class="predefined-type">Book</span>&gt; hits = searchSession.search( <span class="predefined-type">Book</span>.class )
-        .where( f -&gt; f.bool( b -&gt; {
-            b.must( f.matchAll() );
-            <span class="keyword">for</span> ( SearchPredicate predicate : predicates ) {
-                b.must( predicate );
-            }
-        } )
-        .fetchHits( params.getPageIndex() * params.getPageSize(), params.getPageSize() );</code></pre>
+        .where( topLevelPredicate )
+        .fetchHits( searchParameters.getPageIndex() * searchParameters.getPageSize(),
+                searchParameters.getPageSize() );</code></pre>
 </div>
 </div>
 </div>
@@ -5780,7 +5833,7 @@ In Hibernate Search 5, they are at the <code>TRACE</code> level.</p>
 <div class="sect2">
 <h3 id="default-similarity"><a class="anchor" href="#default-similarity"></a>The default similarity for Lucene is now BM25</h3>
 <div class="paragraph">
-<p>The default similarity for the Lucene is now <code>BM25Similarity</code>, instead of <code>ClassicSimilarity</code> in Hibernate Search 5.</p>
+<p>The default similarity for the Lucene backend is now <code>BM25Similarity</code>, instead of <code>ClassicSimilarity</code> in Hibernate Search 5.</p>
 </div>
 <div class="paragraph">
 <p>If necessary, you can force the <code>ClassicSimilarity</code>
@@ -5792,7 +5845,7 @@ through an <a href="#analysis-definition-provider">analysis definition provider<
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-01-05 08:15:51 UTC
+Last updated 2022-08-23 13:21:23 UTC
 </div>
 </div>
 <!-- Google Analytics -->
