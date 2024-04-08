@@ -84,13 +84,16 @@ HibernateDoc.OutdatedContent = (function() {
 					pageHash = jQuery_3_1('div.titlepage h2.title a').attr('id');
 					stableUrl = json.multi.target.replace('${version}', json.stable);
 				}
-			} else if (matchSingle && matchSingle.length == 3) {
+			} else if (matchSingle && matchSingle.length > 2) {
 				var currentVersion = matchSingle[1];
 				if (currentVersion == json.stable || _isNewerThan(currentVersion, json.stable) || currentVersion == 'stable' || currentVersion == 'current') {
 					return;
 				}
-
-				stableUrl = json.single.target.replace('${version}', json.stable).replace('${page}', '');
+				if (json.single.useCurrentUrl) {
+					stableUrl = currentUrl.replace(currentVersion, json.stable);
+				} else {
+					stableUrl = json.single.target.replace('${version}', json.stable).replace('${page}', '');
+				}
 			} else {
 				return;
 			}
