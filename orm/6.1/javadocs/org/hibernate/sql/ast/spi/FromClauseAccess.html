@@ -26,7 +26,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":6,"i1":18,"i2":50,"i3":18,"i4":6,"i5":18};
+var data = {"i0":6,"i1":18,"i2":18,"i3":50,"i4":18,"i5":6,"i6":18};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"],16:["t5","Default Methods"],32:["t6","Deprecated Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -164,26 +164,34 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>default <a href="../tree/from/TableGroup.html" title="interface in org.hibernate.sql.ast.tree.from">TableGroup</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#findTableGroupForGetOrCreate(org.hibernate.spi.NavigablePath)">findTableGroupForGetOrCreate</a></span>&#8203;(<a href="../../../spi/NavigablePath.html" title="class in org.hibernate.spi">NavigablePath</a>&nbsp;navigablePath)</code></th>
+<td class="colLast">
+<div class="block">Find the TableGroup by the NavigablePath for the purpose of creating a
+ new TableGroup if none can be found.</div>
+</td>
+</tr>
+<tr id="i2" class="altColor">
+<td class="colFirst"><code>default <a href="../tree/from/TableGroup.html" title="interface in org.hibernate.sql.ast.tree.from">TableGroup</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#findTableGroupOnCurrentFromClause(org.hibernate.spi.NavigablePath)">findTableGroupOnCurrentFromClause</a></span>&#8203;(<a href="../../../spi/NavigablePath.html" title="class in org.hibernate.spi">NavigablePath</a>&nbsp;p)</code></th>
 <td class="colLast">
 <div class="block">Find a TableGroup in this from clause without consulting parents by the NavigablePath it is registered under.</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>default <a href="../tree/from/TableGroup.html" title="interface in org.hibernate.sql.ast.tree.from">TableGroup</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#findTableGroupOnParents(org.hibernate.spi.NavigablePath)">findTableGroupOnParents</a></span>&#8203;(<a href="../../../spi/NavigablePath.html" title="class in org.hibernate.spi">NavigablePath</a>&nbsp;p)</code></th>
 <td class="colLast">
 <div class="block"><span class="deprecatedLabel">Deprecated.</span></div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>default <a href="../tree/from/TableGroup.html" title="interface in org.hibernate.sql.ast.tree.from">TableGroup</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getTableGroup(org.hibernate.spi.NavigablePath)">getTableGroup</a></span>&#8203;(<a href="../../../spi/NavigablePath.html" title="class in org.hibernate.spi">NavigablePath</a>&nbsp;navigablePath)</code></th>
 <td class="colLast">
 <div class="block">Get a  TableGroup by the NavigablePath it is registered under.</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#registerTableGroup(org.hibernate.spi.NavigablePath,org.hibernate.sql.ast.tree.from.TableGroup)">registerTableGroup</a></span>&#8203;(<a href="../../../spi/NavigablePath.html" title="class in org.hibernate.spi">NavigablePath</a>&nbsp;navigablePath,
                   <a href="../tree/from/TableGroup.html" title="interface in org.hibernate.sql.ast.tree.from">TableGroup</a>&nbsp;tableGroup)</code></th>
@@ -191,7 +199,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <div class="block">Register a TableGroup under the given `navigablePath`.</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>default <a href="../tree/from/TableGroup.html" title="interface in org.hibernate.sql.ast.tree.from">TableGroup</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#resolveTableGroup(org.hibernate.spi.NavigablePath,java.util.function.Function)">resolveTableGroup</a></span>&#8203;(<a href="../../../spi/NavigablePath.html" title="class in org.hibernate.spi">NavigablePath</a>&nbsp;navigablePath,
                  <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/function/Function.html?is-external=true" title="class or interface in java.util.function" class="externalLink">Function</a>&lt;<a href="../../../spi/NavigablePath.html" title="class in org.hibernate.spi">NavigablePath</a>,&#8203;<a href="../tree/from/TableGroup.html" title="interface in org.hibernate.sql.ast.tree.from">TableGroup</a>&gt;&nbsp;creator)</code></th>
@@ -248,6 +256,18 @@ default&nbsp;<a href="../tree/from/TableGroup.html" title="interface in org.hibe
 <div class="block">Find a TableGroup by the NavigablePath it is registered under,
  and if not found on the current from clause level, ask the parent.  Returns
  <code>null</code> if no TableGroup is registered under that NavigablePath</div>
+</li>
+</ul>
+<a id="findTableGroupForGetOrCreate(org.hibernate.spi.NavigablePath)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>findTableGroupForGetOrCreate</h4>
+<pre class="methodSignature">default&nbsp;<a href="../tree/from/TableGroup.html" title="interface in org.hibernate.sql.ast.tree.from">TableGroup</a>&nbsp;findTableGroupForGetOrCreate&#8203;(<a href="../../../spi/NavigablePath.html" title="class in org.hibernate.spi">NavigablePath</a>&nbsp;navigablePath)</pre>
+<div class="block">Find the TableGroup by the NavigablePath for the purpose of creating a
+ new TableGroup if none can be found. Returns <code>null</code> if no TableGroup
+ or parent table group is registered under that NavigablePath</div>
 </li>
 </ul>
 <a id="getTableGroup(org.hibernate.spi.NavigablePath)">
@@ -364,7 +384,7 @@ default&nbsp;<a href="../tree/from/TableGroup.html" title="interface in org.hibe
 </a></div>
 <!-- ======== END OF BOTTOM NAVBAR ======= -->
 </nav>
-<p class="legalCopy"><small>Copyright &copy; 2001-2022 <a href="https://redhat.com">Red Hat, Inc.</a>  All Rights Reserved.</small></p>
+<p class="legalCopy"><small>Copyright &copy; 2001-2023 <a href="https://redhat.com">Red Hat, Inc.</a>  All Rights Reserved.</small></p>
 </footer>
 </body>
 </html>

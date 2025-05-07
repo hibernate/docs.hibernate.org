@@ -2,19 +2,20 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.6.1">
+<meta name="generator" content="Asciidoctor 2.0.10">
 <meta name="author" content="Steve Ebersole, Vlad Mihalcea">
 <title>Hibernate ORM 5.3 Integration Guide</title>
 <link rel="stylesheet" href="./css/hibernate.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body class="article">
 <div id="header">
 <h1>Hibernate ORM 5.3 Integration Guide</h1>
 <div class="details">
 <span id="author" class="author">Steve Ebersole, Vlad Mihalcea</span><br>
+<span id="revnumber">version 5.3.37.Final</span>
 </div>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
@@ -282,7 +283,7 @@ The builder gives type safe access to customizing these three <code>Services</co
 <p>The services of the <code>BootstrapServiceRegistry</code> cannot be extended (added to) nor overridden (replaced).</p>
 </div>
 <div class="sect4">
-<h5 id="_code_classloaderservice_code"><code>ClassLoaderService</code></h5>
+<h5 id="_classloaderservice"><code>ClassLoaderService</code></h5>
 <div class="paragraph">
 <p>The <code>Service</code> role for this <code>Service</code> is <code>org.hibernate.boot.registry.classloading.spi.ClassLoaderService</code>.
 This <code>Service</code> defines Hibernate&#8217;s ability to interact with <code>ClassLoaders</code>.
@@ -309,7 +310,7 @@ And just as important, it does so in a centralized, swappable manner.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_code_integratorservice_code"><code>IntegratorService</code></h5>
+<h5 id="_integratorservice"><code>IntegratorService</code></h5>
 <div class="paragraph">
 <p>The <code>Service</code> role for this <code>Service</code> is <code>org.hibernate.integrator.spi.IntegratorService.</code>
 Applications, third-party integrators and others all need to integrate with Hibernate. Historically this used to require something (usually the application) to coordinate registering the pieces of each integration needed on behalf of each integration. The <code>org.hibernate.integrator.spi.Integrator</code> contract formalized this "integration SPI". The IntegratorService manages all known integrators.</p>
@@ -345,7 +346,7 @@ Applications, third-party integrators and others all need to integrate with Hibe
 </div>
 </div>
 <div class="sect4">
-<h5 id="_code_strategyselector_code"><code>StrategySelector</code></h5>
+<h5 id="_strategyselector"><code>StrategySelector</code></h5>
 <div class="paragraph">
 <p>The <code>Service</code> role for this <code>Service</code> is <code>org.hibernate.boot.registry.selector.spi.StrategySelector</code>.
 Think of this as the <em>short naming</em> service.
@@ -390,7 +391,7 @@ For the full list of <code>Services</code> typically held in the <code>StandardS
 <p>The services of the StandardServiceRegistry can be extended (added to) and overridden (replaced).</p>
 </div>
 <div class="sect4">
-<h5 id="_code_connectionprovider_multitenantconnectionprovider_code"><code>ConnectionProvider/MultiTenantConnectionProvider</code></h5>
+<h5 id="_connectionprovidermultitenantconnectionprovider"><code>ConnectionProvider/MultiTenantConnectionProvider</code></h5>
 <div class="paragraph">
 <p>The <code>Service</code> providing Hibernate with <code>Connections</code> as needed.
 Comes in two distinct (and mutually exclusive) roles:</p>
@@ -409,39 +410,39 @@ Comes in two distinct (and mutually exclusive) roles:</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_code_jdbcservices_code"><code>JdbcServices</code></h5>
+<h5 id="_jdbcservices"><code>JdbcServices</code></h5>
 <div class="paragraph">
 <p><code>org.hibernate.engine.jdbc.spi.JdbcServices</code> is an aggregator <code>Service</code> (a <code>Service</code> that aggregates other Services) exposing unified functionality around JDBC accessibility.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_code_transactioncoordinatorbuilder_code"><code>TransactionCoordinatorBuilder</code></h5>
+<h5 id="_transactioncoordinatorbuilder"><code>TransactionCoordinatorBuilder</code></h5>
 <div class="paragraph">
 <p><code>org.hibernate.resource.transaction.spi.TransactionCoordinatorBuilder</code> is used by Hibernate to integrate with and underlying transaction system.
 It is responsible for building <code>org.hibernate.resource.transaction.spi.TransactionCoordinator</code> instances for use by each Hibernate <code>Session</code>.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_code_jtaplatform_code"><code>JtaPlatform</code></h5>
+<h5 id="_jtaplatform"><code>JtaPlatform</code></h5>
 <div class="paragraph">
 <p>When using a JTA-based <code>TransactionCoordinatorBuilder</code>, the <code>org.hibernate.engine.transaction.jta.platform.spi.JtaPlatform</code> <code>Service</code> provides Hibernate access to the JTA <code>TransactionManager</code> and <code>UserTransaction</code>, as well handling <code>Synchronization</code> registration.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_code_jndiservice_code"><code>JndiService</code></h5>
+<h5 id="_jndiservice"><code>JndiService</code></h5>
 <div class="paragraph">
 <p>The <code>org.hibernate.engine.jndi.spi.JndiService</code> <code>Service</code> is used by Hibernate to interact with JNDI contexts.
 Hibernate&#8217;s default <code>JndiService</code> assumes just a single <code>InitialContext</code>.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_code_regionfactory_code"><code>RegionFactory</code></h5>
+<h5 id="_regionfactory"><code>RegionFactory</code></h5>
 <div class="paragraph">
 <p>The <code>org.hibernate.cache.spi.RegionFactory</code> <code>Service</code> defines the integration with third party cache implementors as second-level caching providers.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_code_sessionfactoryserviceregistryfactory_code"><code>SessionFactoryServiceRegistryFactory</code></h5>
+<h5 id="_sessionfactoryserviceregistryfactory"><code>SessionFactoryServiceRegistryFactory</code></h5>
 <div class="paragraph">
 <p><code>org.hibernate.service.spi.SessionFactoryServiceRegistryFactory</code> is a <code>Service</code> that acts as a factory for building the third type of <code>ServiceRegistry</code> (the SessionFactoryServiceRegistry) which we will discuss next.
 I opted for the <em>factory as service</em> approach because in the current design there is really not a good exposed hook-in spot for when the <code>SessionFactoryServiceRegistry</code> needs to be built.</p>
@@ -475,7 +476,7 @@ I opted for the <em>factory as service</em> approach because in the current desi
 <p>Currently <code>SessionFactoryServiceRegistry</code> holds just four Services.</p>
 </div>
 <div class="sect4">
-<h5 id="_code_eventlistenerregistry_code"><code>EventListenerRegistry</code></h5>
+<h5 id="_eventlistenerregistry"><code>EventListenerRegistry</code></h5>
 <div class="paragraph">
 <p><code>org.hibernate.event.service.spi.EventListenerRegistry</code> is the main <code>Service</code> managed in the <code>SessionFactoryServiceRegistry</code>.
 The is the <code>Service</code> that manages all of Hibernate&#8217;s event listeners.
@@ -497,20 +498,20 @@ The basic idea is to tell Hibernate:</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_code_statisticsimplementor_code"><code>StatisticsImplementor</code></h5>
+<h5 id="_statisticsimplementor"><code>StatisticsImplementor</code></h5>
 <div class="paragraph">
 <p><code>org.hibernate.stat.spi.StatisticsImplementor</code> is the SPI portion of the Statistics API; the collector portion, if you will.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_code_nativequeryinterpreter_code"><code>NativeQueryInterpreter</code></h5>
+<h5 id="_nativequeryinterpreter"><code>NativeQueryInterpreter</code></h5>
 <div class="paragraph">
 <p><code>org.hibernate.engine.query.spi.NativeQueryInterpreter</code> is the <code>Service</code> Hibernate uses for interpreting native queries.
 Exists as a <code>Service</code> mainly so that integrations such as OGM can override it.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_code_cacheimplementor_code"><code>CacheImplementor</code></h5>
+<h5 id="_cacheimplementor"><code>CacheImplementor</code></h5>
 <div class="paragraph">
 <p><code>org.hibernate.engine.spi.CacheImplementor</code> provides a way to customize the way Hibernate interacts with the second-level caching implementation.</p>
 </div>
@@ -548,7 +549,7 @@ For the sake of illustration, lets say that we have developed a new <code>Connec
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">import java.lang.Override;
+<pre class="prettyprint highlight"><code data-lang="JAVA">import java.lang.Override;
 
 public class LatestAndGreatestConnectionProviderImpl
     implements ConnectionProvider, Startable, Stoppable, Configurable {
@@ -623,7 +624,7 @@ As you might guess, there are multiple ways.</p>
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">StandardServiceRegistryBuilder builder = ...;
+<pre class="prettyprint highlight"><code data-lang="JAVA">StandardServiceRegistryBuilder builder = ...;
 ...
 builder.addService(
     ConnectionProvider.class,
@@ -642,7 +643,7 @@ builder.addService(
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">public class LatestAndGreatestConnectionProviderImplContributor1
+<pre class="prettyprint highlight"><code data-lang="JAVA">public class LatestAndGreatestConnectionProviderImplContributor1
         implements ServiceContributor {
 
     @Override
@@ -669,7 +670,7 @@ This file will have just a single line naming our impl.</p>
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">fully.qualified.package.LatestAndGreatestConnectionProviderImplContributor1</code></pre>
+<pre class="prettyprint highlight"><code data-lang="JAVA">fully.qualified.package.LatestAndGreatestConnectionProviderImplContributor1</code></pre>
 </div>
 </div>
 </div>
@@ -682,7 +683,7 @@ This file will have just a single line naming our impl.</p>
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">public class LatestAndGreatestConnectionProviderImplContributor
+<pre class="prettyprint highlight"><code data-lang="JAVA">public class LatestAndGreatestConnectionProviderImplContributor
     implements ServiceContributor {
 
     @Override
@@ -713,7 +714,7 @@ This file will have just a single line naming our impl.</p>
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">StandardServiceRegistryBuilder builder = ...;
+<pre class="prettyprint highlight"><code data-lang="JAVA">StandardServiceRegistryBuilder builder = ...;
 ...
 builder.applySetting( "hibernate.connection.provider_class", "lag" );
 ...</code></pre>
@@ -734,7 +735,7 @@ So, we will expand the <code>ServiceRegistry</code> to host this completely new 
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">public interface EventPublishingService extends Service {
+<pre class="prettyprint highlight"><code data-lang="JAVA">public interface EventPublishingService extends Service {
 
     public void publish(Event theEvent);
 }</code></pre>
@@ -747,7 +748,7 @@ So, we will expand the <code>ServiceRegistry</code> to host this completely new 
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">public class EventPublishingServiceImpl
+<pre class="prettyprint highlight"><code data-lang="JAVA">public class EventPublishingServiceImpl
     implements EventPublishingService, Configurable, Startable, Stoppable,
                ServiceRegistryAwareService {
 
@@ -814,7 +815,7 @@ So, we will expand the <code>ServiceRegistry</code> to host this completely new 
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">public class DisabledEventPublishingServiceImpl implements EventPublishingService {
+<pre class="prettyprint highlight"><code data-lang="JAVA">public class DisabledEventPublishingServiceImpl implements EventPublishingService {
 
     public static DisabledEventPublishingServiceImpl INSTANCE =
         new DisabledEventPublishingServiceImpl();
@@ -839,7 +840,7 @@ So, we will expand the <code>ServiceRegistry</code> to host this completely new 
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">public class EventPublishingServiceInitiator
+<pre class="prettyprint highlight"><code data-lang="JAVA">public class EventPublishingServiceInitiator
     implements StandardServiceInitiator&lt;EventPublishingService&gt; {
 
     public static EventPublishingServiceInitiator INSTANCE =
@@ -884,7 +885,7 @@ So, we will expand the <code>ServiceRegistry</code> to host this completely new 
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-JAVA" data-lang="JAVA">public class EventPublishingServiceContributor
+<pre class="prettyprint highlight"><code data-lang="JAVA">public class EventPublishingServiceContributor
     implements ServiceContributor {
 
     @Override
@@ -908,11 +909,11 @@ So, we will expand the <code>ServiceRegistry</code> to host this completely new 
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-08-15 07:16:58 UTC
+Version 5.3.37.Final<br>
+Last updated 2024-12-05 11:11:48 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js"></script>
-<script>prettyPrint()</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/run_prettify.min.js"></script>
 </body>
 </html>

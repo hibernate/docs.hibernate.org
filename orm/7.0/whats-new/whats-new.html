@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.18">
+<title>What&#8217;s New in 7.0</title>
+<link rel="stylesheet" href="./css/hibernate.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="./rouge-github.css">
+</head>
+<body class="article">
+<div id="header">
+<h1>What&#8217;s New in 7.0</h1>
+<div class="details">
+<span id="revnumber">version 7.0.0.CR1</span>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#relicense">Apache License</a></li>
+<li><a href="#java-17">Java 17</a></li>
+<li><a href="#jpa-32">Jakarta Persistence 3.2</a></li>
+<li><a href="#hibernate-models">Hibernate Models</a></li>
+<li><a href="#soft-delete-timestamp">@SoftDelete with TIMESTAMP</a></li>
+<li><a href="#embedded-column-naming">@EmbeddedColumnNaming</a></li>
+<li><a href="#NamedEntityGraph">@NamedEntityGraph</a></li>
+<li><a href="#session-find-multiple">findMultiple()</a></li>
+<li><a href="#QuerySpecification">QuerySpecification</a></li>
+<li><a href="#session-managed-entities">Direct access to first-level cache</a></li>
+<li><a href="#enum-checks">Converted Enums and Check Constraints</a></li>
+<li><a href="#json-xml-functions">JSON and XML functions</a></li>
+<li><a href="#set-returning-functions">Set-returning Functions</a></li>
+<li><a href="#any-discriminator">@AnyDiscriminatorImplicitValues</a></li>
+<li><a href="#stateless-session-multiple">StatelessSession and Batch Operations</a></li>
+<li><a href="#stateless-session-cache">StatelessSession and Second Level Cache</a></li>
+<li><a href="#stateless-session-jdbc-batching">StatelessSession and JDBC Batching</a></li>
+<li><a href="#transaction-api">Improvements to Transaction</a></li>
+<li><a href="#schema-manager-populate">Data population</a></li>
+<li><a href="#xml-mapping">XML mappings</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Describes the new features and capabilities added to Hibernate ORM in 7.0.</p>
+</div>
+<div class="paragraph">
+<p>If migrating from 6.6, be sure to also check out the <a href="https://docs.jboss.org/hibernate/orm/7.0/migration-guide/migration-guide.html">Migration Guide</a> for discussion of impactful changes.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="relicense">Apache License</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Starting with 7.0, Hibernate ORM will be licensed under the Apache License 2.0.</p>
+</div>
+<div class="paragraph">
+<p>Details can be seen at <a href="https://hibernate.atlassian.net/browse/HHH-19145" class="bare">https://hibernate.atlassian.net/browse/HHH-19145</a>.</p>
+</div>
+<div class="paragraph">
+<p>As part of this effort, the Hibernate team reached out to the authors of
+"non-trivial" contributions to request permission to relicense their
+work under the Apache License.  The response was overwhelming positive, although
+we never heard back from some contributors and another explicitly disagreed.
+This required a few actions on our part:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Dropping <code>hibernate-ucp</code> - see <a href="https://hibernate.atlassian.net/browse/HHH-19162" class="bare">https://hibernate.atlassian.net/browse/HHH-19162</a></p>
+</li>
+<li>
+<p>Dropping <code>TeradataDialect</code> - see <a href="https://hibernate.atlassian.net/browse/HHH-19057" class="bare">https://hibernate.atlassian.net/browse/HHH-19057</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="java-17">Java 17</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Java 17 is the new baseline Java version.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="jpa-32">Jakarta Persistence 3.2</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>7.0 migrates to Jakarta Persistence 3.2, which is fairly disruptive.
+See this <a href="https://in.relation.to/2024/04/01/jakarta-persistence-3/">blog post</a> for a good discussion of the changes.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://ci.hibernate.org/view/ORM/job/hibernate-orm-tck-3.2/job/wip%252F7.0/24/">TCK Results</a> with Java 17</p>
+</li>
+<li>
+<p><a href="https://ci.hibernate.org/view/ORM/job/hibernate-orm-tck-3.2/job/wip%252F7.0/25/">TCK Results</a> with Java 21</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="hibernate-models">Hibernate Models</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>For many years Hibernate has used the Hibernate Commons Annotations (HCANN) library for handling various low-level tasks
+related to understanding the structure of an application domain model, reading annotations and weaving in XML
+mapping documents.
+The <a href="https://github.com/hibernate/hibernate-models">Hibernate Models</a> project was developed to be a better alternative
+to HCANN.
+7.0 uses Hibernate Models in place of HCANN.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="soft-delete-timestamp">@SoftDelete with TIMESTAMP</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Soft-delete now supports the strategy of tracking the timestamp at which the soft-delete occurred,
+in addition to the previous truth-based strategies.
+See the <a href="https://docs.jboss.org/hibernate/orm/7.0/userguide/html_single/Hibernate_User_Guide.html#soft-delete">User Guide</a> for details.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="embedded-column-naming">@EmbeddedColumnNaming</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A long-requested feature for both Hibernate and Jakarta Persistence has been the ability to
+define a prefix for the names of columns associated with an embedded value.</p>
+</div>
+<div class="paragraph">
+<p>7.0 adds support for this using the new <code>@EmbeddedColumnNaming</code> annotation.  The annotation
+accepts a format pattern, so is more flexible than just a prefix.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Embeddable</span>
+<span class="kd">class</span> <span class="nc">Address</span> <span class="o">{</span>
+    <span class="nc">String</span> <span class="n">street</span><span class="o">;</span>
+    <span class="nc">String</span> <span class="n">city</span><span class="o">;</span>
+	<span class="o">...</span>
+<span class="o">}</span>
+
+<span class="nd">@Entity</span>
+<span class="kd">class</span> <span class="nc">Person</span> <span class="o">{</span>
+    <span class="o">...</span>
+    <span class="nd">@Embedded</span>
+    <span class="nd">@EmbeddedColumnNaming</span><span class="o">(</span><span class="s">"home_%"</span><span class="o">)</span>
+    <span class="nc">Address</span> <span class="n">homeAddress</span><span class="o">;</span>
+
+    <span class="nd">@Embedded</span>
+    <span class="nd">@EmbeddedColumnNaming</span><span class="o">(</span><span class="s">"work_%"</span><span class="o">)</span>
+    <span class="nc">Address</span> <span class="n">workAddress</span><span class="o">;</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This feature is considered incubating.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>See the <a href="https://docs.jboss.org/hibernate/orm/7.0/userguide/html_single/Hibernate_User_Guide.html#embeddable-column-naming">User Guide</a> for details.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="NamedEntityGraph">@NamedEntityGraph</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A new annotation (<code>@org.hibernate.annotations.NamedEntityGraph</code>) has been added to allow
+specifying a named entity-graph using Hibernate&#8217;s ability to parse a string representation of the graph.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Entity</span>
+<span class="nd">@NamedEntityGraph</span><span class="o">(</span> <span class="n">graph</span><span class="o">=</span><span class="s">"title, isbn, author(name, phoneNumber)"</span> <span class="o">)</span>
+<span class="kd">class</span> <span class="nc">Book</span> <span class="o">{</span>
+	<span class="c1">// ...</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>See <code>org.hibernate.graph.GraphParser</code> for details on the syntax and the
+<a href="https://docs.jboss.org/hibernate/orm/7.0/userguide/html_single/Hibernate_User_Guide.html#fetching-strategies-dynamic-fetching-entity-graph-parsing-annotation">User Guide</a> for additional details.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="session-find-multiple">findMultiple()</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The new operation <code>Session.findMultiple()</code> provides a convenient way to fetch a batch of entities by id.
+Combined with the <code>BatchSize</code> option, allows breaking up the JDBC calls into "batches".</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="QuerySpecification">QuerySpecification</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A new API has been added for incremental definition of a query, with support for selections -</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nc">SelectionQuery</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="n">qry</span> <span class="o">=</span> <span class="nc">SelectionSpecification</span><span class="o">.</span><span class="na">create</span><span class="o">(</span>
+    <span class="nc">Book</span><span class="o">.</span><span class="na">class</span><span class="o">,</span>
+    <span class="s">"from Book"</span>
+<span class="o">).</span><span class="na">restrict</span><span class="o">(</span>
+    <span class="nc">Restriction</span><span class="o">.</span><span class="na">restrict</span><span class="o">(</span>
+        <span class="n">Book_</span><span class="o">.</span><span class="na">suggestedCost</span><span class="o">,</span>
+        <span class="nc">Range</span><span class="o">.</span><span class="na">closed</span><span class="o">(</span><span class="mf">10.00</span><span class="o">,</span> <span class="mf">19.99</span><span class="o">)</span>
+    <span class="o">)</span>
+<span class="o">).</span><span class="na">sort</span><span class="o">(</span>
+    <span class="nc">Order</span><span class="o">.</span><span class="na">asc</span><span class="o">(</span><span class="n">Book_</span><span class="o">.</span><span class="na">suggestedCost</span><span class="o">)</span>
+<span class="o">).</span><span class="na">createQuery</span><span class="o">(</span><span class="n">session</span><span class="o">);</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>as well as mutations -</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nc">MutationQuery</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="n">qry</span> <span class="o">=</span> <span class="nc">MutationSpecification</span><span class="o">.</span><span class="na">create</span><span class="o">(</span>
+    <span class="nc">Book</span><span class="o">.</span><span class="na">class</span><span class="o">,</span>
+    <span class="s">"delete Book"</span>
+<span class="o">).</span><span class="na">restrict</span><span class="o">(</span>
+    <span class="nc">Restriction</span><span class="o">.</span><span class="na">restrict</span><span class="o">(</span>
+        <span class="n">Book_</span><span class="o">.</span><span class="na">suggestedCost</span><span class="o">,</span>
+        <span class="nc">Range</span><span class="o">.</span><span class="na">closed</span><span class="o">(</span><span class="mf">10.00</span><span class="o">,</span> <span class="mf">19.99</span><span class="o">)</span>
+    <span class="o">)</span>
+<span class="o">).</span><span class="na">createQuery</span><span class="o">(</span><span class="n">session</span><span class="o">);</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This feature is considered incubating.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>See the <a href="https://docs.jboss.org/hibernate/orm/7.0/userguide/html_single/Hibernate_User_Guide.html#QuerySpecification">User Guide</a> for details.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="session-managed-entities">Direct access to first-level cache</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The new operation <code>Session.getManagedEntities()</code> allows the application to iterate over all entities in the first-level cache, or over all entities of a given type.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This feature is considered incubating.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="enum-checks">Converted Enums and Check Constraints</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Hibernate previously added support for generating check constraints for enums mapped using <code>@Enumerated</code>
+as part of schema generation.  7.0 adds the same capability for enums mapped using an <code>AttributeConverter</code>,
+by asking the converter to convert all the enum constants on start up.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="json-xml-functions">JSON and XML functions</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Support for most of the JSON and XML functions that the SQL standard specifies was added to HQL/Criteria.
+The implementations retain the SQL standard semantics and will throw an error if emulation on a database is impossible.</p>
+</div>
+<div class="paragraph">
+<p>New functions include:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>construction functions like <code>json_array()</code>, <code>json_object()</code>, <code>xmlelement()</code> and <code>xmlforest()</code></p>
+</li>
+<li>
+<p>query functions like <code>json_value()</code>, <code>json_query()</code> and <code>xmlquery()</code></p>
+</li>
+<li>
+<p>aggregation functions like <code>json_agg()</code>, <code>json_object_agg()</code> and <code>xmlagg()</code></p>
+</li>
+<li>
+<p>manipulation functions like <code>json_set()</code>, <code>json_mergepatch()</code></p>
+</li>
+<li>
+<p>many others</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="set-returning-functions">Set-returning Functions</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A set-returning function is a new type of function that can return rows and is exclusive to the <code>from</code> clause.
+The concept is known in many different database SQL dialects and is sometimes referred to as table valued function or table function.</p>
+</div>
+<div class="paragraph">
+<p>Custom set-returning functions can be registered via a <code>FunctionContributor</code>.
+Out-of-the-box, some common set-returning functions are already supported or emulated</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>unnest()</code> - allows to turn an array into rows</p>
+</li>
+<li>
+<p><code>generate_series()</code> - can be used to create a series of values as rows</p>
+</li>
+<li>
+<p><code>json_table()</code> - turns a JSON document into rows</p>
+</li>
+<li>
+<p><code>xmltable()</code> - turns an XML document into rows</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="any-discriminator">@AnyDiscriminatorImplicitValues</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The new  <code>@AnyDiscriminatorImplicitValues</code> offers 2 related improvements for the mapping of discriminator values
+for <code>@Any</code> and <code>ManyToAny</code> associations.</p>
+</div>
+<div class="paragraph">
+<p>First, it allows control over how Hibernate determines the discriminator value to store in the database for
+implicit discriminator mappings.  Historically, Hibernate would always use the full name of the associated
+entity.</p>
+</div>
+<div class="paragraph">
+<p>Second, it allows mixing of explicit and implicit value strategies.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This feature is considered incubating.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>See the <a href="https://docs.jboss.org/hibernate/orm/7.0/userguide/html_single/Hibernate_User_Guide.html#associations-any">User Guide</a> for details.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="stateless-session-multiple">StatelessSession and Batch Operations</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>StatelessSession</code> now supports explicit batch operations via <code>insertMultiple()</code>, <code>updateMultiple()</code>, or <code>deleteMultiple()</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This feature is considered incubating.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="stateless-session-cache">StatelessSession and Second Level Cache</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Previously, stateless sessions never interacted with the second-level cache.
+This reflected their original intended role in bulk processing.
+With the advent of Jakarta Data and Hibernate Data Repositories, the responsibilities of <code>StatelessSession</code> have now expanded, and this behavior is no longer appropriate.
+Thus, a stateless session now makes use of the second-level cache by default.</p>
+</div>
+<div class="paragraph">
+<p>See the <a href="https://docs.jboss.org/hibernate/orm/7.0/migration-guide/migration-guide.html#stateless-session-cache">Migration Guide</a> for additional details.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="stateless-session-jdbc-batching">StatelessSession and JDBC Batching</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Automatic JDBC batching has the side effect of delaying the execution of the batched operation, and this undermines the synchronous nature of operations performed through a stateless session.
+In Hibernate 7, the configuration property <code>hibernate.jdbc.batch_size</code> now has no effect on a stateless session.
+Automatic batching may be enabled by explicitly calling <code>setJdbcBatchSize()</code>.
+However, the preferred approach is to <a href="#stateless-session-multiple">explicitly batch operations</a> via <code>insertMultiple()</code>, <code>updateMultiple()</code>, or <code>deleteMultiple()</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="transaction-api">Improvements to Transaction</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <code>Transaction</code> interface leaks the SPI type <code>TransactionStatus</code> via <code>getStatus()</code>, and the JTA-defined type <code>Synchronization</code> via <code>registerSynchronization()</code>, which breaks layering in a fairly harmless way.
+New operations were added to the <code>Transaction</code> interface, allowing code to inspect the status of the transaction or register callbacks without the use of layer-breaking operations.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This feature is considered incubating.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="schema-manager-populate">Data population</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Setting <code>jakarta.persistence.schema-generation.database.action=populate</code> or calling <code>SchemaManager.populate()</code> populates an existing schema with initial data in <code>/import.sql</code> or other SQL scripts specified via <code>jakarta.persistence.sql-load-script-source</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="xml-mapping">XML mappings</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Hibernate&#8217;s legacy <code>hbm.xml</code> mapping schema has been deprecated for quite some time, replaced by a new <code>mapping.xml</code>
+schema, which is now stabilized and should be prefered.
+Support for <code>hbm.xml</code> mappings will be removed in 8.0.</p>
+</div>
+<div class="paragraph">
+<p>We offer a transformation of <code>hbm.xml</code> files into <code>mapping.xml</code> files, which is available both at build-time (Gradle plugin) and at run-time (using <code>hibernate.transform_hbm_xml.enabled=true</code>).</p>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 7.0.0.CR1<br>
+Last updated 2025-04-24 19:38:40 UTC
+</div>
+</div>
+</body>
+</html>

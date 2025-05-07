@@ -26,7 +26,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":10,"i1":10,"i2":10,"i3":10};
+var data = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -210,19 +210,35 @@ extends <a href="AbstractLimitHandler.html" title="class in org.hibernate.dialec
 </td>
 </tr>
 <tr id="i1" class="rowColor">
+<td class="colFirst"><code>boolean</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#forceLimitUsage()">forceLimitUsage</a></span>()</code></th>
+<td class="colLast">
+<div class="block">Generally, if there is no limit applied to a Hibernate query we do not
+ apply any limits to the SQL query.</div>
+</td>
+</tr>
+<tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#processSql(java.lang.String,org.hibernate.query.spi.Limit)">processSql</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;sql,
           <a href="../../query/spi/Limit.html" title="class in org.hibernate.query.spi">Limit</a>&nbsp;limit)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#supportsLimit()">supportsLimit</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Does this handler support limiting query results?</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
+<td class="colFirst"><code>boolean</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#supportsOffset()">supportsOffset</a></span>()</code></th>
+<td class="colLast">
+<div class="block">Does this handler support offsetting query results without
+ also specifying a limit?</div>
+</td>
+</tr>
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#useMaxForLimit()">useMaxForLimit</a></span>()</code></th>
 <td class="colLast">
@@ -240,7 +256,7 @@ extends <a href="AbstractLimitHandler.html" title="class in org.hibernate.dialec
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;org.hibernate.dialect.pagination.<a href="AbstractLimitHandler.html" title="class in org.hibernate.dialect.pagination">AbstractLimitHandler</a></h3>
-<code><a href="AbstractLimitHandler.html#bindLimitParameters(org.hibernate.query.spi.Limit,java.sql.PreparedStatement,int)">bindLimitParameters</a>, <a href="AbstractLimitHandler.html#bindLimitParametersAtEndOfQuery(org.hibernate.query.spi.Limit,java.sql.PreparedStatement,int)">bindLimitParametersAtEndOfQuery</a>, <a href="AbstractLimitHandler.html#bindLimitParametersAtStartOfQuery(org.hibernate.query.spi.Limit,java.sql.PreparedStatement,int)">bindLimitParametersAtStartOfQuery</a>, <a href="AbstractLimitHandler.html#bindLimitParametersFirst()">bindLimitParametersFirst</a>, <a href="AbstractLimitHandler.html#convertToFirstRowValue(int)">convertToFirstRowValue</a>, <a href="AbstractLimitHandler.html#forceLimitUsage()">forceLimitUsage</a>, <a href="AbstractLimitHandler.html#getFirstRow(org.hibernate.query.spi.Limit)">getFirstRow</a>, <a href="AbstractLimitHandler.html#getForUpdatePattern()">getForUpdatePattern</a>, <a href="AbstractLimitHandler.html#getMaxOrLimit(org.hibernate.query.spi.Limit)">getMaxOrLimit</a>, <a href="AbstractLimitHandler.html#hasFirstRow(org.hibernate.query.spi.Limit)">hasFirstRow</a>, <a href="AbstractLimitHandler.html#hasMaxRows(org.hibernate.query.spi.Limit)">hasMaxRows</a>, <a href="AbstractLimitHandler.html#insertAfterDistinct(java.lang.String,java.lang.String)">insertAfterDistinct</a>, <a href="AbstractLimitHandler.html#insertAfterSelect(java.lang.String,java.lang.String)">insertAfterSelect</a>, <a href="AbstractLimitHandler.html#insertAtEnd(java.lang.String,java.lang.String)">insertAtEnd</a>, <a href="AbstractLimitHandler.html#insertBeforeForUpdate(java.lang.String,java.lang.String)">insertBeforeForUpdate</a>, <a href="AbstractLimitHandler.html#setMaxRows(org.hibernate.query.spi.Limit,java.sql.PreparedStatement)">setMaxRows</a>, <a href="AbstractLimitHandler.html#supportsLimitOffset()">supportsLimitOffset</a>, <a href="AbstractLimitHandler.html#supportsOffset()">supportsOffset</a>, <a href="AbstractLimitHandler.html#supportsVariableLimit()">supportsVariableLimit</a></code></li>
+<code><a href="AbstractLimitHandler.html#bindLimitParameters(org.hibernate.query.spi.Limit,java.sql.PreparedStatement,int)">bindLimitParameters</a>, <a href="AbstractLimitHandler.html#bindLimitParametersAtEndOfQuery(org.hibernate.query.spi.Limit,java.sql.PreparedStatement,int)">bindLimitParametersAtEndOfQuery</a>, <a href="AbstractLimitHandler.html#bindLimitParametersAtStartOfQuery(org.hibernate.query.spi.Limit,java.sql.PreparedStatement,int)">bindLimitParametersAtStartOfQuery</a>, <a href="AbstractLimitHandler.html#bindLimitParametersFirst()">bindLimitParametersFirst</a>, <a href="AbstractLimitHandler.html#convertToFirstRowValue(int)">convertToFirstRowValue</a>, <a href="AbstractLimitHandler.html#getFirstRow(org.hibernate.query.spi.Limit)">getFirstRow</a>, <a href="AbstractLimitHandler.html#getForUpdatePattern()">getForUpdatePattern</a>, <a href="AbstractLimitHandler.html#getMaxOrLimit(org.hibernate.query.spi.Limit)">getMaxOrLimit</a>, <a href="AbstractLimitHandler.html#hasFirstRow(org.hibernate.query.spi.Limit)">hasFirstRow</a>, <a href="AbstractLimitHandler.html#hasMaxRows(org.hibernate.query.spi.Limit)">hasMaxRows</a>, <a href="AbstractLimitHandler.html#insertAfterDistinct(java.lang.String,java.lang.String)">insertAfterDistinct</a>, <a href="AbstractLimitHandler.html#insertAfterSelect(java.lang.String,java.lang.String)">insertAfterSelect</a>, <a href="AbstractLimitHandler.html#insertAtEnd(java.lang.String,java.lang.String)">insertAtEnd</a>, <a href="AbstractLimitHandler.html#insertBeforeForUpdate(java.lang.String,java.lang.String)">insertBeforeForUpdate</a>, <a href="AbstractLimitHandler.html#setMaxRows(org.hibernate.query.spi.Limit,java.sql.PreparedStatement)">setMaxRows</a>, <a href="AbstractLimitHandler.html#supportsLimitOffset()">supportsLimitOffset</a>, <a href="AbstractLimitHandler.html#supportsVariableLimit()">supportsVariableLimit</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a id="methods.inherited.from.class.java.lang.Object">
@@ -323,6 +339,46 @@ extends <a href="AbstractLimitHandler.html" title="class in org.hibernate.dialec
 <dd><code><a href="AbstractLimitHandler.html#supportsLimit()">supportsLimit</a></code>&nbsp;in class&nbsp;<code><a href="AbstractLimitHandler.html" title="class in org.hibernate.dialect.pagination">AbstractLimitHandler</a></code></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>True if this handler supports limit alone.</dd>
+</dl>
+</li>
+</ul>
+<a id="supportsOffset()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>supportsOffset</h4>
+<pre class="methodSignature">public&nbsp;boolean&nbsp;supportsOffset()</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="LimitHandler.html#supportsOffset()">LimitHandler</a></code></span></div>
+<div class="block">Does this handler support offsetting query results without
+ also specifying a limit?</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="LimitHandler.html#supportsOffset()">supportsOffset</a></code>&nbsp;in interface&nbsp;<code><a href="LimitHandler.html" title="interface in org.hibernate.dialect.pagination">LimitHandler</a></code></dd>
+<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
+<dd><code><a href="AbstractLimitHandler.html#supportsOffset()">supportsOffset</a></code>&nbsp;in class&nbsp;<code><a href="AbstractLimitHandler.html" title="class in org.hibernate.dialect.pagination">AbstractLimitHandler</a></code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>True if this handler supports offset alone.</dd>
+</dl>
+</li>
+</ul>
+<a id="forceLimitUsage()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>forceLimitUsage</h4>
+<pre class="methodSignature">public&nbsp;boolean&nbsp;forceLimitUsage()</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="AbstractLimitHandler.html#forceLimitUsage()">AbstractLimitHandler</a></code></span></div>
+<div class="block">Generally, if there is no limit applied to a Hibernate query we do not
+ apply any limits to the SQL query. This option forces that the limit
+ be written to the SQL query.</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
+<dd><code><a href="AbstractLimitHandler.html#forceLimitUsage()">forceLimitUsage</a></code>&nbsp;in class&nbsp;<code><a href="AbstractLimitHandler.html" title="class in org.hibernate.dialect.pagination">AbstractLimitHandler</a></code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>true to force limit into SQL query even if none specified in
+         Hibernate query; false otherwise.</dd>
 </dl>
 </li>
 </ul>
@@ -437,7 +493,7 @@ extends <a href="AbstractLimitHandler.html" title="class in org.hibernate.dialec
 </a></div>
 <!-- ======== END OF BOTTOM NAVBAR ======= -->
 </nav>
-<p class="legalCopy"><small>Copyright &copy; 2001-2022 <a href="https://redhat.com">Red Hat, Inc.</a>  All Rights Reserved.</small></p>
+<p class="legalCopy"><small>Copyright &copy; 2001-2023 <a href="https://redhat.com">Red Hat, Inc.</a>  All Rights Reserved.</small></p>
 </footer>
 </body>
 </html>

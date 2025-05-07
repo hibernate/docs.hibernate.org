@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.16">
-<title>Hibernate Search 6.0.10.Final: Migration Guide from 5.11</title>
+<title>Hibernate Search 6.0.11.Final: Migration Guide from 5.11</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -569,9 +569,9 @@ table.CodeRay td.code{padding:0 0 0 .75em}
 </head>
 <body class="book toc2 toc-left">
 <div id="header">
-<h1>Hibernate Search 6.0.10.Final: Migration Guide from 5.11</h1>
+<h1>Hibernate Search 6.0.11.Final: Migration Guide from 5.11</h1>
 <div class="details">
-<span id="revdate">2022-08-23</span>
+<span id="revdate">2023-01-31</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -986,7 +986,7 @@ of Hibernate Search.</p>
 <pre class="CodeRay highlight"><code data-lang="XML"><span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-v5migrationhelper-orm<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>6.0.10.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>6.0.11.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -3520,6 +3520,7 @@ Here is how to retrieve the <code>SearchSession</code> in Hibernate Search 6:</p
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="JAVA">SearchSession searchSession = Search.session( entityManager );
+<span class="comment">// OR</span>
 SearchSession searchSession = Search.session( session );</code></pre>
 </div>
 </div>
@@ -3948,7 +3949,8 @@ SearchPredicate topLevelPredicate = pf.bool( b -&gt; {
     <span class="keyword">for</span> ( SearchPredicate predicate : predicates ) {
         b.must( predicate );
     }
-} );
+} )
+        .toPredicate();
 
 <span class="predefined-type">List</span>&lt;<span class="predefined-type">Book</span>&gt; hits = searchSession.search( <span class="predefined-type">Book</span>.class )
         .where( topLevelPredicate )
@@ -5110,8 +5112,8 @@ but some operations are more conveniently accessible directly from <code>SearchS
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="JAVA">SearchFactory searchFactory = Search.getFullTextEntityManager( entityManager ).getSearchFactory();
-<span class="comment">// Alternatively</span>
-searchFactory = Search.getFullTextSession( session ).getSearchFactory();</code></pre>
+<span class="comment">// OR</span>
+SearchFactory searchFactory = Search.getFullTextSession( session ).getSearchFactory();</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -5122,10 +5124,12 @@ Here is how to retrieve the <code>SearchMapping</code> in Hibernate Search 6:</p
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="JAVA">SearchMapping mapping = Search.mapping( entityManagerFactory );
-<span class="comment">// Alternatively</span>
-mapping = Search.mapping( sessionFactory );
-mapping = Search.mapping( entityManager.getEntityManagerFactory() );
-mapping = Search.mapping( session.getSessionFactory() );</code></pre>
+<span class="comment">// OR</span>
+SearchMapping mapping = Search.mapping( sessionFactory );
+<span class="comment">// OR</span>
+SearchMapping mapping = Search.mapping( entityManager.getEntityManagerFactory() );
+<span class="comment">// OR</span>
+SearchMapping mapping = Search.mapping( session.getSessionFactory() );</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -5142,7 +5146,7 @@ mapping = Search.mapping( session.getSessionFactory() );</code></pre>
 <pre class="CodeRay highlight"><code data-lang="JAVA">SearchFactory searchFactory = Search.getFullTextSession( session ).getSearchFactory();
 
 searchFactory.optimize( <span class="predefined-type">Book</span>.class );
-<span class="comment">// or</span>
+<span class="comment">// OR</span>
 searchFactory.optimize();</code></pre>
 </div>
 </div>
@@ -5154,7 +5158,7 @@ searchFactory.optimize();</code></pre>
 <pre class="CodeRay highlight"><code data-lang="JAVA">SearchSession searchSession = Search.session( session );
 
 searchSession.workspace( <span class="predefined-type">Book</span>.class ).mergeSegments();
-<span class="comment">// or</span>
+<span class="comment">// OR</span>
 searchSession.workspace().mergeSegments();</code></pre>
 </div>
 </div>
@@ -5185,8 +5189,8 @@ Analyzer searchAnalyzer = searchFactory.getAnalyzer( <span class="predefined-typ
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="JAVA">SearchMapping mapping = Search.mapping( entityManagerFactory );
-<span class="comment">// Alternatively</span>
-mapping = Search.mapping( entityManager.getEntityManagerFactory() );
+<span class="comment">// OR</span>
+SearchMapping mapping = Search.mapping( entityManager.getEntityManagerFactory() );
 
 <span class="comment">// Get a named analyzer</span>
 Optional&lt;? <span class="directive">extends</span> Analyzer&gt; analyzer = mapping.backend().unwrap( LuceneBackend.class )
@@ -5197,7 +5201,7 @@ Analyzer searchAnalyzer = mapping.indexedEntity( <span class="predefined-type">B
         .unwrap( LuceneIndexManager.class ).searchAnalyzer();
 
 <span class="comment">// Get the search analyzer for a given index</span>
-Analyzer searchAnalyzer = mapping.indexexManager( <span class="string"><span class="delimiter">&quot;</span><span class="content">Book</span><span class="delimiter">&quot;</span></span> ).indexManager()
+Analyzer searchAnalyzer = mapping.indexManager( <span class="string"><span class="delimiter">&quot;</span><span class="content">Book</span><span class="delimiter">&quot;</span></span> ).indexManager()
         .unwrap( LuceneIndexManager.class ).searchAnalyzer();</code></pre>
 </div>
 </div>
@@ -5295,7 +5299,7 @@ for an equivalent solution in Hibernate Search 6.</p>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="JAVA">FullTextSession fullTextSession = Search.getFullTextSession( session );
 fullTextSession.createIndexer().startAndWait();
-<span class="comment">// or</span>
+<span class="comment">// OR</span>
 fullTextSession.createIndexer( <span class="predefined-type">Book</span>.class, Author.class ).startAndWait();</code></pre>
 </div>
 </div>
@@ -5306,7 +5310,7 @@ fullTextSession.createIndexer( <span class="predefined-type">Book</span>.class, 
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="JAVA">SearchSession searchSession = Search.session( entityManager );
 searchSession.massIndexer().startAndWait();
-<span class="comment">// or</span>
+<span class="comment">// OR</span>
 searchSession.massIndexer( <span class="predefined-type">Book</span>.class, Author.class ).startAndWait();</code></pre>
 </div>
 </div>
@@ -5856,7 +5860,7 @@ through an <a href="#analysis-definition-provider">analysis definition provider<
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-08-23 13:21:23 UTC
+Last updated 2023-01-31 08:08:36 UTC
 </div>
 </div>
 <!-- HibernateDoc.OutdatedContent -->

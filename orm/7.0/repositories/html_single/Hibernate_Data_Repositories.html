@@ -1,0 +1,1955 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.18">
+<title>Introducing Hibernate Data Repositories</title>
+<link rel="stylesheet" href="./css/hibernate.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="./rouge-github.css">
+</head>
+<body class="book">
+<div id="header">
+<h1>Introducing Hibernate Data Repositories</h1>
+<div class="details">
+<span id="revnumber">version 7.0.0.CR1</span>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#preface">Preface</a></li>
+<li><a href="#programming-model">1. Programming model</a>
+<ul class="sectlevel2">
+<li><a href="#repository-interfaces">1.1. Repository interfaces</a></li>
+<li><a href="#organizing-repository-operations">1.2. Organizing persistence operations</a></li>
+<li><a href="#default-method">1.3. Default methods</a></li>
+<li><a href="#resource-accessor-method">1.4. Resource accessor methods</a></li>
+<li><a href="#lifecycle-method">1.5. Lifecycle methods</a></li>
+<li><a href="#find-method">1.6. Automatic query methods</a></li>
+<li><a href="#query-method">1.7. Annotated query methods</a></li>
+<li><a href="#by-and-param">1.8. <code>@By</code> and <code>@Param</code></a></li>
+</ul>
+</li>
+<li><a href="#configuration-integration">2. Configuration and integration</a>
+<ul class="sectlevel2">
+<li><a href="#_project_setup">2.1. Project setup</a></li>
+<li><a href="#_excluding_classes_from_processing">2.2. Excluding classes from processing</a></li>
+<li><a href="#_configuring_hibernate_orm">2.3. Configuring Hibernate ORM</a></li>
+<li><a href="#_obtaining_a_statelesssession">2.4. Obtaining a <code>StatelessSession</code></a></li>
+<li><a href="#_injecting_a_repository">2.5. Injecting a repository</a></li>
+<li><a href="#_integration_with_jakarta_ee">2.6. Integration with Jakarta EE</a></li>
+</ul>
+</li>
+<li><a href="#pagination">3. Pagination and dynamic sorting</a>
+<ul class="sectlevel2">
+<li><a href="#data-static-metamodel">3.1. The static metamodel</a></li>
+<li><a href="#dynamic-sorting">3.2. Dynamic sorting</a></li>
+<li><a href="#limits">3.3. Limits</a></li>
+<li><a href="#offset-based-pagination">3.4. Offset-based pagination</a></li>
+<li><a href="#key-based-pagination">3.5. Key-based pagination</a></li>
+<li><a href="#dynamic-restrictions">3.6. Dynamic restrictions</a></li>
+<li><a href="#advanced-query-control">3.7. Advanced control over querying</a></li>
+</ul>
+</li>
+<li><a href="#reactive-repositories">4. Reactive repositories</a>
+<ul class="sectlevel2">
+<li><a href="#_defining_a_reactive_repository">4.1. Defining a reactive repository</a></li>
+<li><a href="#_obtaining_a_reactive_repository">4.2. Obtaining a reactive repository</a></li>
+<li><a href="#_calling_a_reactive_repository">4.3. Calling a reactive repository</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="preface">Preface</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Jakarta Data is a new specification for <em>repositories</em>.
+A repository, in this context, means an interface exposing a typesafe API for interacting with a datastore.
+Jakarta Data is designed to accommodate a diverse range of database technologies, from relational databases, to document databases, to key-value stores and more.</p>
+</div>
+<div class="paragraph">
+<p>Hibernate Data Repositories is an implementation of Jakarta Data targeting relational databases and backed by Hibernate ORM.
+Entity classes are mapped using the familiar annotations defined by Jakarta Persistence, and queries may be written in the Hibernate Query Language, a superset of the Jakarta Persistence Query Language (JPQL).
+On the other hand, the programming model for interacting with the database is quite different in Jakarta Data from the model you might be used to from Jakarta Persistence.</p>
+</div>
+<div class="paragraph">
+<p>Therefore, this document will show you a different way to use Hibernate.</p>
+</div>
+<div class="paragraph">
+<p>The coverage of Jakarta Data is intentionally inexhaustive.
+If exhaustion is sought, this document should be read in conjunction with the specification, which we&#8217;ve worked hard to keep readable.</p>
+</div>
+<div class="paragraph">
+<p>If you are unfamiliar with Hibernate, this document should be read in conjunction with:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>the <a href="https://docs.jboss.org/hibernate/orm/7.0/introduction/html_single/Hibernate_Introduction.html">Short Guide to Hibernate</a>, and</p>
+</li>
+<li>
+<p>the <a href="https://docs.jboss.org/hibernate/orm/7.0/querylanguage/html_single/Hibernate_Query_Language.html">Guide to Hibernate Query Language</a>.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="programming-model">1. Programming model</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Jakarta Data and Jakarta Persistence both represent data in a typesafe way, using <em>entity classes</em>.
+Since Hibernate&#8217;s implementation of Jakarta Data is backed by access to a relational database, these entity classes are mapped using the annotations defined by Jakarta Persistence.</p>
+</div>
+<div class="paragraph">
+<p>For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Entity</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Book</span> <span class="o">{</span>
+    <span class="nd">@Id</span>
+    <span class="nc">String</span> <span class="n">isbn</span><span class="o">;</span>
+
+    <span class="nd">@Basic</span><span class="o">(</span><span class="n">optional</span> <span class="o">=</span> <span class="kc">false</span><span class="o">)</span>
+    <span class="nc">String</span> <span class="n">title</span><span class="o">;</span>
+
+    <span class="nc">LocalDate</span> <span class="n">publicationDate</span><span class="o">;</span>
+
+    <span class="nd">@Basic</span><span class="o">(</span><span class="n">optional</span> <span class="o">=</span> <span class="kc">false</span><span class="o">)</span>
+    <span class="nc">String</span> <span class="n">text</span><span class="o">;</span>
+
+    <span class="nd">@Enumerated</span><span class="o">(</span><span class="no">STRING</span><span class="o">)</span>
+    <span class="nd">@Basic</span><span class="o">(</span><span class="n">optional</span> <span class="o">=</span> <span class="kc">false</span><span class="o">)</span>
+    <span class="nc">Type</span> <span class="n">type</span> <span class="o">=</span> <span class="nc">Type</span><span class="o">.</span><span class="na">Book</span><span class="o">;</span>
+
+    <span class="nd">@ManyToOne</span><span class="o">(</span><span class="n">optional</span> <span class="o">=</span> <span class="kc">false</span><span class="o">,</span> <span class="n">fetch</span> <span class="o">=</span> <span class="no">LAZY</span><span class="o">)</span>
+    <span class="nc">Publisher</span> <span class="n">publisher</span><span class="o">;</span>
+
+    <span class="nd">@ManyToMany</span><span class="o">(</span><span class="n">mappedBy</span> <span class="o">=</span> <span class="n">Author_</span><span class="o">.</span><span class="na">BOOKS</span><span class="o">)</span>
+    <span class="nc">Set</span><span class="o">&lt;</span><span class="nc">Author</span><span class="o">&gt;</span> <span class="n">authors</span><span class="o">;</span>
+
+    <span class="o">...</span>
+<span class="o">}</span>
+
+<span class="nd">@Entity</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Author</span> <span class="o">{</span>
+    <span class="nd">@Id</span>
+    <span class="nc">String</span> <span class="n">ssn</span><span class="o">;</span>
+
+    <span class="nd">@Basic</span><span class="o">(</span><span class="n">optional</span> <span class="o">=</span> <span class="kc">false</span><span class="o">)</span>
+    <span class="nc">String</span> <span class="n">name</span><span class="o">;</span>
+
+    <span class="nc">Address</span> <span class="n">address</span><span class="o">;</span>
+
+    <span class="nd">@ManyToMany</span>
+    <span class="nc">Set</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="n">books</span><span class="o">;</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For more information about mapping entities, see the <a href="https://docs.jboss.org/hibernate/orm/7.0/introduction/html_single/Hibernate_Introduction.html#entities">Introduction to Hibernate 6</a>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Jakarta Data also works with entities defined using similarly-named annotations defined by Jakarta NoSQL.
+But in this document we’re using Hibernate Data Repositories, so all mapping annotations should be understood to be the ones defined in <code>jakarta.persistence</code> or <code>org.hibernate.annotations</code>.
+For more information about entities in Jakarta Data, please consult chapter 3 of the specification.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Furthermore, queries may be expressed in HQL, Hibernate&#8217;s superset of the Jakarta Persistence Query Language (JPQL).</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The Jakarta Data specification defines a simple subset of JPQL called, appropriately, JDQL.
+JDQL is mostly relevant to non-relational datastores; an implementation of Jakarta Data backed by access to relational data is normally expected to support a much larger subset of JPQL.
+Indeed, Hibernate Data Repositories supports a <em>superset</em> of JPQL.
+So, even though we put rather a large amount of effort into advocating, designing, and specifying JDQL, we won&#8217;t talk much about it here.
+For information about JDQL, please consult chapter 5 of the Jakarta Data specification.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>To learn more about HQL and JPQL, see the <a href="https://docs.jboss.org/hibernate/orm/7.0/querylanguage/html_single/Hibernate_Query_Language.html">Guide to Hibernate Query Language</a>.</p>
+</div>
+<div class="paragraph">
+<p>This is where the similarity between Jakarta Persistence and Jakarta Data ends.
+The following table contrasts the two programming models.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+<col>
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top"></th>
+<th class="tableblock halign-center valign-top">Persistence</th>
+<th class="tableblock halign-center valign-top">Data</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Persistence contexts</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Stateful</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Stateless</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Gateway</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>EntityManager</code> interface</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">User-written <code>@Repository</code> interface</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Underlying implementation</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/Session.html"><code>Session</code></a></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/StatelessSession.html"><code>StatelessSession</code></a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Persistence operations</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Generic methods like <code>find()</code>, <code>persist()</code>, <code>merge()</code>, <code>remove()</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Typesafe user-written methods annotated <code>@Find</code>, <code>@Insert</code>, <code>@Update</code>, <code>@Save</code>, <code>@Delete</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SQL execution</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">During flush</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Immediate</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Updates</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Usually implicit (dirty checking during flush)</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Always explicit (by calling <code>@Update</code> method)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Operation cascading</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Depends on <code>CascadeType</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Never</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lazy fetching</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Implicit</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Explicit using <a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/StatelessSession.html#fetch(java.lang.Object)"><code>StatelessSession.fetch()</code></a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Validation of JPQL</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Runtime</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Compile time</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The fundamental difference here is that Jakarta Data does not feature stateful persistence contexts.
+Among other consequences:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>entity instances are always detached, and so</p>
+</li>
+<li>
+<p>updates require an explicit operation, and</p>
+</li>
+<li>
+<p>there&#8217;s no transparent lazy association fetching.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>It&#8217;s important to understand that a repository in Hibernate Data Repositories is backed by a <code>StatelessSession</code>, not by a Jakarta Persistence <code>EntityManager</code>.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>There&#8217;s only one portable way to fetch an association in Jakarta Data, and that&#8217;s by using a JPQL <code>join fetch</code> clause, in a <a href="#query-method"><code>@Query</code> annotation</a>.
+The specification does not provide a portable way to fetch an association lazily.
+To fetch an association, we need to <a href="#stateless-fetch">call the <code>StatelessSession</code> directly</a>.
+This really isn&#8217;t as bad as it sounds; overuse of lazy fetching is associated with poor performance due to many round trips to the database server.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>A future release of Jakarta Data will feature repositories backed by Jakarta Persistence stateful persistence contexts, but this functionality did not make the cut for Jakarta Data 1.0.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The second big difference is that instead of providing a generic interface like <code>EntityManager</code> that&#8217;s capable of performing persistence operations for any entity class, Jakarta Data requires that each interaction with the database go via a user-written method specific to just one entity type. The method is marked with annotations allowing Hibernate to fill in the method implementation.</p>
+</div>
+<div class="paragraph">
+<p>For example, whereas Jakarta Persistence defines the methods <code>find()</code> and <code>persist()</code> of <code>EntityManager</code>, in Jakarta Data the application programmer is required to write an interface like the following:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Repository</span>
+<span class="kd">interface</span> <span class="nc">Library</span> <span class="o">{</span>
+    <span class="nd">@Find</span>
+    <span class="nc">Book</span> <span class="nf">book</span><span class="o">(</span><span class="nc">String</span> <span class="n">isbn</span><span class="o">);</span>
+
+    <span class="nd">@Insert</span>
+    <span class="kt">void</span> <span class="nf">add</span><span class="o">(</span><span class="nc">Book</span> <span class="n">book</span><span class="o">);</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This is our first example of a repository.</p>
+</div>
+<div class="sect2">
+<h3 id="repository-interfaces">1.1. Repository interfaces</h3>
+<div class="paragraph">
+<p>A <em>repository interface</em> is an interface written by you, the application programmer, and annotated <code>@Repository</code>.
+The implementation of the repository interface is provided by a Jakarta Data provider, in our case, by Hibernate Data Repositories.</p>
+</div>
+<div class="paragraph">
+<p>The Jakarta Data specification does not say how this should work, but in Hibernate Data Repositories, the implementation is generated by an annotation processor.
+In fact, you might already be using this annotation processor: it&#8217;s just <code>HibernateProcessor</code> from the  module which used to be called <code>hibernate-jpamodelgen</code>, and has now been renamed <code>hibernate-processor</code> in Hibernate 7.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>That&#8217;s right, this fancy thing I&#8217;m calling Hibernate Data Repositories is really just a new feature of Hibernate&#8217;s venerable static metamodel generator.
+If you&#8217;re already using the JPA static metamodel in your project, you already have Jakarta Data at your fingertips.
+If you don&#8217;t, we&#8217;ll see how to set it up in the <a href="#configuration-integration">next chapter</a>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Of course, a Jakarta Data provider can&#8217;t generate an implementation of any arbitrary method.
+Therefore, the methods of a repository interface must fall into one of the following categories:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#default-method"><code>default</code> methods</a>,</p>
+</li>
+<li>
+<p><a href="#lifecycle-method"><em>lifecycle methods</em></a> annotated <code>@Insert</code>, <code>@Update</code>, <code>@Delete</code>, or <code>@Save</code>,</p>
+</li>
+<li>
+<p><a href="#find-method"><em>automatic query methods</em></a> annotated <code>@Find</code>,</p>
+</li>
+<li>
+<p><a href="#query-method"><em>annotated query methods</em></a> annotated <code>@Query</code> or <code>@SQL</code>, and</p>
+</li>
+<li>
+<p><a href="#resource-accessor-method"><em>resource accessor methods</em></a>.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>For users migrating from Spring Data, Jakarta Data also provides a <em>Query by Method Name</em> facility.
+We don&#8217;t recommend this approach for new code, since it leads to extremely verbose and unnatural method names for anything but the most trivial examples.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>We&#8217;ll discuss each of these kinds of method soon.
+But first we need to ask a more basic question: how are persistence operations organized into repositories, and how do repository interfaces relate to entity types?
+The&#8212;&#8203;perhaps surprising&#8212;&#8203;answer is: it&#8217;s completely up to you.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="organizing-repository-operations">1.2. Organizing persistence operations</h3>
+<div class="paragraph">
+<p>Jakarta Data lets you freely assign persistence operations to repositories according to your own preference.
+In particular, Jakarta Data does not require that a repository interface inherit a built-in supertype declaring the basic "CRUD" operations, and so it&#8217;s not necessary to have a separate repository interface for each entity.
+You&#8217;re permitted, for example, to have a single <code>Library</code> interface instead of <code>BookRepository</code>, <code>AuthorRepository</code>, and <code>PublisherRepository</code>.</p>
+</div>
+<div class="paragraph">
+<p>Thus, the whole programming model is much more flexible than older approaches such as Spring Data, which require a repository interface per entity class, or, at least, per so-called "aggregate".</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The concept of an "aggregate" makes sense in something like a document database.
+But relational data does not have aggregates, and you should avoid attempting to shoehorn your relational tables into this inappropriate way of thinking about data.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>As a convenience, especially for users migrating from older frameworks, Jakarta Data does define the <code>BasicRepository</code> and <code>CrudRepository</code> interfaces, and you can use them if you like.
+But in Jakarta Data there&#8217;s not much special about these interfaces; their operations are declared using the same annotations you&#8217;ll use to declare methods of your own repositories.
+This older, less-flexible approach is illustrated in the following example.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="c1">// old way</span>
+
+<span class="nd">@Repository</span>
+<span class="kd">interface</span> <span class="nc">BookRepository</span>
+        <span class="kd">extends</span> <span class="nc">CrudRepository</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">,</span><span class="nc">String</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="c1">// query methods</span>
+    <span class="o">...</span>
+<span class="o">}</span>
+
+<span class="nd">@Repository</span>
+<span class="kd">interface</span> <span class="nc">AuthorRepository</span>
+        <span class="kd">extends</span> <span class="nc">CrudRepository</span><span class="o">&lt;</span><span class="nc">Author</span><span class="o">,</span><span class="nc">String</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="c1">// query methods</span>
+    <span class="o">...</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We won&#8217;t see <code>BasicRepository</code> and <code>CrudRepository</code> again in this document, because they&#8217;re not necessary, and because they implement the older, less-flexible way of doing things.</p>
+</div>
+<div class="paragraph">
+<p>Instead, our repositories will often group together operations dealing with several related entities, even when the entities don&#8217;t have a single "root".
+This situation is <em>extremely</em> common in relational data models.
+In our example, <code>Book</code> and <code>Author</code> are related by a <code>@ManyToMany</code> association, and are both "roots".</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="c1">// new way</span>
+
+<span class="nd">@Repository</span>
+<span class="kd">interface</span> <span class="nc">Publishing</span> <span class="o">{</span>
+    <span class="nd">@Find</span>
+    <span class="nc">Book</span> <span class="nf">book</span><span class="o">(</span><span class="nc">String</span> <span class="n">isbn</span><span class="o">);</span>
+
+    <span class="nd">@Find</span>
+    <span class="nc">Author</span> <span class="nf">author</span><span class="o">(</span><span class="nc">String</span> <span class="n">ssn</span><span class="o">);</span>
+
+    <span class="nd">@Insert</span>
+    <span class="kt">void</span> <span class="nf">publish</span><span class="o">(</span><span class="nc">Book</span> <span class="n">book</span><span class="o">);</span>
+
+    <span class="nd">@Insert</span>
+    <span class="kt">void</span> <span class="nf">create</span><span class="o">(</span><span class="nc">Author</span> <span class="n">author</span><span class="o">);</span>
+
+    <span class="c1">// query methods</span>
+    <span class="o">...</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now let&#8217;s walk through the different kinds of method that a repository interface might declare, beginning with the easiest kind.
+If the following summary is insufficient, you&#8217;ll find more detailed information about repositories in chapter 4 of the Jakarta Data specification, and in the Javadoc of the relevant annotations.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="default-method">1.3. Default methods</h3>
+<div class="paragraph">
+<p>A <code>default</code> method is one you implement yourself, and there&#8217;s nothing special about it.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Repository</span>
+<span class="kd">interface</span> <span class="nc">Library</span> <span class="o">{</span>
+    <span class="k">default</span> <span class="kt">void</span> <span class="nf">hello</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Hello, World!"</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This doesn&#8217;t look very useful, at least not unless there&#8217;s some way to interact with the database from a <code>default</code> method.
+For that, we&#8217;ll need to add a resource accessor method.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="resource-accessor-method">1.4. Resource accessor methods</h3>
+<div class="paragraph">
+<p>A resource accessor method is one which exposes access to an underlying implementation type.
+Currently, Hibernate Data Repositories only supports one such type: <code>StatelessSession</code>.
+So a resource accessor method is just any abstract method which returns <code>StatelessSession</code>.
+The name of the method doesn&#8217;t matter.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nc">StatelessSession</span> <span class="nf">session</span><span class="o">();</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This method returns the <code>StatelessSession</code> backing the repository.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Usually, a resource accessor method is called from a <code>default</code> method of the same repository.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="k">default</span> <span class="kt">void</span> <span class="nf">refresh</span><span class="o">(</span><span class="nc">Book</span> <span class="n">book</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">session</span><span class="o">().</span><span class="na">refresh</span><span class="o">(</span><span class="n">book</span><span class="o">);</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This is very useful when we need to gain direct access to the <code>StatelessSession</code> in order to take advantage of the full power of Hibernate.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="stateless-fetch" class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>A resource accessor method is also useful when we need to lazily fetch an association.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="n">library</span><span class="o">.</span><span class="na">session</span><span class="o">().</span><span class="na">fetch</span><span class="o">(</span><span class="n">book</span><span class="o">.</span><span class="na">authors</span><span class="o">);</span></code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Usually, of course, we want Jakarta Data to take care of interacting with the <code>StatelessSession</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="lifecycle-method">1.5. Lifecycle methods</h3>
+<div class="paragraph">
+<p>Jakarta Data 1.0 defines four built-in lifecycle annotations, which map perfectly to the basic operations of the Hibernate <code>StatelessSession</code>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>@Insert</code> maps to <code>insert()</code>,</p>
+</li>
+<li>
+<p><code>@Update</code> maps to <code>update()</code>,</p>
+</li>
+<li>
+<p><code>@Delete</code> maps to <code>delete()</code>, and</p>
+</li>
+<li>
+<p><code>@Save</code> maps to <code>upsert()</code>.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The basic operations of <code>StatelessSession</code>&#8201;&#8212;&#8201;<code>insert()</code>, <code>update()</code>, <code>delete()</code>, and <code>upsert()</code>&#8201;&#8212;&#8201;do not have matching <code>CascadeType</code>s, and so these operations are never cascaded to associated entities.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>A lifecycle method usually accepts an instance of an entity type, and is usually declared <code>void</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Insert</span>
+<span class="kt">void</span> <span class="nf">add</span><span class="o">(</span><span class="nc">Book</span> <span class="n">book</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Alternatively, it may accept a list or array of entities.
+(A variadic parameter is considered an array.)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Insert</span>
+<span class="kt">void</span> <span class="nf">add</span><span class="o">(</span><span class="nc">Book</span><span class="o">...</span> <span class="n">books</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>A future release of Jakarta Data might expand the list of built-in lifecycle annotations.
+In particular, we&#8217;re hoping to add <code>@Persist</code>, <code>@Merge</code>, <code>@Refresh</code>, <code>@Lock</code>, and <code>@Remove</code>, mapping to the fundamental operations of <code>EntityManager</code>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Repositories wouldn&#8217;t be useful at all if this was all they could do.
+Jakarta Data really starts to shine when we start to use it to express queries.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="find-method">1.6. Automatic query methods</h3>
+<div class="paragraph">
+<p>An automatic query method is usually annotated <code>@Find</code>.
+The simplest automatic query method is one which retrieves an entity instance by its unique identifier.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Find</span>
+<span class="nc">Book</span> <span class="nf">book</span><span class="o">(</span><span class="nc">String</span> <span class="n">isbn</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The name of the parameter identifies that this is a lookup by primary key (the <code>isbn</code> field is annotated <code>@Id</code> in <code>Book</code>) and so this method will be implemented to call the <code>get()</code> method of <code>StatelessSession</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If the parameter name does not match any field of the returned entity type, or if the type of the parameter does not match the type of the matching field, <code>HibernateProcessor</code> reports a helpful error at compilation time.
+This is our first glimpse of the advantages of using Jakarta Data repositories with Hibernate.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If there is no <code>Book</code> with the given <code>isbn</code> in the database, the method throws <code>EmptyResultException</code>.
+There&#8217;s two ways around this if that&#8217;s not what we want:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>declare the method to return <code>Optional</code>, or</p>
+</li>
+<li>
+<p>annotate the method <code>@jakarta.annotation.Nullable</code>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The first option is blessed by the specification:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Find</span>
+<span class="nc">Optional</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="nf">book</span><span class="o">(</span><span class="nc">String</span> <span class="n">isbn</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The second option is an extension provided by Hibernate:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Find</span> <span class="nd">@Nullable</span>
+<span class="nc">Book</span> <span class="nf">book</span><span class="o">(</span><span class="nc">String</span> <span class="n">isbn</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>An automatic query method might return multiple results.
+In this case, the return type must be an array or list of the entity type.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Find</span>
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="nf">book</span><span class="o">(</span><span class="nc">String</span> <span class="n">title</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Usually, arguments to a parameter of an automatic query method must match <em>exactly</em> with the field of an entity.
+However, Hibernate provides the <a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/annotations/processing/Pattern.html"><code>@Pattern</code></a> annotation to allow for "fuzzy" matching using <code>like</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Find</span>
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="nf">books</span><span class="o">(</span><span class="nd">@Pattern</span> <span class="nc">String</span> <span class="n">title</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Furthermore, if the parameter type is a list or array of the entity field type, the resulting query has an <code>in</code> condition.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Find</span>
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="nf">books</span><span class="o">(</span><span class="nc">String</span><span class="o">[]</span> <span class="n">ibsn</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Or course, an automatic query method might have multiple parameters.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Find</span>
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="nf">book</span><span class="o">(</span><span class="nd">@Pattern</span> <span class="nc">String</span> <span class="n">title</span><span class="o">,</span> <span class="nc">Year</span> <span class="n">yearPublished</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In this case, <em>every</em> argument must match the corresponding field of the entity.</p>
+</div>
+<div class="paragraph">
+<p>The <code>_</code> character in a parameter name may be used to navigate associations:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Find</span>
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="nf">booksPublishedBy</span><span class="o">(</span><span class="nc">String</span> <span class="n">publisher_name</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>However, once our query starts to involve multiple entities, it&#8217;s usually better to use an <a href="#query-method">annotated query method</a>.</p>
+</div>
+<div class="paragraph">
+<p>The <code>@OrderBy</code> annotation allows results to be sorted.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Find</span>
+<span class="nd">@OrderBy</span><span class="o">(</span><span class="s">"title"</span><span class="o">)</span>
+<span class="nd">@OrderBy</span><span class="o">(</span><span class="s">"publisher.name"</span><span class="o">)</span>
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="nf">book</span><span class="o">(</span><span class="nd">@Pattern</span> <span class="nc">String</span> <span class="n">title</span><span class="o">,</span> <span class="nc">Year</span> <span class="n">yearPublished</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This might not look very typesafe at first glance, but&#8212;&#8203;amazingly&#8212;&#8203;the content of the <code>@OrderBy</code> annotation is completely validated at compile time, as we will see below.</p>
+</div>
+<div class="paragraph">
+<p>Automatic query methods are great and convenient for very simple queries.
+For anything that&#8217;s not extremely simple, we&#8217;re much better off writing a query in JPQL.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="query-method">1.7. Annotated query methods</h3>
+<div class="paragraph">
+<p>An annotated query method is declared using:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>@Query</code> from Jakarta Data, or</p>
+</li>
+<li>
+<p><a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/annotations/processing/HQL.html"><code>@HQL</code></a> or <a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/annotations/processing/SQL.html"><code>@SQL</code></a> from <code>org.hibernate.annotations.processing</code>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The <code>@Query</code> annotation is defined to accept JPQL, JDQL, or anything in between.
+In Hibernate Data Repositories, it accepts arbitrary HQL.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>There&#8217;s no strong reason to use <code>@HQL</code> in preference to <code>@Query</code>.
+This annotation exists because the functionality described here predates the existence of Jakarta Data.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Consider the following example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Query</span><span class="o">(</span><span class="s">"where title like :pattern order by title, isbn"</span><span class="o">)</span>
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="nf">booksByTitle</span><span class="o">(</span><span class="nc">String</span> <span class="n">pattern</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You might notice that:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The <code>from</code> clause is not required in JDQL, and is inferred from the return type of the repository method.</p>
+</li>
+<li>
+<p>Since Jakarta Persistence 3.2, neither the <code>select</code> cause nor entity aliases (identification variables) are required in JPQL, finally standardizing a very old feature of HQL.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This allows simple queries to be written in a very compact form.</p>
+</div>
+<div class="paragraph">
+<p>Method parameters are automatically matched to ordinal or named parameters of the query.
+In the previous example, <code>pattern</code> matches <code>:pattern</code>.
+In the following variation, the first method parameter matches <code>?1</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Query</span><span class="o">(</span><span class="s">"where title like ?1 order by title, isbn"</span><span class="o">)</span>
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="nf">booksByTitle</span><span class="o">(</span><span class="nc">String</span> <span class="n">pattern</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You might be imagining that the JPQL query specified within the <code>@Query</code> annotation cannot be validated at compile time, but this is not the case.
+<code>HibernateProcessor</code> is not only capable of validating the <em>syntax</em> of the query, but it even <em>typechecks</em> the query completely.
+This is much better than passing a string to the <code>createQuery()</code> method of <code>EntityManager</code>, and it&#8217;s probably the top reason to use Jakarta Data with Hibernate.</p>
+</div>
+<div class="paragraph">
+<p>When a query returns more than one object, the nicest thing to do is package each result as an instance of a Java <code>record</code> type.
+For example, we might define a <code>record</code> holding some fields of <code>Book</code> and <code>Author</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="n">record</span> <span class="nf">AuthorBookSummary</span><span class="o">(</span><span class="nc">String</span> <span class="n">isbn</span><span class="o">,</span> <span class="nc">String</span> <span class="n">ssn</span><span class="o">,</span> <span class="nc">String</span> <span class="n">authorName</span><span class="o">,</span> <span class="nc">String</span> <span class="n">title</span><span class="o">)</span> <span class="o">{}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We need to specify that the values in the <code>select</code> clause should be packaged as instances of <code>AuthorBookSummary</code>.
+The JPQL specification provides the <code>select new</code> construct for this.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Query</span><span class="o">(</span><span class="s">"select new AuthorBookSummary(b.isbn, a.ssn, a.name, b.title "</span> <span class="o">+</span>
+       <span class="s">"from Author a join books b "</span> <span class="o">+</span>
+       <span class="s">"where title like :pattern"</span><span class="o">)</span>
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">AuthorBookSummary</span><span class="o">&gt;</span> <span class="nf">summariesForTitle</span><span class="o">(</span><span class="nc">String</span> <span class="n">pattern</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that the <code>from</code> clause is required here, since it&#8217;s impossible to infer the queried entity type from the return type of the repository method.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Since this is quite verbose, Hibernate doesn&#8217;t require the use of <code>select new</code>, nor of aliases, and lets us write:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Query</span><span class="o">(</span><span class="s">"select isbn, ssn, name, title "</span> <span class="o">+</span>
+       <span class="s">"from Author join books "</span> <span class="o">+</span>
+       <span class="s">"where title like :pattern"</span><span class="o">)</span>
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">AuthorBookSummary</span><span class="o">&gt;</span> <span class="nf">summariesForTitle</span><span class="o">(</span><span class="nc">String</span> <span class="n">pattern</span><span class="o">);</span></code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>An annotated query method may even perform an <code>update</code>, <code>delete</code>, or <code>insert</code> statement.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Query</span><span class="o">(</span><span class="s">"delete from Book "</span> <span class="o">+</span>
+       <span class="s">"where extract(year from publicationDate) &lt; :year"</span><span class="o">)</span>
+<span class="kt">int</span> <span class="nf">deleteOldBooks</span><span class="o">(</span><span class="kt">int</span> <span class="n">year</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The method must be declared <code>void</code>, or return <code>int</code> or <code>long</code>.
+The return value is the number of affected records.</p>
+</div>
+<div class="paragraph">
+<p>Finally, a native SQL query may be specified using <code>@SQL</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@SQL</span><span class="o">(</span><span class="s">"select title from books where title like :pattern order by title, isbn"</span><span class="o">)</span>
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="nf">booksByTitle</span><span class="o">(</span><span class="nc">String</span> <span class="n">pattern</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Unfortunately, native SQL queries cannot be validated at compile time, so if there&#8217;s anything wrong with our SQL, we won&#8217;t find out until we run our program.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="by-and-param">1.8. <code>@By</code> and <code>@Param</code></h3>
+<div class="paragraph">
+<p>Query methods match method parameters to entity fields or query parameters by name.
+Occasionally, this is inconvenient, resulting in less natural method parameter names.
+Let&#8217;s reconsider an example we already saw above:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Find</span>
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="nf">books</span><span class="o">(</span><span class="nc">String</span><span class="o">[]</span> <span class="n">ibsn</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Here, because the parameter name must match the field <code>isbn</code> of <code>Book</code>, we couldn&#8217;t call it <code>isbns</code>, plural.</p>
+</div>
+<div class="paragraph">
+<p>The <code>@By</code> annotation lets us work around this problem:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Find</span>
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="nf">books</span><span class="o">(</span><span class="nd">@By</span><span class="o">(</span><span class="s">"isbn"</span><span class="o">)</span> <span class="nc">String</span><span class="o">[]</span> <span class="n">ibsns</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Naturally, the name and type of the parameter are still checked at compile time; there&#8217;s no loss of typesafety here, despite the string.</p>
+</div>
+<div class="paragraph">
+<p>The <code>@Param</code> annotation is significantly less useful, since we can always rename our HQL query parameter to match the method parameter, or, at worst, use an ordinal parameter instead.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuration-integration">2. Configuration and integration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Getting started with Hibernate Data Repositories involves the following steps:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>set up a project with Hibernate ORM and <code>HibernateProcessor</code>,</p>
+</li>
+<li>
+<p>configure a persistence unit,</p>
+</li>
+<li>
+<p>make sure a <code>StatelessSession</code> for that persistence unit is available for injection, and then</p>
+</li>
+<li>
+<p>inject a repository using CDI or some other implementation of <code>jakarta.inject</code>.</p>
+</li>
+</ol>
+</div>
+<div class="sect2">
+<h3 id="_project_setup">2.1. Project setup</h3>
+<div class="paragraph">
+<p>We definitely need the following dependencies in our project:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. Required dependencies</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Dependency</th>
+<th class="tableblock halign-left valign-top">Explanation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>jakarta.data:jakarta.data-api</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The Jakarta Data API</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.hibernate.orm:hibernate-core</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Hibernate ORM</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.hibernate.orm:hibernate-processor</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The annotation processor itself</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>And we&#8217;ll need to pick a JDBC driver:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 2. JDBC driver dependencies</caption>
+<colgroup>
+<col style="width: 50%;">
+<col>
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Database</th>
+<th class="tableblock halign-left valign-top">Driver dependency</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PostgreSQL or CockroachDB</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.postgresql:postgresql</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MySQL or TiDB</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>com.mysql:mysql-connector-j</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MariaDB</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.mariadb.jdbc:mariadb-java-client</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DB2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>com.ibm.db2:jcc</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SQL Server</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>com.microsoft.sqlserver:mssql-jdbc</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Oracle</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>com.oracle.database.jdbc:ojdbc17</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">H2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>com.h2database:h2</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HSQLDB</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.hsqldb:hsqldb</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>In addition, we might add some of the following to the mix.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 3. Optional dependencies</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Optional dependency</th>
+<th class="tableblock halign-left valign-top">Explanation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.hibernate.validator:hibernate-validator</code><br>
+and <code>org.glassfish:jakarta.el</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Hibernate Validator</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.apache.logging.log4j:log4j-core</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">log4j</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.jboss.weld:weld-core-impl</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Weld CDI</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>You&#8217;ll need to configure the annotation processor to run when your project is compiled.
+In Gradle, for example, you&#8217;ll need to use <code>annotationProcessor</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="groovy"><span class="n">annotationProcessor</span> <span class="s1">'org.hibernate.orm:hibernate-processor:7.0.0'</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_excluding_classes_from_processing">2.2. Excluding classes from processing</h3>
+<div class="paragraph">
+<p>There&#8217;s three ways to limit the annotation processor to certain classes:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>A given repository may be excluded from processing simply by specifying <code>@Repository(provider="acme")</code> where <code>"acme"</code> is any string other than the empty string or a string equal, ignoring case, to <code>"Hibernate"</code>. This is the preferred solution when there are multiple Jakarta Data Providers available.</p>
+</li>
+<li>
+<p>A package or type may be excluded by annotating it with the <a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/annotations/processing/Exclude.html"><code>@Exclude</code></a> annotation from <code>org.hibernate.annotations.processing</code>.</p>
+</li>
+<li>
+<p>The annotation processor may be limited to consider only certain types or certain packages using the <code>include</code> configuration option, for example, <code>-Ainclude=*.entity.*,*Repository</code>. Alternatively, types or packages may be excluded using the <code>exclude</code> option, for example, <code>-Aexclude=*Impl</code>.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_configuring_hibernate_orm">2.3. Configuring Hibernate ORM</h3>
+<div class="paragraph">
+<p>How you configure Hibernate depends on the environment you&#8217;re running in, and on your preference:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>in Java SE, we often just use <code>hibernate.properties</code>, but some people prefer to use <code>persistence.xml</code>, especially in case of multiple persistence units,</p>
+</li>
+<li>
+<p>in Quarkus, we must use <code>application.properties</code>, and</p>
+</li>
+<li>
+<p>in a Jakarta EE container, we usually use <code>persistence.xml</code>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Here&#8217;s a simple <code>hibernate.properties</code> file for h2 database, just to get you started.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="properties"><span class="c"># Database connection settings
+</span><span class="py">jakarta.persistence.jdbc.url</span><span class="p">=</span><span class="s">jdbc:h2:~/h2temp;DB_CLOSE_DELAY=-1</span>
+<span class="py">jakarta.persistence.jdbc.user</span><span class="p">=</span><span class="s">sa</span>
+<span class="py">jakarta.persistence.jdbc.pass</span><span class="p">=</span>
+
+<span class="c"># Echo all executed SQL to console
+</span><span class="py">hibernate.show_sql</span><span class="p">=</span><span class="s">true</span>
+<span class="py">hibernate.format_sql</span><span class="p">=</span><span class="s">true</span>
+<span class="py">hibernate.highlight_sql</span><span class="p">=</span><span class="s">true</span>
+
+<span class="c"># Automatically export the schema
+</span><span class="py">hibernate.hbm2ddl.auto</span><span class="p">=</span><span class="s">create</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Please see the <a href="https://docs.jboss.org/hibernate/orm/7.0/introduction/html_single/Hibernate_Introduction.html#configuration">Introduction to Hibernate 6</a> for more information about configuring Hibernate.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_obtaining_a_statelesssession">2.4. Obtaining a <code>StatelessSession</code></h3>
+<div class="paragraph">
+<p>Each repository implementation must somehow obtain a <a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/StatelessSession.html"><code>StatelessSession</code></a> for its persistence unit.
+This usually happens via dependency injection, so you&#8217;ll need to make sure that a <code>StatelessSession</code> is available for injection:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>in Quarkus, this problem is already taken care of for us&#8212;&#8203;there&#8217;s always an injectable <code>StatelessSession</code> bean for each persistence unit, and</p>
+</li>
+<li>
+<p>in a Jakarta EE environment, <code>HibernateProcessor</code> generates special code which takes care of creating and destroying the <code>StatelessSession</code>, but</p>
+</li>
+<li>
+<p>in other environments, this is something we need to take care of ourselves.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Depending on the libraries in your build path, <code>HibernateProcessor</code> generates different code.
+For example, if Quarkus is on the build path, the repository implementation is generated to obtain the <code>StatelessSession</code> directly from CDI in a way which works in Quarkus but not in WildFly.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If you have multiple persistence units, you&#8217;ll need to disambiguate the persistence unit for a repository interface using <code>@Repository(dataStore="my-persistence-unit-name")</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_injecting_a_repository">2.5. Injecting a repository</h3>
+<div class="paragraph">
+<p>In principle, any implementation of <code>jakarta.inject</code> may be used to inject a repository implementation.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Inject</span> <span class="nc">Library</span> <span class="n">library</span><span class="o">;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>However, this code will fail if the repository implementation is not able to obtain a <code>StatelessSession</code> from the bean container.</p>
+</div>
+<div class="paragraph">
+<p>It&#8217;s always possible to instantiate a repository implementation directly.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nc">Library</span> <span class="n">library</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Library_</span><span class="o">(</span><span class="n">statelessSession</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This is useful for testing, or for executing in an environment with no support for <code>jakarta.inject</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_integration_with_jakarta_ee">2.6. Integration with Jakarta EE</h3>
+<div class="paragraph">
+<p>Jakarta Data specifies that methods of a repository interface may be annotated with:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Jakarta Bean Validation constraint annotations, and</p>
+</li>
+<li>
+<p>Jakarta Interceptors interceptor binding types, including,</p>
+</li>
+<li>
+<p>in particular, the <code>@Transactional</code> interceptor binding defined by Jakarta Transactions.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Note that these annotations are usually applied to a CDI bean implementation class, not to an interface,<sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup> but a special exception is made for repository interfaces.</p>
+</div>
+<div class="paragraph">
+<p>Therefore, when running in a Jakarta EE environment, or in Quarkus, and when an instance of a repository interface is obtained via CDI, the semantics of such annotations is respected.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Transactional</span> <span class="nd">@Repository</span>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Library</span> <span class="o">{</span>
+
+    <span class="nd">@Find</span>
+    <span class="nc">Book</span> <span class="nf">book</span><span class="o">(</span><span class="nd">@NotNull</span> <span class="nc">String</span> <span class="n">isbn</span><span class="o">);</span>
+
+    <span class="nd">@Find</span>
+    <span class="nc">Book</span> <span class="nf">book</span><span class="o">(</span><span class="nd">@NotBlank</span> <span class="nc">String</span> <span class="n">title</span><span class="o">,</span> <span class="nd">@NotNull</span> <span class="nc">LocalDate</span> <span class="n">publicationDate</span><span class="o">);</span>
+
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As an aside, it&#8217;s rather satisfying to see all these things working so nicely together, since we members of the Hibernate team played pivotal roles in the creation of the Persistence, Bean Validation, CDI, Interceptors, and Data specifications.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="pagination">3. Pagination and dynamic sorting</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>An <a href="#find-method">automatic</a> or <a href="#query-method">annotated</a> query method may have additional parameters which specify:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>additional sorting criteria, and/or</p>
+</li>
+<li>
+<p>a limit and offset restricting the results which are actually returned to the client.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Before we see this, let&#8217;s see how we can refer to a field of an entity in a completely typesafe way.</p>
+</div>
+<div class="sect2">
+<h3 id="data-static-metamodel">3.1. The static metamodel</h3>
+<div class="paragraph">
+<p>You might already be familiar with the Jakarta Persistence static metamodel.
+For an entity class <code>Book</code>, the class <code>Book_</code> exposes objects representing the persistent fields of <code>Book</code>, for example, <code>Book_.title</code> represents the field <code>title</code>.
+This class is generated by <code>HibernateProcessor</code> at compilation time.</p>
+</div>
+<div class="paragraph">
+<p>Jakarta Data has its own static metamodel, which is different to the Jakarta Persistence metamodel, but conceptually very similar. Instead of <code>Book_</code>, the Jakarta Data static metamodel for <code>Book</code> is exposed by the class <code>_Book</code>.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The Jakarta Persistence static metamodel is most commonly used together with the Criteria Query API or the <code>EntityGraph</code> facility.
+Even though these APIs aren&#8217;t part of the programming model of Jakarta Data, you can still use them from a <code>default</code> method of a repository by <a href="#resource-accessor-method">calling the <code>StatelessSession</code></a> directly.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s see how the static metamodel is useful, by considering a simple example.</p>
+</div>
+<div class="paragraph">
+<p>It&#8217;s perfectly possible to obtain an instance of <code>Sort</code> by passing the name of a field:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kt">var</span> <span class="n">sort</span> <span class="o">=</span> <span class="nc">Sort</span><span class="o">.</span><span class="na">asc</span><span class="o">(</span><span class="s">"title"</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Unfortunately, since this is in regular code, and not in an annotation, the field name <code>"title"</code> cannot be validated at compile time.</p>
+</div>
+<div class="paragraph">
+<p>A much better solution is to use the static metamodel to obtain an instance of <code>Sort</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kt">var</span> <span class="n">sort</span> <span class="o">=</span> <span class="n">_Book</span><span class="o">.</span><span class="na">title</span><span class="o">.</span><span class="na">asc</span><span class="o">();</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The static metamodel also declares constants containing the names of persistent fields.
+For example, <code>_Book.TITLE</code> evaluates to the string <code>"title"</code>.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>These constants are sometimes used as annotation values.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Find</span>
+<span class="nd">@OrderBy</span><span class="o">(</span><span class="n">_Book</span><span class="o">.</span><span class="na">TITLE</span><span class="o">)</span>
+<span class="nd">@OrderBy</span><span class="o">(</span><span class="n">_Book</span><span class="o">.</span><span class="na">ISBN</span><span class="o">)</span>
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="nf">books</span><span class="o">(</span><span class="nd">@Pattern</span> <span class="nc">String</span> <span class="n">title</span><span class="o">,</span> <span class="nc">Year</span> <span class="n">yearPublished</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This example looks superficially more typesafe.
+But since Hibernate Data Repositories already validates the content of the <code>@OrderBy</code> annotation at compile time, it&#8217;s not really better.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="dynamic-sorting">3.2. Dynamic sorting</h3>
+<div class="paragraph">
+<p>Dynamic sorting criteria are expressed using the types <code>Sort</code> and <code>Order</code>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>an instance of <code>Sort</code> represents a single criterion for sorting query results, and</p>
+</li>
+<li>
+<p>an instance of <code>Order</code> packages multiple <code>Sort</code>s together.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>A query method may accept an instance of <code>Sort</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Find</span>
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="nf">books</span><span class="o">(</span><span class="nd">@Pattern</span> <span class="nc">String</span> <span class="n">title</span><span class="o">,</span> <span class="nc">Year</span> <span class="n">yearPublished</span><span class="o">,</span>
+                 <span class="nc">Sort</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="n">sort</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This method might be called as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kt">var</span> <span class="n">books</span> <span class="o">=</span>
+        <span class="n">library</span><span class="o">.</span><span class="na">books</span><span class="o">(</span><span class="n">pattern</span><span class="o">,</span> <span class="n">year</span><span class="o">,</span>
+                      <span class="n">_Book</span><span class="o">.</span><span class="na">title</span><span class="o">.</span><span class="na">ascIgnoreCase</span><span class="o">());</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Alternatively the method may accept an instance of <code>Order</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Find</span>
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="nf">books</span><span class="o">(</span><span class="nd">@Pattern</span> <span class="nc">String</span> <span class="n">title</span><span class="o">,</span> <span class="nc">Year</span> <span class="n">yearPublished</span><span class="o">,</span>
+                 <span class="nc">Order</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="n">order</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The method might now be called like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kt">var</span> <span class="n">books</span> <span class="o">=</span>
+       <span class="n">library</span><span class="o">.</span><span class="na">books</span><span class="o">(</span><span class="n">pattern</span><span class="o">,</span> <span class="n">year</span><span class="o">,</span>
+                     <span class="nc">Order</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="n">_Book</span><span class="o">.</span><span class="na">title</span><span class="o">.</span><span class="na">ascIgnoreCase</span><span class="o">(),</span>
+                              <span class="n">_Book</span><span class="o">.</span><span class="na">isbn</span><span class="o">.</span><span class="na">asc</span><span class="o">()));</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Dynamic sorting criteria may be combined with static criteria.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Find</span>
+<span class="nd">@OrderBy</span><span class="o">(</span><span class="s">"title"</span><span class="o">)</span>
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="nf">books</span><span class="o">(</span><span class="nd">@Pattern</span> <span class="nc">String</span> <span class="n">title</span><span class="o">,</span> <span class="nc">Year</span> <span class="n">yearPublished</span><span class="o">,</span>
+                 <span class="nc">Sort</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="n">sort</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We&#8217;re not convinced this is very useful in practice.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="limits">3.3. Limits</h3>
+<div class="paragraph">
+<p>A <code>Limit</code> is the simplest way to express a subrange of query results.
+It specifies:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>maxResults</code>, the maximum number of results to be returned from the database server to the client, and,</p>
+</li>
+<li>
+<p>optionally, <code>startAt</code>, an offset from the very first result.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>These values map directly the familiar <code>setMaxResults()</code> and <code>setFirstResults()</code> of the Jakarta Persistence <code>Query</code> interface.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Find</span>
+<span class="nd">@OrderBy</span><span class="o">(</span><span class="n">_Book</span><span class="o">.</span><span class="na">TITLE</span><span class="o">)</span>
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="nf">books</span><span class="o">(</span><span class="nd">@Pattern</span> <span class="nc">String</span> <span class="n">title</span><span class="o">,</span> <span class="nc">Year</span> <span class="n">yearPublished</span><span class="o">,</span>
+                 <span class="nc">Limit</span> <span class="n">limit</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kt">var</span> <span class="n">books</span> <span class="o">=</span>
+        <span class="n">library</span><span class="o">.</span><span class="na">books</span><span class="o">(</span><span class="n">pattern</span><span class="o">,</span> <span class="n">year</span><span class="o">,</span>
+                      <span class="nc">Limit</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="no">MAX_RESULTS</span><span class="o">));</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A more sophisticated approach is provided by <code>PageRequest</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="offset-based-pagination">3.4. Offset-based pagination</h3>
+<div class="paragraph">
+<p>A <code>PageRequest</code> is superficially similar to a <code>Limit</code>, except that it&#8217;s specified in terms of:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>a page <code>size</code>, and</p>
+</li>
+<li>
+<p>a numbered <code>page</code>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>We can use a <code>PageRequest</code> just like a <code>Limit</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Find</span>
+<span class="nd">@OrderBy</span><span class="o">(</span><span class="s">"title"</span><span class="o">)</span>
+<span class="nd">@OrderBy</span><span class="o">(</span><span class="s">"isbn"</span><span class="o">)</span>
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="nf">books</span><span class="o">(</span><span class="nd">@Pattern</span> <span class="nc">String</span> <span class="n">title</span><span class="o">,</span> <span class="nc">Year</span> <span class="n">yearPublished</span><span class="o">,</span>
+                 <span class="nc">PageRequest</span> <span class="n">pageRequest</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kt">var</span> <span class="n">books</span> <span class="o">=</span>
+        <span class="n">library</span><span class="o">.</span><span class="na">books</span><span class="o">(</span><span class="n">pattern</span><span class="o">,</span> <span class="n">year</span><span class="o">,</span>
+                      <span class="nc">PageRequest</span><span class="o">.</span><span class="na">ofSize</span><span class="o">(</span><span class="no">PAGE_SIZE</span><span class="o">));</span></code></pre>
+</div>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Query results should be totally ordered when a repository method is used for pagination.
+The easiest way to be sure that you have a well-defined total order is to specify the identifier of the entity as the last element of the order.
+For this reason, we specified <code>@OrderBy("isbn")</code> in the previous example.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>However, a repository method which accepts a <code>PageRequest</code> may return a <code>Page</code> instead of a <code>List</code>, making it easier to implement pagination.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Find</span>
+<span class="nd">@OrderBy</span><span class="o">(</span><span class="s">"title"</span><span class="o">)</span>
+<span class="nd">@OrderBy</span><span class="o">(</span><span class="s">"isbn"</span><span class="o">)</span>
+<span class="nc">Page</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="nf">books</span><span class="o">(</span><span class="nd">@Pattern</span> <span class="nc">String</span> <span class="n">title</span><span class="o">,</span> <span class="nc">Year</span> <span class="n">yearPublished</span><span class="o">,</span>
+                 <span class="nc">PageRequest</span> <span class="n">pageRequest</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kt">var</span> <span class="n">page</span> <span class="o">=</span>
+        <span class="n">library</span><span class="o">.</span><span class="na">books</span><span class="o">(</span><span class="n">pattern</span><span class="o">,</span> <span class="n">year</span><span class="o">,</span>
+                      <span class="nc">PageRequest</span><span class="o">.</span><span class="na">ofSize</span><span class="o">(</span><span class="no">PAGE_SIZE</span><span class="o">));</span>
+<span class="kt">var</span> <span class="n">books</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="na">content</span><span class="o">();</span>
+<span class="kt">long</span> <span class="n">totalPages</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="na">totalPages</span><span class="o">();</span>
+<span class="c1">// ...</span>
+<span class="k">while</span> <span class="o">(</span><span class="n">page</span><span class="o">.</span><span class="na">hasNext</span><span class="o">())</span> <span class="o">{</span>
+    <span class="n">page</span> <span class="o">=</span> <span class="n">library</span><span class="o">.</span><span class="na">books</span><span class="o">(</span><span class="n">pattern</span><span class="o">,</span> <span class="n">year</span><span class="o">,</span>
+                         <span class="n">page</span><span class="o">.</span><span class="na">nextPageRequest</span><span class="o">().</span><span class="na">withoutTotal</span><span class="o">());</span>
+    <span class="n">books</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="na">content</span><span class="o">();</span>
+    <span class="c1">// ...</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Pagination may be combined with dynamic sorting.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Find</span>
+<span class="nc">Page</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="nf">books</span><span class="o">(</span><span class="nd">@Pattern</span> <span class="nc">String</span> <span class="n">title</span><span class="o">,</span> <span class="nc">Year</span> <span class="n">yearPublished</span><span class="o">,</span>
+                 <span class="nc">PageRequest</span> <span class="n">pageRequest</span><span class="o">,</span> <span class="nc">Order</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="n">order</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>It&#8217;s important to pass the same arguments to query parameters, and the same sorting criteria, with each page request!
+The repository is stateless: it doesn&#8217;t remember the values passed on the previous page request.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>A repository method with return type <code>Page</code> uses SQL offset and limit to implement pagination.
+We&#8217;ll refer to this as <em>offset-based pagination</em>.
+A problem with this approach is that it&#8217;s quite vulnerable to missed or duplicate results when the database is modified between page requests.
+Therefore, Jakarta Data offers an alternative solution, which we&#8217;ll call <em>key-based pagination</em>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="key-based-pagination">3.5. Key-based pagination</h3>
+<div class="paragraph">
+<p>In key-based pagination, the query results must be totally ordered by a unique key of the result set.
+The SQL offset is replaced with a restriction on the unique key, appended to the <code>where</code> clause of the query:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>a request for the <em>next</em> page of query results uses the key value of the <em>last</em> result on the current page to restrict the results, or</p>
+</li>
+<li>
+<p>a request for the <em>previous</em> page of query results uses the key value of the <em>first</em> result on the current page to restrict the results.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>For key-based pagination, it&#8217;s <em>essential</em> that the query has a total order.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>From our point of view as users of Jakarta Data, key-based pagination works almost exactly like offset-based pagination.
+The difference is that we must declare our repository method to return <code>CursoredPage</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Find</span>
+<span class="nd">@OrderBy</span><span class="o">(</span><span class="s">"title"</span><span class="o">)</span>
+<span class="nd">@OrderBy</span><span class="o">(</span><span class="s">"isbn"</span><span class="o">)</span>
+<span class="nc">CursoredPage</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="nf">books</span><span class="o">(</span><span class="nd">@Pattern</span> <span class="nc">String</span> <span class="n">title</span><span class="o">,</span> <span class="nc">Year</span> <span class="n">yearPublished</span><span class="o">,</span>
+                         <span class="nc">PageRequest</span> <span class="n">pageRequest</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>On the other hand, with key-based pagination, Hibernate must do some work under the covers rewriting our query.</p>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Key-based pagination goes some way to protect us from skipped or duplicate results.
+The cost is that page numbers can lose synchronization with the query result set during navigation.
+This isn&#8217;t usually a problem, but it&#8217;s something to be aware of.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph">
+<p>Direct API support for key-based pagination originated in the work of Hibernate team member Christian Beikov back in 2015 in the Blaze-Persistence framework.
+It was adopted from there by the Jakarta Data specification, and is now even available in Hibernate ORM via the <a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/query/KeyedPage.html"><code>KeyedPage</code></a>/<a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/query/KeyedResultList.html"><code>KeyedResultList</code></a> API.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="dynamic-restrictions">3.6. Dynamic restrictions</h3>
+<div class="paragraph">
+<p>Jakarta Data 1.0 does not include an API for programmatically specifying restrictions, but for now we may use the native <a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/query/restriction/Restriction.html"><code>Restriction</code></a> API in Hibernate 7.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Restrictions will be standardized by Jakarta Data 1.1.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Hibernate, an atomic <code>Restriction</code> is formed from:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>a reference to a JPA <code>SingularAttribute</code>, usually obtained via the <em>Jakarta Persistence</em> (not Jakarta Data) static metamodel, together with</p>
+</li>
+<li>
+<p>a <code>Range</code> of allowed values for that attribute.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>A query method may have a parameter of type <code>Restriction</code>, for example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Find</span>
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="nf">books</span><span class="o">(</span><span class="nc">Restriction</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="n">restriction</span><span class="o">,</span>
+                 <span class="nc">Order</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="n">order</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This method would be called like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kt">var</span> <span class="n">books</span> <span class="o">=</span>
+       <span class="n">library</span><span class="o">.</span><span class="na">books</span><span class="o">(</span><span class="nc">Restriction</span><span class="o">.</span><span class="na">contains</span><span class="o">(</span><span class="n">Book_</span><span class="o">.</span><span class="na">title</span><span class="o">,</span> <span class="s">"Hibernate"</span><span class="o">),</span>
+                     <span class="nc">Order</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="n">_Book</span><span class="o">.</span><span class="na">title</span><span class="o">.</span><span class="na">ascIgnoreCase</span><span class="o">(),</span>
+                              <span class="n">_Book</span><span class="o">.</span><span class="na">isbn</span><span class="o">.</span><span class="na">asc</span><span class="o">()));</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Notice the mix of metamodels here: <code>Book_</code> is the Persistence metamodel, and <code>_Book</code> is the Data metamodel.</p>
+</div>
+<div class="paragraph">
+<p>It&#8217;s even possible to directly use a <a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/query/range/Range.html"><code>Range</code></a> to restrict a given property or field of an entity:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Find</span>
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="nf">books</span><span class="o">(</span><span class="nc">Range</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">title</span><span class="o">,</span> <span class="nc">Range</span><span class="o">&lt;</span><span class="nc">Year</span><span class="o">&gt;</span> <span class="n">yearPublished</span><span class="o">,</span>
+                 <span class="nc">Order</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="n">order</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There are various kinds of <code>Range</code>, including lists, patterns, and intervals:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kt">var</span> <span class="n">books</span> <span class="o">=</span>
+       <span class="n">library</span><span class="o">.</span><span class="na">books</span><span class="o">(</span><span class="nc">Range</span><span class="o">.</span><span class="na">prefix</span><span class="o">(</span><span class="s">"Hibernate"</span><span class="o">),</span>
+                     <span class="nc">Range</span><span class="o">.</span><span class="na">closed</span><span class="o">(</span><span class="nc">Year</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="mi">2000</span><span class="o">),</span> <span class="nc">Year</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="mi">2009</span><span class="o">)),</span>
+                     <span class="nc">Order</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="n">_Book</span><span class="o">.</span><span class="na">title</span><span class="o">.</span><span class="na">ascIgnoreCase</span><span class="o">(),</span>
+                              <span class="n">_Book</span><span class="o">.</span><span class="na">isbn</span><span class="o">.</span><span class="na">asc</span><span class="o">()));</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="advanced-query-control">3.7. Advanced control over querying</h3>
+<div class="paragraph">
+<p>For more advanced usage, an automatic or annotated query method may be declared to return <code>jakarta.persistence.Query</code>, <code>jakarta.persistence.TypedQuery</code>, <a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/query/Query.html"><code>org.hibernate.query.Query</code></a>, or <a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/query/SelectionQuery.html"><code>org.hibernate.query.SelectionQuery</code></a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Find</span>
+<span class="nc">SelectionQuery</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="nf">booksQuery</span><span class="o">(</span><span class="nd">@Pattern</span> <span class="nc">String</span> <span class="n">title</span><span class="o">,</span> <span class="nc">Year</span> <span class="n">yearPublished</span><span class="o">);</span>
+
+<span class="k">default</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="nf">booksQuery</span><span class="o">(</span><span class="nc">String</span> <span class="n">title</span><span class="o">,</span> <span class="nc">Year</span> <span class="n">yearPublished</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="nf">books</span><span class="o">(</span><span class="n">title</span><span class="o">,</span> <span class="n">yearPublished</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">enableFetchProfile</span><span class="o">(</span><span class="n">_Book</span><span class="o">.</span><span class="na">PROFILE_WITH_AUTHORS</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">setReadOnly</span><span class="o">(</span><span class="kc">true</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">setTimeout</span><span class="o">(</span><span class="no">QUERY_TIMEOUT</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">getResultList</span><span class="o">();</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This allows for direct control over query execution, without loss of type safety.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="reactive-repositories">4. Reactive repositories</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Hibernate Data Repositories provides repositories backed by <a href="https://hibernate.org/reactive/">Hibernate Reactive</a> for use in reactive programming.
+The methods of a reactive repository are non-blocking, and so every operation returns a reactive stream.
+This is an extension to the programming model defined by Jakarta Data.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The Jakarta Data specification has not yet defined a way to write repositories for use in reactive programming, but the spec was written to accommodate such extensions, and this capability might be standardized in a future release.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>In Hibernate Data Repositories we use <a href="https://smallrye.io/smallrye-mutiny/">Mutiny</a> to work with reactive streams.</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If and when Jakarta Data <em>does</em> provide standard support for reactive repositories, the functionality will almost certainly be based on Java&#8217;s <code>CompletionStage</code>, and not on Mutiny.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>In our opinion, Mutiny is a <em>much</em> more comfortable API than <code>CompletionStage</code>.</p>
+</div>
+<div class="sect2">
+<h3 id="_defining_a_reactive_repository">4.1. Defining a reactive repository</h3>
+<div class="paragraph">
+<p>In the following code example we notice the two requirements for a reactive repository in Hibernate Data Repositories:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>there must be a resource accessor method returning the underlying <code>Mutiny.StatelessSession</code> from Hibernate Reactive, and</p>
+</li>
+<li>
+<p>the return type of every other operation is <code>Uni</code>, a reactive stream type defined by Mutiny.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>For example, a <code>@Find</code> method which would return <code>Book</code> in a regular Jakarta Data repository must return <code>Uni&lt;Book&gt;</code> in a reactive repository.
+Similarly, lifecycle methods usually return <code>Uni&lt;Void&gt;</code> instead of <code>void</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Repository</span>
+<span class="kd">interface</span> <span class="nc">Library</span> <span class="o">{</span>
+
+    <span class="nc">Mutiny</span><span class="o">.</span><span class="na">StatelessSession</span> <span class="nf">session</span><span class="o">();</span>
+
+    <span class="nd">@Find</span>
+    <span class="nc">Uni</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="nf">book</span><span class="o">(</span><span class="nc">String</span> <span class="n">isbn</span><span class="o">);</span>
+
+    <span class="nd">@Insert</span>
+    <span class="nc">Uni</span><span class="o">&lt;</span><span class="nc">Void</span><span class="o">&gt;</span> <span class="nf">add</span><span class="o">(</span><span class="nc">Book</span> <span class="n">book</span><span class="o">);</span>
+
+    <span class="nd">@Find</span>
+    <span class="nc">Uni</span><span class="o">&lt;</span><span class="nc">List</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;&gt;</span> <span class="nf">books</span><span class="o">(</span><span class="nd">@By</span><span class="o">(</span><span class="s">"isbn"</span><span class="o">)</span> <span class="nc">String</span><span class="o">[]</span> <span class="n">ibsns</span><span class="o">);</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It&#8217;s <em>not</em> possible to mix blocking and non-blocking operations in the same repository interface.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+Depending on how you&#8217;re managing the stateless session, you might need to declare the resource accessor method with the type <code>Uni&lt;Mutiny.StatelessSession&gt;</code>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_obtaining_a_reactive_repository">4.2. Obtaining a reactive repository</h3>
+<div class="paragraph">
+<p>To make use of our reactive repository, we&#8217;ll need to bootstrap Hibernate Reactive and obtain a <code>Mutiny.SessionFactory</code>.
+For example, if we have a persistence unit named <code>example</code> in our <code>persistence.xml</code> file, we can obtain a <code>SessionFactory</code> like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nc">Mutiny</span><span class="o">.</span><span class="na">SessionFactory</span> <span class="n">factory</span> <span class="o">=</span>
+        <span class="n">createEntityManagerFactory</span><span class="o">(</span><span class="s">"example"</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">unwrap</span><span class="o">(</span><span class="nc">Mutiny</span><span class="o">.</span><span class="na">SessionFactory</span><span class="o">.</span><span class="na">class</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Please refer to the <a href="https://hibernate.org/reactive/documentation/">documentation for Hibernate Reactive</a> for more information on this topic.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+In Quarkus, this step is unnecessary, and you can let Quarkus manage and inject the reactive <code>SessionFactory</code>.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Once we have the <code>SessionFactory</code>, we can easily obtain a <code>Mutiny.StatelessSession</code>, and use it to instantiate our repository:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="n">factory</span><span class="o">.</span><span class="na">withStatelessTransaction</span><span class="o">(</span><span class="n">session</span> <span class="o">-&gt;</span> <span class="o">{</span>
+    <span class="nc">Library</span> <span class="n">library</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Library_</span><span class="o">(</span><span class="n">session</span><span class="o">);</span>
+    <span class="o">...</span>
+<span class="o">})</span></code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+An even better approach is to make a <code>@RequestScoped</code> instance of <code>Mutiny.StatelessSession</code> or <code>Uni&lt;Mutiny.StatelessSession&gt;</code> available for injection by CDI.
+Then the <code>Library</code> repository itself may be directly injected, and you won&#8217;t have to worry about managing the stateless session in application program code.
+This is a little bit tricky to get working perfectly, so hopefully by the time you&#8217;re reading this, there will already be a built-in implementation in Quarkus.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_calling_a_reactive_repository">4.3. Calling a reactive repository</h3>
+<div class="paragraph">
+<p>To actually make use of a reactive repository, you&#8217;ll need to be familiar with the programming model of reactive streams.
+For this, we refer you to the Mutiny documentation, and to the documentation for Hibernate Reactive, which goes over some gotchas.</p>
+</div>
+<div class="paragraph">
+<p>The most important thing to understand is that a code fragment like the following does <em>not</em> result in any immediate interaction with the database:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nc">Uni</span><span class="o">&lt;</span><span class="nc">Void</span><span class="o">&gt;</span> <span class="n">uni</span> <span class="o">=</span>
+        <span class="n">factory</span><span class="o">.</span><span class="na">withStatelessTransaction</span><span class="o">(</span><span class="n">session</span> <span class="o">-&gt;</span> <span class="o">{</span>
+            <span class="nc">Library</span> <span class="n">library</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Library_</span><span class="o">(</span><span class="n">session</span><span class="o">);</span>
+            <span class="k">return</span> <span class="n">library</span><span class="o">.</span><span class="na">book</span><span class="o">(</span><span class="s">"9781932394153"</span><span class="o">);</span>
+        <span class="o">})</span>
+        <span class="o">.</span><span class="na">invoke</span><span class="o">(</span><span class="n">book</span> <span class="o">-&gt;</span> <span class="n">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">book</span><span class="o">.</span><span class="na">title</span><span class="o">))</span>
+        <span class="o">.</span><span class="na">replaceWithVoid</span><span class="o">();</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This code does no more than construct a reactive stream.
+We can execute the stream blockingly by calling <code>uni.await().indefinitely()</code>, but that&#8217;s not something we would ever do in real code.
+Instead, what we usually do is simply return the stream, allowing it to be executed in a non-blocking way.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<hr>
+<div class="footnote" id="_footnotedef_1">
+<a href="#_footnoteref_1">1</a>. <code>@Inherited</code> annotations are inherited from superclass to subclass, but not from interface to implementing class.
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 7.0.0.CR1<br>
+Last updated 2025-04-24 19:31:08 UTC
+</div>
+</div>
+</body>
+</html>

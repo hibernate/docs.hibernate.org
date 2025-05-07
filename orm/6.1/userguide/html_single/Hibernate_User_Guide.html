@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.10">
 <meta name="author" content="Vlad Mihalcea, Steve Ebersole, Andrea Boriero, Gunnar Morling, Gail Badner, Chris Cranford, Emmanuel Bernard, Sanne Grinovero, Brett Meyer, Hardy Ferentschik, Gavin King, Christian Bauer, Max Rydahl Andersen, Karel Maesen, Radim Vansa, Louis Jacomet">
-<title>Hibernate ORM 6.1.6.Final User Guide</title>
+<title>Hibernate ORM 6.1.7.Final User Guide</title>
 <link rel="stylesheet" href="./css/hibernate.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
@@ -19,10 +19,10 @@
 </head>
 <body class="article toc2 toc-left">
 <div id="header">
-<h1>Hibernate ORM 6.1.6.Final User Guide</h1>
+<h1>Hibernate ORM 6.1.7.Final User Guide</h1>
 <div class="details">
 <span id="author" class="author">Vlad Mihalcea, Steve Ebersole, Andrea Boriero, Gunnar Morling, Gail Badner, Chris Cranford, Emmanuel Bernard, Sanne Grinovero, Brett Meyer, Hardy Ferentschik, Gavin King, Christian Bauer, Max Rydahl Andersen, Karel Maesen, Radim Vansa, Louis Jacomet</span><br>
-<span id="revnumber">version 6.1.6.Final</span>
+<span id="revnumber">version 6.1.7.Final</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -36044,7 +36044,7 @@ for(Object[] person : persons) {
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight"><code data-lang="JAVA">List&lt;Object[]&gt; persons = session.createNativeQuery(
-	"SELECT * FROM Person")
+	"SELECT * FROM Person", Object[].class)
 .list();</code></pre>
 </div>
 </div>
@@ -36056,7 +36056,7 @@ for(Object[] person : persons) {
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight"><code data-lang="JAVA">List&lt;Object[]&gt; persons = session.createNativeQuery(
-	"SELECT id, name FROM Person")
+	"SELECT id, name FROM Person", Object[].class)
 .list();
 
 for(Object[] person : persons) {
@@ -36080,7 +36080,7 @@ Hibernate will use <code>java.sql.ResultSetMetadata</code> to deduce the actual 
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight"><code data-lang="JAVA">List&lt;Object[]&gt; persons = session.createNativeQuery(
-	"SELECT * FROM Person")
+	"SELECT * FROM Person", Object[].class)
 .addScalar("id", StandardBasicTypes.LONG)
 .addScalar("name", StandardBasicTypes.STRING)
 .list();
@@ -36106,7 +36106,7 @@ This also means that only these two columns will be returned, even though the qu
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight"><code data-lang="JAVA">List&lt;Object[]&gt; persons = session.createNativeQuery(
-	"SELECT * FROM Person")
+	"SELECT * FROM Person", Object[].class)
 .addScalar("id", StandardBasicTypes.LONG)
 .addScalar("name")
 .list();
@@ -36150,8 +36150,7 @@ If a specific type is not mapped, or does not result in the expected type, it is
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight"><code data-lang="JAVA">List&lt;Person&gt; persons = session.createNativeQuery(
-	"SELECT * FROM Person")
-.addEntity(Person.class)
+	"SELECT * FROM Person", Person.class)
 .list();</code></pre>
 </div>
 </div>
@@ -36181,8 +36180,7 @@ the following query will also return a <code>List</code> where each element is a
 <div class="content">
 <pre class="prettyprint highlight"><code data-lang="JAVA">List&lt;Person&gt; persons = session.createNativeQuery(
 	"SELECT id, name, nickName, address, createdOn, version " +
-	"FROM Person")
-.addEntity(Person.class)
+	"FROM Person", Person.class)
 .list();</code></pre>
 </div>
 </div>
@@ -36216,8 +36214,7 @@ otherwise, a database-specific <em>column not found</em> error will occur.</p>
 <div class="content">
 <pre class="prettyprint highlight"><code data-lang="JAVA">List&lt;Phone&gt; phones = session.createNativeQuery(
 	"SELECT id, phone_number, phone_type, person_id " +
-	"FROM Phone")
-.addEntity(Phone.class)
+	"FROM Phone", Phone.class)
 .list();</code></pre>
 </div>
 </div>
@@ -36238,8 +36235,7 @@ association is going to use a proxy that will be initialized when being navigate
 <pre class="prettyprint highlight"><code data-lang="JAVA">List&lt;Phone&gt; tuples = session.createNativeQuery(
 	"SELECT {ph.*}, {pr.*} " +
 	"FROM Phone ph " +
-	"JOIN Person pr ON ph.person_id = pr.id")
-.addEntity("ph", Phone.class)
+	"JOIN Person pr ON ph.person_id = pr.id", Phone.class, "ph")
 .addJoin("pr", "ph.person")
 .list();
 
@@ -36287,8 +36283,7 @@ Joined entities will only be present for their respective association.</p>
 <pre class="prettyprint highlight"><code data-lang="JAVA">List&lt;Phone&gt; phones = session.createNativeQuery(
 	"SELECT {ph.*}, {pr.*} " +
 	"FROM Phone ph " +
-	"JOIN Person pr ON ph.person_id = pr.id")
-.addEntity("ph", Phone.class)
+	"JOIN Person pr ON ph.person_id = pr.id", Phone.class, "ph")
 .addJoin("pr", "ph.person")
 .list();
 
@@ -36336,8 +36331,7 @@ JOIN call c ON c.phone_id = ph.id</code></pre>
 <pre class="prettyprint highlight"><code data-lang="JAVA">List&lt;Phone&gt; tuples = session.createNativeQuery(
 	"SELECT {ph.*}, {c.*} " +
 	"FROM Phone ph " +
-	"JOIN phone_call c ON c.phone_id = ph.id")
-.addEntity("ph", Phone.class)
+	"JOIN phone_call c ON c.phone_id = ph.id", Phone.class, "ph")
 .addJoin("c", "ph.calls")
 .list();
 
@@ -36414,7 +36408,7 @@ which are not equal to the columns specified in the mappings (<code>id</code> an
 <pre class="prettyprint highlight"><code data-lang="JAVA">List&lt;Object&gt; entities = session.createNativeQuery(
 	"SELECT {pr.*}, {pt.*} " +
 	"FROM Person pr, Partner pt " +
-	"WHERE pr.name = pt.name")
+	"WHERE pr.name = pt.name", Object.class)
 .addEntity("pr", Person.class)
 .addEntity("pt", Partner.class)
 .list();</code></pre>
@@ -36557,8 +36551,15 @@ Please note that the alias names in the result are simply examples, each alias w
 
 List&lt;PersonSummaryDTO&gt; dtos = session.createNativeQuery(
 	"SELECT p.id as \"id\", p.name as \"name\" " +
-	"FROM Person p")
-.setResultTransformer(Transformers.aliasToBean(PersonSummaryDTO.class))
+	"FROM Person p", Tuple.class)
+.setTupleTransformer(
+		(tuple, aliases) -&gt; {
+			PersonSummaryDTO dto = new PersonSummaryDTO();
+			dto.setId( (Long)tuple[0] );
+			dto.setName( (String)tuple[1] );
+			return dto;
+		}
+)
 .list();</code></pre>
 </div>
 </div>
@@ -36595,8 +36596,7 @@ List&lt;PersonSummaryDTO&gt; dtos = session.createNativeQuery(
 <pre class="prettyprint highlight"><code data-lang="JAVA">List&lt;CreditCardPayment&gt; payments = session.createNativeQuery(
 	"SELECT * " +
 	"FROM Payment p " +
-	"JOIN CreditCardPayment cp on cp.id = p.id")
-.addEntity(CreditCardPayment.class)
+	"JOIN CreditCardPayment cp on cp.id = p.id", CreditCardPayment.class)
 .list();</code></pre>
 </div>
 </div>
@@ -36645,8 +36645,7 @@ List&lt;PersonSummaryDTO&gt; dtos = session.createNativeQuery(
 <pre class="prettyprint highlight"><code data-lang="JAVA">List&lt;Person&gt; persons = session.createNativeQuery(
 	"SELECT * " +
 	"FROM Person " +
-	"WHERE name like :name")
-.addEntity(Person.class)
+	"WHERE name like :name", Person.class)
 .setParameter("name", "J%")
 .list();</code></pre>
 </div>
@@ -36794,8 +36793,8 @@ for(Object[] tuple : tuples) {
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code data-lang="JAVA">List&lt;Object[]&gt; tuples = session.getNamedQuery(
-	"find_person_name_and_nickName")
+<pre class="prettyprint highlight"><code data-lang="JAVA">List&lt;Object[]&gt; tuples = session.createNamedQuery(
+	"find_person_name_and_nickName", Object[].class)
 .list();
 
 for(Object[] tuple : tuples) {
@@ -36882,8 +36881,8 @@ for(Object[] tuple : tuples) {
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code data-lang="JAVA">List&lt;PersonNames&gt; personNames = session.getNamedQuery(
-	"find_person_name_and_nickName_dto")
+<pre class="prettyprint highlight"><code data-lang="JAVA">List&lt;PersonNames&gt; personNames = session.createNamedQuery(
+	"find_person_name_and_nickName_dto", PersonNames.class)
 .list();</code></pre>
 </div>
 </div>
@@ -36927,8 +36926,8 @@ to customize the named query using various configurations such as fetch mode, ca
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code data-lang="JAVA">List&lt;PersonPhoneCount&gt; personNames = session.getNamedNativeQuery(
-	"get_person_phone_count")
+<pre class="prettyprint highlight"><code data-lang="JAVA">List&lt;PersonPhoneCount&gt; personNames = session.createNamedQuery(
+	"get_person_phone_count", PersonPhoneCount.class)
 .getResultList();</code></pre>
 </div>
 </div>
@@ -36990,8 +36989,8 @@ Field definitions are optional provided that they map to the same column name as
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code data-lang="JAVA">List&lt;Person&gt; persons = session.getNamedQuery(
-	"find_person_by_name")
+<pre class="prettyprint highlight"><code data-lang="JAVA">List&lt;Person&gt; persons = session.createNamedQuery(
+	"find_person_by_name", Person.class)
 .setParameter("name", "J%")
 .list();</code></pre>
 </div>
@@ -37077,8 +37076,8 @@ for(Object[] tuple : tuples) {
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code data-lang="JAVA">List&lt;Object[]&gt; tuples = session.getNamedQuery(
-	"find_person_with_phones_by_name")
+<pre class="prettyprint highlight"><code data-lang="JAVA">List&lt;Object[]&gt; tuples = session.createNamedQuery(
+	"find_person_with_phones_by_name", Object[].class)
 .setParameter("name", "J%")
 .list();
 
@@ -37235,8 +37234,8 @@ for(Object[] tuple : tuples) {
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code data-lang="JAVA">List&lt;Object[]&gt; tuples = session.getNamedQuery(
-	"find_all_spaceships")
+<pre class="prettyprint highlight"><code data-lang="JAVA">List&lt;Object[]&gt; tuples = session.createNamedQuery(
+	"find_all_spaceships", Object[].class)
 .list();
 
 for(Object[] tuple : tuples) {
@@ -50459,8 +50458,8 @@ Addison-Wesley Professional. 2002.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 6.1.6.Final<br>
-Last updated 2022-12-07 14:31:00 UTC
+Version 6.1.7.Final<br>
+Last updated 2023-02-07 11:26:16 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">

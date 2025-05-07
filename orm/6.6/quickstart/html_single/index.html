@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.18">
+<meta name="description" content="Quick start guide for Hibernate ORM">
+<title>Getting Started with Hibernate</title>
+<link rel="stylesheet" href="./css/hibernate.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="./rouge-github.css">
+</head>
+<body class="book">
+<div id="header">
+<h1>Getting Started with Hibernate</h1>
+<div class="details">
+<span id="revnumber">version 6.6.13.Final</span>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#preface">Preface</a></li>
+<li><a href="#obtaining">1. Obtaining Hibernate</a>
+<ul class="sectlevel2">
+<li><a href="#modules">1.1. Hibernate ORM modules</a></li>
+<li><a href="#platform">1.2. Platform / BOM</a></li>
+<li><a href="#examples">1.3. Example sources</a></li>
+</ul>
+</li>
+<li><a href="#tutorial_annotations">2. Tutorial using native Hibernate APIs</a>
+<ul class="sectlevel2">
+<li><a href="#hibernate-gsg-tutorial-annotations-config">2.1. Configuration via properties file</a></li>
+<li><a href="#hibernate-gsg-tutorial-annotations-entity">2.2. The annotated entity Java class</a></li>
+<li><a href="#hibernate-gsg-tutorial-annotations-test">2.3. Example code</a></li>
+<li><a href="#hibernate-gsg-tutorial-annotations-further">2.4. Take it further!</a></li>
+</ul>
+</li>
+<li><a href="#tutorial_jpa">3. Tutorial using JPA-standard APIs</a>
+<ul class="sectlevel2">
+<li><a href="#hibernate-gsg-tutorial-jpa-config">3.1. persistence.xml</a></li>
+<li><a href="#hibernate-gsg-tutorial-jpa-entity">3.2. The annotated entity Java class</a></li>
+<li><a href="#hibernate-gsg-tutorial-jpa-test">3.3. Example code</a></li>
+<li><a href="#hibernate-gsg-tutorial-jpa-further">3.4. Take it further!</a></li>
+</ul>
+</li>
+<li><a href="#tutorial_envers">4. Tutorial Using Envers</a>
+<ul class="sectlevel2">
+<li><a href="#hibernate-gsg-tutorial-envers-config">4.1. persistence.xml</a></li>
+<li><a href="#hibernate-gsg-tutorial-envers-entity">4.2. The annotated entity Java class</a></li>
+<li><a href="#hibernate-gsg-tutorial-envers-test">4.3. Example code</a></li>
+<li><a href="#hibernate-gsg-tutorial-envers-further">4.4. Take it further!</a></li>
+</ul>
+</li>
+<li><a href="#credits">5. Credits</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="preface">Preface</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Hibernate is an <em>Object/Relational Mapping</em> (ORM) solution for programs written in Java and other JVM
+languages.</p>
+</div>
+<div class="paragraph">
+<p>While a strong background in SQL is not required to use Hibernate, a basic understanding of its concepts is useful - especially the principles of <em>data modeling</em>.
+Understanding the basics of transactions and design patterns such as <em>Unit of Work</em> are important as well.</p>
+</div>
+<div id="useful-resources" class="sidebarblock">
+<div class="content">
+<div class="title">Useful background resources</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://en.wikipedia.org/wiki/Data_modeling">Data Modeling (Wikipedia)</a>.</p>
+</li>
+<li>
+<p><a href="https://www.agiledata.org/essays/dataModeling101.html">Data Modeling 101</a></p>
+</li>
+<li>
+<p><a href="https://www.marcobehler.com/guides/a-guide-to-accessing-databases-in-java">Java &amp; Databases: An Overview of Libraries &amp; APIs</a></p>
+</li>
+<li>
+<p><a href="https://martinfowler.com/eaaCatalog/unitOfWork.html">Unit of Work</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="obtaining">1. Obtaining Hibernate</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Hibernate is broken into a number of modules/artifacts under the <code>org.hibernate.orm</code>
+group.  The main artifact is named <code>hibernate-core</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This guide uses 6.6.13.Final as the Hibernate version for illustration purposes.  Be sure to change
+this version, if necessary, to the version you wish to use.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>We can declare a dependency on this artifact using <a href="https://www.gradle.org">Gradle</a></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="groovy"><span class="n">dependencies</span> <span class="o">{</span>
+  <span class="n">implementation</span> <span class="s2">"org.hibernate.orm:hibernate-core:6.6.13.Final"</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or <a href="https://maven.org">Maven</a>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="xml"><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.hibernate.orm<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>hibernate-core<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>6.6.13.Final<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span></code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="modules">1.1. Hibernate ORM modules</h3>
+<div class="paragraph">
+<p>As mentioned earlier, Hibernate ORM is broken into a number of modules with the intent of isolating
+transitive dependencies based on the features being used or not.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. API-oriented modules</caption>
+<colgroup>
+<col style="width: 40%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate-core</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The core object/relational mapping engine</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate-envers</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Entity versioning and auditing</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate-spatial</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Support for spatial/GIS data types using <a href="https://github.com/GeoLatte/geolatte-geom">GeoLatte</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate-jpamodelgen</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An annotation processor that generates a JPA-compliant metamodel, plus optional Hibernate extras</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate-vector</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Support for mathematical vector types and functions useful for AI/ML topics like vector similarity search and Retrieval-Augmented Generation (RAG)</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 2. Integration-oriented modules</caption>
+<colgroup>
+<col style="width: 40%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate-agroal</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Support for <a href="https://agroal.github.io/">Agroal</a> connection pooling</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate-c3p0</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Support for <a href="https://www.mchange.com/projects/c3p0/">C3P0</a> connection pooling</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate-hikaricp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Support for <a href="https://github.com/brettwooldridge/HikariCP/">HikariCP</a> connection pooling</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate-vibur</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Support for <a href="https://www.vibur.org/">Vibur DBCP</a> connection pooling</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate-proxool</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Support for <a href="https://proxool.sourceforge.net/">Proxool</a> connection pooling</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate-ucp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Support for <a href="https://docs.oracle.com/en/database/oracle/oracle-database/23/jjucp/intro.html">Universal Connection Pool</a> connection pooling</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate-jcache</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Integration with <a href="https://jcp.org/en/jsr/detail?id=107$$">JCache</a>, allowing any compliant implementation as a second-level cache provider</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate-graalvm</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Experimental extension to make it easier to compile applications as a <a href="https://www.graalvm.org/">GraalVM</a> native image</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate-micrometer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Integration with <a href="https://micrometer.io">Micrometer</a> metrics</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate-community-dialects</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Additional community-supported SQL dialects</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 3. Testing-oriented modules</caption>
+<colgroup>
+<col style="width: 40%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate-testing</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A series of JUnit extensions for testing Hibernate ORM functionality</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="platform">1.2. Platform / BOM</h3>
+<div class="paragraph">
+<p>Hibernate also provides a platform (BOM in Maven terminology) module which can be used to align versions of the Hibernate modules along with the versions of its libraries.  The platform artifact is named <code>hibernate-platform</code>.</p>
+</div>
+<div class="paragraph">
+<p>To apply the platform in Gradle</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="groovy"><span class="n">dependencies</span> <span class="o">{</span>
+  <span class="n">implementation</span> <span class="n">platform</span> <span class="s2">"org.hibernate.orm:hibernate-platform:6.6.13.Final"</span>
+
+  <span class="c1">// use the versions from the platform</span>
+  <span class="n">implementation</span> <span class="s2">"org.hibernate.orm:hibernate-core"</span>
+  <span class="n">implementation</span> <span class="s2">"jakarta.transaction:jakarta.transaction-api"</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>See the <a href="https://docs.gradle.org/current/userguide/java_platform_plugin.html#sec:java_platform_consumption">Gradle documentation</a> for capabilities of applying a platform.</p>
+</div>
+<div class="paragraph">
+<p>To apply the platform (BOM) in Maven</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="xml"><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.hibernate.orm<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>hibernate-core<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>jakarta.transaction<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>jakarta.transaction-api<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+
+<span class="nt">&lt;dependencyManagement&gt;</span>
+  <span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.hibernate.orm<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>hibernate-platform<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>6.6.13.Final<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;type&gt;</span>pom<span class="nt">&lt;/type&gt;</span>
+    <span class="nt">&lt;scope&gt;</span>import<span class="nt">&lt;/scope&gt;</span>
+  <span class="nt">&lt;/dependency&gt;</span>
+<span class="nt">&lt;/dependencyManagement&gt;</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="examples">1.3. Example sources</h3>
+<div class="paragraph">
+<p>The bundled examples mentioned in this tutorial can be downloaded from <a href="https://docs.jboss.org/hibernate/orm/6.6/quickstart/html_single/hibernate-tutorials.zip">here</a>.</p>
+</div>
+<div class="paragraph">
+<p>Alternatively, the example source code can also be obtained from <a href="https://github.com/hibernate/hibernate-orm/tree/6.6.13.Final/documentation/src/main/asciidoc/quickstart/tutorials">Github</a></p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="tutorial_annotations">2. Tutorial using native Hibernate APIs</h2>
+<div class="sectionbody">
+<div class="ulist checklist">
+<div class="title">Objectives</div>
+<ul class="checklist">
+<li>
+<p><i class="fa fa-check-square-o"></i> Configure Hibernate using <code>hibernate.properties</code></p>
+</li>
+<li>
+<p><i class="fa fa-check-square-o"></i> Create a <code>SessionFactory</code> using <a href="https://docs.jboss.org/hibernate/orm/6.6/userguide/html_single/Hibernate_User_Guide.html#bootstrap-native">native bootstrapping</a></p>
+</li>
+<li>
+<p><i class="fa fa-check-square-o"></i> Use annotations to provide mapping information</p>
+</li>
+<li>
+<p><i class="fa fa-check-square-o"></i> Use <code>Session</code> to persist and query data</p>
+</li>
+</ul>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph">
+<p>This tutorial is located within the download bundle under <code>annotations/</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="hibernate-gsg-tutorial-annotations-config">2.1. Configuration via properties file</h3>
+<div class="paragraph">
+<p>In this example, configuration properties are specified in a file named <code>hibernate.properties</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Configuration via <code>hibernate.properties</code></div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="properties"><span class="c"># Database connection settings
+</span><span class="py">hibernate.connection.url</span><span class="p">=</span><span class="s">jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1</span>
+<span class="py">hibernate.connection.username</span><span class="p">=</span><span class="s">sa</span>
+<span class="py">hibernate.connection.password</span><span class="p">=</span>
+
+<span class="c"># Echo all executed SQL to console
+</span><span class="py">hibernate.show_sql</span><span class="p">=</span><span class="s">true</span>
+<span class="py">hibernate.format_sql</span><span class="p">=</span><span class="s">true</span>
+<span class="py">hibernate.highlight_sql</span><span class="p">=</span><span class="s">true</span>
+
+<span class="c"># Automatically export the schema
+</span><span class="py">hibernate.hbm2ddl.auto</span><span class="p">=</span><span class="s">create</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The following properties specify JDBC connection information:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 4. JDBC connection settings</caption>
+<colgroup>
+<col style="width: 35%;">
+<col>
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Configuration property name</th>
+<th class="tableblock halign-left valign-top">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>jakarta.persistence.jdbc.url</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JDBC URL of your database</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>jakarta.persistence.jdbc.user</code> and <code>jakarta.persistence.jdbc.password</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Your database credentials</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+These tutorials use the H2 embedded database, so the values of these properties are specific to running H2 in its in-memory mode.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>These properties enable logging of SQL to the console as it is executed, in an aesthetically pleasing format:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 5. Settings for SQL logging to the console</caption>
+<colgroup>
+<col style="width: 35%;">
+<col>
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Configuration property name</th>
+<th class="tableblock halign-left valign-top">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate.show_sql</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If <code>true</code>, log SQL directly to the console</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate.format_sql</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If <code>true</code>, log SQL in a multiline, indented format</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate.highlight_sql</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If <code>true</code>, log SQL with syntax highlighting via ANSI escape codes</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>When developing persistence logic with Hibernate, it&#8217;s very important to be able to see exactly what SQL is being executed.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="hibernate-gsg-tutorial-annotations-entity">2.2. The annotated entity Java class</h3>
+<div class="paragraph">
+<p>The entity class in this tutorial is <code>org.hibernate.tutorial.annotations.Event</code>.
+Observe that:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>This class uses standard JavaBean naming conventions for property getter and setter methods, as well as private visibility for the fields.
+This is recommended, but it&#8217;s not a requirement.</p>
+</li>
+<li>
+<p>The no-argument constructor, which is also a JavaBean convention, <em>is</em> a requirement for all persistent classes.
+Hibernate needs to instantiate objects for you, using Java Reflection.
+The constructor should have package-private or <code>public</code> visibility, to allow Hibernate to generate proxies and optimized code for field access.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The <a href="https://docs.jboss.org/hibernate/orm/6.6/userguide/html_single/Hibernate_User_Guide.html#entity">Entity types</a> section of the User Guide covers the complete set of requirements for the entity class.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>We use annotations to identify the class as an entity, and to map it to the relational schema.</p>
+</div>
+<div id="hibernate-gsg-tutorial-annotations-entity-entity" class="listingblock">
+<div class="title">Identifying the class as an entity</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Entity</span>   <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@Table</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"Events"</span><span class="o">)</span>   <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Event</span> <span class="o">{</span>
+    <span class="o">...</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@jakarta.persistence.Entity</code> marks the <code>Event</code> class as an entity.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>@jakarta.persistence.Table</code> explicitly specifies the name of the mapped table.
+Without this annotation, the table name would default to <code>Event</code>.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Every entity class must have an identifier.</p>
+</div>
+<div id="hibernate-gsg-tutorial-annotations-entity-id" class="listingblock">
+<div class="title">Identifying the identifier property</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Id</span>   <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@GeneratedValue</span>   <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="kd">private</span> <span class="nc">Long</span> <span class="n">id</span><span class="o">;</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@jakarta.persistence.Id</code> marks the field as holding the identifier (primary key) of the entity.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>@jakarta.persistence.GeneratedValue</code> specifies that this is a <em>synthetic id</em>, that is, a system-generated identifier (a surrogate primary key).</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Other fields of the entity are considered persistent by default.</p>
+</div>
+<div id="hibernate-gsg-tutorial-annotations-entity-properties" class="listingblock">
+<div class="title">Mapping basic properties</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">private</span> <span class="nc">String</span> <span class="n">title</span><span class="o">;</span>
+
+<span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"eventDate"</span><span class="o">)</span>   <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">private</span> <span class="nc">LocalDateTime</span> <span class="n">date</span><span class="o">;</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@jakarta.persistence.Column</code> explicitly specifies the name of a mapped column.
+Without this annotation, the column name would default to <code>date</code>, which is a keyword on some databases.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="hibernate-gsg-tutorial-annotations-test">2.3. Example code</h3>
+<div class="paragraph">
+<p>The class <code>org.hibernate.tutorial.annotations.HibernateIllustrationTest</code> illustrates the use of the Hibernate&#8217;s native APIs, including:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>Session</code> and <code>SessionFactory</code>, and</p>
+</li>
+<li>
+<p><code>org.hibernate.boot</code> for configuration and bootstrap.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>There are several different ways to configure and start Hibernate, and this is not even the most common approach.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The examples in these tutorials are presented as JUnit tests.
+A benefit of this approach is that <code>setUp()</code> and <code>tearDown()</code> roughly illustrate how a <code>org.hibernate.SessionFactory</code> is
+created when the program starts, and closed when the program terminates.
+</td>
+</tr>
+</table>
+</div>
+<div id="hibernate-gsg-tutorial-basic-test-setUp" class="listingblock">
+<div class="title">Obtaining the <code>SessionFactory</code></div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">protected</span> <span class="kt">void</span> <span class="nf">setUp</span><span class="o">()</span> <span class="o">{</span>
+    <span class="c1">// A SessionFactory is set up once for an application!</span>
+    <span class="kd">final</span> <span class="nc">StandardServiceRegistry</span> <span class="n">registry</span> <span class="o">=</span>
+            <span class="k">new</span> <span class="nf">StandardServiceRegistryBuilder</span><span class="o">()</span>
+                    <span class="o">.</span><span class="na">build</span><span class="o">();</span>    <i class="conum" data-value="1"></i><b>(1)</b> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="k">try</span> <span class="o">{</span>
+        <span class="n">sessionFactory</span> <span class="o">=</span>
+                <span class="k">new</span> <span class="nf">MetadataSources</span><span class="o">(</span><span class="n">registry</span><span class="o">)</span>             <i class="conum" data-value="3"></i><b>(3)</b>
+                        <span class="o">.</span><span class="na">addAnnotatedClass</span><span class="o">(</span><span class="nc">Event</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>   <i class="conum" data-value="4"></i><b>(4)</b>
+                        <span class="o">.</span><span class="na">buildMetadata</span><span class="o">()</span>                  <i class="conum" data-value="5"></i><b>(5)</b>
+                        <span class="o">.</span><span class="na">buildSessionFactory</span><span class="o">();</span>           <i class="conum" data-value="6"></i><b>(6)</b>
+    <span class="o">}</span>
+    <span class="k">catch</span> <span class="o">(</span><span class="nc">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// The registry would be destroyed by the SessionFactory, but we</span>
+        <span class="c1">// had trouble building the SessionFactory so destroy it manually.</span>
+        <span class="nc">StandardServiceRegistryBuilder</span><span class="o">.</span><span class="na">destroy</span><span class="o">(</span><span class="n">registry</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The <code>setUp()</code> method first builds a <code>StandardServiceRegistry</code> instance which incorporates configuration information into a working set of <code>Services</code> for use by the <code>SessionFactory</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Here we put all configuration information in <code>hibernate.properties</code>, so there&#8217;s not much interesting to see.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Using the <code>StandardServiceRegistry</code> we create the <code>MetadataSources</code> which lets us tell Hibernate about our domain model.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Here we have only one entity class to register.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>An instance of <code>Metadata</code> represents a complete, partially-validated view of the application domain model.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>The final step in the bootstrap process is to build a <code>SessionFactory</code> for the configured services and validated domain model.
+The <code>SessionFactory</code> is a thread-safe object that&#8217;s instantiated once to serve the entire application.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The <code>SessionFactory</code> produces instances of <code>Session</code>.
+Each session should be thought of as representing a <em>unit of work</em>.</p>
+</div>
+<div id="hibernate-gsg-tutorial-basic-test-saving" class="listingblock">
+<div class="title">Persisting entities</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="n">sessionFactory</span><span class="o">.</span><span class="na">inTransaction</span><span class="o">(</span><span class="n">session</span> <span class="o">-&gt;</span> <span class="o">{</span>   <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="n">session</span><span class="o">.</span><span class="na">persist</span><span class="o">(</span><span class="k">new</span> <span class="nc">Event</span><span class="o">(</span><span class="s">"Our very first event!"</span><span class="o">,</span> <span class="n">now</span><span class="o">()));</span>   <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="n">session</span><span class="o">.</span><span class="na">persist</span><span class="o">(</span><span class="k">new</span> <span class="nc">Event</span><span class="o">(</span><span class="s">"A follow up event"</span><span class="o">,</span> <span class="n">now</span><span class="o">()));</span>
+<span class="o">});</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The <code>inTransaction()</code> method creates a session and starts a new transaction.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Here we create two new <code>Event</code> objects and hands them over to Hibernate, calling the <code>persist()</code> method to make these instances persistent.
+Hibernate is responsible for executing an <code>INSERT</code> statement for each <code>Event</code>.</td>
+</tr>
+</table>
+</div>
+<div id="hibernate-gsg-tutorial-basic-test-list" class="listingblock">
+<div class="title">Obtaining a list of entities</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="n">sessionFactory</span><span class="o">.</span><span class="na">inTransaction</span><span class="o">(</span><span class="n">session</span> <span class="o">-&gt;</span> <span class="o">{</span>
+    <span class="n">session</span><span class="o">.</span><span class="na">createSelectionQuery</span><span class="o">(</span><span class="s">"from Event"</span><span class="o">,</span> <span class="nc">Event</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>   <i class="conum" data-value="1"></i><b>(1)</b>
+            <span class="o">.</span><span class="na">getResultList</span><span class="o">()</span>   <i class="conum" data-value="2"></i><b>(2)</b>
+            <span class="o">.</span><span class="na">forEach</span><span class="o">(</span><span class="n">event</span> <span class="o">-&gt;</span> <span class="n">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Event ("</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="na">getDate</span><span class="o">()</span> <span class="o">+</span> <span class="s">") : "</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="na">getTitle</span><span class="o">()));</span>
+<span class="o">});</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Here we use a very simple <em>Hibernate Query Language</em> (HQL) statement to load all existing <code>Event</code> objects from the database.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Hibernate generates and executes the appropriate <code>SELECT</code> statement, and then instantiates and populates <code>Event</code> objects with the data in the query result set.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="hibernate-gsg-tutorial-annotations-further">2.4. Take it further!</h3>
+<div class="ulist checklist">
+<div class="title">Practice Exercises</div>
+<ul class="checklist">
+<li>
+<p><i class="fa fa-square-o"></i> Actually run this example to see the SQL executed by Hibernate displayed in the console.</p>
+</li>
+<li>
+<p><i class="fa fa-square-o"></i> Reconfigure the examples to connect to your own persistent relational database.</p>
+</li>
+<li>
+<p><i class="fa fa-square-o"></i> Add an association to the <code>Event</code> entity to model a message thread.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="tutorial_jpa">3. Tutorial using JPA-standard APIs</h2>
+<div class="sectionbody">
+<div class="ulist checklist">
+<div class="title">Objectives</div>
+<ul class="checklist">
+<li>
+<p><i class="fa fa-check-square-o"></i> Configure Hibernate using <code>persistence.xml</code></p>
+</li>
+<li>
+<p><i class="fa fa-check-square-o"></i> Bootstrap a Jakarta Persistence <code>EntityManagerFactory</code></p>
+</li>
+<li>
+<p><i class="fa fa-check-square-o"></i> Use annotations to provide mapping information</p>
+</li>
+<li>
+<p><i class="fa fa-check-square-o"></i> Use <code>EntityManager</code> to persist and query data</p>
+</li>
+</ul>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph">
+<p>This tutorial is located within the download bundle under <code>entitymanager/</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="hibernate-gsg-tutorial-jpa-config">3.1. persistence.xml</h3>
+<div class="paragraph">
+<p>JPA defines a different bootstrap process, along with a standard configuration file format named <code>persistence.xml</code>.
+In Java&#8482; SE environments the persistence provider (Hibernate) is required to locate every JPA configuration file in the classpath at the path <code>META-INF/persistence.xml</code>.</p>
+</div>
+<div id="hibernate-gsg-tutorial-jpa-config-pu" class="listingblock">
+<div class="title">Configuration via <code>persistence.xml</code></div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="xml"><span class="nt">&lt;persistence</span> <span class="na">xmlns=</span><span class="s">"http://java.sun.com/xml/ns/persistence"</span>
+             <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
+             <span class="na">xsi:schemaLocation=</span><span class="s">"http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"</span>
+             <span class="na">version=</span><span class="s">"2.0"</span><span class="nt">&gt;</span>
+
+    <span class="nt">&lt;persistence-unit</span> <span class="na">name=</span><span class="s">"org.hibernate.tutorial.jpa"</span><span class="nt">&gt;</span>   <i class="conum" data-value="1"></i><b>(1)</b>
+        <span class="nt">&lt;description&gt;</span>
+            Persistence unit for the Jakarta Persistence tutorial of the Hibernate Getting Started Guide
+        <span class="nt">&lt;/description&gt;</span>
+
+        <span class="nt">&lt;class&gt;</span>org.hibernate.tutorial.em.Event<span class="nt">&lt;/class&gt;</span>     <i class="conum" data-value="2"></i><b>(2)</b>
+
+        <span class="nt">&lt;properties&gt;</span>    <i class="conum" data-value="3"></i><b>(3)</b>
+            <span class="c">&lt;!-- Database connection settings --&gt;</span>
+            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"jakarta.persistence.jdbc.url"</span> <span class="na">value=</span><span class="s">"jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1"</span> <span class="nt">/&gt;</span>
+            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"jakarta.persistence.jdbc.user"</span> <span class="na">value=</span><span class="s">"sa"</span> <span class="nt">/&gt;</span>
+            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"jakarta.persistence.jdbc.password"</span> <span class="na">value=</span><span class="s">""</span> <span class="nt">/&gt;</span>
+
+            <span class="c">&lt;!-- Automatically export the schema --&gt;</span>
+            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"jakarta.persistence.schema-generation.database.action"</span> <span class="na">value=</span><span class="s">"create"</span> <span class="nt">/&gt;</span>
+
+            <span class="c">&lt;!-- Echo all executed SQL to console --&gt;</span>
+            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"hibernate.show_sql"</span> <span class="na">value=</span><span class="s">"true"</span> <span class="nt">/&gt;</span>
+            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"hibernate.format_sql"</span> <span class="na">value=</span><span class="s">"true"</span> <span class="nt">/&gt;</span>
+            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"hibernate.highlight_sql"</span> <span class="na">value=</span><span class="s">"true"</span> <span class="nt">/&gt;</span>
+       <span class="nt">&lt;/properties&gt;</span>
+
+    <span class="nt">&lt;/persistence-unit&gt;</span>
+
+<span class="nt">&lt;/persistence&gt;</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>A <code>persistence.xml</code> file should provide a unique name for each <em>persistence unit</em> it declares.
+Applications use this name to reference the configuration when obtaining an <code>EntityManagerFactory</code> as we will see shortly.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The <code>&lt;class/&gt;</code> element registers our annotated entity class.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The settings specified as <code>&lt;properties/&gt;</code> elements were already discussed in <a href="#hibernate-gsg-tutorial-annotations-config">Configuration via properties file</a>.
+Here JPA-standard property names are used where possible.</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Configuration properties prefixed with the legacy Java EE namespace <code>javax.persistence</code> are still
+recognized, but the Jakarta EE namespace <code>jakarta.persistence</code> should be preferred.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="hibernate-gsg-tutorial-jpa-entity">3.2. The annotated entity Java class</h3>
+<div class="paragraph">
+<p>The entity class is exactly the same as in <a href="#hibernate-gsg-tutorial-annotations-entity">The annotated entity Java class</a>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="hibernate-gsg-tutorial-jpa-test">3.3. Example code</h3>
+<div class="paragraph">
+<p>The previous tutorials used Hibernate native APIs.
+This tutorial uses the standard Jakarta Persistence APIs.</p>
+</div>
+<div id="hibernate-gsg-tutorial-jpa-test-setUp" class="listingblock">
+<div class="title">Obtaining the JPA EntityManagerFactory</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">protected</span> <span class="kt">void</span> <span class="nf">setUp</span><span class="o">()</span> <span class="o">{</span>
+    <span class="n">entityManagerFactory</span> <span class="o">=</span> <span class="nc">Persistence</span><span class="o">.</span><span class="na">createEntityManagerFactory</span><span class="o">(</span><span class="s">"org.hibernate.tutorial.jpa"</span><span class="o">);</span>   <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Notice again that the persistence unit name is <code>org.hibernate.tutorial.jpa</code>, which matches the name from our <a href="#hibernate-gsg-tutorial-jpa-config-pu">persistence.xml</a>.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The code to persist and query entities is almost identical to <a href="#hibernate-gsg-tutorial-basic-test-saving">Persisting entities</a>.
+Unfortunately, <code>EntityManagerFactory</code> doesn&#8217;t have a nice <code>inTransaction()</code> method like <code>SessionFactory</code> does, so we had to write our own:</p>
+</div>
+<div class="listingblock">
+<div class="title">Managing transactions in JPA</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kt">void</span> <span class="nf">inTransaction</span><span class="o">(</span><span class="nc">Consumer</span><span class="o">&lt;</span><span class="nc">EntityManager</span><span class="o">&gt;</span> <span class="n">work</span><span class="o">)</span> <span class="o">{</span>
+    <span class="nc">EntityManager</span> <span class="n">entityManager</span> <span class="o">=</span> <span class="n">entityManagerFactory</span><span class="o">.</span><span class="na">createEntityManager</span><span class="o">();</span>
+    <span class="nc">EntityTransaction</span> <span class="n">transaction</span> <span class="o">=</span> <span class="n">entityManager</span><span class="o">.</span><span class="na">getTransaction</span><span class="o">();</span>
+    <span class="k">try</span> <span class="o">{</span>
+        <span class="n">transaction</span><span class="o">.</span><span class="na">begin</span><span class="o">();</span>
+        <span class="n">work</span><span class="o">.</span><span class="na">accept</span><span class="o">(</span><span class="n">entityManager</span><span class="o">);</span>
+        <span class="n">transaction</span><span class="o">.</span><span class="na">commit</span><span class="o">();</span>
+    <span class="o">}</span>
+    <span class="k">catch</span> <span class="o">(</span><span class="nc">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">transaction</span><span class="o">.</span><span class="na">isActive</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">transaction</span><span class="o">.</span><span class="na">rollback</span><span class="o">();</span>
+        <span class="o">}</span>
+        <span class="k">throw</span> <span class="n">e</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="k">finally</span> <span class="o">{</span>
+        <span class="n">entityManager</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+If you use JPA in Java SE, you&#8217;ll need to copy/paste this function into your project.  Alternatively you could unwrap the <code>EntityManagerFactory</code> as a <code>SessionFactory</code>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="hibernate-gsg-tutorial-jpa-further">3.4. Take it further!</h3>
+<div class="ulist checklist">
+<div class="title">Practice Exercises</div>
+<ul class="checklist">
+<li>
+<p><i class="fa fa-square-o"></i> Learn how to use CDI to inject a container-managed <code>EntityManager</code> in Quarkus.
+See <a href="https://quarkus.io/guides/hibernate-orm">the Quarkus website</a> for instructions.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="tutorial_envers">4. Tutorial Using Envers</h2>
+<div class="sectionbody">
+<div class="ulist checklist">
+<div class="title">Objectives</div>
+<ul class="checklist">
+<li>
+<p><i class="fa fa-check-square-o"></i> Annotate an entity as historical</p>
+</li>
+<li>
+<p><i class="fa fa-check-square-o"></i> Configure Envers</p>
+</li>
+<li>
+<p><i class="fa fa-check-square-o"></i> Use the Envers APIs to view and analyze historical data</p>
+</li>
+</ul>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph">
+<p>This tutorial is located within the download bundle under <code>envers/</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="hibernate-gsg-tutorial-envers-config">4.1. persistence.xml</h3>
+<div class="paragraph">
+<p>This file is unchanged from <a href="#hibernate-gsg-tutorial-jpa-config">what we had before</a>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="hibernate-gsg-tutorial-envers-entity">4.2. The annotated entity Java class</h3>
+<div class="paragraph">
+<p>The entity class is also almost identical to what we had <a href="#hibernate-gsg-tutorial-annotations-entity">previously</a>.
+The major difference is the addition of the annotation <code>@org.hibernate.envers.Audited</code>, which tells Envers to automatically track changes to this entity.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="hibernate-gsg-tutorial-envers-test">4.3. Example code</h3>
+<div class="paragraph">
+<p>The code saves some entities, makes a change to one of the entities and then uses the Envers API to pull back the
+initial revision as well as the updated revision.  A revision refers to a historical snapshot of an entity.</p>
+</div>
+<div id="hibernate-gsg-tutorial-envers-test-api" class="listingblock">
+<div class="title">Using the <code>org.hibernate.envers.AuditReader</code></div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="kt">void</span> <span class="nf">testBasicUsage</span><span class="o">()</span> <span class="o">{</span>
+    <span class="o">...</span>
+    <span class="nc">AuditReader</span> <span class="n">reader</span> <span class="o">=</span> <span class="nc">AuditReaderFactory</span><span class="o">.</span><span class="na">get</span><span class="o">(</span> <span class="n">entityManager</span> <span class="o">);</span>   <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="nc">Event</span> <span class="n">firstRevision</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="na">find</span><span class="o">(</span> <span class="nc">Event</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="mi">2L</span><span class="o">,</span> <span class="mi">1</span> <span class="o">);</span>        <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="o">...</span>
+    <span class="nc">Event</span> <span class="n">secondRevision</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="na">find</span><span class="o">(</span> <span class="nc">Event</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="mi">2L</span><span class="o">,</span> <span class="mi">2</span> <span class="o">);</span>       <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="o">...</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>An <code>org.hibernate.envers.AuditReader</code> is obtained from the <code>org.hibernate.envers.AuditReaderFactory</code> which wraps the JPA <code>EntityManager</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The <code>find</code> method retrieves specific revisions of the entity. The first call retrieves revision number 1 of the <code>Event</code> with id 2.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Later, the second call asks for revision number 2 of the <code>Event</code> with id 2.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="hibernate-gsg-tutorial-envers-further">4.4. Take it further!</h3>
+<div class="ulist checklist">
+<div class="title">Practice Exercises</div>
+<ul class="checklist">
+<li>
+<p><i class="fa fa-check-square-o"></i> Provide a custom revision entity to additionally capture who made the changes.</p>
+</li>
+<li>
+<p><i class="fa fa-check-square-o"></i> Write a query to retrieve only historical data which meets some criteria. Use the <em>User Guide</em> to see how
+Envers queries are constructed.</p>
+</li>
+<li>
+<p><i class="fa fa-check-square-o"></i> Experiment with auditing entities which have various forms of relationships (many-to-one, many-to-many, etc).  Try
+retrieving historical versions (revisions) of such entities and navigating the object tree.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="credits">5. Credits</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The full list of contributors to Hibernate ORM can be found on the
+<a href="https://github.com/hibernate/hibernate-orm/graphs/contributors">GitHub repository</a>.</p>
+</div>
+<div class="paragraph">
+<p>The following contributors were involved in this documentation:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Steve Ebersole</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 6.6.13.Final<br>
+Last updated 2025-04-06 00:01:18 UTC
+</div>
+</div>
+</body>
+</html>

@@ -13,7 +13,7 @@
 <div id="header">
 <h1>6.1 Migration Guide</h1>
 <div class="details">
-<span id="revnumber">version 6.1.6.Final</span>
+<span id="revnumber">version 6.1.7.Final</span>
 </div>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
@@ -79,6 +79,16 @@ that the data is first read through the Java serialization mechanism and then wr
 </li>
 </ol>
 </div>
+<div class="paragraph">
+<p>Alternatively, to revert to pre-6.1 behavior, annotate your array property with <code>@JdbcTypeCode(SqlTypes.VARBINARY)</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code data-lang="java">@Basic
+@JdbcTypeCode(SqlTypes.VARBINARY)
+double[] myArray;</code></pre>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -136,8 +146,8 @@ or <code>alter table tbl modify column enum_col smallint</code>, depending on yo
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 6.1.6.Final<br>
-Last updated 2022-12-07 14:31:01 UTC
+Version 6.1.7.Final<br>
+Last updated 2023-02-07 11:26:17 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">

@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.17">
+<meta name="generator" content="Asciidoctor 2.0.20">
 <meta name="author" content="Hardy Ferentschik, Gunnar Morling, Guillaume Smet">
-<title>Hibernate Validator 8.0.0.Final - Jakarta Bean Validation Reference Implementation: Reference Guide</title>
+<title>Hibernate Validator 8.0.2.Final - Jakarta Bean Validation Reference Implementation: Reference Guide</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -85,10 +85,10 @@ code{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;
 ul,ol,dl{line-height:1.6;margin-bottom:1.25em;list-style-position:outside;font-family:inherit}
 ul,ol{margin-left:1.5em}
 ul li ul,ul li ol{margin-left:1.25em;margin-bottom:0}
-ul.square li ul,ul.circle li ul,ul.disc li ul{list-style:inherit}
-ul.square{list-style-type:square}
 ul.circle{list-style-type:circle}
 ul.disc{list-style-type:disc}
+ul.square{list-style-type:square}
+ul.circle ul:not([class]),ul.disc ul:not([class]),ul.square ul:not([class]){list-style:inherit}
 ol li ul,ol li ol{margin-left:1.25em;margin-bottom:0}
 dl dt{margin-bottom:.3125em;font-weight:bold}
 dl dd{margin-bottom:1.25em}
@@ -209,13 +209,10 @@ table.tableblock.fit-content>caption.title{white-space:nowrap;width:0}
 .admonitionblock>table td.content{padding-left:1.125em;padding-right:1.25em;border-left:1px solid #dddddf;color:rgba(0,0,0,.6);word-wrap:anywhere}
 .admonitionblock>table td.content>:last-child>:last-child{margin-bottom:0}
 .exampleblock>.content{border:1px solid #e6e6e6;margin-bottom:1.25em;padding:1.25em;background:#fff;border-radius:4px}
-.exampleblock>.content>:first-child{margin-top:0}
-.exampleblock>.content>:last-child{margin-bottom:0}
 .sidebarblock{border:1px solid #dbdbd6;margin-bottom:1.25em;padding:1.25em;background:#f3f3f2;border-radius:4px}
-.sidebarblock>:first-child{margin-top:0}
-.sidebarblock>:last-child{margin-bottom:0}
 .sidebarblock>.content>.title{color:#7a2518;margin-top:0;text-align:center}
-.exampleblock>.content>:last-child>:last-child,.exampleblock>.content .olist>ol>li:last-child>:last-child,.exampleblock>.content .ulist>ul>li:last-child>:last-child,.exampleblock>.content .qlist>ol>li:last-child>:last-child,.sidebarblock>.content>:last-child>:last-child,.sidebarblock>.content .olist>ol>li:last-child>:last-child,.sidebarblock>.content .ulist>ul>li:last-child>:last-child,.sidebarblock>.content .qlist>ol>li:last-child>:last-child{margin-bottom:0}
+.exampleblock>.content>:first-child,.sidebarblock>.content>:first-child{margin-top:0}
+.exampleblock>.content>:last-child,.exampleblock>.content>:last-child>:last-child,.exampleblock>.content .olist>ol>li:last-child>:last-child,.exampleblock>.content .ulist>ul>li:last-child>:last-child,.exampleblock>.content .qlist>ol>li:last-child>:last-child,.sidebarblock>.content>:last-child,.sidebarblock>.content>:last-child>:last-child,.sidebarblock>.content .olist>ol>li:last-child>:last-child,.sidebarblock>.content .ulist>ul>li:last-child>:last-child,.sidebarblock>.content .qlist>ol>li:last-child>:last-child{margin-bottom:0}
 .literalblock pre,.listingblock>.content>pre{border-radius:4px;overflow-x:auto;padding:1em;font-size:.8125em}
 @media screen and (min-width:768px){.literalblock pre,.listingblock>.content>pre{font-size:.90625em}}
 @media screen and (min-width:1280px){.literalblock pre,.listingblock>.content>pre{font-size:1em}}
@@ -394,7 +391,7 @@ b.conum *{color:inherit!important}
 dt,th.tableblock,td.content,div.footnote{text-rendering:optimizeLegibility}
 h1,h2,p,td.content,span.alt,summary{letter-spacing:-.01em}
 p strong,td.content strong,div.footnote strong{letter-spacing:-.005em}
-p,blockquote,dt,td.content,span.alt,summary{font-size:1.0625rem}
+p,blockquote,dt,td.content,td.hdlist1,span.alt,summary{font-size:1.0625rem}
 p{margin-bottom:1.25rem}
 .sidebarblock p,.sidebarblock dt,.sidebarblock td.content,p.tableblock{font-size:1em}
 .exampleblock>.content{background:#fffef7;border-color:#e0e0dc;box-shadow:0 1px 4px #e0e0dc}
@@ -462,6 +459,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
   }
   @media print{
     #tocbot a.toc-link.node-name--H4{ display:none }
+    #tocbot a.toc-link.node-name--H5{ display:none }
+    #tocbot a.toc-link.node-name--H6{ display:none }
   }
 </style>
 <!-- /Dynamic TOC -->
@@ -479,12 +478,12 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </head>
 <body class="book toc2 toc-left">
 <div id="header">
-<h1>Hibernate Validator 8.0.0.Final - Jakarta Bean Validation Reference Implementation: Reference Guide</h1>
+<h1>Hibernate Validator 8.0.2.Final - Jakarta Bean Validation Reference Implementation: Reference Guide</h1>
 <div class="details">
 <span id="author" class="author">Hardy Ferentschik</span><br>
 <span id="author2" class="author">Gunnar Morling</span><br>
 <span id="author3" class="author">Guillaume Smet</span><br>
-<span id="revdate">2022-09-09</span>
+<span id="revdate">2024-12-13</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -498,7 +497,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#section-getting-started-cdi">1.1.2. CDI</a></li>
 <li><a href="#section-getting-started-security-manager">1.1.3. Running with a security manager</a></li>
 <li><a href="#_updating_hibernate_validator_in_wildfly">1.1.4. Updating Hibernate Validator in WildFly</a></li>
-<li><a href="#validator-gettingstarted-java9">1.1.5. Running on Java 11+</a></li>
+<li><a href="#validator-gettingstarted-modulepath">1.1.5.  Running in the modulepath</a></li>
 </ul>
 </li>
 <li><a href="#validator-gettingstarted-createmodel">1.2. Applying constraints</a></li>
@@ -863,7 +862,7 @@ your <em>pom.xml</em>:</p>
 <pre class="prettyprint highlight"><code data-lang="XML">&lt;dependency&gt;
     &lt;groupId&gt;org.hibernate.validator&lt;/groupId&gt;
     &lt;artifactId&gt;hibernate-validator&lt;/artifactId&gt;
-    &lt;version&gt;8.0.0.Final&lt;/version&gt;
+    &lt;version&gt;8.0.2.Final&lt;/version&gt;
 &lt;/dependency&gt;</code></pre>
 </div>
 </div>
@@ -932,7 +931,7 @@ Validator CDI portable extension by adding the following Maven dependency to you
 <pre class="prettyprint highlight"><code data-lang="XML">&lt;dependency&gt;
     &lt;groupId&gt;org.hibernate.validator&lt;/groupId&gt;
     &lt;artifactId&gt;hibernate-validator-cdi&lt;/artifactId&gt;
-    &lt;version&gt;8.0.0.Final&lt;/version&gt;
+    &lt;version&gt;8.0.2.Final&lt;/version&gt;
 &lt;/dependency&gt;</code></pre>
 </div>
 </div>
@@ -956,7 +955,7 @@ The following shows how to do this via a <a href="http://docs.oracle.com/javase/
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code data-lang="XML">grant codeBase "file:path/to/hibernate-validator-8.0.0.Final.jar" {
+<pre class="prettyprint highlight"><code data-lang="XML">grant codeBase "file:path/to/hibernate-validator-8.0.2.Final.jar" {
     permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
     permission java.lang.RuntimePermission "accessDeclaredMembers";
     permission java.lang.RuntimePermission "setContextClassLoader";
@@ -968,10 +967,10 @@ The following shows how to do this via a <a href="http://docs.oracle.com/javase/
 };
 
 grant codeBase "file:path/to/jakarta.validation-api-3.0.2.jar" {
-    permission java.io.FilePermission "path/to/hibernate-validator-8.0.0.Final.jar", "read";
+    permission java.io.FilePermission "path/to/hibernate-validator-8.0.2.Final.jar", "read";
 };
 
-grant codeBase "file:path/to/jboss-logging-3.4.1.Final.jar" {
+grant codeBase "file:path/to/jboss-logging-3.4.3.Final.jar" {
     permission java.util.PropertyPermission "org.jboss.logging.provider", "read";
     permission java.util.PropertyPermission "org.jboss.logging.locale", "read";
 };
@@ -1005,7 +1004,7 @@ In order to update the server modules for Jakarta Bean Validation API and Hibern
 <pre class="prettyprint highlight"><code data-lang="XML">&lt;dependency&gt;
     &lt;groupId&gt;org.hibernate.validator&lt;/groupId&gt;
     &lt;artifactId&gt;hibernate-validator-modules&lt;/artifactId&gt;
-    &lt;version&gt;8.0.0.Final&lt;/version&gt;
+    &lt;version&gt;8.0.2.Final&lt;/version&gt;
     &lt;classifier&gt;wildfly-27.0.0.Alpha4-patch&lt;/classifier&gt;
     &lt;type&gt;zip&lt;/type&gt;
 &lt;/dependency&gt;</code></pre>
@@ -1024,7 +1023,7 @@ In order to update the server modules for Jakarta Bean Validation API and Hibern
 <pre class="prettyprint highlight"><code data-lang="XML">&lt;dependency&gt;
     &lt;groupId&gt;org.hibernate.validator&lt;/groupId&gt;
     &lt;artifactId&gt;hibernate-validator-modules&lt;/artifactId&gt;
-    &lt;version&gt;8.0.0.Final&lt;/version&gt;
+    &lt;version&gt;8.0.2.Final&lt;/version&gt;
     &lt;classifier&gt;wildfly--patch&lt;/classifier&gt;
     &lt;type&gt;zip&lt;/type&gt;
 &lt;/dependency&gt;</code></pre>
@@ -1040,7 +1039,7 @@ In order to update the server modules for Jakarta Bean Validation API and Hibern
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code>$JBOSS_HOME/bin/jboss-cli.sh patch apply hibernate-validator-modules-8.0.0.Final-wildfly-27.0.0.Alpha4-patch.zip</code></pre>
+<pre class="prettyprint highlight"><code>$JBOSS_HOME/bin/jboss-cli.sh patch apply hibernate-validator-modules-8.0.2.Final-wildfly-27.0.0.Alpha4-patch.zip</code></pre>
 </div>
 </div>
 </div>
@@ -1063,9 +1062,9 @@ In order to update the server modules for Jakarta Bean Validation API and Hibern
 </div>
 </div>
 <div class="sect3">
-<h4 id="validator-gettingstarted-java9"><a class="anchor" href="#validator-gettingstarted-java9"></a>1.1.5. Running on Java 11+</h4>
+<h4 id="validator-gettingstarted-modulepath"><a class="anchor" href="#validator-gettingstarted-modulepath"></a>1.1.5. <a id="validator-gettingstarted-java9"></a> Running in the modulepath</h4>
 <div class="paragraph">
-<p>Support for Java 11 and the Java Platform Module System (JPMS) is present in a preliminary form.
+<p>Support for the Java Platform Module System (JPMS) is present in a preliminary form.
 There are no JPMS module descriptors provided, but Hibernate Validator is usable as automatic modules.</p>
 </div>
 <div class="paragraph">
@@ -3458,7 +3457,7 @@ public class RentalStation {
 <div class="ulist">
 <ul>
 <li>
-<p>The <code>name</code> passed to the <code>RentalCar</code> constructor must not be <code>null</code></p>
+<p>The <code>name</code> passed to the <code>RentalStation</code> constructor must not be <code>null</code></p>
 </li>
 <li>
 <p>When invoking the <code>rentCar()</code> method, the given <code>customer</code> must not be <code>null</code>, the rental&#8217;s start
@@ -11707,8 +11706,8 @@ configuring the default validator factory using <em>META-INF/validation.xml</em>
 <p>One use case for registering constraint definitions through the programmatic API is the ability to specify an alternative
 constraint validator for the <code>@URL</code> constraint. Historically, Hibernate Validator&#8217;s default constraint
 validator for this constraint uses the <code>java.net.URL</code> constructor to validate an URL.
-However, there is also a purely regular expression based version available which can be configured using
-a <code>ConstraintDefinitionContributor</code>:</p>
+However, there is also a purely regular expression based version available, which can be configured using
+the programmatic constraint declaration API:</p>
 </div>
 <div class="listingblock">
 <div class="title">Using the programmatic constraint declaration API to register a regular expression based constraint definition for <code>@URL</code></div>
@@ -12264,7 +12263,7 @@ annotations are incorrectly used.</p>
 <p>You can find the Hibernate Validator Annotation Processor as part of the distribution bundle on
 <a href="http://sourceforge.net/projects/hibernate/files/hibernate-validator">Sourceforge</a> or in the
 usual Maven repositories such as Maven Central under the GAV
-<code>org.hibernate.validator:hibernate-validator-annotation-processor:8.0.0.Final</code>.</p>
+<code>org.hibernate.validator:hibernate-validator-annotation-processor:8.0.2.Final</code>.</p>
 </div>
 </td>
 </tr>
@@ -12281,7 +12280,7 @@ Platform.</p>
 <div class="sect2">
 <h3 id="validator-annotationprocessor-features"><a class="anchor" href="#validator-annotationprocessor-features"></a>13.2. Features</h3>
 <div class="paragraph">
-<p>As of Hibernate Validator 8.0.0.Final the Hibernate Validator Annotation Processor checks that:</p>
+<p>As of Hibernate Validator 8.0.2.Final the Hibernate Validator Annotation Processor checks that:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -12376,15 +12375,15 @@ NetBeans).</p>
             &lt;plugin&gt;
                 &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
                 &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
-                &lt;version&gt;3.6.1&lt;/version&gt;
+                &lt;version&gt;3.8.1&lt;/version&gt;
                 &lt;configuration&gt;
-                    &lt;source&gt;1.8&lt;/source&gt;
-                    &lt;target&gt;1.8&lt;/target&gt;
+                    &lt;source&gt;11&lt;/source&gt;
+                    &lt;target&gt;11&lt;/target&gt;
                     &lt;annotationProcessorPaths&gt;
                         &lt;path&gt;
                             &lt;groupId&gt;org.hibernate.validator&lt;/groupId&gt;
                             &lt;artifactId&gt;hibernate-validator-annotation-processor&lt;/artifactId&gt;
-                            &lt;version&gt;8.0.0.Final&lt;/version&gt;
+                            &lt;version&gt;8.0.2.Final&lt;/version&gt;
                         &lt;/path&gt;
                     &lt;/annotationProcessorPaths&gt;
                 &lt;/configuration&gt;
@@ -12411,7 +12410,7 @@ NetBeans).</p>
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight"><code data-lang="groovy">dependencies {
-    annotationProcessor group: 'org.hibernate.validator', name: 'hibernate-validator-annotation-processor', version: '8.0.0.Final'
+    annotationProcessor group: 'org.hibernate.validator', name: 'hibernate-validator-annotation-processor', version: '8.0.2.Final'
 
     // any other dependencies ...
 }</code></pre>
@@ -12436,7 +12435,7 @@ for <a href="http://ant.apache.org/">Apache Ant</a>:</p>
        destdir="build/classes"
        classpath="/path/to/validation-api-3.0.2.jar"&gt;
        &lt;compilerarg value="-processorpath" /&gt;
-       &lt;compilerarg value="/path/to/hibernate-validator-annotation-processor-8.0.0.Final.jar"/&gt;
+       &lt;compilerarg value="/path/to/hibernate-validator-annotation-processor-8.0.2.Final.jar"/&gt;
 &lt;/javac&gt;</code></pre>
 </div>
 </div>
@@ -12448,7 +12447,7 @@ for <a href="http://ant.apache.org/">Apache Ant</a>:</p>
 <div class="paragraph">
 <p>When compiling on the command line using
 <a href="http://docs.oracle.com/javase/8/docs/technotes/guides/javac/index.html">javac</a>, specify the JAR
-<em>hibernate-validator-annotation-processor-8.0.0.Final.jar</em> using the "processorpath" option as shown in
+<em>hibernate-validator-annotation-processor-8.0.2.Final.jar</em> using the "processorpath" option as shown in
 the following listing. The processor will be detected automatically by the compiler and invoked
 during compilation.</p>
 </div>
@@ -12459,7 +12458,7 @@ during compilation.</p>
 <div class="content">
 <pre>javac src/main/java/org/hibernate/validator/ap/demo/Car.java \
    -cp /path/to/validation-api-3.0.2.jar \
-   -processorpath /path/to/hibernate-validator-annotation-processor-8.0.0.Final.jar</pre>
+   -processorpath /path/to/hibernate-validator-annotation-processor-8.0.2.Final.jar</pre>
 </div>
 </div>
 </div>
@@ -12483,7 +12482,7 @@ provided you have the <a href="https://www.eclipse.org/m2e/">M2E Eclipse plug-in
 <p>Right-click your project, choose "Properties"</p>
 </li>
 <li>
-<p>Go to "Java Compiler" and make sure, that "Compiler compliance level" is set to "1.8".
+<p>Go to "Java Compiler" and make sure, that "Compiler compliance level" is set to "11".
 Otherwise the processor won&#8217;t be activated</p>
 </li>
 <li>
@@ -12491,7 +12490,7 @@ Otherwise the processor won&#8217;t be activated</p>
 </li>
 <li>
 <p>Go to "Java Compiler - Annotation Processing - Factory Path" and add the JAR
-hibernate-validator-annotation-processor-8.0.0.Final.jar</p>
+hibernate-validator-annotation-processor-8.0.2.Final.jar</p>
 </li>
 <li>
 <p>Confirm the workspace rebuild</p>
@@ -12524,7 +12523,7 @@ hibernate-validator-annotation-processor-8.0.0.Final.jar</p>
 </li>
 <li>
 <p>Choose "Enable annotation processing" and enter the following as "Processor path":
-/path/to/hibernate-validator-annotation-processor-8.0.0.Final.jar</p>
+/path/to/hibernate-validator-annotation-processor-8.0.2.Final.jar</p>
 </li>
 <li>
 <p>Add the processor&#8217;s fully qualified name org.hibernate.validator.ap.ConstraintValidationProcessor
@@ -12556,7 +12555,7 @@ annotation processors within the IDE build. To do so, do the following:</p>
 <p>Right-click your project, choose "Properties"</p>
 </li>
 <li>
-<p>Go to "Libraries", tab "Processor", and add the JAR hibernate-validator-annotation-processor-8.0.0.Final.jar</p>
+<p>Go to "Libraries", tab "Processor", and add the JAR hibernate-validator-annotation-processor-8.0.2.Final.jar</p>
 </li>
 <li>
 <p>Go to "Build - Compiling", select "Enable Annotation Processing" and "Enable Annotation Processing
@@ -12642,12 +12641,12 @@ Feedback is always welcome!</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-09-09 13:29:33 UTC
+Last updated 2024-12-13 17:09:21 UTC
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/run_prettify.min.js"></script>
 <!-- HibernateDoc.OutdatedContent -->
-<script src="//code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
 <script src="/hibernate/_outdated-content/outdated-content.js" type="text/javascript"></script>
 <script type="text/javascript">var jQuery_3_1 = $.noConflict(true); jQuery_3_1(document).ready(function() { HibernateDoc.OutdatedContent.install('validator'); });</script>
 <!-- /HibernateDoc.OutdatedContent -->
@@ -12657,14 +12656,38 @@ Last updated 2022-09-09 13:29:33 UTC
 <script src="script/tocbot-3.0.2/tocbot.min.js"></script>
 <script>
     /* Tocbot dynamic TOC, works with tocbot 3.0.2 */
-    /* Source: https://github.com/asciidoctor/asciidoctor/issues/699#issuecomment-321066006 */
+    /* Source: https://github.com/asciidoctor/asciidoctor/issues/699#issuecomment-321066006
+     * Adapted to auto-detect the heading selector.
+     */
     var oldtoc = document.getElementById('toctitle').nextElementSibling;
+
+    var headingSelectorVal;
+    if (oldtoc.querySelector('.sectlevel5')) {
+        headingSelectorVal = 'h1, h2, h3, h4, h5, h6'
+    }
+    else if (oldtoc.querySelector('.sectlevel4')) {
+        headingSelectorVal = 'h1, h2, h3, h4, h5'
+    }
+    else if (oldtoc.querySelector('.sectlevel3')) {
+        headingSelectorVal = 'h1, h2, h3, h4'
+    }
+    else if (oldtoc.querySelector('.sectlevel2')) {
+        headingSelectorVal = 'h1, h2, h3'
+    }
+    else if (oldtoc.querySelector('.sectlevel1')) {
+        headingSelectorVal = 'h1, h2'
+    }
+    else {
+        // In case something went wrong
+        headingSelectorVal = 'h1, h2, h3, h4'
+    }
+
     var newtoc = document.createElement('div');
     newtoc.setAttribute('id', 'tocbot');
     newtoc.setAttribute('class', 'js-toc');
     oldtoc.parentNode.replaceChild(newtoc, oldtoc);
     tocbot.init({ contentSelector: '#content',
-        headingSelector: 'h1, h2, h3, h4',
+        headingSelector: headingSelectorVal,
         smoothScroll: false });
     var handleTocOnResize = function() {
         var width = window.innerWidth
@@ -12672,7 +12695,7 @@ Last updated 2022-09-09 13:29:33 UTC
                     || document.body.clientWidth;
         if (width < 768) {
             tocbot.refresh({ contentSelector: '#content',
-                headingSelector: 'h1, h2, h3, h4',
+                headingSelector: headingSelectorVal,
                 collapseDepth: 6,
                 activeLinkClass: 'ignoreactive',
                 throttleTimeout: 1000,
@@ -12680,7 +12703,7 @@ Last updated 2022-09-09 13:29:33 UTC
         }
         else {
             tocbot.refresh({ contentSelector: '#content',
-                headingSelector: 'h1, h2, h3, h4',
+                headingSelector: headingSelectorVal,
                 smoothScroll: false });
         }
     };

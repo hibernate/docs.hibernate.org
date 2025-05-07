@@ -26,7 +26,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10,"i24":10,"i25":10,"i26":10,"i27":10,"i28":10,"i29":10,"i30":10,"i31":10,"i32":10,"i33":10,"i34":10,"i35":10,"i36":10,"i37":10,"i38":10,"i39":10,"i40":10,"i41":10,"i42":10,"i43":10,"i44":10,"i45":10,"i46":10,"i47":10,"i48":10,"i49":10,"i50":10,"i51":10,"i52":10,"i53":10,"i54":10,"i55":10,"i56":10,"i57":10,"i58":10,"i59":10,"i60":10,"i61":10,"i62":10,"i63":10};
+var data = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10,"i24":10,"i25":10,"i26":10,"i27":10,"i28":10,"i29":10,"i30":10,"i31":10,"i32":10,"i33":10,"i34":10,"i35":10,"i36":10,"i37":10,"i38":10,"i39":10,"i40":10,"i41":10,"i42":10,"i43":10,"i44":10,"i45":10,"i46":10,"i47":10,"i48":10,"i49":10,"i50":10,"i51":10,"i52":10,"i53":10,"i54":10,"i55":10,"i56":10,"i57":10,"i58":10,"i59":10,"i60":10,"i61":10,"i62":10,"i63":10,"i64":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -142,7 +142,8 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <pre>public class <span class="typeNameLabel">Column</span>
 extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">Object</a>
 implements <a href="Selectable.html" title="interface in org.hibernate.mapping">Selectable</a>, <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/Serializable.html?is-external=true" title="class or interface in java.io" class="externalLink">Serializable</a>, <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Cloneable.html?is-external=true" title="class or interface in java.lang" class="externalLink">Cloneable</a>, <a href="../tool/schema/extract/spi/ColumnTypeInformation.html" title="interface in org.hibernate.tool.schema.extract.spi">ColumnTypeInformation</a></pre>
-<div class="block">A column of a relational database table</div>
+<div class="block">A mapping model object representing a column
+ of a relational database <a href="Table.html" title="class in org.hibernate.mapping">table</a>.</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../serialized-form.html#org.hibernate.mapping.Column">Serialized Form</a></dd>
@@ -364,38 +365,44 @@ implements <a href="Selectable.html" title="interface in org.hibernate.mapping">
 </tr>
 <tr id="i27" class="rowColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getSqlType(org.hibernate.boot.Metadata)">getSqlType</a></span>&#8203;(<a href="../boot/Metadata.html" title="interface in org.hibernate.boot">Metadata</a>&nbsp;mapping)</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr id="i28" class="altColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getSqlType(org.hibernate.type.spi.TypeConfiguration,org.hibernate.dialect.Dialect,org.hibernate.engine.spi.Mapping)">getSqlType</a></span>&#8203;(<a href="../type/spi/TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration,
           <a href="../dialect/Dialect.html" title="class in org.hibernate.dialect">Dialect</a>&nbsp;dialect,
           <a href="../engine/spi/Mapping.html" title="interface in org.hibernate.engine.spi">Mapping</a>&nbsp;mapping)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i28" class="altColor">
+<tr id="i29" class="rowColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Integer.html?is-external=true" title="class or interface in java.lang" class="externalLink">Integer</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getSqlTypeCode()">getSqlTypeCode</a></span>()</code></th>
 <td class="colLast">
-<div class="block">Returns the underlying columns SqlTypeCode.</div>
+<div class="block">Returns <a href="../type/SqlTypes.html" title="class in org.hibernate.type">SQL type code</a>
+ for this column, or <code>null</code> if the type code is unknown.</div>
 </td>
 </tr>
-<tr id="i29" class="rowColor">
+<tr id="i30" class="altColor">
 <td class="colFirst"><code>int</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getSqlTypeCode(org.hibernate.engine.spi.Mapping)">getSqlTypeCode</a></span>&#8203;(<a href="../engine/spi/Mapping.html" title="interface in org.hibernate.engine.spi">Mapping</a>&nbsp;mapping)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i30" class="altColor">
+<tr id="i31" class="rowColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getTemplate(org.hibernate.dialect.Dialect,org.hibernate.type.spi.TypeConfiguration,org.hibernate.query.sqm.function.SqmFunctionRegistry)">getTemplate</a></span>&#8203;(<a href="../dialect/Dialect.html" title="class in org.hibernate.dialect">Dialect</a>&nbsp;dialect,
            <a href="../type/spi/TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration,
            <a href="../query/sqm/function/SqmFunctionRegistry.html" title="class in org.hibernate.query.sqm.function">SqmFunctionRegistry</a>&nbsp;functionRegistry)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i31" class="rowColor">
+<tr id="i32" class="altColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getText()">getText</a></span>()</code></th>
 <td class="colLast">
 <div class="block">The selectable's "canonical" text representation</div>
 </td>
 </tr>
-<tr id="i32" class="altColor">
+<tr id="i33" class="rowColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getText(org.hibernate.dialect.Dialect)">getText</a></span>&#8203;(<a href="../dialect/Dialect.html" title="class in org.hibernate.dialect">Dialect</a>&nbsp;d)</code></th>
 <td class="colLast">
@@ -403,51 +410,51 @@ implements <a href="Selectable.html" title="interface in org.hibernate.mapping">
  quoting, if quoted</div>
 </td>
 </tr>
-<tr id="i33" class="rowColor">
+<tr id="i34" class="altColor">
 <td class="colFirst"><code>int</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getTypeCode()">getTypeCode</a></span>()</code></th>
 <td class="colLast">
 <div class="block">The JDBC type-code.</div>
 </td>
 </tr>
-<tr id="i34" class="altColor">
+<tr id="i35" class="rowColor">
 <td class="colFirst"><code>int</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getTypeIndex()">getTypeIndex</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i35" class="rowColor">
+<tr id="i36" class="altColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getTypeName()">getTypeName</a></span>()</code></th>
 <td class="colLast">
 <div class="block">The database specific type name.</div>
 </td>
 </tr>
-<tr id="i36" class="altColor">
+<tr id="i37" class="rowColor">
 <td class="colFirst"><code><a href="Value.html" title="interface in org.hibernate.mapping">Value</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getValue()">getValue</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i37" class="rowColor">
+<tr id="i38" class="altColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getWriteExpr()">getWriteExpr</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i38" class="altColor">
+<tr id="i39" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#hasCheckConstraint()">hasCheckConstraint</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i39" class="rowColor">
+<tr id="i40" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#hasCustomRead()">hasCustomRead</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i40" class="altColor">
+<tr id="i41" class="rowColor">
 <td class="colFirst"><code>int</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#hashCode()">hashCode</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i41" class="rowColor">
+<tr id="i42" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isFormula()">isFormula</a></span>()</code></th>
 <td class="colLast">
@@ -455,112 +462,112 @@ implements <a href="Selectable.html" title="interface in org.hibernate.mapping">
  it is a formula; <code>false</code> indicates it is a physical column</div>
 </td>
 </tr>
-<tr id="i42" class="altColor">
+<tr id="i43" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isNullable()">isNullable</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i43" class="rowColor">
+<tr id="i44" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isQuoted()">isQuoted</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i44" class="altColor">
+<tr id="i45" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isUnique()">isUnique</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i45" class="rowColor">
+<tr id="i46" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setCheckConstraint(java.lang.String)">setCheckConstraint</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;checkConstraint)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i46" class="altColor">
+<tr id="i47" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setComment(java.lang.String)">setComment</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;comment)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i47" class="rowColor">
+<tr id="i48" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setCustomRead(java.lang.String)">setCustomRead</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;customRead)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i48" class="altColor">
+<tr id="i49" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setCustomWrite(java.lang.String)">setCustomWrite</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;customWrite)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i49" class="rowColor">
+<tr id="i50" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setDefaultValue(java.lang.String)">setDefaultValue</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;defaultValue)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i50" class="altColor">
+<tr id="i51" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setGeneratedAs(java.lang.String)">setGeneratedAs</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;generatedAs)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i51" class="rowColor">
+<tr id="i52" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setLength(java.lang.Integer)">setLength</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Integer.html?is-external=true" title="class or interface in java.lang" class="externalLink">Integer</a>&nbsp;length)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i52" class="altColor">
+<tr id="i53" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setLength(java.lang.Long)">setLength</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Long.html?is-external=true" title="class or interface in java.lang" class="externalLink">Long</a>&nbsp;length)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i53" class="rowColor">
+<tr id="i54" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setName(java.lang.String)">setName</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;name)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i54" class="altColor">
+<tr id="i55" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setNullable(boolean)">setNullable</a></span>&#8203;(boolean&nbsp;nullable)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i55" class="rowColor">
+<tr id="i56" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setPrecision(java.lang.Integer)">setPrecision</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Integer.html?is-external=true" title="class or interface in java.lang" class="externalLink">Integer</a>&nbsp;precision)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i56" class="altColor">
+<tr id="i57" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setResolvedCustomRead(java.lang.String)">setResolvedCustomRead</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;customRead)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i57" class="rowColor">
+<tr id="i58" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setScale(java.lang.Integer)">setScale</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Integer.html?is-external=true" title="class or interface in java.lang" class="externalLink">Integer</a>&nbsp;scale)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i58" class="altColor">
-<td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setSqlType(java.lang.String)">setSqlType</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;sqlType)</code></th>
-<td class="colLast">&nbsp;</td>
-</tr>
 <tr id="i59" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setSqlTypeCode(java.lang.Integer)">setSqlTypeCode</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Integer.html?is-external=true" title="class or interface in java.lang" class="externalLink">Integer</a>&nbsp;typeCode)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setSqlType(java.lang.String)">setSqlType</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;typeName)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i60" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setTypeIndex(int)">setTypeIndex</a></span>&#8203;(int&nbsp;typeIndex)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setSqlTypeCode(java.lang.Integer)">setSqlTypeCode</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Integer.html?is-external=true" title="class or interface in java.lang" class="externalLink">Integer</a>&nbsp;typeCode)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i61" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setUnique(boolean)">setUnique</a></span>&#8203;(boolean&nbsp;unique)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setTypeIndex(int)">setTypeIndex</a></span>&#8203;(int&nbsp;typeIndex)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i62" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setValue(org.hibernate.mapping.Value)">setValue</a></span>&#8203;(<a href="Value.html" title="interface in org.hibernate.mapping">Value</a>&nbsp;value)</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setUnique(boolean)">setUnique</a></span>&#8203;(boolean&nbsp;unique)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i63" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setValue(org.hibernate.mapping.Value)">setValue</a></span>&#8203;(<a href="Value.html" title="interface in org.hibernate.mapping">Value</a>&nbsp;value)</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr id="i64" class="altColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#toString()">toString</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
@@ -828,14 +835,14 @@ implements <a href="Selectable.html" title="interface in org.hibernate.mapping">
 <li class="blockList">
 <h4>getSqlTypeCode</h4>
 <pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Integer.html?is-external=true" title="class or interface in java.lang" class="externalLink">Integer</a>&nbsp;getSqlTypeCode()</pre>
-<div class="block">Returns the underlying columns SqlTypeCode.
- If null, it is because the SqlTypeCode is unknown.
- <p/>
- Use #getSqlTypeCode(Mapping) to retrieve the SqlTypeCode used
- for the columns associated Value/Type.</div>
+<div class="block">Returns <a href="../type/SqlTypes.html" title="class in org.hibernate.type">SQL type code</a>
+ for this column, or <code>null</code> if the type code is unknown.
+ <p>
+ Use <a href="#getSqlTypeCode(org.hibernate.engine.spi.Mapping)"><code>getSqlTypeCode(Mapping)</code></a> to retrieve the type code
+ using <a href="Value.html" title="interface in org.hibernate.mapping"><code>Value</code></a> associated with the column.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>sqlTypeCode if it is set, otherwise null.</dd>
+<dd>the type code, if it is set, otherwise null.</dd>
 </dl>
 </li>
 </ul>
@@ -848,6 +855,15 @@ implements <a href="Selectable.html" title="interface in org.hibernate.mapping">
 <pre class="methodSignature">public&nbsp;void&nbsp;setSqlTypeCode&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Integer.html?is-external=true" title="class or interface in java.lang" class="externalLink">Integer</a>&nbsp;typeCode)</pre>
 </li>
 </ul>
+<a id="getSqlType(org.hibernate.boot.Metadata)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getSqlType</h4>
+<pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;getSqlType&#8203;(<a href="../boot/Metadata.html" title="interface in org.hibernate.boot">Metadata</a>&nbsp;mapping)</pre>
+</li>
+</ul>
 <a id="getSqlType(org.hibernate.type.spi.TypeConfiguration,org.hibernate.dialect.Dialect,org.hibernate.engine.spi.Mapping)">
 <!--   -->
 </a>
@@ -856,12 +872,7 @@ implements <a href="Selectable.html" title="interface in org.hibernate.mapping">
 <h4>getSqlType</h4>
 <pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;getSqlType&#8203;(<a href="../type/spi/TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration,
                          <a href="../dialect/Dialect.html" title="class in org.hibernate.dialect">Dialect</a>&nbsp;dialect,
-                         <a href="../engine/spi/Mapping.html" title="interface in org.hibernate.engine.spi">Mapping</a>&nbsp;mapping)
-                  throws <a href="../HibernateException.html" title="class in org.hibernate">HibernateException</a></pre>
-<dl>
-<dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../HibernateException.html" title="class in org.hibernate">HibernateException</a></code></dd>
-</dl>
+                         <a href="../engine/spi/Mapping.html" title="interface in org.hibernate.engine.spi">Mapping</a>&nbsp;mapping)</pre>
 </li>
 </ul>
 <a id="getTypeName()">
@@ -974,7 +985,7 @@ implements <a href="Selectable.html" title="interface in org.hibernate.mapping">
 <ul class="blockList">
 <li class="blockList">
 <h4>setSqlType</h4>
-<pre class="methodSignature">public&nbsp;void&nbsp;setSqlType&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;sqlType)</pre>
+<pre class="methodSignature">public&nbsp;void&nbsp;setSqlType&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;typeName)</pre>
 </li>
 </ul>
 <a id="setUnique(boolean)">
@@ -1396,7 +1407,7 @@ implements <a href="Selectable.html" title="interface in org.hibernate.mapping">
 </a></div>
 <!-- ======== END OF BOTTOM NAVBAR ======= -->
 </nav>
-<p class="legalCopy"><small>Copyright &copy; 2001-2022 <a href="https://redhat.com">Red Hat, Inc.</a>  All Rights Reserved.</small></p>
+<p class="legalCopy"><small>Copyright &copy; 2001-2023 <a href="https://redhat.com">Red Hat, Inc.</a>  All Rights Reserved.</small></p>
 </footer>
 </body>
 </html>

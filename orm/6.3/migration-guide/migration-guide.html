@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.10">
+<title>6.3 Migration Guide</title>
+<link rel="stylesheet" href="./css/hibernate.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body class="article">
+<div id="header">
+<h1>6.3 Migration Guide</h1>
+<div class="details">
+<span id="revnumber">version 6.3.2.Final</span>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#hql-numeric-literal-types">HQL Numeric Literal Types</a></li>
+<li><a href="#batch-fetching-changes">Batch Fetching and LockMode</a></li>
+<li><a href="#metamodel-generation">Integrating Static Metamodel Generation</a></li>
+<li><a href="#hql-null-literal-comparison">HQL null literal comparison</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>This guide discusses migration to Hibernate ORM version 6.3. For migration from
+earlier versions, see any other pertinent migration guides as well.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://docs.jboss.org/hibernate/orm/6.2/migration-guide/migration-guide.html">6.2 Migration guide</a></p>
+</li>
+<li>
+<p><a href="https://docs.jboss.org/hibernate/orm/6.1/migration-guide/migration-guide.html">6.1 Migration guide</a></p>
+</li>
+<li>
+<p><a href="https://docs.jboss.org/hibernate/orm/6.0/migration-guide/migration-guide.html">6.0 Migration guide</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="hql-numeric-literal-types">HQL Numeric Literal Types</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Version 3.2 of the Jakarta Persistence specification
+<a href="https://github.com/jakartaee/persistence/issues/423">clarifies</a> the interpretation of
+numeric literals with regard to type, explicitly aligning with the Java specification (as well
+as adopting Hibernate&#8217;s long-standing <code>BigInteger</code> and <code>BigDecimal</code> suffixes).
+HQL and JPQL are domain/object-level queries, so that makes perfect sense.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>Integer</code> - 123</p>
+</li>
+<li>
+<p><code>Long</code> - 123l, 123L</p>
+</li>
+<li>
+<p><code>BigInteger</code> - 123bi, 123BI</p>
+</li>
+<li>
+<p><code>Double</code> - 123.4</p>
+</li>
+<li>
+<p><code>Float</code> - 123.4f, 123.4F</p>
+</li>
+<li>
+<p><code>BigDecimal</code> - 123.4bd, 123.4BD</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Hibernate 6.3 aligns with those interpretations, which may lead to different behavior
+from prior versions.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="batch-fetching-changes">Batch Fetching and LockMode</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When LockMode is greater than READ Hibernate does not execute the batch fetching so existing uninitialized proxies will not be initialized.
+This because the lock mode is different from the one of the proxies in the batch fetch queue.</p>
+</div>
+<div class="paragraph">
+<p>E.g.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nc">MyEntity</span> <span class="n">proxy</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">getReference</span><span class="o">(</span> <span class="nc">MyEntity</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="mi">1</span> <span class="o">);</span>
+<span class="nc">MyEntity</span> <span class="n">myEntity</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">find</span><span class="o">(</span><span class="nc">MyEntity</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="nc">LockMode</span><span class="o">.</span><span class="na">WRITE</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>only the entity with id equals to 2 will be loaded but the proxy will not be initialized.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="metamodel-generation">Integrating Static Metamodel Generation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The integration of static metamodel generation in a project has changed; the recommended way to do this now is by harnessing the annotation processor classpath. This is true for both Gradle and Maven.</p>
+</div>
+<div class="paragraph">
+<p>Some projects currently integrate with <code>hibernate-jpamodelgen</code> with a dependency, like so:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="xml">    <span class="nt">&lt;dependencies&gt;</span>
+        <span class="c">&lt;!-- ... --&gt;</span>
+        <span class="c">&lt;!-- THIS IS WRONG! See below --&gt;</span>
+        <span class="nt">&lt;dependency&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>org.hibernate.orm<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>hibernate-jpamodelgen<span class="nt">&lt;/artifactId&gt;</span>
+            <span class="nt">&lt;scope&gt;</span>provided<span class="nt">&lt;/scope&gt;</span>
+            <span class="nt">&lt;version&gt;</span>6.3.1<span class="nt">&lt;/version&gt;</span> <span class="c">&lt;!-- Optional, may be managed by a BOM --&gt;</span>
+        <span class="nt">&lt;/dependency&gt;</span>
+        <span class="c">&lt;!-- ... --&gt;</span>
+    <span class="nt">&lt;/dependencies&gt;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you are in that case, in previous versions of Hibernate ORM you were leaking dependencies of <code>hibernate-jpamodelgen</code> into your compile classpath unknowingly.
+With Hibernate ORM 6.3, you may now experience a compilation error during annotation processing related to missing Antlr classes.
+To get rid of that error:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Check out the specific sections in the User Guide for a guideline on how to properly harness the annotation processor classpath to use <code>hibernate-jpamodelgen</code>:
+see <a href="https://docs.jboss.org/hibernate/orm/6.3/userguide/html_single/Hibernate_User_Guide.html#tooling-gradle-modelgen">here for Gradle</a> or <a href="https://docs.jboss.org/hibernate/orm/6.4/userguide/html_single/Hibernate_User_Guide.html#tooling-maven-modelgen">here for Maven</a>.</p>
+</li>
+<li>
+<p>If the annotation processor classpath doesn&#8217;t work in your case (e.g. because you use Maven and need the version of <code>hibernate-jpamodelgen</code> managed through a BOM),
+upgrade to a newer version of Hibernate ORM that fixes <a href="https://hibernate.atlassian.net/browse/HHH-17362">HHH-17362</a>.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="hql-null-literal-comparison">HQL null literal comparison</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In prior versions of Hibernate it was possible to compare expressions against a <code>null</code> literal with the <code>=</code> and <code>&lt;&gt;</code>/<code>!=</code>
+operators. This is counter-intuitive as the comparison against a parameter or expression that resolves to a <code>null</code> would
+always yield <code>false</code> i.e. no results.</p>
+</div>
+<div class="paragraph">
+<p>As of Hibernate ORM 6.3, this special treatment in HQL was removed without a way to retain backwards compatibility.
+Users should migrate queries to use the <code>is null</code> and <code>is not null</code> predicate syntax instead.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 6.3.2.Final<br>
+Last updated 2023-11-23 14:56:44 UTC
+</div>
+</div>
+<link rel="stylesheet" href="./rouge-github.css">
+</body>
+</html>

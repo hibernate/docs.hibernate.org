@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.18">
+<title>6.4 Migration Guide</title>
+<link rel="stylesheet" href="./css/hibernate.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="./rouge-github.css">
+</head>
+<body class="article">
+<div id="header">
+<h1>6.4 Migration Guide</h1>
+<div class="details">
+<span id="revnumber">version 6.4.10.Final</span>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#soft-delete">Soft Delete</a></li>
+<li><a href="#custom-tenant-identifier-type">Custom tenant identifier type</a></li>
+<li><a href="#IdGeneratorStrategyInterpreter">Removed IdGeneratorStrategyInterpreter</a></li>
+<li><a href="#function-rendering-support-deprecation">Deprecation of <code>FunctionRenderingSupport</code></a></li>
+<li><a href="#SupportedDialects">Supported Dialects</a></li>
+<li><a href="#GeneratedValues">Generated Values</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>This guide discusses migration to Hibernate ORM version 6.4. For migration from
+earlier versions, see any other pertinent migration guides as well.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://docs.jboss.org/hibernate/orm/6.3/migration-guide/migration-guide.html">6.3 Migration guide</a></p>
+</li>
+<li>
+<p><a href="https://docs.jboss.org/hibernate/orm/6.2/migration-guide/migration-guide.html">6.2 Migration guide</a></p>
+</li>
+<li>
+<p><a href="https://docs.jboss.org/hibernate/orm/6.1/migration-guide/migration-guide.html">6.1 Migration guide</a></p>
+</li>
+<li>
+<p><a href="https://docs.jboss.org/hibernate/orm/6.0/migration-guide/migration-guide.html">6.0 Migration guide</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="soft-delete">Soft Delete</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>6.4 adds support for soft deletes, using the new <code>@SoftDelete</code> annotation.
+See the <a href="https://docs.jboss.org/hibernate/orm/6.4/userguide/html_single/Hibernate_User_Guide.html#soft-delete">User Guide</a> for details.</p>
+</div>
+<div class="paragraph">
+<p>In previous versions, support for soft-deletes was somewhat implementable using
+a combination of any or all of event-listeners, filters, <code>@Where</code>, etc.
+Applications using such implementations are encouraged to switch.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="custom-tenant-identifier-type">Custom tenant identifier type</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <code>CurrentTenantIdentifierResolver</code> and <code>MultiTenantConnectionProvider</code> SPIs were generified to support custom tenant identifier types.
+Both types now accept a type parameter that represents the tenant identifier type.
+Methods that were accepting or returning a tenant identifier value of type <code>String</code> were changed to use the type variable.</p>
+</div>
+<div class="paragraph">
+<p>Applications can migrate by specifying the type parameter <code>&lt;String&gt;</code> when extending <code>CurrentTenantIdentifierResolver</code>
+or one of the <code>MultiTenantConnectionProvider</code> subtypes.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="IdGeneratorStrategyInterpreter">Removed IdGeneratorStrategyInterpreter</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>IdGeneratorStrategyInterpreter</code> has been deprecated since 6.0 and has been removed to simplify id generator internals.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="function-rendering-support-deprecation">Deprecation of <code>FunctionRenderingSupport</code></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <code>FunctionRenderingSupport</code> interface was deprecated for removal in favor of the new <code>FunctionRenderer</code> interface.
+<code>FunctionRenderer</code> extends <code>FunctionRenderingSupport</code>, so switching to the new type should not be a big deal.
+Classes the previously implemented the <code>FunctionRenderingSupport</code> interface should switch to implement <code>FunctionRenderer</code>
+and the signature of the implemented <code>render(SqlAppender, List, SqlAstTranslator)</code> method has to be changed to
+<code>render(SqlAppender, List, ReturnableType, SqlAstTranslator)</code> i.e. add <code>ReturnableType</code> as second last argument.</p>
+</div>
+<div class="paragraph">
+<p>The newly passed <code>ReturnableType</code> argument allows the rendering process to consider the resolved function result type
+during rendering, which is common for certain array specific functions, especially for Oracle.</p>
+</div>
+<div class="paragraph">
+<p>Note that the deprecation also affects some methods/constructors of the <code>SelfRenderingSqlAstExpression</code> type hierarchy,
+which were previously accepting/returning a <code>FunctionRenderingSupport</code>. Constructors that accept a <code>FunctionRenderer</code>
+have been added to:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>SelfRenderingSqmFunction</code></p>
+</li>
+<li>
+<p><code>SelfRenderingSqmWindowFunction</code></p>
+</li>
+<li>
+<p><code>SelfRenderingSqmAggregateFunction</code></p>
+</li>
+<li>
+<p><code>SelfRenderingSqmOrderedSetAggregateFunction</code></p>
+</li>
+<li>
+<p><code>SelfRenderingFunctionSqlAstExpression</code></p>
+</li>
+<li>
+<p><code>SelfRenderingWindowFunctionSqlAstExpression</code></p>
+</li>
+<li>
+<p><code>SelfRenderingAggregateFunctionSqlAstExpression</code></p>
+</li>
+<li>
+<p><code>SelfRenderingOrderedSetAggregateFunctionSqlAstExpression</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>In addition, the <code>SelfRenderingSqmFunction.getRenderingSupport()</code> method was deprecated in favor of the new <code>SelfRenderingSqmFunction.getFunctionRenderer()</code> method.
+Finally, the <code>SelfRenderingFunctionSqlAstExpression.getRenderer()</code> method was deprecated in favor of the new <code>SelfRenderingFunctionSqlAstExpression.getFunctionRenderer()</code> method.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="SupportedDialects">Supported Dialects</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Please also do have a look at the <a href="https://docs.jboss.org/hibernate/orm/6.4/dialect/dialect.html">Supported Dialects</a> document to check for potential upgrades to the minimum version of the databases underpinning the dialects that Hibernate currently supports.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="GeneratedValues">Generated Values</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Previous versions of Hibernate silently ignored annotations <code>@GeneratedValue</code> applied to non identifier fields.</p>
+</div>
+<div class="paragraph">
+<p>E.g.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>@Entity
+class Entity{
+
+    @Id
+    Integer id,
+
+
+
+    @GeneratedValue // Ignored in Hibernate versions &lt; 6.4, since 6.4 an AnnotationException is thrown
+    String name;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>From 6.4 this mapping is not allowed anymore and an <code>AnnotationException</code> will be raised.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 6.4.10.Final<br>
+Last updated 2024-08-06 09:52:21 UTC
+</div>
+</div>
+</body>
+</html>

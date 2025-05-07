@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.18">
+<title>6.6 Migration Guide</title>
+<link rel="stylesheet" href="./css/hibernate.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="./rouge-github.css">
+</head>
+<body class="article">
+<div id="header">
+<h1>6.6 Migration Guide</h1>
+<div class="details">
+<span id="revnumber">version 6.6.13.Final</span>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#oracle-implicit-array-types">Oracle implicit array types</a></li>
+<li><a href="#user-defined-type">Changes to <code>UserDefinedType</code></a></li>
+<li><a href="#array-contains-array-deprecation">Subset check for arrays to use <code>array_includes</code></a></li>
+<li><a href="#merge-versioned-deleted">Merge versioned entity when row is deleted</a></li>
+<li><a href="#mapped-superclass-embeddable">Explicit validation of annotated class types</a></li>
+<li><a href="#embeddable-inheritance">Discriminator-based embeddable inheritance</a></li>
+<li><a href="#h2-dialect">H2 database and bulk mutation strategy</a></li>
+<li><a href="#criteria-query">Criteria: <code>jakarta.persistence.criteria.Expression#as(Class)</code></a></li>
+<li><a href="#table-annotation-subclasses">@Table and SINGLE_TABLE inheritance</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>This guide discusses migration to Hibernate ORM version 6.6. For migration from
+earlier versions, see any other pertinent migration guides as well.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://docs.jboss.org/hibernate/orm/6.5/migration-guide/migration-guide.html">6.5 Migration guide</a></p>
+</li>
+<li>
+<p><a href="https://docs.jboss.org/hibernate/orm/6.4/migration-guide/migration-guide.html">6.4 Migration guide</a></p>
+</li>
+<li>
+<p><a href="https://docs.jboss.org/hibernate/orm/6.3/migration-guide/migration-guide.html">6.3 Migration guide</a></p>
+</li>
+<li>
+<p><a href="https://docs.jboss.org/hibernate/orm/6.2/migration-guide/migration-guide.html">6.2 Migration guide</a></p>
+</li>
+<li>
+<p><a href="https://docs.jboss.org/hibernate/orm/6.1/migration-guide/migration-guide.html">6.1 Migration guide</a></p>
+</li>
+<li>
+<p><a href="https://docs.jboss.org/hibernate/orm/6.0/migration-guide/migration-guide.html">6.0 Migration guide</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="oracle-implicit-array-types">Oracle implicit array types</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The names for implicitly created array types on Oracle have slightly changed to account for converted types.
+Previously, the naming of implicit array types was only using the Java type simple name which could conflict
+when the same Java type is used with different JDBC type codes or converters.
+To avoid name clashes, the naming of implicitly created array types now also includes
+the preferred Java type simple name of the JDBC type in case the preferred Java type differs from the field type.
+In case of converted types, the converter Java class simple name is used instead.</p>
+</div>
+<div class="paragraph">
+<p>The array type for a persistent property of type <code>BigInteger[]</code> was previously <code>BigIntegerArray</code>
+and would now be <code>BigIntegerBigDecimalArray</code>, because the preferred Java type for the <code>NUMERIC</code>/<code>DECIMAL</code> JDBC type is <code>BigDecimal</code>.
+To specify a custom array type name, annotate the persistent property with <code>@Column(columnDefinition = "BigIntegerArray")</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="user-defined-type">Changes to <code>UserDefinedType</code></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>UserDefinedType</code> was renamed to <code>UserDefinedObjectType</code> and everything except access to column information
+was abstracted in a new interface named <code>UserDefinedType</code>. This was done to allow modelling dependencies between
+named arrays, modeled as <code>UserDefinedArrayType</code> extending the new <code>UserDefinedType</code> interface,
+and <code>UserDefinedObjectType</code> i.e. arrays of structs.</p>
+</div>
+<div class="paragraph">
+<p><code>UserDefinedType</code> was not explicitly annotated with <code>@Incubating</code> before,
+but it was introduced for the incubating <code>@Struct</code> feature in ORM 6.2,
+which made it effectively incubating as well. To make this more clear,
+the types were now also explicitly marked as <code>@Incubating</code>.</p>
+</div>
+<div class="paragraph">
+<p>The changes affect users which previously queried or created <code>UserDefinedType</code> in a <code>Namespace</code>.
+Methods that return or operate on <code>UserDefinedType</code> have been marked as <code>@Incubating</code>
+to make it clear that these contracts might still evolve.</p>
+</div>
+<div class="paragraph">
+<p>Another change is to the already incubating <code>ColumnOrderingStrategy</code>,
+where the argument type of <code>orderUserDefinedTypeColumns</code> was changed from <code>UserDefinedType</code> to <code>UserDefinedObjectType</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="array-contains-array-deprecation">Subset check for arrays to use <code>array_includes</code></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Support for <code>array_contains()</code> to accept an array as element argument is deprecated and will emit a warning.
+To check if an array is a subset of another array, use the <code>array_includes()</code> function,
+or the new <code>INCLUDES</code> predicate i.e. <code>array INCLUDES subarray</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="merge-versioned-deleted">Merge versioned entity when row is deleted</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Previously, merging a detached entity resulted in a SQL <code>insert</code> whenever there was no matching row in the database (for example, if the object had been deleted in another transaction).
+This behavior was unexpected and violated the rules of optimistic locking.</p>
+</div>
+<div class="paragraph">
+<p>An <code>OptimisticLockException</code> is now thrown when it is possible to determine that an entity is definitely detached, but there is no matching row.
+For this determination to be possible, the entity must have either:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>a generated <code>@Id</code> field, or</p>
+</li>
+<li>
+<p>a non-primitive <code>@Version</code> field.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>For entities which have neither, it&#8217;s impossible to distinguish a new instance from a deleted detached instance, and there is no change from the previous behavior.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="mapped-superclass-embeddable">Explicit validation of annotated class types</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Hibernate has always been lax when it comes to <code>@Embedded</code> property types, allowing classes not annotated with <code>@Embeddable</code> to still work correctly. This is a nice feature that enables you to map your attributes to classes that you cannot modify to add the annotation, and will continue to work as expected in the future.</p>
+</div>
+<div class="paragraph">
+<p>One consequence of this, though, was letting you use both <code>@MappedSuperlcass</code> and <code>@Embeddable</code> on the same annotated class as a workaround to enable having subclasses annotated as <code>@Embeddable</code> and still use both types in embedded attribute mappings. This has never been officially supported, with things like the JPA static metamodel not working as expected, and starting from 6.6 we will explicitly validate that mapped classes are annotated <em>either</em> <code>@MappedSuperclass</code> <em>or</em> <code>@Embeddable</code>, <em>or</em> <code>@Entity</code>.</p>
+</div>
+<div class="paragraph">
+<p>Extending a <code>@MappedSuperclass</code> annotated class with an <code>@Embeddable</code> type is still supported, but we suggest keeping the two annotated class types separate. You can now also take advantage of explicit discriminator column based <a href="#embeddable-inheritance">embeddable inheritance</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="embeddable-inheritance">Discriminator-based embeddable inheritance</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>ORM 6.6 introduced support for <code>@Embeddable</code> type inheritance, always relying on a discriminator column stored within the entity mappings that contain the polymorphic <code>@Embedded</code> property of that type.
+Note that this functionality will be automatically enabled for all <code>@Embedded</code> properties whose type (Java class) is extended by subclasses annotated with <code>@Embeddable</code>. Previously, <code>@Embeddable</code>-annotated subtypes were always ignored, so this should not impact your mappings, unless you were using the "workaround" described in the <a href="#mapped-superclass-embeddable">previous chapter</a>.</p>
+</div>
+<div class="paragraph">
+<p>With embeddable inheritance, we also enabled the <code>type()</code> and <code>treat()</code> functions to work with embeddable-typed paths.
+As a consequence, the <code>org.hibernate.query.sqm.tree.domain.SqmTreatedPath#getTreatTarget()</code> method will now return a generic <code>ManagedDomainType</code> object,
+which could in turn be an <code>EntityDomainType</code> (as it was before) or also an <code>EmbeddableDomainType</code> instance.</p>
+</div>
+<div class="paragraph">
+<p>You can find more details about embeddable inheritance in the dedicated <a href="https://docs.jboss.org/hibernate/orm/6.6/userguide/html_single/Hibernate_User_Guide.html#embeddable-inheritance">user guide chapter</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="h2-dialect">H2 database and bulk mutation strategy</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>With ORM 6.6 when a bulk mutation involves multiple tables, H2 dialect will make use of global temporary tables instead of local ones.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="criteria-query">Criteria: <code>jakarta.persistence.criteria.Expression#as(Class)</code></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The behaviour of <code>jakarta.persistence.criteria.Expression#as(Class)</code> has been changed to conform to the Jakarta Persistence specification.</p>
+</div>
+<div class="paragraph">
+<p><code>Expression.as()</code> doesn’t do anymore a real type conversions, it’s just an unsafe typecast on the Expression object itself.</p>
+</div>
+<div class="paragraph">
+<p>In order to perform an actual typecast, <code>org.hibernate.query.criteria.JpaExpression#cast(Class)</code> can be used.</p>
+</div>
+<div class="paragraph">
+<p>E.g.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="o">(</span> <span class="o">(</span><span class="nc">JpaExpression</span><span class="o">)</span> <span class="n">from</span><span class="o">.</span><span class="na">get</span><span class="o">(</span> <span class="s">"theInt"</span> <span class="o">)</span> <span class="o">).</span><span class="na">cast</span><span class="o">(</span> <span class="nc">String</span><span class="o">.</span><span class="na">class</span> <span class="o">)</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="table-annotation-subclasses">@Table and SINGLE_TABLE inheritance</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In previous versions, <code>@Table</code> on a subclass in a SINGLE_TABLE hierarchy was simply ignored.  E.g.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Entity</span>
+<span class="nd">@Inherited</span>
+<span class="kd">class</span> <span class="nc">RootClass</span> <span class="o">{</span>
+	<span class="c1">// ...</span>
+<span class="o">}</span>
+<span class="nd">@Entity</span>
+<span class="nd">@Table</span><span class="o">(...)</span>
+<span class="kd">class</span> <span class="nc">SubClass</span> <span class="kd">extends</span> <span class="nc">RootClass</span> <span class="o">{</span>
+	<span class="c1">// ...</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As part of a larger effort toward better annotation validation, this now results in a mapping exception.
+All classes in the hierarchy are stored to a single table as defined by the root.  <code>@Table</code> on the subclasses is,
+at best, confusing.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 6.6.13.Final<br>
+Last updated 2025-04-06 00:04:05 UTC
+</div>
+</div>
+</body>
+</html>

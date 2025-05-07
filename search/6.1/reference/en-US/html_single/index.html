@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.17">
-<title>Hibernate Search 6.1.7.Final: Reference Documentation</title>
+<title>Hibernate Search 6.1.8.Final: Reference Documentation</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -568,9 +568,9 @@ table.CodeRay td.code{padding:0 0 0 .75em}
 </head>
 <body class="book toc2 toc-left">
 <div id="header">
-<h1>Hibernate Search 6.1.7.Final: Reference Documentation</h1>
+<h1>Hibernate Search 6.1.8.Final: Reference Documentation</h1>
 <div class="details">
-<span id="revdate">2022-09-16</span>
+<span id="revdate">2023-01-31</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -1582,7 +1582,7 @@ to integrate Hibernate Search into your application.</p>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Hibernate ORM (for the ORM mapper)</p></th>
-<td class="tableblock halign-center valign-top"><p class="tableblock">5.6.11.Final</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">5.6.12.Final</p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
@@ -1700,9 +1700,12 @@ and the Lucene integration now requires an explicit dependency instead of being 
 Read <a href="#gettingstarted-dependencies">Dependencies</a> for more information.</p>
 </div>
 <div class="paragraph">
-<p>Additionally, be aware that a lot of APIs changed, some only because of a package change,
+<p>Additionally, be aware that a lot of APIs have changed, some only because of a package change,
 others because of more fundamental changes
-(like moving away from using Lucene types in Hibernate Search APIs).</p>
+(like moving away from using Lucene types in Hibernate Search APIs).
+For that reason, you are encouraged to migrate first to Hibernate Search 6.0
+using the <a href="https://docs.jboss.org/hibernate/search/6.0/migration/html_single/">6.0 migration guide</a>,
+and only then to later versions (which will be significantly easier).</p>
 </div>
 </td>
 </tr>
@@ -1760,7 +1763,7 @@ Thus, it is recommended to override Spring Boot&#8217;s defaults at least for so
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="XML"><span class="tag">&lt;properties&gt;</span>
-    <span class="tag">&lt;hibernate.version&gt;</span>5.6.11.Final<span class="tag">&lt;/hibernate.version&gt;</span>
+    <span class="tag">&lt;hibernate.version&gt;</span>5.6.12.Final<span class="tag">&lt;/hibernate.version&gt;</span>
     <span class="tag">&lt;elasticsearch.version&gt;</span>7.16.3<span class="tag">&lt;/elasticsearch.version&gt;</span>
     <span class="comment">&lt;!-- ... plus any other properties of yours ... --&gt;</span>
 <span class="tag">&lt;/properties&gt;</span></code></pre>
@@ -1778,7 +1781,7 @@ Thus, it is recommended to override Spring Boot&#8217;s defaults at least for so
 you still have problems (e.g. <code>NoClassDefFoundError</code>) with some of Hibernate Search&#8217;s dependencies,
 look for the version of that dependency in
 <a href="https://search.maven.org/artifact/org.springframework.boot/spring-boot-dependencies/2.6.2/pom">Spring Boot&#8217;s POM</a>
-and <a href="https://search.maven.org/artifact/org.hibernate.search/hibernate-search-parent/6.1.7.Final/pom">Hibernate Search&#8217;s POM</a>:
+and <a href="https://search.maven.org/artifact/org.hibernate.search/hibernate-search-parent/6.1.8.Final/pom">Hibernate Search&#8217;s POM</a>:
 there will probably be a mismatch,
 and generally overriding Spring Boot&#8217;s version to match Hibernate Search&#8217;s version will work fine.</p>
 </div>
@@ -1841,7 +1844,7 @@ Hibernate Search works just fine with plenty of other frameworks.</p>
 <div class="paragraph">
 <p>If you do not want to, or cannot, fetch the JARs from a Maven repository,
 you can get them from the
-<a href="http://sourceforge.net/projects/hibernate/files/hibernate-search/6.1.7.Final/">distribution bundle hosted at Sourceforge</a>.</p>
+<a href="http://sourceforge.net/projects/hibernate/files/hibernate-search/6.1.8.Final/">distribution bundle hosted at Sourceforge</a>.</p>
 </div>
 <div class="paragraph">
 <p>In order to use Hibernate Search, you will need at least two direct dependencies:</p>
@@ -1874,12 +1877,12 @@ storing the index on the local filesystem.</p>
 <pre class="CodeRay highlight"><code data-lang="XML"><span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-mapper-orm<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>6.1.7.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>6.1.8.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span>
 <span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-backend-lucene<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>6.1.7.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>6.1.8.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -1901,12 +1904,12 @@ storing the index on a remote Elasticsearch or OpenSearch cluster (to be configu
 <pre class="CodeRay highlight"><code data-lang="XML"><span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-mapper-orm<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>6.1.7.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>6.1.8.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span>
 <span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-backend-elasticsearch<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>6.1.7.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>6.1.8.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -3729,12 +3732,12 @@ and all indexes need to live on the same server.</p>
 <pre class="CodeRay highlight"><code data-lang="XML"><span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-mapper-orm<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>6.1.7.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>6.1.8.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span>
 <span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-backend-lucene<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>6.1.7.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>6.1.8.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -3835,12 +3838,12 @@ and won&#8217;t perform very well if you need changes to be visible immediately 
 <pre class="CodeRay highlight"><code data-lang="XML"><span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-mapper-orm<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>6.1.7.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>6.1.8.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span>
 <span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-backend-elasticsearch<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>6.1.7.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>6.1.8.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -3978,17 +3981,17 @@ To implement this architecture, use the following Maven dependencies:</p>
 <pre class="CodeRay highlight"><code data-lang="XML"><span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-mapper-orm<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>6.1.7.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>6.1.8.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span>
 <span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-mapper-orm-coordination-outbox-polling<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>6.1.7.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>6.1.8.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span>
 <span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-backend-elasticsearch<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>6.1.7.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>6.1.8.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -17351,7 +17354,7 @@ As for other implementations, they can also be used, but will require
 <pre class="CodeRay highlight"><code data-lang="XML"><span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-mapper-orm-batch-jsr352-jberet<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>6.1.7.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>6.1.8.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -17363,7 +17366,7 @@ As for other implementations, they can also be used, but will require
 <pre class="CodeRay highlight"><code data-lang="XML"><span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-mapper-orm-batch-jsr352-core<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>6.1.7.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>6.1.8.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -29322,7 +29325,7 @@ you can enable it with an additional dependency and a bit of configuration.</p>
 <pre class="CodeRay highlight"><code data-lang="XML"><span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-backend-elasticsearch-aws<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>6.1.7.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>6.1.8.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -31732,7 +31735,7 @@ you will need extra configuration.</p>
 <pre class="CodeRay highlight"><code data-lang="XML"><span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-mapper-orm-coordination-outbox-polling<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>6.1.7.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>6.1.8.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -32553,18 +32556,18 @@ will need to update its dependencies as follows:</p>
 <pre class="CodeRay highlight"><code data-lang="XML"><span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-core-jakarta<span class="tag">&lt;/artifactId&gt;</span> <i class="conum" data-value="1"></i><b>(1)</b>
-   <span class="tag">&lt;version&gt;</span>5.6.11.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>5.6.12.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span>
 <span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span><span class="tag">&lt;/artifactId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-mapper-orm-jakarta<span class="tag">&lt;/artifactId&gt;</span> <i class="conum" data-value="2"></i><b>(2)</b>
-   <span class="tag">&lt;version&gt;</span>6.1.7.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>6.1.8.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span>
 <span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-backend-elasticsearch<span class="tag">&lt;/artifactId&gt;</span> <i class="conum" data-value="3"></i><b>(3)</b>
-   <span class="tag">&lt;version&gt;</span>6.1.7.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>6.1.8.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -32668,13 +32671,13 @@ you must add <code>-orm6</code> to some artifact identifiers.</p>
 </td>
 <td class="content">
 <div class="paragraph">
-<p>The experimental support for Hibernate ORM 6 in Hibernate Search 6.1.7.Final
+<p>The experimental support for Hibernate ORM 6 in Hibernate Search 6.1.8.Final
 targets Hibernate ORM version 6.0.2.Final.</p>
 </div>
 <div class="paragraph">
 <p>Newer versions of Hibernate ORM 6 may introduce breaking changes,
 in which case they will no longer be compatible with
-the experimental support for Hibernate ORM 6 in Hibernate Search 6.1.7.Final,
+the experimental support for Hibernate ORM 6 in Hibernate Search 6.1.8.Final,
 until Hibernate Search catches up in its next release.</p>
 </div>
 </td>
@@ -32695,12 +32698,12 @@ will need to update its dependencies as follows:</p>
 <span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-mapper-orm-orm6<span class="tag">&lt;/artifactId&gt;</span> <i class="conum" data-value="2"></i><b>(2)</b>
-   <span class="tag">&lt;version&gt;</span>6.1.7.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>6.1.8.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span>
 <span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-backend-elasticsearch<span class="tag">&lt;/artifactId&gt;</span> <i class="conum" data-value="3"></i><b>(3)</b>
-   <span class="tag">&lt;version&gt;</span>6.1.7.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>6.1.8.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -33332,7 +33335,7 @@ available in particular in our <a href="https://github.com/hibernate/hibernate-s
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-09-16 06:37:33 UTC
+Last updated 2023-01-31 08:09:11 UTC
 </div>
 </div>
 <!-- HibernateDoc.OutdatedContent -->

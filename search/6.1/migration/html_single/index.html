@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.17">
-<title>Hibernate Search 6.1.7.Final: Migration Guide from 6.0</title>
+<title>Hibernate Search 6.1.8.Final: Migration Guide from 6.0</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -479,9 +479,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </head>
 <body class="book toc2 toc-left">
 <div id="header">
-<h1>Hibernate Search 6.1.7.Final: Migration Guide from 6.0</h1>
+<h1>Hibernate Search 6.1.8.Final: Migration Guide from 6.0</h1>
 <div class="details">
-<span id="revdate">2022-09-16</span>
+<span id="revdate">2023-01-31</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -522,13 +522,37 @@ If you think something is missing or something does not work, please <a href="ht
 you should migrate step-by-step, from one minor version to the next,
 following the migration guide of <a href="https://hibernate.org/search/documentation/">each version</a>.</p>
 </div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><strong>To Hibernate Search 5 users</strong></p>
+</div>
+<div class="paragraph">
+<p>Be aware that a lot of APIs have changed since Hibernate Search 5, some only because of a package change,
+others because of more fundamental changes
+(like moving away from using Lucene types in Hibernate Search APIs).</p>
+</div>
+<div class="paragraph">
+<p>When migrating from Hibernate Search 5, you are encouraged to migrate first to Hibernate Search 6.0
+using the <a href="https://docs.jboss.org/hibernate/search/6.0/migration/html_single/">6.0 migration guide</a>,
+and only then to later versions (which will be significantly easier).</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="requirements"><a class="anchor" href="#requirements"></a>Requirements</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Hibernate Search 6.1.7.Final now requires using Hibernate ORM versions from the 5.6.x family.</p>
+<p>Hibernate Search 6.1.8.Final now requires using Hibernate ORM versions from the 5.6.x family.</p>
 </div>
 </div>
 </div>
@@ -537,7 +561,7 @@ following the migration guide of <a href="https://hibernate.org/search/documenta
 <div class="sectionbody">
 <div class="paragraph">
 <p>Indexes created with Hibernate Search 6.0
-can be read from and written to with Hibernate Search 6.1.7.Final.</p>
+can be read from and written to with Hibernate Search 6.1.8.Final.</p>
 </div>
 </div>
 </div>
@@ -698,6 +722,10 @@ for an example of how to migrate backend implementations.</p>
 <li>
 <p><code>ElasticsearcAwsCredentialsProvider</code>: implement <code>ElasticsearchAwsCredentialsProvider</code> instead.</p>
 </li>
+<li>
+<p><code>PojoAdditionalMetadataCollectorTypeNode#markAsEntity(String, org.hibernate.search.mapper.pojo.model.path.spi.PojoPathsDefinition)</code>:
+use <code>PojoAdditionalMetadataCollectorTypeNode#markAsEntity(String, org.hibernate.search.mapper.pojo.model.path.spi.PojoPathDefinitionProvider)</code> instead.</p>
+</li>
 </ul>
 </div>
 </div>
@@ -713,7 +741,7 @@ for an example of how to migrate backend implementations.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-09-16 06:37:32 UTC
+Last updated 2023-01-31 08:09:11 UTC
 </div>
 </div>
 <!-- HibernateDoc.OutdatedContent -->

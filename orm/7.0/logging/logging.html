@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.18">
+<title>Hibernate logging</title>
+<link rel="stylesheet" href="./css/hibernate.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body class="article">
+<div id="header">
+<h1>Hibernate logging</h1>
+<div class="details">
+<span id="revnumber">version 7.0.0.CR1</span>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="subsystems">Sub-system logging</h2>
+<div class="sectionbody">
+<div id="MutationQueryLogging_MUTATION_QUERY_LOGGER_NAME" class="dlist">
+<dl>
+<dt class="hdlist1"><code>MutationQueryLogging.MUTATION_QUERY_LOGGER_NAME</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>MutationQueryLogging</code></p>
+</li>
+<li>
+<p>Description = Logging for multi-table mutation queries</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="envers_boot" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.envers.boot</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>EnversBootLogger</code></p>
+</li>
+<li>
+<p>Description = Logging related to bootstrapping an Envers (currently just its in-flight generation of <code>hbm.xml</code> mappings for Hibernate ORM to process)</p>
+</li>
+<li>
+<p>ValidIdRange = <a href="#HHH90005601">HHH90005601 - HHH90005700</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="beans" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.beans</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>BeansMessageLogger</code></p>
+</li>
+<li>
+<p>Description = Logging related to managed beans and the BeanContainer (CDI, etc)</p>
+</li>
+<li>
+<p>ValidIdRange = <a href="#HHH10005001">HHH10005001 - HHH10010000</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="boot" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.boot</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>LobCreationLogging</code></p>
+</li>
+<li>
+<p>Description = Logging related to</p>
+</li>
+<li>
+<p>ValidIdRange = <a href="#HHH10010001">HHH10010001 - HHH10010050</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="boot_jaxb" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.boot.jaxb</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>JaxbLogger</code></p>
+</li>
+<li>
+<p>Description = Logging related to JAXB processing</p>
+</li>
+<li>
+<p>ValidIdRange = <a href="#HHH90005501">HHH90005501 - HHH90005600</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="boot_query" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.boot.query</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>BootQueryLogging</code></p>
+</li>
+<li>
+<p>Description = Logging related to processing of named-queries</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="cache" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.cache</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>SecondLevelCacheLogger</code></p>
+</li>
+<li>
+<p>Description = Logging related to Hibernate second-level caching</p>
+</li>
+<li>
+<p>ValidIdRange = <a href="#HHH90001001">HHH90001001 - HHH90002000</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="connections_access" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.connections.access</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>ConnectionAccessLogger</code></p>
+</li>
+<li>
+<p>Description = Used to log details around use of <code>JdbcConnectionAccess</code></p>
+</li>
+<li>
+<p>ValidIdRange = <a href="#HHH10001501">HHH10001501 - HHH10002000</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="connections_pooling" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.connections.pooling</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>ConnectionInfoLogger</code></p>
+</li>
+<li>
+<p>Description = Logging related to connection pooling</p>
+</li>
+<li>
+<p>ValidIdRange = <a href="#HHH10001001">HHH10001001 - HHH10001500</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="connections_pooling_c3p0" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.connections.pooling.c3p0</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>C3P0MessageLogger</code></p>
+</li>
+<li>
+<p>Description = Logging related to the C3P0 connection pool</p>
+</li>
+<li>
+<p>ValidIdRange = <a href="#HHH010001">HHH010001 - HHH015000</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="deprecation" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.deprecation</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>DeprecationLogger</code></p>
+</li>
+<li>
+<p>Description = Logging related to uses of deprecated features</p>
+</li>
+<li>
+<p>ValidIdRange = <a href="#HHH90000001">HHH90000001 - HHH90001000</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="dialect" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.dialect</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>DialectLogging</code></p>
+</li>
+<li>
+<p>Description = Logging related to the dialects of SQL implemented by particular RDBMS</p>
+</li>
+<li>
+<p>ValidIdRange = <a href="#HHH035001">HHH035001 - HHH036000</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="factoryRegistry" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.factoryRegistry</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>SessionFactoryRegistryMessageLogger</code></p>
+</li>
+<li>
+<p>Description = Logging related to session factory registry</p>
+</li>
+<li>
+<p>ValidIdRange = <a href="#HHH020100">HHH020100 - HHH020400</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="graph_parsing" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.graph.parsing</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>GraphParserLogging</code></p>
+</li>
+<li>
+<p>Description = Logging related to Hibernate&#8217;s <code>GraphParser</code> for parsing entity-graphs from String representations</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="jdbc" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.jdbc</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>JdbcLogging</code></p>
+</li>
+<li>
+<p>Description = Logging related to JDBC interactions</p>
+</li>
+<li>
+<p>ValidIdRange = <a href="#HHH100001">HHH100001 - HHH100500</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="jdbc_batch" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.jdbc.batch</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>JdbcBatchLogging</code></p>
+</li>
+<li>
+<p>Description = Logging related to JDBC batch execution</p>
+</li>
+<li>
+<p>ValidIdRange = <a href="#HHH100501">HHH100501 - HHH101000</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="jdbc_bind" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.jdbc.bind</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>JdbcBindingLogging</code></p>
+</li>
+<li>
+<p>Description = Logging of JDBC parameter value binding</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="jdbc_extract" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.jdbc.extract</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>JdbcExtractingLogging</code></p>
+</li>
+<li>
+<p>Description = Logging of JDBC value extraction</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="jdbc_mutation" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.jdbc.mutation</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>ModelMutationLogging</code></p>
+</li>
+<li>
+<p>Description = Logging related to entity and collection mutations stemming from persistence-context events</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="loader" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.loader</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>LoaderLogging</code></p>
+</li>
+<li>
+<p>Description = Logging related to loaders of domain model references (<code>org.hibernate.loader.ast.spi.Loader</code>); see also <code>org.hibernate.orm.results</code></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="loader_multi" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.loader.multi</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>MultiKeyLoadLogging</code></p>
+</li>
+<li>
+<p>Description = Logging related to multi-key loading of entity and collection references</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="mapping_natural_id" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.mapping.natural_id</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>NaturalIdLogging</code></p>
+</li>
+<li>
+<p>Description = Logging related to handling of natural-id mappings</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="model_mapping_creation" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.model.mapping.creation</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>MappingModelCreationLogging</code></p>
+</li>
+<li>
+<p>Description = Logging related to building of Hibernate&#8217;s runtime metamodel descriptors of the domain model</p>
+</li>
+<li>
+<p>ValidIdRange = <a href="#HHH90005701">HHH90005701 - HHH90005800</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="query" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.query</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>QueryLogging</code></p>
+</li>
+<li>
+<p>Description = Logging related to Query processing</p>
+</li>
+<li>
+<p>ValidIdRange = <a href="#HHH90003001">HHH90003001 - HHH90003500</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="query_hql" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.query.hql</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>HqlLogging</code></p>
+</li>
+<li>
+<p>Description = Logging related to HQL parsing</p>
+</li>
+<li>
+<p>ValidIdRange = <a href="#HHH90003501">HHH90003501 - HHH90004000</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="results" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.results</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>ResultsLogger</code></p>
+</li>
+<li>
+<p>Description = Logging related to <code>DomainResult</code> graphs which build individual parts of the domain model from JDBC or from cache</p>
+</li>
+<li>
+<p>ValidIdRange = <a href="#HHH90005001">HHH90005001 - HHH90005100</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="results_graph_AST" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.results.graph.AST</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>Logging</code></p>
+</li>
+<li>
+<p>Description = Logging of <code>DomainResult</code> graphs</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="results_loading" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.results.loading</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>LoadingLogger</code></p>
+</li>
+<li>
+<p>Description = Logging related to building parts of the domain model from JDBC or from cache</p>
+</li>
+<li>
+<p>ValidIdRange = <a href="#HHH90005801">HHH90005801 - HHH90005900</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="results_loading_collection" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.results.loading.collection</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>CollectionLoadingLogger</code></p>
+</li>
+<li>
+<p>Description = Logging related to collection loading</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="results_loading_embeddable" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.results.loading.embeddable</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>EntityLoadingLogging</code></p>
+</li>
+<li>
+<p>Description = Logging related to entity loading</p>
+</li>
+<li>
+<p>ValidIdRange = <a href="#HHH90005301">HHH90005301 - HHH90005400</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="sql_ast_create" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.sql.ast.create</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>SqlTreeCreationLogger</code></p>
+</li>
+<li>
+<p>Description = Logging related to the creation of SQL AST trees</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="sql_ast_tree" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.sql.ast.tree</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>SqlAstTreeLogger</code></p>
+</li>
+<li>
+<p>Description = Logging related to the processing of SQL AST trees</p>
+</li>
+<li>
+<p>ValidIdRange = <a href="#HHH90005401">HHH90005401 - HHH90005500</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="sql_exec" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.sql.exec</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>SqlExecLogger</code></p>
+</li>
+<li>
+<p>Description = Logging related to the execution of SQL statements</p>
+</li>
+<li>
+<p>ValidIdRange = <a href="#HHH90004001">HHH90004001 - HHH90005000</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="url" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.url</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>UrlMessageBundle</code></p>
+</li>
+<li>
+<p>Description = Logging related to URL handling</p>
+</li>
+<li>
+<p>ValidIdRange = <a href="#HHH10000001">HHH10000001 - HHH10001000</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="versioning" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.orm.versioning</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>VersionLogger</code></p>
+</li>
+<li>
+<p>Description = Logging related to versioning</p>
+</li>
+<li>
+<p>ValidIdRange = <a href="#HHH160000">HHH160000 - HHH160100</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="ormbytecode" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.ormbytecode</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>BytecodeLogging</code></p>
+</li>
+<li>
+<p>Description = Logging related to bytecode handling</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="ormbytecode_interceptor" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.ormbytecode.interceptor</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>BytecodeInterceptorLogging</code></p>
+</li>
+<li>
+<p>Description = Logging related to bytecode-based interception</p>
+</li>
+<li>
+<p>ValidIdRange = <a href="#HHH90005901">HHH90005901 - HHH90006000</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="spatial" class="dlist">
+<dl>
+<dt class="hdlist1"><code>org.hibernate.spatial</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Logging class-name = <code>HSMessageLogger</code></p>
+</li>
+<li>
+<p>Description = Base logging for Hibernate Spatial</p>
+</li>
+<li>
+<p>ValidIdRange = <a href="#HHH80000001">HHH80000001 - HHH80001000</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="id-ranges">Message Id Ranges</h2>
+<div class="sectionbody">
+<div id="HHH000002" class="dlist">
+<dl>
+<dt class="hdlist1"><code>HHH000002 - HHH020000</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>ValidIdRange = HHH000002 - HHH020000 (explicit)</p>
+</li>
+<li>
+<p>MessageLogger = <code>CoreMessageLogger</code></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="HHH010001" class="dlist">
+<dl>
+<dt class="hdlist1"><code>HHH010001 - HHH015000</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>ValidIdRange = HHH010001 - HHH015000 (explicit)</p>
+</li>
+<li>
+<p>MessageLogger = <code>C3P0MessageLogger</code></p>
+</li>
+<li>
+<p>SubSystem = <a href="#connections_pooling_c3p0">org.hibernate.orm.connections.pooling.c3p0</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="HHH020100" class="dlist">
+<dl>
+<dt class="hdlist1"><code>HHH020100 - HHH020400</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>ValidIdRange = HHH020100 - HHH020400 (explicit)</p>
+</li>
+<li>
+<p>MessageLogger = <code>SessionFactoryRegistryMessageLogger</code></p>
+</li>
+<li>
+<p>SubSystem = <a href="#factoryRegistry">org.hibernate.orm.factoryRegistry</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="HHH025001" class="dlist">
+<dl>
+<dt class="hdlist1"><code>HHH025001 - HHH030000</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>ValidIdRange = HHH025001 - HHH030000 (explicit)</p>
+</li>
+<li>
+<p>MessageLogger = <code>EnversMessageLogger</code></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="HHH035001" class="dlist">
+<dl>
+<dt class="hdlist1"><code>HHH035001 - HHH036000</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>ValidIdRange = HHH035001 - HHH036000 (explicit)</p>
+</li>
+<li>
+<p>MessageLogger = <code>DialectLogging</code></p>
+</li>
+<li>
+<p>SubSystem = <a href="#dialect">org.hibernate.orm.dialect</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="HHH100001" class="dlist">
+<dl>
+<dt class="hdlist1"><code>HHH100001 - HHH100500</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>ValidIdRange = HHH100001 - HHH100500 (explicit)</p>
+</li>
+<li>
+<p>MessageLogger = <code>JdbcLogging</code></p>
+</li>
+<li>
+<p>SubSystem = <a href="#jdbc">org.hibernate.orm.jdbc</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="HHH100501" class="dlist">
+<dl>
+<dt class="hdlist1"><code>HHH100501 - HHH101000</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>ValidIdRange = HHH100501 - HHH101000 (explicit)</p>
+</li>
+<li>
+<p>MessageLogger = <code>JdbcBatchLogging</code></p>
+</li>
+<li>
+<p>SubSystem = <a href="#jdbc_batch">org.hibernate.orm.jdbc.batch</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="HHH160000" class="dlist">
+<dl>
+<dt class="hdlist1"><code>HHH160000 - HHH160100</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>ValidIdRange = HHH160000 - HHH160100 (explicit)</p>
+</li>
+<li>
+<p>MessageLogger = <code>VersionLogger</code></p>
+</li>
+<li>
+<p>SubSystem = <a href="#versioning">org.hibernate.orm.versioning</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="HHH10000001" class="dlist">
+<dl>
+<dt class="hdlist1"><code>HHH10000001 - HHH10001000</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>ValidIdRange = HHH10000001 - HHH10001000 (explicit)</p>
+</li>
+<li>
+<p>MessageLogger = <code>UrlMessageBundle</code></p>
+</li>
+<li>
+<p>SubSystem = <a href="#url">org.hibernate.orm.url</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="HHH10001001" class="dlist">
+<dl>
+<dt class="hdlist1"><code>HHH10001001 - HHH10001500</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>ValidIdRange = HHH10001001 - HHH10001500 (explicit)</p>
+</li>
+<li>
+<p>MessageLogger = <code>ConnectionInfoLogger</code></p>
+</li>
+<li>
+<p>SubSystem = <a href="#connections_pooling">org.hibernate.orm.connections.pooling</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="HHH10001501" class="dlist">
+<dl>
+<dt class="hdlist1"><code>HHH10001501 - HHH10002000</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>ValidIdRange = HHH10001501 - HHH10002000 (explicit)</p>
+</li>
+<li>
+<p>MessageLogger = <code>ConnectionAccessLogger</code></p>
+</li>
+<li>
+<p>SubSystem = <a href="#connections_access">org.hibernate.orm.connections.access</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="HHH10005001" class="dlist">
+<dl>
+<dt class="hdlist1"><code>HHH10005001 - HHH10010000</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>ValidIdRange = HHH10005001 - HHH10010000 (explicit)</p>
+</li>
+<li>
+<p>MessageLogger = <code>BeansMessageLogger</code></p>
+</li>
+<li>
+<p>SubSystem = <a href="#beans">org.hibernate.orm.beans</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="HHH10010001" class="dlist">
+<dl>
+<dt class="hdlist1"><code>HHH10010001 - HHH10010050</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>ValidIdRange = HHH10010001 - HHH10010050 (explicit)</p>
+</li>
+<li>
+<p>MessageLogger = <code>LobCreationLogging</code></p>
+</li>
+<li>
+<p>SubSystem = <a href="#boot">org.hibernate.orm.boot</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="HHH80000001" class="dlist">
+<dl>
+<dt class="hdlist1"><code>HHH80000001 - HHH80001000</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>ValidIdRange = HHH80000001 - HHH80001000 (explicit)</p>
+</li>
+<li>
+<p>MessageLogger = <code>HSMessageLogger</code></p>
+</li>
+<li>
+<p>SubSystem = <a href="#spatial">org.hibernate.spatial</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="HHH90000001" class="dlist">
+<dl>
+<dt class="hdlist1"><code>HHH90000001 - HHH90001000</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>ValidIdRange = HHH90000001 - HHH90001000 (explicit)</p>
+</li>
+<li>
+<p>MessageLogger = <code>DeprecationLogger</code></p>
+</li>
+<li>
+<p>SubSystem = <a href="#deprecation">org.hibernate.orm.deprecation</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="HHH90001001" class="dlist">
+<dl>
+<dt class="hdlist1"><code>HHH90001001 - HHH90002000</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>ValidIdRange = HHH90001001 - HHH90002000 (explicit)</p>
+</li>
+<li>
+<p>MessageLogger = <code>SecondLevelCacheLogger</code></p>
+</li>
+<li>
+<p>SubSystem = <a href="#cache">org.hibernate.orm.cache</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="HHH90003001" class="dlist">
+<dl>
+<dt class="hdlist1"><code>HHH90003001 - HHH90003500</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>ValidIdRange = HHH90003001 - HHH90003500 (explicit)</p>
+</li>
+<li>
+<p>MessageLogger = <code>QueryLogging</code></p>
+</li>
+<li>
+<p>SubSystem = <a href="#query">org.hibernate.orm.query</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="HHH90003501" class="dlist">
+<dl>
+<dt class="hdlist1"><code>HHH90003501 - HHH90004000</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>ValidIdRange = HHH90003501 - HHH90004000 (explicit)</p>
+</li>
+<li>
+<p>MessageLogger = <code>HqlLogging</code></p>
+</li>
+<li>
+<p>SubSystem = <a href="#query_hql">org.hibernate.orm.query.hql</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="HHH90004001" class="dlist">
+<dl>
+<dt class="hdlist1"><code>HHH90004001 - HHH90005000</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>ValidIdRange = HHH90004001 - HHH90005000 (explicit)</p>
+</li>
+<li>
+<p>MessageLogger = <code>SqlExecLogger</code></p>
+</li>
+<li>
+<p>SubSystem = <a href="#sql_exec">org.hibernate.orm.sql.exec</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="HHH90005001" class="dlist">
+<dl>
+<dt class="hdlist1"><code>HHH90005001 - HHH90005100</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>ValidIdRange = HHH90005001 - HHH90005100 (explicit)</p>
+</li>
+<li>
+<p>MessageLogger = <code>ResultsLogger</code></p>
+</li>
+<li>
+<p>SubSystem = <a href="#results">org.hibernate.orm.results</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="HHH90005301" class="dlist">
+<dl>
+<dt class="hdlist1"><code>HHH90005301 - HHH90005400</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>ValidIdRange = HHH90005301 - HHH90005400 (explicit)</p>
+</li>
+<li>
+<p>MessageLogger = <code>EmbeddableLoadingLogger</code></p>
+</li>
+<li>
+<p>SubSystem = <a href="#results_loading_embeddable">org.hibernate.orm.results.loading.embeddable</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="HHH90005401" class="dlist">
+<dl>
+<dt class="hdlist1"><code>HHH90005401 - HHH90005500</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>ValidIdRange = HHH90005401 - HHH90005500 (explicit)</p>
+</li>
+<li>
+<p>MessageLogger = <code>SqlAstTreeLogger</code></p>
+</li>
+<li>
+<p>SubSystem = <a href="#sql_ast_tree">org.hibernate.orm.sql.ast.tree</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="HHH90005501" class="dlist">
+<dl>
+<dt class="hdlist1"><code>HHH90005501 - HHH90005600</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>ValidIdRange = HHH90005501 - HHH90005600 (explicit)</p>
+</li>
+<li>
+<p>MessageLogger = <code>JaxbLogger</code></p>
+</li>
+<li>
+<p>SubSystem = <a href="#boot_jaxb">org.hibernate.orm.boot.jaxb</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="HHH90005601" class="dlist">
+<dl>
+<dt class="hdlist1"><code>HHH90005601 - HHH90005700</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>ValidIdRange = HHH90005601 - HHH90005700 (explicit)</p>
+</li>
+<li>
+<p>MessageLogger = <code>EnversBootLogger</code></p>
+</li>
+<li>
+<p>SubSystem = <a href="#envers_boot">org.hibernate.envers.boot</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="HHH90005701" class="dlist">
+<dl>
+<dt class="hdlist1"><code>HHH90005701 - HHH90005800</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>ValidIdRange = HHH90005701 - HHH90005800 (explicit)</p>
+</li>
+<li>
+<p>MessageLogger = <code>MappingModelCreationLogging</code></p>
+</li>
+<li>
+<p>SubSystem = <a href="#model_mapping_creation">org.hibernate.orm.model.mapping.creation</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="HHH90005801" class="dlist">
+<dl>
+<dt class="hdlist1"><code>HHH90005801 - HHH90005900</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>ValidIdRange = HHH90005801 - HHH90005900 (explicit)</p>
+</li>
+<li>
+<p>MessageLogger = <code>LoadingLogger</code></p>
+</li>
+<li>
+<p>SubSystem = <a href="#results_loading">org.hibernate.orm.results.loading</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="HHH90005901" class="dlist">
+<dl>
+<dt class="hdlist1"><code>HHH90005901 - HHH90006000</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>ValidIdRange = HHH90005901 - HHH90006000 (explicit)</p>
+</li>
+<li>
+<p>MessageLogger = <code>BytecodeInterceptorLogging</code></p>
+</li>
+<li>
+<p>SubSystem = <a href="#ormbytecode_interceptor">org.hibernate.ormbytecode.interceptor</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div id="HHH90006001" class="dlist">
+<dl>
+<dt class="hdlist1"><code>HHH90006001 - HHH90007000</code></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>ValidIdRange = HHH90006001 - HHH90007000 (explicit)</p>
+</li>
+<li>
+<p>MessageLogger = <code>IncubationLogger</code></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 7.0.0.CR1<br>
+Last updated 2025-04-24 19:45:05 UTC
+</div>
+</div>
+</body>
+</html>

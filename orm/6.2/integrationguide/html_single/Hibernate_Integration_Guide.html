@@ -1,30 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.10">
-<meta name="author" content="Steve Ebersole, Vlad Mihalcea">
-<title>Hibernate ORM 6.2 Integration Guide</title>
+<meta name="generator" content="Asciidoctor 2.0.18">
+<title>Hibernate ORM Integration Guide</title>
 <link rel="stylesheet" href="./css/hibernate.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="./rouge-github.css">
 </head>
 <body class="article">
 <div id="header">
-<h1>Hibernate ORM 6.2 Integration Guide</h1>
+<h1>Hibernate ORM Integration Guide</h1>
 <div class="details">
-<span id="author" class="author">Steve Ebersole, Vlad Mihalcea</span><br>
-<span id="revnumber">version 6.2.0.CR1</span>
+<span id="revnumber">version 6.2.36.Final</span>
 </div>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#preface">Preface</a>
-<ul class="sectlevel2">
-<li><a href="#_audience">Audience</a></li>
-</ul>
-</li>
+<li><a href="#preface">Preface</a></li>
 <li><a href="#services">1. Services and Registries</a>
 <ul class="sectlevel2">
 <li><a href="#services-service">1.1. What is a Service?</a>
@@ -50,6 +45,7 @@
 </li>
 </ul>
 </li>
+<li><a href="#credits">2. Credits</a></li>
 </ul>
 </div>
 </div>
@@ -58,19 +54,20 @@
 <h2 id="preface">Preface</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Hibernate is an <a href="https://en.wikipedia.org/wiki/Object-relational_mapping">Object/Relational Mapping</a> solution for Java environments.</p>
+<p>Hibernate provides many integration points that allow integration new capabilities or supplying custom behavior for standard capabilities.  This guide covers these integration points and is intended for software developers and architects who will be</p>
 </div>
-<div class="paragraph">
-<p>Hibernate not only takes care of the mapping from Java classes to database tables (and from Java data types to SQL data types), but also provides data query and retrieval facilities.
-It can significantly reduce development time otherwise spent with manual data handling in SQL and JDBC.
-Hibernate’s design goal is to relieve the developer from 95% of common data persistence-related programming tasks by eliminating the need for manual, hand-crafted data processing using SQL and JDBC.
-However, unlike many other persistence solutions, Hibernate does not hide the power of SQL from you and guarantees that your investment in relational technology and knowledge is as valid as always.</p>
-</div>
-<div class="sect2">
-<h3 id="_audience">Audience</h3>
-<div class="paragraph">
-<p>This guide is for software developers and architects who will be integrating Hibernate with Java EE application servers, Spring framework, caching solutions (e.g. Infinispan, Ehcache, Hazelcast).</p>
-</div>
+<div class="ulist">
+<ul>
+<li>
+<p>integrating Hibernate with Java EE application servers, Spring framework, caching solutions (e.g. Infinispan, Ehcache, Hazelcast).</p>
+</li>
+<li>
+<p>supplying custom integrations</p>
+</li>
+<li>
+<p>want to override standard capabilities</p>
+</li>
+</ul>
 </div>
 </div>
 </div>
@@ -549,7 +546,7 @@ For the sake of illustration, lets say that we have developed a new <code>Connec
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code data-lang="JAVA">import java.lang.Override;
+<pre class="rouge highlight"><code data-lang="JAVA">import java.lang.Override;
 
 public class LatestAndGreatestConnectionProviderImpl
     implements ConnectionProvider, Startable, Stoppable, Configurable {
@@ -624,7 +621,7 @@ As you might guess, there are multiple ways.</p>
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code data-lang="JAVA">StandardServiceRegistryBuilder builder = ...;
+<pre class="rouge highlight"><code data-lang="JAVA">StandardServiceRegistryBuilder builder = ...;
 ...
 builder.addService(
     ConnectionProvider.class,
@@ -643,7 +640,7 @@ builder.addService(
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code data-lang="JAVA">public class LatestAndGreatestConnectionProviderImplContributor1
+<pre class="rouge highlight"><code data-lang="JAVA">public class LatestAndGreatestConnectionProviderImplContributor1
         implements ServiceContributor {
 
     @Override
@@ -670,7 +667,7 @@ This file will have just a single line naming our impl.</p>
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code data-lang="JAVA">fully.qualified.package.LatestAndGreatestConnectionProviderImplContributor1</code></pre>
+<pre class="rouge highlight"><code data-lang="JAVA">fully.qualified.package.LatestAndGreatestConnectionProviderImplContributor1</code></pre>
 </div>
 </div>
 </div>
@@ -683,7 +680,7 @@ This file will have just a single line naming our impl.</p>
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code data-lang="JAVA">public class LatestAndGreatestConnectionProviderImplContributor
+<pre class="rouge highlight"><code data-lang="JAVA">public class LatestAndGreatestConnectionProviderImplContributor
     implements ServiceContributor {
 
     @Override
@@ -714,7 +711,7 @@ This file will have just a single line naming our impl.</p>
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code data-lang="JAVA">StandardServiceRegistryBuilder builder = ...;
+<pre class="rouge highlight"><code data-lang="JAVA">StandardServiceRegistryBuilder builder = ...;
 ...
 builder.applySetting( "hibernate.connection.provider_class", "lag" );
 ...</code></pre>
@@ -735,7 +732,7 @@ So, we will expand the <code>ServiceRegistry</code> to host this completely new 
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code data-lang="JAVA">public interface EventPublishingService extends Service {
+<pre class="rouge highlight"><code data-lang="JAVA">public interface EventPublishingService extends Service {
 
     public void publish(Event theEvent);
 }</code></pre>
@@ -748,7 +745,7 @@ So, we will expand the <code>ServiceRegistry</code> to host this completely new 
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code data-lang="JAVA">public class EventPublishingServiceImpl
+<pre class="rouge highlight"><code data-lang="JAVA">public class EventPublishingServiceImpl
     implements EventPublishingService, Configurable, Startable, Stoppable,
                ServiceRegistryAwareService {
 
@@ -815,7 +812,7 @@ So, we will expand the <code>ServiceRegistry</code> to host this completely new 
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code data-lang="JAVA">public class DisabledEventPublishingServiceImpl implements EventPublishingService {
+<pre class="rouge highlight"><code data-lang="JAVA">public class DisabledEventPublishingServiceImpl implements EventPublishingService {
 
     public static DisabledEventPublishingServiceImpl INSTANCE =
         new DisabledEventPublishingServiceImpl();
@@ -840,7 +837,7 @@ So, we will expand the <code>ServiceRegistry</code> to host this completely new 
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code data-lang="JAVA">public class EventPublishingServiceInitiator
+<pre class="rouge highlight"><code data-lang="JAVA">public class EventPublishingServiceInitiator
     implements StandardServiceInitiator&lt;EventPublishingService&gt; {
 
     public static EventPublishingServiceInitiator INSTANCE =
@@ -885,7 +882,7 @@ So, we will expand the <code>ServiceRegistry</code> to host this completely new 
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code data-lang="JAVA">public class EventPublishingServiceContributor
+<pre class="rouge highlight"><code data-lang="JAVA">public class EventPublishingServiceContributor
     implements ServiceContributor {
 
     @Override
@@ -906,14 +903,34 @@ So, we will expand the <code>ServiceRegistry</code> to host this completely new 
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="credits">2. Credits</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The full list of contributors to Hibernate ORM can be found on the
+<a href="https://github.com/hibernate/hibernate-orm/graphs/contributors">GitHub repository</a>.</p>
+</div>
+<div class="paragraph">
+<p>The following contributors were involved in this documentation:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Steve Ebersole</p>
+</li>
+<li>
+<p>Vlad Mihalcea</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 6.2.0.CR1<br>
-Last updated 2022-12-22 23:34:56 UTC
+Version 6.2.36.Final<br>
+Last updated 2025-03-16 00:01:40 UTC
 </div>
 </div>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/run_prettify.min.js"></script>
 </body>
 </html>

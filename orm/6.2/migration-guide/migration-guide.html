@@ -1,36 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.10">
+<meta name="generator" content="Asciidoctor 2.0.18">
 <title>6.2 Migration Guide</title>
 <link rel="stylesheet" href="./css/hibernate.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="./rouge-github.css">
 </head>
 <body class="article">
 <div id="header">
 <h1>6.2 Migration Guide</h1>
 <div class="details">
-<span id="revnumber">version 6.2.0.CR1</span>
+<span id="revnumber">version 6.2.36.Final</span>
 </div>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
 <li><a href="#ddl-changes">DDL type changes</a>
 <ul class="sectlevel2">
+<li><a href="#ddl-offset-time">OffsetTime mapping changes</a></li>
 <li><a href="#ddl-uuid-mariadv">UUID mapping changes on MariaDB</a></li>
 <li><a href="#ddl-uuid-sqlserver">UUID mapping changes on SQL Server</a></li>
 <li><a href="#ddl-json-oracle">JSON mapping changes on Oracle</a></li>
+<li><a href="#ddl-json-h2">JSON mapping changes on H2</a></li>
 <li><a href="#ddl-implicit-datatype-enum">Datatype for enums</a></li>
 <li><a href="#ddl-timezones">Timezone and offset storage</a></li>
+</ul>
+</li>
+<li><a href="#byte-and-character-array-mapping-changes">Byte[]/Character[] mapping changes</a>
+<ul class="sectlevel2">
 <li><a href="#ddl-check">Check constraints for boolean and enum mappings</a></li>
 </ul>
 </li>
 <li><a href="#logical-1-1-unique">UNIQUE constraint for optional one-to-one mappings</a></li>
 <li><a href="#oracle-number">Column type inference for <code>number(n,0)</code> in native SQL queries on Oracle</a></li>
 <li><a href="#database-versions">Removal of support for legacy database versions</a></li>
+<li><a href="#cdi">Changes to CDI handling</a></li>
 <li><a href="#enhancement">Change enhancement defaults and deprecation</a></li>
 <li><a href="#api-internal">API / SPI / Internal distinction</a>
 <ul class="sectlevel2">
@@ -44,8 +52,12 @@
 <li><a href="#spi-multiLoad">EntityPersister#multiLoad</a></li>
 <li><a href="#spi-afterDeserialize">Executable#afterDeserialize</a></li>
 <li><a href="#spi-JdbcType">JdbcType#getJdbcRecommendedJavaTypeMapping()</a></li>
+<li><a href="#query-path-comparison">Query Path comparison</a></li>
 </ul>
 </li>
+<li><a href="#batch-fetching-changes">Batch Fetching and LockMode</a></li>
+<li><a href="#metamodel-generation">Integrating Static Metamodel Generation</a></li>
+<li><a href="#mative-query">Native query with joins</a></li>
 </ul>
 </div>
 </div>
@@ -71,6 +83,31 @@ earlier versions, see any other pertinent migration guides as well.</p>
 <div class="sect1">
 <h2 id="ddl-changes">DDL type changes</h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="ddl-offset-time">OffsetTime mapping changes</h3>
+<div class="paragraph">
+<p><code>OffsetTime</code> now depends on <code>@TimeZoneStorage</code> and the <code>hibernate.timezone.default_storage</code> setting.
+Since the default for this setting is now <code>TimeZoneStorageType.DEFAULT</code>, this means that the DDL expectations for such columns changed.</p>
+</div>
+<div class="paragraph">
+<p>If the target database supports time zone types natively like H2, Oracle, SQL Server and DB2 z/OS,
+the type code <code>SqlTypes.TIME_WITH_TIMEZONE</code> is now used, which maps to the DDL type <code>time with time zone</code>.</p>
+</div>
+<div class="paragraph">
+<p>Due to this change, schema validation errors could occur on existing databases.</p>
+</div>
+<div class="paragraph">
+<p>The migration to <code>time with time zone</code> requires a migration expression like <code>cast(old as time with time zone)</code>
+which will interpret the previous time as local time and compute the offset for the <code>time with time zone</code> based on the current date
+and time zone settings of your database session.</p>
+</div>
+<div class="paragraph">
+<p>If the target database does not support time zone types natively, Hibernate behaves just like before.</p>
+</div>
+<div class="paragraph">
+<p>To retain backwards compatibility, configure the setting <code>hibernate.timezone.default_storage</code> to <code>NORMALIZE</code>.</p>
+</div>
+</div>
 <div class="sect2">
 <h3 id="ddl-uuid-mariadv">UUID mapping changes on MariaDB</h3>
 <div class="paragraph">
@@ -114,6 +151,24 @@ Due to this change, schema validation errors could occur on existing databases.<
 </div>
 </div>
 <div class="sect2">
+<h3 id="ddl-json-h2">JSON mapping changes on H2</h3>
+<div class="paragraph">
+<p>On H2 1.4.200+, the type code <code>SqlTypes.JSON</code> now by default refers to the DDL type <code>json</code>, whereas before it was using <code>clob</code>.
+Due to this change, schema validation errors could occur on existing databases.</p>
+</div>
+<div class="paragraph">
+<p>The migration to <code>json</code> requires a migration expression like <code>cast(old as json)</code>.
+Note that this change in behavior is backwards compatible and you do not need to change your schema,
+unless you are running into schema validation errors and want to fix them.</p>
+</div>
+<div class="paragraph">
+<p>To get the old behavior, annotate the column with <code>@Column(definition = "clob")</code>.</p>
+</div>
+<div class="paragraph">
+<p>This change was done because the native <code>json</code> type is more efficient and because we don&#8217;t expect wide usage of <code>SqlTypes.JSON</code> yet.</p>
+</div>
+</div>
+<div class="sect2">
 <h3 id="ddl-implicit-datatype-enum">Datatype for enums</h3>
 <div class="paragraph">
 <p>Hibernate 6.1 changed the implicit SQL datatype for mapping enums from <code>TINYINT</code> to <code>SMALLINT</code> to account for
@@ -134,8 +189,123 @@ otherwise <code>TINYINT</code> is used.</p>
 <div class="sect2">
 <h3 id="ddl-timezones">Timezone and offset storage</h3>
 <div class="paragraph">
-<p><code>OffsetDateTime</code> and <code>ZonedDateTime</code> now always map to <code>TIMESTAMP WITH TIME ZONE</code> by default</p>
+<p><code>hibernate.timezone.default_storage</code> now defaults to <code>DEFAULT</code>, meaning:</p>
 </div>
+<div class="ulist">
+<ul>
+<li>
+<p>if the database/dialect supports it, time zones of date/time values are stored by using the <code>timestamp with time zone</code> SQL column type;</p>
+</li>
+<li>
+<p>otherwise, time zones of date/time values are not stored, and date/time values are normalized to UTC.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>In Hibernate ORM 5, time zones were not stored, but normalized to the time zone set in <code>hibernate.jdbc.time_zone</code>, the JVM time zone by default.</p>
+</div>
+<div class="paragraph">
+<p>This discrepancy might lead to incorrect date/time being loaded from the database
+for properties of type <code>OffsetDateTime</code> and <code>ZonedDateTime</code>
+if your application was migrated from Hibernate ORM 5 and
+was setting <code>hibernate.jdbc.time_zone</code> to a non-UTC timezone.</p>
+</div>
+<div class="paragraph">
+<p>To revert to Hibernate ORM 5&#8217;s behavior, set the configuration property <code>hibernate.timezone.default_storage</code> to <code>NORMALIZE</code>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="byte-and-character-array-mapping-changes">Byte[]/Character[] mapping changes</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Hibernate historically allowed mapping <code>Byte[]</code> and <code>Character[]</code> in a domain model as basic values to
+<code>VARBINARY</code> and <code>(N)VARCHAR</code> SQL types.</p>
+</div>
+<div class="paragraph">
+<p>Strictly speaking, this is an inaccurate mapping.  Because the Java wrapper types (<code>Byte</code> and <code>Character</code>) are used, null
+elements are allowed.  However, it is not possible to store such domain values as <code>VARBINARY</code> and <code>(N)VARCHAR</code> SQL types.
+In fact, attempting to store such values leads to errors on previous versions.  The legacy support has an implicit contract
+that the <code>Byte[]</code> and <code>Character[]</code> types are handled exactly the same as the <code>byte[]</code> and <code>char[]</code> variants.</p>
+</div>
+<div class="paragraph">
+<p>Building on the <a href="https://docs.jboss.org/hibernate/orm/6.1/migration-guide/migration-guide.html#basic-arraycollection-mapping">ability</a> to use
+structured SQL types (<code>ARRAY</code>, <code>SQLXML</code>, &#8230;&#8203;) for storing basic values, 6.2 makes it configurable how to handle mappings of
+this type:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">DISALLOW</dt>
+<dd>
+<p>(default) Throw an informative and actionable error</p>
+</dd>
+<dt class="hdlist1">ALLOW</dt>
+<dd>
+<p>Allows the use of the wrapper arrays stored as structured SQL types (<code>ARRAY</code>, <code>SQLXML</code>, &#8230;&#8203;) to maintain proper null element semantics.</p>
+</dd>
+<dt class="hdlist1">LEGACY</dt>
+<dd>
+<p>Allows the use of the wrapper arrays stored as <code>VARBINARY</code> and <code>VARCHAR</code>, disallowing null elements.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>See <a href="https://docs.jboss.org/hibernate/orm/6.2/javadocs/org/hibernate/cfg/AvailableSettings.html#WRAPPER_ARRAY_HANDLING">AvailableSettings#WRAPPER_ARRAY_HANDLING</a></p>
+</div>
+<div class="paragraph">
+<p>The main idea here is for applications using these types in the domain model to make a conscious decision about how these
+values are stored.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Some mappings are considered implicit opt-in to the legacy behavior; e.g. using <code>@Lob</code> or <code>@Nationalized</code>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>For those using such mappings, there are a few options -</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Migrate the domain model to use <code>byte[]</code> and <code>char[]</code> instead.</p>
+</li>
+<li>
+<p>Specify <code>hibernate.type.wrapper_array_handling=legacy</code> to enable the legacy behavior.</p>
+</li>
+<li>
+<p>Specify <code>@JavaType(ByteArrayJavaType.class)</code> or <code>@JavaType(CharacterArrayJavaType.class)</code> attribute-by-attribute</p>
+</li>
+<li>
+<p>Specify <code>hibernate.type.wrapper_array_handling=allow</code>.  If the schema is legacy, migrate the database schema to use a structured SQL type.  E.g.</p>
+<div class="olist loweralpha">
+<ol class="loweralpha">
+<li>
+<p>Execute <code>alter table tbl rename column array_col to array_col_old</code> to have the old format available</p>
+</li>
+<li>
+<p>Execute <code>alter table tbl add column array_col DATATYPE array</code> to add the column like the new mapping expects it to be</p>
+</li>
+<li>
+<p>Run the query <code>select t.primary_key, t.array_col_old from table t</code> to extract <code>byte[]</code> or <code>String</code></p>
+</li>
+<li>
+<p>For every result, load the Hibernate entity by primary key and set the field value to transformed result <code>Byte[]</code> or <code>Character[]</code></p>
+</li>
+<li>
+<p>Finally, drop the old column <code>alter table tbl drop column array_col_old</code></p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
 </div>
 <div class="sect2">
 <h3 id="ddl-check">Check constraints for boolean and enum mappings</h3>
@@ -153,10 +323,6 @@ otherwise <code>TINYINT</code> is used.</p>
 logical<sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup> one-to-one associations marked as optional.  That is not correct
 from a modeling perspective as the foreign-key should be constrained as unique.  Starting in
 6.2, those UNIQUE constraints are now created.</p>
-</div>
-<div class="paragraph">
-<p>If this causes problems for an application, creation of the UNIQUE constraint can be skipped
-using <code>@jakarta.persistence.ForeignKey(NO_CONSTRAINT)</code>.</p>
 </div>
 <div class="paragraph">
 <p>Often the association can also be remapped using <code>@ManyToOne</code> + <code>@UniqueConstraint</code> instead.</p>
@@ -179,7 +345,11 @@ depending on the precision.</p>
 <h2 id="database-versions">Removal of support for legacy database versions</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This version introduces the concept of minimum supported database version for most of the database dialects that Hibernate supports. This implies that the legacy code for versions that are no longer supported by their vendors, has been removed from the hibernate-core module. It is, however, still available in the hibernate-community-dialects module.</p>
+<p>This version introduces the concept of minimum supported database version for most of the database dialects that Hibernate supports.
+This implies that the legacy code for versions that are no longer supported by their vendors, has been removed from the hibernate-core module.
+It is, however, still available in the hibernate-community-dialects module, just under a different package,
+namely <code>org.hibernate.community.dialect</code> instead of <code>org.hibernate.dialect</code>.
+Note that this also includes version specific dialects like <code>PostgreSQL81Dialect</code>, <code>MariaDB102Dialect</code> etc.</p>
 </div>
 <div class="paragraph">
 <p>The minimum supported dialect versions are as follows:</p>
@@ -250,6 +420,38 @@ depending on the precision.</p>
 </tr>
 </tbody>
 </table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cdi">Changes to CDI handling</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When CDI is available and configured, Hibernate can use the CDI <code>BeanManager</code> to resolve various
+bean references.  JPA explicitly defines support for this for both attribute-converters and
+entity-listeners.</p>
+</div>
+<div class="paragraph">
+<p>Hibernate also has the ability to resolve some of its extension points using the CDI <code>BeanManager</code>.
+Version 6.2 adds a new boolean <code>hibernate.cdi.extensions</code> setting to control this:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">true</dt>
+<dd>
+<p>indicates to use the CDI <code>BeanManager</code> to resolve these extensions</p>
+</dd>
+<dt class="hdlist1">false</dt>
+<dd>
+<p>(the default) indicates to not use the CDI <code>BeanManager</code> to resolve these extensions</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>The previous behavior was to always load the extensions from CDI if it was available.  However,
+this can sometimes lead to timing issues with the <code>BeanManager</code> not being ready for use when we need
+those extension beans.  Starting with 6.2, these extensions will only be resolved from the CDI
+<code>BeanManager</code> if <code>hibernate.cdi.extensions</code> is set to true.</p>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -356,6 +558,138 @@ Even though this is a source compatible change, it breaks binary backwards compa
 We decided that it is fine to do this though, as this is a new minor version.</p>
 </div>
 </div>
+<div class="sect2">
+<h3 id="query-path-comparison">Query Path comparison</h3>
+<div class="paragraph">
+<p>As of 6.2, comparisons of paths are type checked early. This means that a comparison predicate in HQL or JPA Criteria
+might fail to construct if the types of the left and right hand side are not compatible.</p>
+</div>
+<div class="paragraph">
+<p>In general, two types T1 and T2 are considered compatible if</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>T1 == T2</p>
+</li>
+<li>
+<p>T1 instanceof T2 or T2 instanceof T1</p>
+</li>
+<li>
+<p>T1 is temporal and T2 is temporal</p>
+</li>
+<li>
+<p>T1 or T2 is unknown</p>
+</li>
+<li>
+<p>T1 can be widened/coerced to T2, or the other way around</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Widening/Coercion usually refers to e.g. widening an integer to a long, but can also mean
+that a string constant can be interpreted as enum when comparing against an enum attribute.</p>
+</div>
+<div class="paragraph">
+<p>Note that a comparison of a temporal attribute against a string literal worked before</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">from</span> <span class="n">MyEntity</span> <span class="n">e</span> <span class="k">where</span> <span class="n">e</span><span class="p">.</span><span class="n">temporalAttribute</span> <span class="o">&gt;</span> <span class="s1">'2020-01-01'</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>but has to be changed to the proper temporal literal now</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">from</span> <span class="n">MyEntity</span> <span class="n">e</span> <span class="k">where</span> <span class="n">e</span><span class="p">.</span><span class="n">temporalAttribute</span> <span class="o">&gt;</span> <span class="nb">date</span> <span class="mi">2020</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="batch-fetching-changes">Batch Fetching and LockMode</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When LockMode is greater than READ Hibernate does not execute the batch fetching so existing uninitialized proxies will not be initialized.
+This because the lock mode is different from the one of the proxies in the batch fetch queue.</p>
+</div>
+<div class="paragraph">
+<p>E.g.</p>
+</div>
+<div class="paragraph">
+<p>`
+MyEntity proxy = session.getReference( MyEntity.class, 1 );
+MyEntity myEntity = session.find(MyEntity.class, 2, LockMode.WRITE);
+`
+only the entity with id equals to 2 will be loaded but the proxy will not be initialized.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="metamodel-generation">Integrating Static Metamodel Generation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The integration of static metamodel generation in a project has changed; the recommended way to do this now is by harnessing the annotation processor classpath. This is true for both gradle and maven.</p>
+</div>
+<div class="paragraph">
+<p>Check out the specific sections in the User Guide for a guideline on how to do this for <a href="https://docs.jboss.org/hibernate/orm/6.2/userguide/html_single/Hibernate_User_Guide.html#tooling-gradle-modelgen">Gradle</a> or <a href="https://docs.jboss.org/hibernate/orm/6.2/userguide/html_single/Hibernate_User_Guide.html#tooling-maven-modelgen">Maven</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="mative-query">Native query with joins</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A Native query that uses a result set mapping, explicit or implicitly by specifying an entity class as result type to <code>createNativeQuery</code>,
+requires unique select item aliases.
+If the native query contains a join to a table with same named columns, a query that e.g. does <code>select * from ..</code> will lead to an error.
+If the desire is to select only columns for the result type entity, prefix the * with a tables alias e.g.
+<code>select p.* from &#8230;&#8203;</code></p>
+</div>
+<div class="paragraph">
+<p>E.g.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>@Entity
+class Person {
+    @Id
+    private Long id;
+
+    @OneToMany(mappedBy = "person")
+    private Set&lt;Dog&gt; dogs = new HashSet&lt;&gt;( 0 );
+}
+
+@Entity
+class Dog {
+    @Id
+    private Long id;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Queries like</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>session.createNativeQuery(
+"SELECT * FROM person p LEFT JOIN dog d on d.person_id = p.id", Person.class )
+.getResultList();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>have to be changed to</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>session.createNativeQuery(
+"SELECT p.* FROM person p LEFT JOIN dog d on d.person_id = p.id", Person.class )
+.getResultList();</code></pre>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -367,11 +701,9 @@ We decided that it is fine to do this though, as this is a new minor version.</p
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 6.2.0.CR1<br>
-Last updated 2022-12-22 23:34:57 UTC
+Version 6.2.36.Final<br>
+Last updated 2025-03-16 00:06:45 UTC
 </div>
 </div>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/run_prettify.min.js"></script>
 </body>
 </html>

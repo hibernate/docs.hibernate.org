@@ -1,447 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.10">
-<title>Hibernate Getting Started Guide</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
-<style>
-/* Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
-/* Uncomment @import statement to use as custom stylesheet */
-/*@import "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700";*/
-article,aside,details,figcaption,figure,footer,header,hgroup,main,nav,section{display:block}
-audio,video{display:inline-block}
-audio:not([controls]){display:none;height:0}
-html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}
-a{background:none}
-a:focus{outline:thin dotted}
-a:active,a:hover{outline:0}
-h1{font-size:2em;margin:.67em 0}
-abbr[title]{border-bottom:1px dotted}
-b,strong{font-weight:bold}
-dfn{font-style:italic}
-hr{-moz-box-sizing:content-box;box-sizing:content-box;height:0}
-mark{background:#ff0;color:#000}
-code,kbd,pre,samp{font-family:monospace;font-size:1em}
-pre{white-space:pre-wrap}
-q{quotes:"\201C" "\201D" "\2018" "\2019"}
-small{font-size:80%}
-sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}
-sup{top:-.5em}
-sub{bottom:-.25em}
-img{border:0}
-svg:not(:root){overflow:hidden}
-figure{margin:0}
-fieldset{border:1px solid silver;margin:0 2px;padding:.35em .625em .75em}
-legend{border:0;padding:0}
-button,input,select,textarea{font-family:inherit;font-size:100%;margin:0}
-button,input{line-height:normal}
-button,select{text-transform:none}
-button,html input[type="button"],input[type="reset"],input[type="submit"]{-webkit-appearance:button;cursor:pointer}
-button[disabled],html input[disabled]{cursor:default}
-input[type="checkbox"],input[type="radio"]{box-sizing:border-box;padding:0}
-button::-moz-focus-inner,input::-moz-focus-inner{border:0;padding:0}
-textarea{overflow:auto;vertical-align:top}
-table{border-collapse:collapse;border-spacing:0}
-*,*::before,*::after{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}
-html,body{font-size:100%}
-body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto;tab-size:4;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
-a:hover{cursor:pointer}
-img,object,embed{max-width:100%;height:auto}
-object,embed{height:100%}
-img{-ms-interpolation-mode:bicubic}
-.left{float:left!important}
-.right{float:right!important}
-.text-left{text-align:left!important}
-.text-right{text-align:right!important}
-.text-center{text-align:center!important}
-.text-justify{text-align:justify!important}
-.hide{display:none}
-img,object,svg{display:inline-block;vertical-align:middle}
-textarea{height:auto;min-height:50px}
-select{width:100%}
-.center{margin-left:auto;margin-right:auto}
-.stretch{width:100%}
-.subheader,.admonitionblock td.content>.title,.audioblock>.title,.exampleblock>.title,.imageblock>.title,.listingblock>.title,.literalblock>.title,.stemblock>.title,.openblock>.title,.paragraph>.title,.quoteblock>.title,table.tableblock>.title,.verseblock>.title,.videoblock>.title,.dlist>.title,.olist>.title,.ulist>.title,.qlist>.title,.hdlist>.title{line-height:1.45;color:#7a2518;font-weight:400;margin-top:0;margin-bottom:.25em}
-div,dl,dt,dd,ul,ol,li,h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6,pre,form,p,blockquote,th,td{margin:0;padding:0;direction:ltr}
-a{color:#2156a5;text-decoration:underline;line-height:inherit}
-a:hover,a:focus{color:#1d4b8f}
-a img{border:0}
-p{font-family:inherit;font-weight:400;font-size:1em;line-height:1.6;margin-bottom:1.25em;text-rendering:optimizeLegibility}
-p aside{font-size:.875em;line-height:1.35;font-style:italic}
-h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{font-family:"Open Sans","DejaVu Sans",sans-serif;font-weight:300;font-style:normal;color:#ba3925;text-rendering:optimizeLegibility;margin-top:1em;margin-bottom:.5em;line-height:1.0125em}
-h1 small,h2 small,h3 small,#toctitle small,.sidebarblock>.content>.title small,h4 small,h5 small,h6 small{font-size:60%;color:#e99b8f;line-height:0}
-h1{font-size:2.125em}
-h2{font-size:1.6875em}
-h3,#toctitle,.sidebarblock>.content>.title{font-size:1.375em}
-h4,h5{font-size:1.125em}
-h6{font-size:1em}
-hr{border:solid #dddddf;border-width:1px 0 0;clear:both;margin:1.25em 0 1.1875em;height:0}
-em,i{font-style:italic;line-height:inherit}
-strong,b{font-weight:bold;line-height:inherit}
-small{font-size:60%;line-height:inherit}
-code{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;color:rgba(0,0,0,.9)}
-ul,ol,dl{font-size:1em;line-height:1.6;margin-bottom:1.25em;list-style-position:outside;font-family:inherit}
-ul,ol{margin-left:1.5em}
-ul li ul,ul li ol{margin-left:1.25em;margin-bottom:0;font-size:1em}
-ul.square li ul,ul.circle li ul,ul.disc li ul{list-style:inherit}
-ul.square{list-style-type:square}
-ul.circle{list-style-type:circle}
-ul.disc{list-style-type:disc}
-ol li ul,ol li ol{margin-left:1.25em;margin-bottom:0}
-dl dt{margin-bottom:.3125em;font-weight:bold}
-dl dd{margin-bottom:1.25em}
-abbr,acronym{text-transform:uppercase;font-size:90%;color:rgba(0,0,0,.8);border-bottom:1px dotted #ddd;cursor:help}
-abbr{text-transform:none}
-blockquote{margin:0 0 1.25em;padding:.5625em 1.25em 0 1.1875em;border-left:1px solid #ddd}
-blockquote cite{display:block;font-size:.9375em;color:rgba(0,0,0,.6)}
-blockquote cite::before{content:"\2014 \0020"}
-blockquote cite a,blockquote cite a:visited{color:rgba(0,0,0,.6)}
-blockquote,blockquote p{line-height:1.6;color:rgba(0,0,0,.85)}
-@media screen and (min-width:768px){h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2}
-h1{font-size:2.75em}
-h2{font-size:2.3125em}
-h3,#toctitle,.sidebarblock>.content>.title{font-size:1.6875em}
-h4{font-size:1.4375em}}
-table{background:#fff;margin-bottom:1.25em;border:solid 1px #dedede}
-table thead,table tfoot{background:#f7f8f7}
-table thead tr th,table thead tr td,table tfoot tr th,table tfoot tr td{padding:.5em .625em .625em;font-size:inherit;color:rgba(0,0,0,.8);text-align:left}
-table tr th,table tr td{padding:.5625em .625em;font-size:inherit;color:rgba(0,0,0,.8)}
-table tr.even,table tr.alt{background:#f8f8f7}
-table thead tr th,table tfoot tr th,table tbody tr td,table tr td,table tfoot tr td{display:table-cell;line-height:1.6}
-h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2;word-spacing:-.05em}
-h1 strong,h2 strong,h3 strong,#toctitle strong,.sidebarblock>.content>.title strong,h4 strong,h5 strong,h6 strong{font-weight:400}
-.clearfix::before,.clearfix::after,.float-group::before,.float-group::after{content:" ";display:table}
-.clearfix::after,.float-group::after{clear:both}
-:not(pre):not([class^=L])>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed;word-wrap:break-word}
-:not(pre)>code.nobreak{word-wrap:normal}
-:not(pre)>code.nowrap{white-space:nowrap}
-pre{color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;line-height:1.45;text-rendering:optimizeSpeed}
-pre code,pre pre{color:inherit;font-size:inherit;line-height:inherit}
-pre>code{display:block}
-pre.nowrap,pre.nowrap pre{white-space:pre;word-wrap:normal}
-em em{font-style:normal}
-strong strong{font-weight:400}
-.keyseq{color:rgba(51,51,51,.8)}
-kbd{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;display:inline-block;color:rgba(0,0,0,.8);font-size:.65em;line-height:1.45;background:#f7f7f7;border:1px solid #ccc;-webkit-border-radius:3px;border-radius:3px;-webkit-box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em white inset;box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em #fff inset;margin:0 .15em;padding:.2em .5em;vertical-align:middle;position:relative;top:-.1em;white-space:nowrap}
-.keyseq kbd:first-child{margin-left:0}
-.keyseq kbd:last-child{margin-right:0}
-.menuseq,.menuref{color:#000}
-.menuseq b:not(.caret),.menuref{font-weight:inherit}
-.menuseq{word-spacing:-.02em}
-.menuseq b.caret{font-size:1.25em;line-height:.8}
-.menuseq i.caret{font-weight:bold;text-align:center;width:.45em}
-b.button::before,b.button::after{position:relative;top:-1px;font-weight:400}
-b.button::before{content:"[";padding:0 3px 0 2px}
-b.button::after{content:"]";padding:0 2px 0 3px}
-p a>code:hover{color:rgba(0,0,0,.9)}
-#header,#content,#footnotes,#footer{width:100%;margin-left:auto;margin-right:auto;margin-top:0;margin-bottom:0;max-width:62.5em;*zoom:1;position:relative;padding-left:.9375em;padding-right:.9375em}
-#header::before,#header::after,#content::before,#content::after,#footnotes::before,#footnotes::after,#footer::before,#footer::after{content:" ";display:table}
-#header::after,#content::after,#footnotes::after,#footer::after{clear:both}
-#content{margin-top:1.25em}
-#content::before{content:none}
-#header>h1:first-child{color:rgba(0,0,0,.85);margin-top:2.25rem;margin-bottom:0}
-#header>h1:first-child+#toc{margin-top:8px;border-top:1px solid #dddddf}
-#header>h1:only-child,body.toc2 #header>h1:nth-last-child(2){border-bottom:1px solid #dddddf;padding-bottom:8px}
-#header .details{border-bottom:1px solid #dddddf;line-height:1.45;padding-top:.25em;padding-bottom:.25em;padding-left:.25em;color:rgba(0,0,0,.6);display:-ms-flexbox;display:-webkit-flex;display:flex;-ms-flex-flow:row wrap;-webkit-flex-flow:row wrap;flex-flow:row wrap}
-#header .details span:first-child{margin-left:-.125em}
-#header .details span.email a{color:rgba(0,0,0,.85)}
-#header .details br{display:none}
-#header .details br+span::before{content:"\00a0\2013\00a0"}
-#header .details br+span.author::before{content:"\00a0\22c5\00a0";color:rgba(0,0,0,.85)}
-#header .details br+span#revremark::before{content:"\00a0|\00a0"}
-#header #revnumber{text-transform:capitalize}
-#header #revnumber::after{content:"\00a0"}
-#content>h1:first-child:not([class]){color:rgba(0,0,0,.85);border-bottom:1px solid #dddddf;padding-bottom:8px;margin-top:0;padding-top:1rem;margin-bottom:1.25rem}
-#toc{border-bottom:1px solid #e7e7e9;padding-bottom:.5em}
-#toc>ul{margin-left:.125em}
-#toc ul.sectlevel0>li>a{font-style:italic}
-#toc ul.sectlevel0 ul.sectlevel1{margin:.5em 0}
-#toc ul{font-family:"Open Sans","DejaVu Sans",sans-serif;list-style-type:none}
-#toc li{line-height:1.3334;margin-top:.3334em}
-#toc a{text-decoration:none}
-#toc a:active{text-decoration:underline}
-#toctitle{color:#7a2518;font-size:1.2em}
-@media screen and (min-width:768px){#toctitle{font-size:1.375em}
-body.toc2{padding-left:15em;padding-right:0}
-#toc.toc2{margin-top:0!important;background:#f8f8f7;position:fixed;width:15em;left:0;top:0;border-right:1px solid #e7e7e9;border-top-width:0!important;border-bottom-width:0!important;z-index:1000;padding:1.25em 1em;height:100%;overflow:auto}
-#toc.toc2 #toctitle{margin-top:0;margin-bottom:.8rem;font-size:1.2em}
-#toc.toc2>ul{font-size:.9em;margin-bottom:0}
-#toc.toc2 ul ul{margin-left:0;padding-left:1em}
-#toc.toc2 ul.sectlevel0 ul.sectlevel1{padding-left:0;margin-top:.5em;margin-bottom:.5em}
-body.toc2.toc-right{padding-left:0;padding-right:15em}
-body.toc2.toc-right #toc.toc2{border-right-width:0;border-left:1px solid #e7e7e9;left:auto;right:0}}
-@media screen and (min-width:1280px){body.toc2{padding-left:20em;padding-right:0}
-#toc.toc2{width:20em}
-#toc.toc2 #toctitle{font-size:1.375em}
-#toc.toc2>ul{font-size:.95em}
-#toc.toc2 ul ul{padding-left:1.25em}
-body.toc2.toc-right{padding-left:0;padding-right:20em}}
-#content #toc{border-style:solid;border-width:1px;border-color:#e0e0dc;margin-bottom:1.25em;padding:1.25em;background:#f8f8f7;-webkit-border-radius:4px;border-radius:4px}
-#content #toc>:first-child{margin-top:0}
-#content #toc>:last-child{margin-bottom:0}
-#footer{max-width:100%;background:rgba(0,0,0,.8);padding:1.25em}
-#footer-text{color:rgba(255,255,255,.8);line-height:1.44}
-#content{margin-bottom:.625em}
-.sect1{padding-bottom:.625em}
-@media screen and (min-width:768px){#content{margin-bottom:1.25em}
-.sect1{padding-bottom:1.25em}}
-.sect1:last-child{padding-bottom:0}
-.sect1+.sect1{border-top:1px solid #e7e7e9}
-#content h1>a.anchor,h2>a.anchor,h3>a.anchor,#toctitle>a.anchor,.sidebarblock>.content>.title>a.anchor,h4>a.anchor,h5>a.anchor,h6>a.anchor{position:absolute;z-index:1001;width:1.5ex;margin-left:-1.5ex;display:block;text-decoration:none!important;visibility:hidden;text-align:center;font-weight:400}
-#content h1>a.anchor::before,h2>a.anchor::before,h3>a.anchor::before,#toctitle>a.anchor::before,.sidebarblock>.content>.title>a.anchor::before,h4>a.anchor::before,h5>a.anchor::before,h6>a.anchor::before{content:"\00A7";font-size:.85em;display:block;padding-top:.1em}
-#content h1:hover>a.anchor,#content h1>a.anchor:hover,h2:hover>a.anchor,h2>a.anchor:hover,h3:hover>a.anchor,#toctitle:hover>a.anchor,.sidebarblock>.content>.title:hover>a.anchor,h3>a.anchor:hover,#toctitle>a.anchor:hover,.sidebarblock>.content>.title>a.anchor:hover,h4:hover>a.anchor,h4>a.anchor:hover,h5:hover>a.anchor,h5>a.anchor:hover,h6:hover>a.anchor,h6>a.anchor:hover{visibility:visible}
-#content h1>a.link,h2>a.link,h3>a.link,#toctitle>a.link,.sidebarblock>.content>.title>a.link,h4>a.link,h5>a.link,h6>a.link{color:#ba3925;text-decoration:none}
-#content h1>a.link:hover,h2>a.link:hover,h3>a.link:hover,#toctitle>a.link:hover,.sidebarblock>.content>.title>a.link:hover,h4>a.link:hover,h5>a.link:hover,h6>a.link:hover{color:#a53221}
-details,.audioblock,.imageblock,.literalblock,.listingblock,.stemblock,.videoblock{margin-bottom:1.25em}
-details>summary:first-of-type{cursor:pointer;display:list-item;outline:none;margin-bottom:.75em}
-.admonitionblock td.content>.title,.audioblock>.title,.exampleblock>.title,.imageblock>.title,.listingblock>.title,.literalblock>.title,.stemblock>.title,.openblock>.title,.paragraph>.title,.quoteblock>.title,table.tableblock>.title,.verseblock>.title,.videoblock>.title,.dlist>.title,.olist>.title,.ulist>.title,.qlist>.title,.hdlist>.title{text-rendering:optimizeLegibility;text-align:left;font-family:"Noto Serif","DejaVu Serif",serif;font-size:1rem;font-style:italic}
-table.tableblock.fit-content>caption.title{white-space:nowrap;width:0}
-.paragraph.lead>p,#preamble>.sectionbody>[class="paragraph"]:first-of-type p{font-size:1.21875em;line-height:1.6;color:rgba(0,0,0,.85)}
-table.tableblock #preamble>.sectionbody>[class="paragraph"]:first-of-type p{font-size:inherit}
-.admonitionblock>table{border-collapse:separate;border:0;background:none;width:100%}
-.admonitionblock>table td.icon{text-align:center;width:80px}
-.admonitionblock>table td.icon img{max-width:none}
-.admonitionblock>table td.icon .title{font-weight:bold;font-family:"Open Sans","DejaVu Sans",sans-serif;text-transform:uppercase}
-.admonitionblock>table td.content{padding-left:1.125em;padding-right:1.25em;border-left:1px solid #dddddf;color:rgba(0,0,0,.6)}
-.admonitionblock>table td.content>:last-child>:last-child{margin-bottom:0}
-.exampleblock>.content{border-style:solid;border-width:1px;border-color:#e6e6e6;margin-bottom:1.25em;padding:1.25em;background:#fff;-webkit-border-radius:4px;border-radius:4px}
-.exampleblock>.content>:first-child{margin-top:0}
-.exampleblock>.content>:last-child{margin-bottom:0}
-.sidebarblock{border-style:solid;border-width:1px;border-color:#dbdbd6;margin-bottom:1.25em;padding:1.25em;background:#f3f3f2;-webkit-border-radius:4px;border-radius:4px}
-.sidebarblock>:first-child{margin-top:0}
-.sidebarblock>:last-child{margin-bottom:0}
-.sidebarblock>.content>.title{color:#7a2518;margin-top:0;text-align:center}
-.exampleblock>.content>:last-child>:last-child,.exampleblock>.content .olist>ol>li:last-child>:last-child,.exampleblock>.content .ulist>ul>li:last-child>:last-child,.exampleblock>.content .qlist>ol>li:last-child>:last-child,.sidebarblock>.content>:last-child>:last-child,.sidebarblock>.content .olist>ol>li:last-child>:last-child,.sidebarblock>.content .ulist>ul>li:last-child>:last-child,.sidebarblock>.content .qlist>ol>li:last-child>:last-child{margin-bottom:0}
-.literalblock pre,.listingblock>.content>pre{-webkit-border-radius:4px;border-radius:4px;word-wrap:break-word;overflow-x:auto;padding:1em;font-size:.8125em}
-@media screen and (min-width:768px){.literalblock pre,.listingblock>.content>pre{font-size:.90625em}}
-@media screen and (min-width:1280px){.literalblock pre,.listingblock>.content>pre{font-size:1em}}
-.literalblock pre,.listingblock>.content>pre:not(.highlight),.listingblock>.content>pre[class="highlight"],.listingblock>.content>pre[class^="highlight "]{background:#f7f7f8}
-.literalblock.output pre{color:#f7f7f8;background:rgba(0,0,0,.9)}
-.listingblock>.content{position:relative}
-.listingblock code[data-lang]::before{display:none;content:attr(data-lang);position:absolute;font-size:.75em;top:.425rem;right:.5rem;line-height:1;text-transform:uppercase;color:inherit;opacity:.5}
-.listingblock:hover code[data-lang]::before{display:block}
-.listingblock.terminal pre .command::before{content:attr(data-prompt);padding-right:.5em;color:inherit;opacity:.5}
-.listingblock.terminal pre .command:not([data-prompt])::before{content:"$"}
-.listingblock pre.highlightjs{padding:0}
-.listingblock pre.highlightjs>code{padding:1em;-webkit-border-radius:4px;border-radius:4px}
-.listingblock pre.prettyprint{border-width:0}
-.prettyprint{background:#f7f7f8}
-pre.prettyprint .linenums{line-height:1.45;margin-left:2em}
-pre.prettyprint li{background:none;list-style-type:inherit;padding-left:0}
-pre.prettyprint li code[data-lang]::before{opacity:1}
-pre.prettyprint li:not(:first-child) code[data-lang]::before{display:none}
-table.linenotable{border-collapse:separate;border:0;margin-bottom:0;background:none}
-table.linenotable td[class]{color:inherit;vertical-align:top;padding:0;line-height:inherit;white-space:normal}
-table.linenotable td.code{padding-left:.75em}
-table.linenotable td.linenos{border-right:1px solid currentColor;opacity:.35;padding-right:.5em}
-pre.pygments .lineno{border-right:1px solid currentColor;opacity:.35;display:inline-block;margin-right:.75em}
-pre.pygments .lineno::before{content:"";margin-right:-.125em}
-.quoteblock{margin:0 1em 1.25em 1.5em;display:table}
-.quoteblock:not(.excerpt)>.title{margin-left:-1.5em;margin-bottom:.75em}
-.quoteblock blockquote,.quoteblock p{color:rgba(0,0,0,.85);font-size:1.15rem;line-height:1.75;word-spacing:.1em;letter-spacing:0;font-style:italic;text-align:justify}
-.quoteblock blockquote{margin:0;padding:0;border:0}
-.quoteblock blockquote::before{content:"\201c";float:left;font-size:2.75em;font-weight:bold;line-height:.6em;margin-left:-.6em;color:#7a2518;text-shadow:0 1px 2px rgba(0,0,0,.1)}
-.quoteblock blockquote>.paragraph:last-child p{margin-bottom:0}
-.quoteblock .attribution{margin-top:.75em;margin-right:.5ex;text-align:right}
-.verseblock{margin:0 1em 1.25em}
-.verseblock pre{font-family:"Open Sans","DejaVu Sans",sans;font-size:1.15rem;color:rgba(0,0,0,.85);font-weight:300;text-rendering:optimizeLegibility}
-.verseblock pre strong{font-weight:400}
-.verseblock .attribution{margin-top:1.25rem;margin-left:.5ex}
-.quoteblock .attribution,.verseblock .attribution{font-size:.9375em;line-height:1.45;font-style:italic}
-.quoteblock .attribution br,.verseblock .attribution br{display:none}
-.quoteblock .attribution cite,.verseblock .attribution cite{display:block;letter-spacing:-.025em;color:rgba(0,0,0,.6)}
-.quoteblock.abstract blockquote::before,.quoteblock.excerpt blockquote::before,.quoteblock .quoteblock blockquote::before{display:none}
-.quoteblock.abstract blockquote,.quoteblock.abstract p,.quoteblock.excerpt blockquote,.quoteblock.excerpt p,.quoteblock .quoteblock blockquote,.quoteblock .quoteblock p{line-height:1.6;word-spacing:0}
-.quoteblock.abstract{margin:0 1em 1.25em;display:block}
-.quoteblock.abstract>.title{margin:0 0 .375em;font-size:1.15em;text-align:center}
-.quoteblock.excerpt>blockquote,.quoteblock .quoteblock{padding:0 0 .25em 1em;border-left:.25em solid #dddddf}
-.quoteblock.excerpt,.quoteblock .quoteblock{margin-left:0}
-.quoteblock.excerpt blockquote,.quoteblock.excerpt p,.quoteblock .quoteblock blockquote,.quoteblock .quoteblock p{color:inherit;font-size:1.0625rem}
-.quoteblock.excerpt .attribution,.quoteblock .quoteblock .attribution{color:inherit;text-align:left;margin-right:0}
-table.tableblock{max-width:100%;border-collapse:separate}
-p.tableblock:last-child{margin-bottom:0}
-td.tableblock>.content>:last-child{margin-bottom:-1.25em}
-td.tableblock>.content>:last-child.sidebarblock{margin-bottom:0}
-table.tableblock,th.tableblock,td.tableblock{border:0 solid #dedede}
-table.grid-all>thead>tr>.tableblock,table.grid-all>tbody>tr>.tableblock{border-width:0 1px 1px 0}
-table.grid-all>tfoot>tr>.tableblock{border-width:1px 1px 0 0}
-table.grid-cols>*>tr>.tableblock{border-width:0 1px 0 0}
-table.grid-rows>thead>tr>.tableblock,table.grid-rows>tbody>tr>.tableblock{border-width:0 0 1px}
-table.grid-rows>tfoot>tr>.tableblock{border-width:1px 0 0}
-table.grid-all>*>tr>.tableblock:last-child,table.grid-cols>*>tr>.tableblock:last-child{border-right-width:0}
-table.grid-all>tbody>tr:last-child>.tableblock,table.grid-all>thead:last-child>tr>.tableblock,table.grid-rows>tbody>tr:last-child>.tableblock,table.grid-rows>thead:last-child>tr>.tableblock{border-bottom-width:0}
-table.frame-all{border-width:1px}
-table.frame-sides{border-width:0 1px}
-table.frame-topbot,table.frame-ends{border-width:1px 0}
-table.stripes-all tr,table.stripes-odd tr:nth-of-type(odd),table.stripes-even tr:nth-of-type(even),table.stripes-hover tr:hover{background:#f8f8f7}
-th.halign-left,td.halign-left{text-align:left}
-th.halign-right,td.halign-right{text-align:right}
-th.halign-center,td.halign-center{text-align:center}
-th.valign-top,td.valign-top{vertical-align:top}
-th.valign-bottom,td.valign-bottom{vertical-align:bottom}
-th.valign-middle,td.valign-middle{vertical-align:middle}
-table thead th,table tfoot th{font-weight:bold}
-tbody tr th{display:table-cell;line-height:1.6;background:#f7f8f7}
-tbody tr th,tbody tr th p,tfoot tr th,tfoot tr th p{color:rgba(0,0,0,.8);font-weight:bold}
-p.tableblock>code:only-child{background:none;padding:0}
-p.tableblock{font-size:1em}
-ol{margin-left:1.75em}
-ul li ol{margin-left:1.5em}
-dl dd{margin-left:1.125em}
-dl dd:last-child,dl dd:last-child>:last-child{margin-bottom:0}
-ol>li p,ul>li p,ul dd,ol dd,.olist .olist,.ulist .ulist,.ulist .olist,.olist .ulist{margin-bottom:.625em}
-ul.checklist,ul.none,ol.none,ul.no-bullet,ol.no-bullet,ol.unnumbered,ul.unstyled,ol.unstyled{list-style-type:none}
-ul.no-bullet,ol.no-bullet,ol.unnumbered{margin-left:.625em}
-ul.unstyled,ol.unstyled{margin-left:0}
-ul.checklist{margin-left:.625em}
-ul.checklist li>p:first-child>.fa-square-o:first-child,ul.checklist li>p:first-child>.fa-check-square-o:first-child{width:1.25em;font-size:.8em;position:relative;bottom:.125em}
-ul.checklist li>p:first-child>input[type="checkbox"]:first-child{margin-right:.25em}
-ul.inline{display:-ms-flexbox;display:-webkit-box;display:flex;-ms-flex-flow:row wrap;-webkit-flex-flow:row wrap;flex-flow:row wrap;list-style:none;margin:0 0 .625em -1.25em}
-ul.inline>li{margin-left:1.25em}
-.unstyled dl dt{font-weight:400;font-style:normal}
-ol.arabic{list-style-type:decimal}
-ol.decimal{list-style-type:decimal-leading-zero}
-ol.loweralpha{list-style-type:lower-alpha}
-ol.upperalpha{list-style-type:upper-alpha}
-ol.lowerroman{list-style-type:lower-roman}
-ol.upperroman{list-style-type:upper-roman}
-ol.lowergreek{list-style-type:lower-greek}
-.hdlist>table,.colist>table{border:0;background:none}
-.hdlist>table>tbody>tr,.colist>table>tbody>tr{background:none}
-td.hdlist1,td.hdlist2{vertical-align:top;padding:0 .625em}
-td.hdlist1{font-weight:bold;padding-bottom:1.25em}
-.literalblock+.colist,.listingblock+.colist{margin-top:-.5em}
-.colist td:not([class]):first-child{padding:.4em .75em 0;line-height:1;vertical-align:top}
-.colist td:not([class]):first-child img{max-width:none}
-.colist td:not([class]):last-child{padding:.25em 0}
-.thumb,.th{line-height:0;display:inline-block;border:solid 4px #fff;-webkit-box-shadow:0 0 0 1px #ddd;box-shadow:0 0 0 1px #ddd}
-.imageblock.left{margin:.25em .625em 1.25em 0}
-.imageblock.right{margin:.25em 0 1.25em .625em}
-.imageblock>.title{margin-bottom:0}
-.imageblock.thumb,.imageblock.th{border-width:6px}
-.imageblock.thumb>.title,.imageblock.th>.title{padding:0 .125em}
-.image.left,.image.right{margin-top:.25em;margin-bottom:.25em;display:inline-block;line-height:0}
-.image.left{margin-right:.625em}
-.image.right{margin-left:.625em}
-a.image{text-decoration:none;display:inline-block}
-a.image object{pointer-events:none}
-sup.footnote,sup.footnoteref{font-size:.875em;position:static;vertical-align:super}
-sup.footnote a,sup.footnoteref a{text-decoration:none}
-sup.footnote a:active,sup.footnoteref a:active{text-decoration:underline}
-#footnotes{padding-top:.75em;padding-bottom:.75em;margin-bottom:.625em}
-#footnotes hr{width:20%;min-width:6.25em;margin:-.25em 0 .75em;border-width:1px 0 0}
-#footnotes .footnote{padding:0 .375em 0 .225em;line-height:1.3334;font-size:.875em;margin-left:1.2em;margin-bottom:.2em}
-#footnotes .footnote a:first-of-type{font-weight:bold;text-decoration:none;margin-left:-1.05em}
-#footnotes .footnote:last-of-type{margin-bottom:0}
-#content #footnotes{margin-top:-.625em;margin-bottom:0;padding:.75em 0}
-.gist .file-data>table{border:0;background:#fff;width:100%;margin-bottom:0}
-.gist .file-data>table td.line-data{width:99%}
-div.unbreakable{page-break-inside:avoid}
-.big{font-size:larger}
-.small{font-size:smaller}
-.underline{text-decoration:underline}
-.overline{text-decoration:overline}
-.line-through{text-decoration:line-through}
-.aqua{color:#00bfbf}
-.aqua-background{background:#00fafa}
-.black{color:#000}
-.black-background{background:#000}
-.blue{color:#0000bf}
-.blue-background{background:#0000fa}
-.fuchsia{color:#bf00bf}
-.fuchsia-background{background:#fa00fa}
-.gray{color:#606060}
-.gray-background{background:#7d7d7d}
-.green{color:#006000}
-.green-background{background:#007d00}
-.lime{color:#00bf00}
-.lime-background{background:#00fa00}
-.maroon{color:#600000}
-.maroon-background{background:#7d0000}
-.navy{color:#000060}
-.navy-background{background:#00007d}
-.olive{color:#606000}
-.olive-background{background:#7d7d00}
-.purple{color:#600060}
-.purple-background{background:#7d007d}
-.red{color:#bf0000}
-.red-background{background:#fa0000}
-.silver{color:#909090}
-.silver-background{background:#bcbcbc}
-.teal{color:#006060}
-.teal-background{background:#007d7d}
-.white{color:#bfbfbf}
-.white-background{background:#fafafa}
-.yellow{color:#bfbf00}
-.yellow-background{background:#fafa00}
-span.icon>.fa{cursor:default}
-a span.icon>.fa{cursor:inherit}
-.admonitionblock td.icon [class^="fa icon-"]{font-size:2.5em;text-shadow:1px 1px 2px rgba(0,0,0,.5);cursor:default}
-.admonitionblock td.icon .icon-note::before{content:"\f05a";color:#19407c}
-.admonitionblock td.icon .icon-tip::before{content:"\f0eb";text-shadow:1px 1px 2px rgba(155,155,0,.8);color:#111}
-.admonitionblock td.icon .icon-warning::before{content:"\f071";color:#bf6900}
-.admonitionblock td.icon .icon-caution::before{content:"\f06d";color:#bf3400}
-.admonitionblock td.icon .icon-important::before{content:"\f06a";color:#bf0000}
-.conum[data-value]{display:inline-block;color:#fff!important;background:rgba(0,0,0,.8);-webkit-border-radius:100px;border-radius:100px;text-align:center;font-size:.75em;width:1.67em;height:1.67em;line-height:1.67em;font-family:"Open Sans","DejaVu Sans",sans-serif;font-style:normal;font-weight:bold}
-.conum[data-value] *{color:#fff!important}
-.conum[data-value]+b{display:none}
-.conum[data-value]::after{content:attr(data-value)}
-pre .conum[data-value]{position:relative;top:-.125em}
-b.conum *{color:inherit!important}
-.conum:not([data-value]):empty{display:none}
-dt,th.tableblock,td.content,div.footnote{text-rendering:optimizeLegibility}
-h1,h2,p,td.content,span.alt{letter-spacing:-.01em}
-p strong,td.content strong,div.footnote strong{letter-spacing:-.005em}
-p,blockquote,dt,td.content,span.alt{font-size:1.0625rem}
-p{margin-bottom:1.25rem}
-.sidebarblock p,.sidebarblock dt,.sidebarblock td.content,p.tableblock{font-size:1em}
-.exampleblock>.content{background:#fffef7;border-color:#e0e0dc;-webkit-box-shadow:0 1px 4px #e0e0dc;box-shadow:0 1px 4px #e0e0dc}
-.print-only{display:none!important}
-@page{margin:1.25cm .75cm}
-@media print{*{-webkit-box-shadow:none!important;box-shadow:none!important;text-shadow:none!important}
-html{font-size:80%}
-a{color:inherit!important;text-decoration:underline!important}
-a.bare,a[href^="#"],a[href^="mailto:"]{text-decoration:none!important}
-a[href^="http:"]:not(.bare)::after,a[href^="https:"]:not(.bare)::after{content:"(" attr(href) ")";display:inline-block;font-size:.875em;padding-left:.25em}
-abbr[title]::after{content:" (" attr(title) ")"}
-pre,blockquote,tr,img,object,svg{page-break-inside:avoid}
-thead{display:table-header-group}
-svg{max-width:100%}
-p,blockquote,dt,td.content{font-size:1em;orphans:3;widows:3}
-h2,h3,#toctitle,.sidebarblock>.content>.title{page-break-after:avoid}
-#toc,.sidebarblock,.exampleblock>.content{background:none!important}
-#toc{border-bottom:1px solid #dddddf!important;padding-bottom:0!important}
-body.book #header{text-align:center}
-body.book #header>h1:first-child{border:0!important;margin:2.5em 0 1em}
-body.book #header .details{border:0!important;display:block;padding:0!important}
-body.book #header .details span:first-child{margin-left:0!important}
-body.book #header .details br{display:block}
-body.book #header .details br+span::before{content:none!important}
-body.book #toc{border:0!important;text-align:left!important;padding:0!important;margin:0!important}
-body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-break-before:always}
-.listingblock code[data-lang]::before{display:block}
-#footer{padding:0 .9375em}
-.hide-on-print{display:none!important}
-.print-only{display:block!important}
-.hide-for-print{display:none!important}
-.show-for-print{display:inherit!important}}
-@media print,amzn-kf8{#header>h1:first-child{margin-top:1.25rem}
-.sect1{padding:0!important}
-.sect1+.sect1{border:0}
-#footer{background:none}
-#footer-text{color:rgba(0,0,0,.6);font-size:.9em}}
-@media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
-</style>
+<meta name="generator" content="Asciidoctor 2.0.18">
+<meta name="description" content="Quick start guide for Hibernate ORM">
+<title>Getting Started with Hibernate</title>
+<link rel="stylesheet" href="./css/hibernate.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="./rouge-github.css">
 </head>
-<body class="article">
+<body class="book">
 <div id="header">
-<h1>Hibernate Getting Started Guide</h1>
+<h1>Getting Started with Hibernate</h1>
 <div class="details">
-<span id="revnumber">version 6.2.0.CR1</span>
+<span id="revnumber">version 6.2.36.Final</span>
 </div>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
@@ -449,44 +23,36 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#preface">Preface</a></li>
 <li><a href="#obtaining">1. Obtaining Hibernate</a>
 <ul class="sectlevel2">
-<li><a href="#_the_hibernate_modulesartifacts">1.1. The Hibernate Modules/Artifacts</a></li>
-<li><a href="#_release_bundle_downloads">1.2. Release Bundle Downloads</a></li>
-<li><a href="#_maven_repository_artifacts">1.3. Maven Repository Artifacts</a></li>
+<li><a href="#modules">1.1. Hibernate ORM modules</a></li>
+<li><a href="#platform">1.2. Platform / BOM</a></li>
+<li><a href="#examples">1.3. Example sources</a></li>
 </ul>
 </li>
-<li><a href="#tutorial-native">2. Tutorial Using Native Hibernate APIs and hbm.xml Mapping</a>
+<li><a href="#tutorial_annotations">2. Tutorial using native Hibernate APIs</a>
 <ul class="sectlevel2">
-<li><a href="#hibernate-gsg-tutorial-basic-config">2.1. The Hibernate configuration file</a></li>
-<li><a href="#hibernate-gsg-tutorial-basic-entity">2.2. The entity Java class</a></li>
-<li><a href="#hibernate-gsg-tutorial-basic-mapping">2.3. The mapping file</a></li>
-<li><a href="#hibernate-gsg-tutorial-basic-test">2.4. Example code</a></li>
-<li><a href="#hibernate-gsg-tutorial-annotations-further">2.5. Take it further!</a></li>
+<li><a href="#hibernate-gsg-tutorial-annotations-config">2.1. Configuration via properties file</a></li>
+<li><a href="#hibernate-gsg-tutorial-annotations-entity">2.2. The annotated entity Java class</a></li>
+<li><a href="#hibernate-gsg-tutorial-annotations-test">2.3. Example code</a></li>
+<li><a href="#hibernate-gsg-tutorial-annotations-further">2.4. Take it further!</a></li>
 </ul>
 </li>
-<li><a href="#tutorial_annotations">3. Tutorial Using Native Hibernate APIs and Annotation Mappings</a>
+<li><a href="#tutorial_jpa">3. Tutorial using JPA-standard APIs</a>
 <ul class="sectlevel2">
-<li><a href="#hibernate-gsg-tutorial-annotations-config">3.1. The Hibernate configuration file</a></li>
-<li><a href="#hibernate-gsg-tutorial-annotations-entity">3.2. The annotated entity Java class</a></li>
-<li><a href="#hibernate-gsg-tutorial-annotations-test">3.3. Example code</a></li>
-<li><a href="#hibernate-gsg-tutorial-annotations-further">3.4. Take it further!</a></li>
+<li><a href="#hibernate-gsg-tutorial-jpa-config">3.1. persistence.xml</a></li>
+<li><a href="#hibernate-gsg-tutorial-jpa-entity">3.2. The annotated entity Java class</a></li>
+<li><a href="#hibernate-gsg-tutorial-jpa-test">3.3. Example code</a></li>
+<li><a href="#hibernate-gsg-tutorial-jpa-further">3.4. Take it further!</a></li>
 </ul>
 </li>
-<li><a href="#tutorial_jpa">4. Tutorial Using the Java Persistence API (Jakarta Persistence)</a>
+<li><a href="#tutorial_envers">4. Tutorial Using Envers</a>
 <ul class="sectlevel2">
-<li><a href="#hibernate-gsg-tutorial-jpa-config">4.1. persistence.xml</a></li>
-<li><a href="#hibernate-gsg-tutorial-jpa-entity">4.2. The annotated entity Java class</a></li>
-<li><a href="#hibernate-gsg-tutorial-jpa-test">4.3. Example code</a></li>
-<li><a href="#hibernate-gsg-tutorial-annotations-further">4.4. Take it further!</a></li>
+<li><a href="#hibernate-gsg-tutorial-envers-config">4.1. persistence.xml</a></li>
+<li><a href="#hibernate-gsg-tutorial-envers-entity">4.2. The annotated entity Java class</a></li>
+<li><a href="#hibernate-gsg-tutorial-envers-test">4.3. Example code</a></li>
+<li><a href="#hibernate-gsg-tutorial-envers-further">4.4. Take it further!</a></li>
 </ul>
 </li>
-<li><a href="#tutorial_envers">5. Tutorial Using Envers</a>
-<ul class="sectlevel2">
-<li><a href="#hibernate-gsg-tutorial-envers-config">5.1. persistence.xml</a></li>
-<li><a href="#hibernate-gsg-tutorial-envers-entity">5.2. The annotated entity Java class</a></li>
-<li><a href="#hibernate-gsg-tutorial-envers-test">5.3. Example code</a></li>
-<li><a href="#hibernate-gsg-tutorial-annotations-further">5.4. Take it further!</a></li>
-</ul>
-</li>
+<li><a href="#credits">5. Credits</a></li>
 </ul>
 </div>
 </div>
@@ -495,416 +61,368 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="preface">Preface</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Working with both Object-Oriented software and Relational Databases can be cumbersome and time-consuming.
-Development costs are significantly higher due to a number of "paradigm mismatches" between how data is represented in objects
-versus relational databases.  Hibernate is an Object/Relational Mapping (ORM) solution for Java environments.  The
-term Object/Relational Mapping refers to the technique of mapping data between an object model representation to
-a relational data model representation.  See <a href="https://en.wikipedia.org/wiki/Object-relational_mapping" class="bare">https://en.wikipedia.org/wiki/Object-relational_mapping</a> for a good
-high-level discussion.  Also, Martin Fowler&#8217;s <a href="https://martinfowler.com/bliki/OrmHate.html">OrmHate</a> article
-takes a look at many of the mismatch problems.</p>
+<p>Hibernate is an <em>Object/Relational Mapping</em> (ORM) solution for programs written in Java and other JVM
+languages.</p>
 </div>
 <div class="paragraph">
-<p>Although having a strong background in SQL is not required to use Hibernate, having a basic understanding of the
-concepts can help you understand Hibernate more quickly and fully.  An understanding of data modeling principles
-is especially important.  Both <a href="https://www.agiledata.org/essays/dataModeling101.html" class="bare">https://www.agiledata.org/essays/dataModeling101.html</a> and
-<a href="https://en.wikipedia.org/wiki/Data_modeling" class="bare">https://en.wikipedia.org/wiki/Data_modeling</a> are good starting points for understanding these data modeling
-principles.  If you are completely new to database access in Java,
-<a href="https://www.marcobehler.com/guides/a-guide-to-accessing-databases-in-java" class="bare">https://www.marcobehler.com/guides/a-guide-to-accessing-databases-in-java</a> contains a good overview of the various parts,
-pieces and options.</p>
+<p>While a strong background in SQL is not required to use Hibernate, a basic understanding of its concepts is useful - especially the principles of <em>data modeling</em>.
+Understanding the basics of transactions and design patterns such as <em>Unit of Work</em> are important as well.</p>
 </div>
-<div class="paragraph">
-<p>Hibernate takes care of the mapping from Java classes to database tables, and from Java data types to SQL data
-types. In addition, it provides data query and retrieval facilities. It can significantly reduce development
-time otherwise spent with manual data handling in SQL and JDBC.  Hibernate’s design goal is to relieve the
-developer from 95% of common data persistence-related programming tasks by eliminating the need for manual,
-hand-crafted data processing using SQL and JDBC.  However, unlike many other persistence solutions, Hibernate
-does not hide the power of SQL from you and guarantees that your investment in relational technology and
-knowledge is as valid as always.</p>
+<div id="useful-resources" class="sidebarblock">
+<div class="content">
+<div class="title">Useful background resources</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://en.wikipedia.org/wiki/Data_modeling">Data Modeling (Wikipedia)</a>.</p>
+</li>
+<li>
+<p><a href="https://www.agiledata.org/essays/dataModeling101.html">Data Modeling 101</a></p>
+</li>
+<li>
+<p><a href="https://www.marcobehler.com/guides/a-guide-to-accessing-databases-in-java">Java &amp; Databases: An Overview of Libraries &amp; APIs</a></p>
+</li>
+<li>
+<p><a href="https://martinfowler.com/eaaCatalog/unitOfWork.html">Unit of Work</a></p>
+</li>
+</ul>
 </div>
-<div class="paragraph">
-<p>Hibernate may not be the best solution for data-centric applications that only use stored-procedures to
-implement the business logic in the database, it is most useful with object-oriented domain models and business
-logic in the Java-based middle-tier. However, Hibernate can certainly help you to remove or encapsulate
-vendor-specific SQL code and streamlines the common task of translating result sets from a tabular
-representation to a graph of objects.</p>
 </div>
-<div class="paragraph">
-<p>See <a href="https://hibernate.org/orm/contribute/" class="bare">https://hibernate.org/orm/contribute/</a> for information on getting involved.</p>
-</div>
-<div class="admonitionblock important">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-important" title="Important"></i>
-</td>
-<td class="content">
-The projects and code for the tutorials referenced in this guide are available as <a href="hibernate-tutorials.zip" class="bare">hibernate-tutorials.zip</a>
-</td>
-</tr>
-</table>
 </div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="obtaining">1. Obtaining Hibernate</h2>
 <div class="sectionbody">
-<div class="sect2">
-<h3 id="_the_hibernate_modulesartifacts">1.1. The Hibernate Modules/Artifacts</h3>
 <div class="paragraph">
-<p>Hibernate&#8217;s functionality is split into a number of modules/artifacts meant to isolate dependencies (modularity).</p>
+<p>Hibernate is broken into a number of modules/artifacts under the <code>org.hibernate.orm</code>
+group.  The main artifact is named <code>hibernate-core</code>.</p>
 </div>
-<div class="dlist">
-<dl>
-<dt class="hdlist1">hibernate-core</dt>
-<dd>
-<p>The main (core) Hibernate module.  Defines its ORM features and APIs as well as the various integration SPIs.</p>
-</dd>
-<dt class="hdlist1">hibernate-envers</dt>
-<dd>
-<p>Hibernate&#8217;s historical entity versioning feature</p>
-</dd>
-<dt class="hdlist1">hibernate-spatial</dt>
-<dd>
-<p>Hibernate&#8217;s Spatial/GIS data-type support</p>
-</dd>
-<dt class="hdlist1">hibernate-agroal</dt>
-<dd>
-<p>Integrates the <a href="https://agroal.github.io/">Agroal</a> connection pooling library into Hibernate</p>
-</dd>
-<dt class="hdlist1">hibernate-c3p0</dt>
-<dd>
-<p>Integrates the <a href="https://www.mchange.com/projects/c3p0/">C3P0</a> connection pooling library into Hibernate</p>
-</dd>
-<dt class="hdlist1">hibernate-hikaricp</dt>
-<dd>
-<p>Integrates the <a href="https://github.com/brettwooldridge/HikariCP/">HikariCP</a> connection pooling library into Hibernate</p>
-</dd>
-<dt class="hdlist1">hibernate-vibur</dt>
-<dd>
-<p>Integrates the <a href="https://www.vibur.org/">Vibur DBCP</a> connection pooling library into Hibernate</p>
-</dd>
-<dt class="hdlist1">hibernate-proxool</dt>
-<dd>
-<p>Integrates the <a href="https://proxool.sourceforge.net/">Proxool</a> connection pooling library into Hibernate</p>
-</dd>
-<dt class="hdlist1">hibernate-jcache</dt>
-<dd>
-<p>Integrates the <a href="https://jcp.org/en/jsr/detail?id=107$$">JCache</a> caching specification into Hibernate,
-enabling any compliant implementation to become a second-level cache provider.</p>
-</dd>
-<dt class="hdlist1">hibernate-community-dialects</dt>
-<dd>
-<p>Hibernate&#8217;s community supported dialects</p>
-</dd>
-<dt class="hdlist1">hibernate-graalvm</dt>
-<dd>
-<p>Experimental extension to make it easier to compile applications into a <a href="https://www.graalvm.org/">GraalVM</a> native image</p>
-</dd>
-<dt class="hdlist1">hibernate-micrometer</dt>
-<dd>
-<p>Integration for Micrometer metrics into Hibernate as a metrics collection package</p>
-</dd>
-<dt class="hdlist1">hibernate-testing</dt>
-<dd>
-<p>Support for testing Hibernate ORM functionality</p>
-</dd>
-<dt class="hdlist1">hibernate-integrationtest-java-modules</dt>
-<dd>
-<p>Integration tests for running Hibernate ORM in the Java module path</p>
-</dd>
-</dl>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This guide uses 6.2.0.Final as the Hibernate version for illustration purposes.  Be sure to change
+this version, if necessary, to the version you wish to use.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>We can declare a dependency on this artifact using <a href="https://www.gradle.org">Gradle</a></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="groovy"><span class="n">dependencies</span> <span class="o">{</span>
+  <span class="n">implementation</span> <span class="s2">"org.hibernate.orm:hibernate-core:6.2.0.Final"</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or <a href="https://maven.org">Maven</a>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="xml"><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.hibernate.orm<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>hibernate-core<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>6.2.0.Final<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_release_bundle_downloads">1.2. Release Bundle Downloads</h3>
+<h3 id="modules">1.1. Hibernate ORM modules</h3>
 <div class="paragraph">
-<p>The Hibernate team provides release bundles hosted on the SourceForge File Release System, in both
-<code>TGZ</code> and <code>ZIP</code> formats.  Each release bundle contains <code>JAR</code> files, documentation, source code, and other goodness.</p>
+<p>As mentioned earlier, Hibernate ORM is broken into a number of modules with the intent of isolating
+transitive dependencies based on the features being used or not.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. API-oriented modules</caption>
+<colgroup>
+<col style="width: 40%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate-core</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The core object/relational mapping engine</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate-envers</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Entity versioning and auditing</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate-spatial</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Support for spatial/GIS data types using <a href="https://github.com/GeoLatte/geolatte-geom">GeoLatte</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate-jpamodelgen</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An annotation processor that generates a JPA-compliant metamodel, plus optional Hibernate extras</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 2. Integration-oriented modules</caption>
+<colgroup>
+<col style="width: 40%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate-agroal</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Support for <a href="https://agroal.github.io/">Agroal</a> connection pooling</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate-c3p0</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Support for <a href="https://www.mchange.com/projects/c3p0/">C3P0</a> connection pooling</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate-hikaricp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Support for <a href="https://github.com/brettwooldridge/HikariCP/">HikariCP</a> connection pooling</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate-vibur</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Support for <a href="https://www.vibur.org/">Vibur DBCP</a> connection pooling</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate-proxool</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Support for <a href="https://proxool.sourceforge.net/">Proxool</a> connection pooling</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate-jcache</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Integration with <a href="https://jcp.org/en/jsr/detail?id=107$$">JCache</a>, allowing any compliant implementation as a second-level cache provider</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate-graalvm</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Experimental extension to make it easier to compile applications as a <a href="https://www.graalvm.org/">GraalVM</a> native image</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate-micrometer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Integration with <a href="https://micrometer.io">Micrometer</a> metrics</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate-community-dialects</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Additional community-supported SQL dialects</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 3. Testing-oriented modules</caption>
+<colgroup>
+<col style="width: 40%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate-testing</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A series of JUnit extensions for testing Hibernate ORM functionality</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="platform">1.2. Platform / BOM</h3>
+<div class="paragraph">
+<p>Hibernate also provides a platform (BOM in Maven terminology) module which can be used to align versions of the Hibernate modules along with the versions of its libraries.  The platform artifact is named <code>hibernate-platform</code>.</p>
 </div>
 <div class="paragraph">
-<p>You can download releases of Hibernate, in your chosen format, from the list at
-<a href="https://sourceforge.net/projects/hibernate/files/hibernate-orm/" class="bare">https://sourceforge.net/projects/hibernate/files/hibernate-orm/</a>.  The release bundle is structured as follows:</p>
+<p>To apply the platform in Gradle</p>
 </div>
-<div class="ulist">
-<ul>
-<li>
-<p>The <code>lib/required/</code> directory contains the <code>hibernate-core</code> jar and all of its dependencies.  All of these jars are
-required to be available on your classpath no matter which features of Hibernate are being used.</p>
-</li>
-<li>
-<p>The <code>lib/envers</code> directory contains the <code>hibernate-envers</code> jar and all of its dependencies (beyond those in
-<code>lib/required/</code> and <code>lib/jpa/</code>).</p>
-</li>
-<li>
-<p>The <code>lib/spatial/</code> directory contains the <code>hibernate-spatial</code> jar and all of its dependencies (beyond those in <code>lib/required/</code>)</p>
-</li>
-<li>
-<p>The <code>lib/jpa-metamodel-generator/</code> directory contains the jar needed for generating the Criteria API type-safe Metamodel.</p>
-</li>
-<li>
-<p>The <code>lib/optional/</code> directory contains the jars needed for the various connection pooling and second-level cache integrations
-provided by Hibernate, along with their dependencies.</p>
-</li>
-</ul>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="groovy"><span class="n">dependencies</span> <span class="o">{</span>
+  <span class="n">implementation</span> <span class="n">platform</span> <span class="s2">"org.hibernate.orm:hibernate-platform:6.2.0.Final"</span>
+
+  <span class="c1">// use the versions from the platform</span>
+  <span class="n">implementation</span> <span class="s2">"org.hibernate.orm:hibernate-core"</span>
+  <span class="n">implementation</span> <span class="s2">"jakarta.transaction:jakarta.transaction-api"</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>See the <a href="https://docs.gradle.org/current/userguide/java_platform_plugin.html#sec:java_platform_consumption">Gradle documentation</a> for capabilities of applying a platform.</p>
+</div>
+<div class="paragraph">
+<p>To apply the platform (BOM) in Maven</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="xml"><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.hibernate.orm<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>hibernate-core<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>jakarta.transaction<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>jakarta.transaction-api<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+
+<span class="nt">&lt;dependencyManagement&gt;</span>
+  <span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.hibernate.orm<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>hibernate-platform<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>6.2.0.Final<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;type&gt;</span>pom<span class="nt">&lt;/type&gt;</span>
+    <span class="nt">&lt;scope&gt;</span>import<span class="nt">&lt;/scope&gt;</span>
+  <span class="nt">&lt;/dependency&gt;</span>
+<span class="nt">&lt;/dependencyManagement&gt;</span></code></pre>
+</div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_maven_repository_artifacts">1.3. Maven Repository Artifacts</h3>
+<h3 id="examples">1.3. Example sources</h3>
 <div class="paragraph">
-<p>The authoritative repository for Hibernate artifacts is the JBoss Maven repository.  The Hibernate artifacts are
-synced to Maven Central as part of an automated job (some small delay may occur).</p>
+<p>The bundled examples mentioned in this tutorial can be downloaded from <a href="https://docs.jboss.org/hibernate/orm/6.2/quickstart/html_single/hibernate-tutorials.zip">here</a>.</p>
 </div>
 <div class="paragraph">
-<p>The team responsible for the JBoss Maven repository maintains a number of Wiki pages that contain important information:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="https://community.jboss.org/docs/DOC-14900" class="bare">https://community.jboss.org/docs/DOC-14900</a> - General information about the repository.</p>
-</li>
-<li>
-<p><a href="https://community.jboss.org/docs/DOC-15170" class="bare">https://community.jboss.org/docs/DOC-15170</a> - Information about setting up the JBoss repositories in order to do
-development work on JBoss projects themselves.</p>
-</li>
-<li>
-<p><a href="https://community.jboss.org/docs/DOC-15169" class="bare">https://community.jboss.org/docs/DOC-15169</a> - Information about setting up access to the repository to use JBoss
-projects as part of your own software.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>The Hibernate ORM artifacts are published under the <code>org.hibernate</code> groupId.</p>
+<p>Alternatively, the example source code can also be obtained from <a href="https://github.com/hibernate/hibernate-orm/tree/6.2.36.Final/documentation/src/main/asciidoc/quickstart/tutorials">Github</a></p>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="tutorial-native">2. Tutorial Using Native Hibernate APIs and hbm.xml Mapping</h2>
+<h2 id="tutorial_annotations">2. Tutorial using native Hibernate APIs</h2>
 <div class="sectionbody">
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-This tutorial is located within the download bundle under <code>basic/</code>.
-</td>
-</tr>
-</table>
-</div>
 <div class="ulist checklist">
 <div class="title">Objectives</div>
 <ul class="checklist">
 <li>
-<p><i class="fa fa-check-square-o"></i> Bootstrap a Hibernate <code>SessionFactory</code></p>
+<p><i class="fa fa-check-square-o"></i> Configure Hibernate using <code>hibernate.properties</code></p>
 </li>
 <li>
-<p><i class="fa fa-check-square-o"></i> Use Hibernate mapping (<code>hbm.xml</code>) files to provide mapping information</p>
+<p><i class="fa fa-check-square-o"></i> Create a <code>SessionFactory</code> using <a href="https://docs.jboss.org/hibernate/orm/6.2/userguide/html_single/Hibernate_User_Guide.html#bootstrap-native">native bootstrapping</a></p>
 </li>
 <li>
-<p><i class="fa fa-check-square-o"></i> Use the Hibernate native APIs</p>
+<p><i class="fa fa-check-square-o"></i> Use annotations to provide mapping information</p>
+</li>
+<li>
+<p><i class="fa fa-check-square-o"></i> Use <code>Session</code> to persist and query data</p>
 </li>
 </ul>
 </div>
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph">
+<p>This tutorial is located within the download bundle under <code>annotations/</code>.</p>
+</div>
+</div>
+</div>
 <div class="sect2">
-<h3 id="hibernate-gsg-tutorial-basic-config">2.1. The Hibernate configuration file</h3>
+<h3 id="hibernate-gsg-tutorial-annotations-config">2.1. Configuration via properties file</h3>
 <div class="paragraph">
-<p>For this tutorial, the <code>hibernate.cfg.xml</code> file defines the Hibernate configuration information.</p>
+<p>In this example, configuration properties are specified in a file named <code>hibernate.properties</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Configuration via <code>hibernate.properties</code></div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="properties"><span class="c"># Database connection settings
+</span><span class="py">hibernate.connection.url</span><span class="p">=</span><span class="s">jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1</span>
+<span class="py">hibernate.connection.username</span><span class="p">=</span><span class="s">sa</span>
+<span class="py">hibernate.connection.password</span><span class="p">=</span>
+
+<span class="c"># Echo all executed SQL to console
+</span><span class="py">hibernate.show_sql</span><span class="p">=</span><span class="s">true</span>
+<span class="py">hibernate.format_sql</span><span class="p">=</span><span class="s">true</span>
+<span class="py">hibernate.highlight_sql</span><span class="p">=</span><span class="s">true</span>
+
+<span class="c"># Automatically export the schema
+</span><span class="py">hibernate.hbm2ddl.auto</span><span class="p">=</span><span class="s">create</span></code></pre>
+</div>
 </div>
 <div class="paragraph">
-<p>The <code>connection.driver_class</code>, <code>connection.url</code>, <code>connection.username</code> and <code>connection.password</code> <code>&lt;property/&gt;</code> elements
-define JDBC connection information. These tutorials utilize the H2 in-memory database, so the values of these properties
-are all specific to running H2 in its in-memory mode.  <code>connection.pool_size</code> is used to configure the number of
-connections in Hibernate&#8217;s built-in connection pool.</p>
+<p>The following properties specify JDBC connection information:</p>
 </div>
-<div class="admonitionblock important">
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 4. JDBC connection settings</caption>
+<colgroup>
+<col style="width: 35%;">
+<col>
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Configuration property name</th>
+<th class="tableblock halign-left valign-top">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>jakarta.persistence.jdbc.url</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JDBC URL of your database</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>jakarta.persistence.jdbc.user</code> and <code>jakarta.persistence.jdbc.password</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Your database credentials</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
 <table>
 <tr>
 <td class="icon">
-<i class="fa icon-important" title="Important"></i>
+<i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-The built-in Hibernate connection pool is in no way intended for production use. It lacks several
-features found on production-ready connection pools.
+These tutorials use the H2 embedded database, so the values of these properties are specific to running H2 in its in-memory mode.
 </td>
 </tr>
 </table>
 </div>
 <div class="paragraph">
-<p>The <code>dialect</code> property specifies the particular SQL variant with which Hibernate will converse.</p>
+<p>These properties enable logging of SQL to the console as it is executed, in an aesthetically pleasing format:</p>
 </div>
-<div class="admonitionblock tip">
-<table>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 5. Settings for SQL logging to the console</caption>
+<colgroup>
+<col style="width: 35%;">
+<col>
+</colgroup>
+<thead>
 <tr>
-<td class="icon">
-<i class="fa icon-tip" title="Tip"></i>
-</td>
-<td class="content">
-In most cases, Hibernate is able to properly determine which dialect to use. This is particularly useful
-if your application targets multiple databases.
-</td>
+<th class="tableblock halign-left valign-top">Configuration property name</th>
+<th class="tableblock halign-left valign-top">Purpose</th>
 </tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate.show_sql</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If <code>true</code>, log SQL directly to the console</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate.format_sql</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If <code>true</code>, log SQL in a multiline, indented format</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate.highlight_sql</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If <code>true</code>, log SQL with syntax highlighting via ANSI escape codes</p></td>
+</tr>
+</tbody>
 </table>
-</div>
 <div class="paragraph">
-<p>The <code>hbm2ddl.auto</code> property enables automatic generation of database schemas directly into the database.</p>
-</div>
-<div class="paragraph">
-<p>Finally, add the mapping file(s) for persistent classes to the configuration.  The <code>resource</code> attribute of the
-<code>&lt;mapping/&gt;</code> element causes Hibernate to attempt to locate that mapping as a classpath resource using a
-<code>java.lang.ClassLoader</code> lookup.</p>
-</div>
-<div class="paragraph">
-<p>There are many ways and options to bootstrap a Hibernate <code>SessionFactory</code>.  For additional details, see
-the <em>Native Bootstrapping</em> topical guide.</p>
+<p>When developing persistence logic with Hibernate, it&#8217;s very important to be able to see exactly what SQL is being executed.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="hibernate-gsg-tutorial-basic-entity">2.2. The entity Java class</h3>
+<h3 id="hibernate-gsg-tutorial-annotations-entity">2.2. The annotated entity Java class</h3>
 <div class="paragraph">
-<p>The entity class for this tutorial is <code>org.hibernate.tutorial.hbm.Event</code></p>
+<p>The entity class in this tutorial is <code>org.hibernate.tutorial.annotations.Event</code>.
+Observe that:</p>
 </div>
 <div class="ulist">
-<div class="title">Notes About the Entity</div>
 <ul>
 <li>
-<p>This class uses standard JavaBean naming conventions for property getter and setter methods, as well as
-private visibility for the fields. Although this is the recommended design, it is not required.</p>
+<p>This class uses standard JavaBean naming conventions for property getter and setter methods, as well as private visibility for the fields.
+This is recommended, but it&#8217;s not a requirement.</p>
 </li>
 <li>
-<p>The no-argument constructor, which is also a JavaBean convention, is a requirement for all persistent classes.
-Hibernate needs to create objects for you, using Java Reflection.  The constructor can be private.  However, package
-or public visibility is required for runtime proxy generation and efficient data retrieval without bytecode
-instrumentation.</p>
+<p>The no-argument constructor, which is also a JavaBean convention, <em>is</em> a requirement for all persistent classes.
+Hibernate needs to instantiate objects for you, using Java Reflection.
+The constructor should have package-private or <code>public</code> visibility, to allow Hibernate to generate proxies and optimized code for field access.</p>
 </li>
 </ul>
-</div>
-</div>
-<div class="sect2">
-<h3 id="hibernate-gsg-tutorial-basic-mapping">2.3. The mapping file</h3>
-<div class="paragraph">
-<p>The mapping file for this tutorial is the classpath resource <code>org/hibernate/tutorial/hbm/Event.hbm.xml</code> (as discussed above).</p>
-</div>
-<div class="paragraph">
-<p>Hibernate uses the mapping metadata to determine how to load and store objects of the persistent class. The Hibernate
-mapping file is one choice for providing Hibernate with this metadata.</p>
-</div>
-<div id="hibernate-gsg-tutorial-basic-mapping-class" class="exampleblock">
-<div class="title">Example 1. The class mapping element</div>
-<div class="content">
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code data-lang="XML">&lt;class name="Event" table="EVENTS"&gt;
-	...
-&lt;/class&gt;</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="ulist">
-<div class="title">Functions of the &lt;varname&gt;class&lt;/varname&gt; mapping element</div>
-<ul>
-<li>
-<p>The <code>name</code> attribute (combined here with the <code>package</code> attribute from the containing <code>&lt;hibernate-mapping/&gt;</code> element)
-names the FQN of the class to be defined as an entity.</p>
-</li>
-<li>
-<p>The <code>table</code> attribute names the database table which contains the data for this entity.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>Instances of the <code>Event</code> class are now mapped to rows in the <code>EVENTS</code> database table.</p>
-</div>
-<div id="hibernate-gsg-tutorial-basic-mapping-id" class="exampleblock">
-<div class="title">Example 2. The id mapping element</div>
-<div class="content">
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code data-lang="XML">&lt;id name="id" column="EVENT_ID"&gt;
-    ...
-&lt;/id&gt;</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="paragraph">
-<p>Hibernate uses the property named by the <code>&lt;id/&gt;</code> element to uniquely identify rows in the table.</p>
-</div>
-<div class="admonitionblock important">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-important" title="Important"></i>
-</td>
-<td class="content">
-It is not required for the id element to map to the table&#8217;s actual primary key column(s), but it is
-the normal convention.  Tables mapped in Hibernate do not even need to define primary keys. However, it is strongly
-recommend that all schemas define proper referential integrity. Therefore id and primary key are used interchangeably
-throughout Hibernate documentation.
-</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p>The <code>&lt;id/&gt;</code> element here names the EVENT_ID column as the primary key of the EVENTS table. It also identifies the
-<code>id</code> property of the <code>Event</code> class as the property containing the identifier value.</p>
-</div>
-<div class="paragraph">
-<p>The <code>generator</code> element informs Hibernate about which strategy is used to generated primary key values for this entity.
-This example uses a simple incrementing count.</p>
-</div>
-<div id="hibernate-gsg-tutorial-basic-mapping-property" class="exampleblock">
-<div class="title">Example 3. The property mapping element</div>
-<div class="content">
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code data-lang="XML">&lt;property name="date" type="timestamp" column="EVENT_DATE"/&gt;
-&lt;property name="title"/&gt;</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="paragraph">
-<p>The two <code>&lt;property/&gt;</code> elements declare the remaining two persistent properties of the <code>Event</code> class: <code>date</code> and <code>title</code>.
-The <code>date</code> property mapping includes the <code>column</code> attribute, but the <code>title</code> does not.
-In the absence of a <code>column</code> attribute, Hibernate uses the property name as the column name.
-This is appropriate for <code>title</code>, but since <code>date</code> is a reserved keyword in most databases, you need to specify a
-non-reserved word for the column name.</p>
-</div>
-<div class="paragraph">
-<p>The <code>title</code> mapping also lacks a type attribute.  The types declared and used in the mapping files are neither Java data
-types nor SQL database types.  Instead, they are <strong>Hibernate mapping types</strong>, which are converters which translate between
-Java and SQL data types.  Hibernate attempts to determine the correct conversion and mapping type autonomously if the
-type attribute is not specified in the mapping, by using Java reflection to determine the Java type of the declared
-property and using a default mapping type for that Java type.</p>
-</div>
-<div class="paragraph">
-<p>In some cases this automatic detection might not choose the default you expect or need, as seen with the
-<code>date</code> property.  Hibernate cannot know if the property, which is of type <code>java.util.Date</code>, should map to an SQL
-<em>DATE</em>, <em>TIME</em>, or <em>TIMESTAMP</em> datatype.  Full date and time information is preserved by mapping the property to
-the <em>timestamp</em> converter, which identifies the converter as declared by <code>org.hibernate.type.StandardBasicTypes.TIMESTAMP</code>.</p>
-</div>
-<div class="admonitionblock tip">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-tip" title="Tip"></i>
-</td>
-<td class="content">
-Hibernate determines the mapping type using reflection when the mapping files are processed. This process adds
-overhead in terms of time and resources. If startup performance is important, consider explicitly defining the type
-to use.
-</td>
-</tr>
-</table>
-</div>
-</div>
-<div class="sect2">
-<h3 id="hibernate-gsg-tutorial-basic-test">2.4. Example code</h3>
-<div class="paragraph">
-<p>The <code>org.hibernate.tutorial.hbm.NativeApiIllustrationTest</code> class illustrates using the Hibernate native API.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -913,105 +431,223 @@ to use.
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-The examples in these tutorials are presented as JUnit tests, for ease of use.  One benefit of this
-approach is that <code>setUp</code> and <code>tearDown</code> roughly illustrate how a <code>org.hibernate.SessionFactory</code> is created at the
-start-up of an application and closed at the end of the application lifecycle.
+The <a href="https://docs.jboss.org/hibernate/orm/6.2/userguide/html_single/Hibernate_User_Guide.html#entity">Entity types</a> section of the User Guide covers the complete set of requirements for the entity class.
 </td>
 </tr>
 </table>
 </div>
-<div id="hibernate-gsg-tutorial-basic-test-setUp" class="exampleblock">
-<div class="title">Example 4. Obtaining the <code>org.hibernate.SessionFactory</code></div>
+<div class="paragraph">
+<p>We use annotations to identify the class as an entity, and to map it to the relational schema.</p>
+</div>
+<div id="hibernate-gsg-tutorial-annotations-entity-entity" class="listingblock">
+<div class="title">Identifying the class as an entity</div>
 <div class="content">
-<div class="listingblock">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Entity</span>   <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@Table</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"Events"</span><span class="o">)</span>   <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Event</span> <span class="o">{</span>
+    <span class="o">...</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@jakarta.persistence.Entity</code> marks the <code>Event</code> class as an entity.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>@jakarta.persistence.Table</code> explicitly specifies the name of the mapped table.
+Without this annotation, the table name would default to <code>Event</code>.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Every entity class must have an identifier.</p>
+</div>
+<div id="hibernate-gsg-tutorial-annotations-entity-id" class="listingblock">
+<div class="title">Identifying the identifier property</div>
 <div class="content">
-<pre class="prettyprint highlight"><code data-lang="JAVA">protected void setUp() throws Exception {
-	// A SessionFactory is set up once for an application!
-	final StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
-			.configure() // configures settings from hibernate.cfg.xml
-			.build();
-	try {
-		sessionFactory = new MetadataSources( registry ).buildMetadata().buildSessionFactory();
-	}
-	catch (Exception e) {
-		// The registry would be destroyed by the SessionFactory, but we had trouble building the SessionFactory
-		// so destroy it manually.
-		StandardServiceRegistryBuilder.destroy( registry );
-	}
-}</code></pre>
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Id</span>   <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@GeneratedValue</span>   <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="kd">private</span> <span class="nc">Long</span> <span class="n">id</span><span class="o">;</span></code></pre>
 </div>
 </div>
-</div>
-</div>
-<div class="paragraph">
-<p>The <code>setUp</code> method first builds a <code>org.hibernate.boot.registry.StandardServiceRegistry</code> instance which incorporates
-configuration information into a working set of Services for use by the SessionFactory.  In this tutorial
-we defined all configuration information in <code>hibernate.cfg.xml</code> so there is not much interesting to see here.</p>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@jakarta.persistence.Id</code> marks the field as holding the identifier (primary key) of the entity.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>@jakarta.persistence.GeneratedValue</code> specifies that this is a <em>synthetic id</em>, that is, a system-generated identifier (a surrogate primary key).</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
-<p>Using the <code>StandardServiceRegistry</code> we create the <code>org.hibernate.boot.MetadataSources</code> which is the start point for
-telling Hibernate about your domain model.  Again, since we defined that in <code>hibernate.cfg.xml</code> so there is not much
-interesting to see here.</p>
+<p>Other fields of the entity are considered persistent by default.</p>
 </div>
-<div class="paragraph">
-<p><code>org.hibernate.boot.Metadata</code> represents the complete, partially validated view of the application domain model which the
-<code>SessionFactory</code> will be based on.</p>
-</div>
-<div class="paragraph">
-<p>The final step in the bootstrap process is to build the <code>SessionFactory</code>.  The <code>SessionFactory</code> is a
-thread-safe object that is instantiated once to serve the entire application.</p>
-</div>
-<div class="paragraph">
-<p>The <code>SessionFactory</code> acts as a factory for <code>org.hibernate.Session</code> instances, which should be thought of
-as a corollary to a "unit of work".</p>
-</div>
-<div id="hibernate-gsg-tutorial-basic-test-saving" class="exampleblock">
-<div class="title">Example 5. Saving entities</div>
+<div id="hibernate-gsg-tutorial-annotations-entity-properties" class="listingblock">
+<div class="title">Mapping basic properties</div>
 <div class="content">
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code data-lang="JAVA">Session session = sessionFactory.openSession();
-session.beginTransaction();
-session.save( new Event( "Our very first event!", new Date() ) );
-session.save( new Event( "A follow up event", new Date() ) );
-session.getTransaction().commit();
-session.close();</code></pre>
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">private</span> <span class="nc">String</span> <span class="n">title</span><span class="o">;</span>
+
+<span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"eventDate"</span><span class="o">)</span>   <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">private</span> <span class="nc">LocalDateTime</span> <span class="n">date</span><span class="o">;</span></code></pre>
 </div>
 </div>
-</div>
-</div>
-<div class="paragraph">
-<p><code>testBasicUsage()</code> first creates some new <code>Event</code> objects and hands them over to Hibernate for management, using the
-<code>save()</code> method.  Hibernate now takes responsibility to perform an <em>INSERT</em> on the database for each <code>Event</code>.</p>
-</div>
-<div id="hibernate-gsg-tutorial-basic-test-list" class="exampleblock">
-<div class="title">Example 6. Obtaining a list of entities</div>
-<div class="content">
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code data-lang="JAVA">session = sessionFactory.openSession();
-session.beginTransaction();
-List result = session.createQuery( "from Event" ).list();
-for ( Event event : (List&lt;Event&gt;) result ) {
-    System.out.println( "Event (" + event.getDate() + ") : " + event.getTitle() );
-}
-session.getTransaction().commit();
-session.close();</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="paragraph">
-<p>Here we see an example of the Hibernate Query Language (HQL) to load all existing <code>Event</code> objects from the database
-by generating the appropriate <em>SELECT</em> SQL, sending it to the database and populating <code>Event</code> objects with the result
-set data.</p>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@jakarta.persistence.Column</code> explicitly specifies the name of a mapped column.
+Without this annotation, the column name would default to <code>date</code>, which is a keyword on some databases.</td>
+</tr>
+</table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="hibernate-gsg-tutorial-annotations-further">2.5. Take it further!</h3>
+<h3 id="hibernate-gsg-tutorial-annotations-test">2.3. Example code</h3>
+<div class="paragraph">
+<p>The class <code>org.hibernate.tutorial.annotations.HibernateIllustrationTest</code> illustrates the use of the Hibernate&#8217;s native APIs, including:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>Session</code> and <code>SessionFactory</code>, and</p>
+</li>
+<li>
+<p><code>org.hibernate.boot</code> for configuration and bootstrap.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>There are several different ways to configure and start Hibernate, and this is not even the most common approach.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The examples in these tutorials are presented as JUnit tests.
+A benefit of this approach is that <code>setUp()</code> and <code>tearDown()</code> roughly illustrate how a <code>org.hibernate.SessionFactory</code> is
+created when the program starts, and closed when the program terminates.
+</td>
+</tr>
+</table>
+</div>
+<div id="hibernate-gsg-tutorial-basic-test-setUp" class="listingblock">
+<div class="title">Obtaining the <code>SessionFactory</code></div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">protected</span> <span class="kt">void</span> <span class="nf">setUp</span><span class="o">()</span> <span class="o">{</span>
+    <span class="c1">// A SessionFactory is set up once for an application!</span>
+    <span class="kd">final</span> <span class="nc">StandardServiceRegistry</span> <span class="n">registry</span> <span class="o">=</span>
+            <span class="k">new</span> <span class="nf">StandardServiceRegistryBuilder</span><span class="o">()</span>
+                    <span class="o">.</span><span class="na">build</span><span class="o">();</span>    <i class="conum" data-value="1"></i><b>(1)</b> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="k">try</span> <span class="o">{</span>
+        <span class="n">sessionFactory</span> <span class="o">=</span>
+                <span class="k">new</span> <span class="nf">MetadataSources</span><span class="o">(</span><span class="n">registry</span><span class="o">)</span>             <i class="conum" data-value="3"></i><b>(3)</b>
+                        <span class="o">.</span><span class="na">addAnnotatedClass</span><span class="o">(</span><span class="nc">Event</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>   <i class="conum" data-value="4"></i><b>(4)</b>
+                        <span class="o">.</span><span class="na">buildMetadata</span><span class="o">()</span>                  <i class="conum" data-value="5"></i><b>(5)</b>
+                        <span class="o">.</span><span class="na">buildSessionFactory</span><span class="o">();</span>           <i class="conum" data-value="6"></i><b>(6)</b>
+    <span class="o">}</span>
+    <span class="k">catch</span> <span class="o">(</span><span class="nc">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// The registry would be destroyed by the SessionFactory, but we</span>
+        <span class="c1">// had trouble building the SessionFactory so destroy it manually.</span>
+        <span class="nc">StandardServiceRegistryBuilder</span><span class="o">.</span><span class="na">destroy</span><span class="o">(</span><span class="n">registry</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The <code>setUp()</code> method first builds a <code>StandardServiceRegistry</code> instance which incorporates configuration information into a working set of <code>Services</code> for use by the <code>SessionFactory</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Here we put all configuration information in <code>hibernate.properties</code>, so there&#8217;s not much interesting to see.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Using the <code>StandardServiceRegistry</code> we create the <code>MetadataSources</code> which lets us tell Hibernate about our domain model.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Here we have only one entity class to register.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>An instance of <code>Metadata</code> represents a complete, partially-validated view of the application domain model.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>The final step in the bootstrap process is to build a <code>SessionFactory</code> for the configured services and validated domain model.
+The <code>SessionFactory</code> is a thread-safe object that&#8217;s instantiated once to serve the entire application.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The <code>SessionFactory</code> produces instances of <code>Session</code>.
+Each session should be thought of as representing a <em>unit of work</em>.</p>
+</div>
+<div id="hibernate-gsg-tutorial-basic-test-saving" class="listingblock">
+<div class="title">Persisting entities</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="n">sessionFactory</span><span class="o">.</span><span class="na">inTransaction</span><span class="o">(</span><span class="n">session</span> <span class="o">-&gt;</span> <span class="o">{</span>   <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="n">session</span><span class="o">.</span><span class="na">persist</span><span class="o">(</span><span class="k">new</span> <span class="nc">Event</span><span class="o">(</span><span class="s">"Our very first event!"</span><span class="o">,</span> <span class="n">now</span><span class="o">()));</span>   <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="n">session</span><span class="o">.</span><span class="na">persist</span><span class="o">(</span><span class="k">new</span> <span class="nc">Event</span><span class="o">(</span><span class="s">"A follow up event"</span><span class="o">,</span> <span class="n">now</span><span class="o">()));</span>
+<span class="o">});</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The <code>inTransaction()</code> method creates a session and starts a new transaction.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Here we create two new <code>Event</code> objects and hands them over to Hibernate, calling the <code>persist()</code> method to make these instances persistent.
+Hibernate is responsible for executing an <code>INSERT</code> statement for each <code>Event</code>.</td>
+</tr>
+</table>
+</div>
+<div id="hibernate-gsg-tutorial-basic-test-list" class="listingblock">
+<div class="title">Obtaining a list of entities</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="n">sessionFactory</span><span class="o">.</span><span class="na">inTransaction</span><span class="o">(</span><span class="n">session</span> <span class="o">-&gt;</span> <span class="o">{</span>
+    <span class="n">session</span><span class="o">.</span><span class="na">createSelectionQuery</span><span class="o">(</span><span class="s">"from Event"</span><span class="o">,</span> <span class="nc">Event</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>   <i class="conum" data-value="1"></i><b>(1)</b>
+            <span class="o">.</span><span class="na">getResultList</span><span class="o">()</span>   <i class="conum" data-value="2"></i><b>(2)</b>
+            <span class="o">.</span><span class="na">forEach</span><span class="o">(</span><span class="n">event</span> <span class="o">-&gt;</span> <span class="n">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Event ("</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="na">getDate</span><span class="o">()</span> <span class="o">+</span> <span class="s">") : "</span> <span class="o">+</span> <span class="n">event</span><span class="o">.</span><span class="na">getTitle</span><span class="o">()));</span>
+<span class="o">});</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Here we use a very simple <em>Hibernate Query Language</em> (HQL) statement to load all existing <code>Event</code> objects from the database.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Hibernate generates and executes the appropriate <code>SELECT</code> statement, and then instantiates and populates <code>Event</code> objects with the data in the query result set.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="hibernate-gsg-tutorial-annotations-further">2.4. Take it further!</h3>
 <div class="ulist checklist">
 <div class="title">Practice Exercises</div>
 <ul class="checklist">
+<li>
+<p><i class="fa fa-square-o"></i> Actually run this example to see the SQL executed by Hibernate displayed in the console.</p>
+</li>
 <li>
 <p><i class="fa fa-square-o"></i> Reconfigure the examples to connect to your own persistent relational database.</p>
 </li>
@@ -1024,161 +660,14 @@ set data.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="tutorial_annotations">3. Tutorial Using Native Hibernate APIs and Annotation Mappings</h2>
+<h2 id="tutorial_jpa">3. Tutorial using JPA-standard APIs</h2>
 <div class="sectionbody">
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-This tutorial is located within the download bundle under <code>annotations/</code>.
-</td>
-</tr>
-</table>
-</div>
 <div class="ulist checklist">
 <div class="title">Objectives</div>
 <ul class="checklist">
 <li>
-<p><i class="fa fa-check-square-o"></i> Bootstrap a Hibernate <code>SessionFactory</code></p>
+<p><i class="fa fa-check-square-o"></i> Configure Hibernate using <code>peristence.xml</code></p>
 </li>
-<li>
-<p><i class="fa fa-check-square-o"></i> Use annotations to provide mapping information</p>
-</li>
-<li>
-<p><i class="fa fa-check-square-o"></i> Use the Hibernate native APIs</p>
-</li>
-</ul>
-</div>
-<div class="sect2">
-<h3 id="hibernate-gsg-tutorial-annotations-config">3.1. The Hibernate configuration file</h3>
-<div class="paragraph">
-<p>The contents are identical to <a href="#hibernate-gsg-tutorial-basic-config">The Hibernate configuration file</a> with one important difference&#8230;&#8203;
-The <code>&lt;mapping/&gt;</code> element at the very end naming the annotated entity class using the <code>class</code> attribute.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="hibernate-gsg-tutorial-annotations-entity">3.2. The annotated entity Java class</h3>
-<div class="paragraph">
-<p>The entity class in this tutorial is <code>org.hibernate.tutorial.annotations.Event</code> which follows JavaBean conventions.
-In fact the class itself is identical to the one in <a href="#hibernate-gsg-tutorial-basic-entity">The entity Java class</a>, except that annotations
-are used to provide the metadata, rather than a separate mapping file.</p>
-</div>
-<div id="hibernate-gsg-tutorial-annotations-entity-entity" class="exampleblock">
-<div class="title">Example 7. Identifying the class as an entity</div>
-<div class="content">
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code data-lang="JAVA">@Entity
-@Table( name = "EVENTS" )
-public class Event {
-    ...
-}</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="paragraph">
-<p>The <code>@jakarta.persistence.Entity</code> annotation is used to mark a class as an entity.  It functions the same as the
-<code>&lt;class/&gt;</code> mapping element discussed in <a href="#hibernate-gsg-tutorial-basic-mapping">The mapping file</a>.   Additionally the
-<code>@jakarta.persistence.Table</code> annotation explicitly specifies the table name. Without this specification, the default
-table name would be <em>EVENT</em>.</p>
-</div>
-<div id="hibernate-gsg-tutorial-annotations-entity-id" class="exampleblock">
-<div class="title">Example 8. Identifying the identifier property</div>
-<div class="content">
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code data-lang="JAVA">@Id
-@GeneratedValue(generator="increment")
-@GenericGenerator(name="increment", strategy = "increment")
-public Long getId() {
-    return id;
-}</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="paragraph">
-<p><code>@jakarta.persistence.Id</code> marks the property which defines the entity&#8217;s identifier.</p>
-</div>
-<div class="paragraph">
-<p><code>@jakarta.persistence.GeneratedValue</code> and <code>@org.hibernate.annotations.GenericGenerator</code> work in tandem
-to indicate that Hibernate should use Hibernate&#8217;s <code>increment</code> generation strategy for this entity&#8217;s identifier values.</p>
-</div>
-<div id="hibernate-gsg-tutorial-annotations-entity-properties" class="exampleblock">
-<div class="title">Example 9. Identifying basic properties</div>
-<div class="content">
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code data-lang="JAVA">public String getTitle() {
-    return title;
-}
-
-@Temporal(TemporalType.TIMESTAMP)
-@Column(name = "EVENT_DATE")
-public Date getDate() {
-    return date;
-}</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="paragraph">
-<p>As in <a href="#hibernate-gsg-tutorial-basic-mapping">The mapping file</a>, the <code>date</code> property needs special handling to account for its special
-naming and its SQL type.</p>
-</div>
-<div class="paragraph">
-<p>Attributes of an entity are considered persistent by default when mapping with annotations, which is why we don&#8217;t see
-any mapping information associated with <code>title</code>.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="hibernate-gsg-tutorial-annotations-test">3.3. Example code</h3>
-<div class="paragraph">
-<p><code>org.hibernate.tutorial.annotations.AnnotationsIllustrationTest</code> is essentially the same as
-<code>org.hibernate.tutorial.hbm.NativeApiIllustrationTest</code> discussed in <a href="#hibernate-gsg-tutorial-basic-test">Example code</a>.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="hibernate-gsg-tutorial-annotations-further">3.4. Take it further!</h3>
-<div class="ulist checklist">
-<div class="title">Practice Exercises</div>
-<ul class="checklist">
-<li>
-<p><i class="fa fa-square-o"></i> Add an association to the <code>Event</code> entity to model a message thread. Use the
-<a href="https://docs.jboss.org/hibernate/orm/current/userguide/html_single/Hibernate_User_Guide.html"><em>User Guide</em></a> for more details.</p>
-</li>
-<li>
-<p><i class="fa fa-square-o"></i> Add a callback to receive notifications when an <code>Event</code> is created, updated or deleted.
-Try the same with an event listener. Use the
-<a href="https://docs.jboss.org/hibernate/orm/current/userguide/html_single/Hibernate_User_Guide.html"><em>User Guide</em></a> for more details.</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="tutorial_jpa">4. Tutorial Using the Java Persistence API (Jakarta Persistence)</h2>
-<div class="sectionbody">
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-This tutorial is located within the download bundle under <code>entitymanager/</code>.
-</td>
-</tr>
-</table>
-</div>
-<div class="ulist checklist">
-<div class="title">Objectives</div>
-<ul class="checklist">
 <li>
 <p><i class="fa fa-check-square-o"></i> Bootstrap a Jakarta Persistence <code>EntityManagerFactory</code></p>
 </li>
@@ -1186,143 +675,76 @@ This tutorial is located within the download bundle under <code>entitymanager/</
 <p><i class="fa fa-check-square-o"></i> Use annotations to provide mapping information</p>
 </li>
 <li>
-<p><i class="fa fa-check-square-o"></i> Use Jakarta Persistence API calls</p>
+<p><i class="fa fa-check-square-o"></i> Use <code>EntityManager</code> to persist and query data</p>
 </li>
 </ul>
 </div>
-<div class="sect2">
-<h3 id="hibernate-gsg-tutorial-jpa-config">4.1. persistence.xml</h3>
-<div class="paragraph">
-<p>The previous tutorials used the Hibernate-specific <code>hibernate.cfg.xml</code> configuration file.  Jakarta Persistence, however, defines
-a different bootstrap process that uses its own configuration file named <code>persistence.xml</code>.  This bootstrapping process
-is defined by the Jakarta Persistence specification.  In Java&#8482; SE environments the persistence provider (Hibernate in this case)
-is required to locate all Jakarta Persistence configuration files by classpath lookup of the <code>META-INF/persistence.xml</code> resource name.</p>
-</div>
-<div id="hibernate-gsg-tutorial-jpa-config-pu" class="exampleblock">
-<div class="title">Example 10. persistence.xml</div>
+<div class="sidebarblock">
 <div class="content">
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code data-lang="XML">&lt;persistence xmlns="http://java.sun.com/xml/ns/persistence"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
-        version="2.0"&gt;
-    &lt;persistence-unit name="org.hibernate.tutorial.jpa"&gt;
-        ...
-    &lt;/persistence-unit&gt;
-&lt;/persistence&gt;</code></pre>
-</div>
-</div>
-</div>
-</div>
 <div class="paragraph">
-<p><code>persistence.xml</code> files should provide a unique name for each "persistence unit".  Applications use this name to
-reference the configuration when obtaining an <code>jakarta.persistence.EntityManagerFactory</code> reference.</p>
+<p>This tutorial is located within the download bundle under <code>entitymanager/</code>.</p>
 </div>
-<div class="paragraph">
-<p>The settings defined in the <code>&lt;properties/&gt;</code> element are discussed in <a href="#hibernate-gsg-tutorial-basic-config">The Hibernate configuration file</a>.
-Here the <code>jakarta.persistence</code>-prefixed varieties are used when possible.  Notice that the remaining
-Hibernate-specific configuration setting names are now prefixed with <code>hibernate.</code>.</p>
-</div>
-<div class="dlist">
-<dl>
-<dt class="hdlist1">NOTE</dt>
-<dd>
-<p>Configuration properties prefixed with the legacy Java EE "namespace" (<code>javax.persistence.<strong></code>) are also still
-supported, although the Jakarta EE version (<code>jakarta.persistence.</strong></code>) should be preferred</p>
-</dd>
-</dl>
-</div>
-<div class="paragraph">
-<p>Additionally, the <code>&lt;class/&gt;</code> element functions the same as we saw in <a href="#hibernate-gsg-tutorial-annotations-config">The Hibernate configuration file</a>.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="hibernate-gsg-tutorial-jpa-entity">4.2. The annotated entity Java class</h3>
+<h3 id="hibernate-gsg-tutorial-jpa-config">3.1. persistence.xml</h3>
 <div class="paragraph">
-<p>The entity is exactly the same as in <a href="#hibernate-gsg-tutorial-annotations-entity">The annotated entity Java class</a>.</p>
+<p>JPA defines a different bootstrap process, along with a standard configuration file format named <code>persistence.xml</code>.
+In Java&#8482; SE environments the persistence provider (Hibernate) is required to locate every JPA configuration file in the classpath at the path <code>META-INF/persistence.xml</code>.</p>
 </div>
-</div>
-<div class="sect2">
-<h3 id="hibernate-gsg-tutorial-jpa-test">4.3. Example code</h3>
-<div class="paragraph">
-<p>The previous tutorials used the Hibernate native APIs.  This tutorial uses the Jakarta Persistence APIs.</p>
-</div>
-<div id="hibernate-gsg-tutorial-jpa-test-setUp" class="exampleblock">
-<div class="title">Example 11. Obtaining the jakarta.persistence.EntityManagerFactory</div>
+<div id="hibernate-gsg-tutorial-jpa-config-pu" class="listingblock">
+<div class="title">Configuration via <code>persistence.xml</code></div>
 <div class="content">
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code data-lang="JAVA">protected void setUp() throws Exception {
-	sessionFactory = Persistence.createEntityManagerFactory( "org.hibernate.tutorial.jpa" );
-}</code></pre>
+<pre class="rouge highlight"><code data-lang="xml"><span class="nt">&lt;persistence</span> <span class="na">xmlns=</span><span class="s">"http://java.sun.com/xml/ns/persistence"</span>
+             <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
+             <span class="na">xsi:schemaLocation=</span><span class="s">"http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"</span>
+             <span class="na">version=</span><span class="s">"2.0"</span><span class="nt">&gt;</span>
+
+    <span class="nt">&lt;persistence-unit</span> <span class="na">name=</span><span class="s">"org.hibernate.tutorial.jpa"</span><span class="nt">&gt;</span>   <i class="conum" data-value="1"></i><b>(1)</b>
+        <span class="nt">&lt;description&gt;</span>
+            Persistence unit for the Jakarta Persistence tutorial of the Hibernate Getting Started Guide
+        <span class="nt">&lt;/description&gt;</span>
+
+        <span class="nt">&lt;class&gt;</span>org.hibernate.tutorial.em.Event<span class="nt">&lt;/class&gt;</span>     <i class="conum" data-value="2"></i><b>(2)</b>
+
+        <span class="nt">&lt;properties&gt;</span>    <i class="conum" data-value="3"></i><b>(3)</b>
+            <span class="c">&lt;!-- Database connection settings --&gt;</span>
+            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"jakarta.persistence.jdbc.url"</span> <span class="na">value=</span><span class="s">"jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1"</span> <span class="nt">/&gt;</span>
+            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"jakarta.persistence.jdbc.user"</span> <span class="na">value=</span><span class="s">"sa"</span> <span class="nt">/&gt;</span>
+            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"jakarta.persistence.jdbc.password"</span> <span class="na">value=</span><span class="s">""</span> <span class="nt">/&gt;</span>
+
+            <span class="c">&lt;!-- Automatically export the schema --&gt;</span>
+            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"jakarta.persistence.schema-generation.database.action"</span> <span class="na">value=</span><span class="s">"create"</span> <span class="nt">/&gt;</span>
+
+            <span class="c">&lt;!-- Echo all executed SQL to console --&gt;</span>
+            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"hibernate.show_sql"</span> <span class="na">value=</span><span class="s">"true"</span> <span class="nt">/&gt;</span>
+            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"hibernate.format_sql"</span> <span class="na">value=</span><span class="s">"true"</span> <span class="nt">/&gt;</span>
+            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"hibernate.highlight_sql"</span> <span class="na">value=</span><span class="s">"true"</span> <span class="nt">/&gt;</span>
+       <span class="nt">&lt;/properties&gt;</span>
+
+    <span class="nt">&lt;/persistence-unit&gt;</span>
+
+<span class="nt">&lt;/persistence&gt;</span></code></pre>
 </div>
 </div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>A <code>persistence.xml</code> file should provide a unique name for each <em>persistence unit</em> it declares.
+Applications use this name to reference the configuration when obtaining an <code>EntityManagerFactory</code> as we will see shortly.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The <code>&lt;class/&gt;</code> element registers our annotated entity class.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The settings specified as <code>&lt;properties/&gt;</code> elements were already discussed in <a href="#hibernate-gsg-tutorial-annotations-config">Configuration via properties file</a>.
+Here JPA-standard property names are used where possible.</td>
+</tr>
+</table>
 </div>
-</div>
-<div class="paragraph">
-<p>Notice again that the persistence unit name is <code>org.hibernate.tutorial.jpa</code>, which matches <a href="#hibernate-gsg-tutorial-jpa-config-pu">persistence.xml</a>.</p>
-</div>
-<div id="hibernate-gsg-tutorial-jpa-test-saving" class="exampleblock">
-<div class="title">Example 12. Saving (persisting) entities</div>
-<div class="content">
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code data-lang="JAVA">EntityManager entityManager = sessionFactory.createEntityManager();
-entityManager.getTransaction().begin();
-entityManager.persist( new Event( "Our very first event!", new Date() ) );
-entityManager.persist( new Event( "A follow up event", new Date() ) );
-entityManager.getTransaction().commit();
-entityManager.close();</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="paragraph">
-<p>The code is similar to <a href="#hibernate-gsg-tutorial-basic-test-saving">Saving entities</a>.  The <code>jakarta.persistence.EntityManager</code> interface
-is used instead of the <code>org.hibernate.Session</code> interface.  Jakarta Persistence calls this operation "persist" instead of "save".</p>
-</div>
-<div id="hibernate-gsg-tutorial-jpa-test-list" class="exampleblock">
-<div class="title">Example 13. Obtaining a list of entities</div>
-<div class="content">
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code data-lang="JAVA">entityManager = sessionFactory.createEntityManager();
-entityManager.getTransaction().begin();
-List&lt;Event&gt; result = entityManager.createQuery( "from Event", Event.class ).getResultList();
-for ( Event event : result ) {
-	System.out.println( "Event (" + event.getDate() + ") : " + event.getTitle() );
-}
-entityManager.getTransaction().commit();
-entityManager.close();</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="paragraph">
-<p>Again, the code is pretty similar to what we saw in <a href="#hibernate-gsg-tutorial-basic-test-list">Obtaining a list of entities</a>.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="hibernate-gsg-tutorial-annotations-further">4.4. Take it further!</h3>
-<div class="ulist checklist">
-<div class="title">Practice Exercises</div>
-<ul class="checklist">
-<li>
-<p><i class="fa fa-square-o"></i> Develop an EJB Session bean to investigate implications of using a container-managed
-persistence context.  Try both stateless and stateful use-cases.</p>
-</li>
-<li>
-<p><i class="fa fa-square-o"></i> Use listeners with CDI-based injection to develop a JMS-based event message hub</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="tutorial_envers">5. Tutorial Using Envers</h2>
-<div class="sectionbody">
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -1330,11 +752,100 @@ persistence context.  Try both stateless and stateful use-cases.</p>
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-This tutorial is located within the download bundle under <code>envers/</code>.
+<div class="paragraph">
+<p>Configuration properties prefixed with the legacy Java EE namespace <code>javax.persistence</code> are still
+recognized, but the Jakarta EE namespace <code>jakarta.persistence</code> should be preferred.</p>
+</div>
 </td>
 </tr>
 </table>
 </div>
+</div>
+<div class="sect2">
+<h3 id="hibernate-gsg-tutorial-jpa-entity">3.2. The annotated entity Java class</h3>
+<div class="paragraph">
+<p>The entity class is exactly the same as in <a href="#hibernate-gsg-tutorial-annotations-entity">The annotated entity Java class</a>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="hibernate-gsg-tutorial-jpa-test">3.3. Example code</h3>
+<div class="paragraph">
+<p>The previous tutorials used Hibernate native APIs.
+This tutorial uses the standard Jakarta Persistence APIs.</p>
+</div>
+<div id="hibernate-gsg-tutorial-jpa-test-setUp" class="listingblock">
+<div class="title">Obtaining the JPA EntityManagerFactory</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">protected</span> <span class="kt">void</span> <span class="nf">setUp</span><span class="o">()</span> <span class="o">{</span>
+    <span class="n">entityManagerFactory</span> <span class="o">=</span> <span class="nc">Persistence</span><span class="o">.</span><span class="na">createEntityManagerFactory</span><span class="o">(</span><span class="s">"org.hibernate.tutorial.jpa"</span><span class="o">);</span>   <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Notice again that the persistence unit name is <code>org.hibernate.tutorial.jpa</code>, which matches the name from our <a href="#hibernate-gsg-tutorial-jpa-config-pu">persistence.xml</a>.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The code to persist and query entities is almost identical to <a href="#hibernate-gsg-tutorial-basic-test-saving">Persisting entities</a>.
+Unfortunately, <code>EntityManagerFactory</code> doesn&#8217;t have a nice <code>inTransaction()</code> method like <code>SessionFactory</code> does, so we had to write our own:</p>
+</div>
+<div class="listingblock">
+<div class="title">Managing transactions in JPA</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kt">void</span> <span class="nf">inTransaction</span><span class="o">(</span><span class="nc">Consumer</span><span class="o">&lt;</span><span class="nc">EntityManager</span><span class="o">&gt;</span> <span class="n">work</span><span class="o">)</span> <span class="o">{</span>
+    <span class="nc">EntityManager</span> <span class="n">entityManager</span> <span class="o">=</span> <span class="n">entityManagerFactory</span><span class="o">.</span><span class="na">createEntityManager</span><span class="o">();</span>
+    <span class="nc">EntityTransaction</span> <span class="n">transaction</span> <span class="o">=</span> <span class="n">entityManager</span><span class="o">.</span><span class="na">getTransaction</span><span class="o">();</span>
+    <span class="k">try</span> <span class="o">{</span>
+        <span class="n">transaction</span><span class="o">.</span><span class="na">begin</span><span class="o">();</span>
+        <span class="n">work</span><span class="o">.</span><span class="na">accept</span><span class="o">(</span><span class="n">entityManager</span><span class="o">);</span>
+        <span class="n">transaction</span><span class="o">.</span><span class="na">commit</span><span class="o">();</span>
+    <span class="o">}</span>
+    <span class="k">catch</span> <span class="o">(</span><span class="nc">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">transaction</span><span class="o">.</span><span class="na">isActive</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">transaction</span><span class="o">.</span><span class="na">rollback</span><span class="o">();</span>
+        <span class="o">}</span>
+        <span class="k">throw</span> <span class="n">e</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="k">finally</span> <span class="o">{</span>
+        <span class="n">entityManager</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+If you use JPA in Java SE, you&#8217;ll need to copy/paste this function into your project.  Alternatively you could unwrap the <code>EntityManagerFactory</code> as a <code>SessionFactory</code>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="hibernate-gsg-tutorial-jpa-further">3.4. Take it further!</h3>
+<div class="ulist checklist">
+<div class="title">Practice Exercises</div>
+<ul class="checklist">
+<li>
+<p><i class="fa fa-square-o"></i> Learn how to use CDI to inject a container-managed <code>EntityManager</code> in Quarkus.
+See <a href="https://quarkus.io/guides/hibernate-orm">the Quarkus website</a> for instructions.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="tutorial_envers">4. Tutorial Using Envers</h2>
+<div class="sectionbody">
 <div class="ulist checklist">
 <div class="title">Objectives</div>
 <ul class="checklist">
@@ -1349,54 +860,64 @@ This tutorial is located within the download bundle under <code>envers/</code>.
 </li>
 </ul>
 </div>
-<div class="sect2">
-<h3 id="hibernate-gsg-tutorial-envers-config">5.1. persistence.xml</h3>
+<div class="sidebarblock">
+<div class="content">
 <div class="paragraph">
-<p>This file was discussed in the Jakarta Persistence tutorial in <a href="#hibernate-gsg-tutorial-jpa-config">persistence.xml</a>, and is essentially the same here.</p>
+<p>This tutorial is located within the download bundle under <code>envers/</code>.</p>
+</div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="hibernate-gsg-tutorial-envers-entity">5.2. The annotated entity Java class</h3>
+<h3 id="hibernate-gsg-tutorial-envers-config">4.1. persistence.xml</h3>
 <div class="paragraph">
-<p>Again, the entity is largely the same as in <a href="#hibernate-gsg-tutorial-jpa-entity">The annotated entity Java class</a>.  The major difference is the
-addition of the <code>@org.hibernate.envers.Audited</code> annotation, which tells Envers to automatically track changes to this
-entity.</p>
+<p>This file is unchanged from <a href="#hibernate-gsg-tutorial-jpa-config">what we had before</a>.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="hibernate-gsg-tutorial-envers-test">5.3. Example code</h3>
+<h3 id="hibernate-gsg-tutorial-envers-entity">4.2. The annotated entity Java class</h3>
+<div class="paragraph">
+<p>The entity class is also almost identical to what we had <a href="#hibernate-gsg-tutorial-annotations-entity">previously</a>.
+The major difference is the addition of the annotation <code>@org.hibernate.envers.Audited</code>, which tells Envers to automatically track changes to this entity.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="hibernate-gsg-tutorial-envers-test">4.3. Example code</h3>
 <div class="paragraph">
 <p>The code saves some entities, makes a change to one of the entities and then uses the Envers API to pull back the
 initial revision as well as the updated revision.  A revision refers to a historical snapshot of an entity.</p>
 </div>
-<div id="hibernate-gsg-tutorial-envers-test-api" class="exampleblock">
-<div class="title">Example 14. Using the <code>org.hibernate.envers.AuditReader</code></div>
+<div id="hibernate-gsg-tutorial-envers-test-api" class="listingblock">
+<div class="title">Using the <code>org.hibernate.envers.AuditReader</code></div>
 <div class="content">
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code data-lang="JAVA">public void testBasicUsage() {
-    ...
-    AuditReader reader = AuditReaderFactory.get( entityManager );
-    Event firstRevision = reader.find( Event.class, 2L, 1 );
-    ...
-    Event secondRevision = reader.find( Event.class, 2L, 2 );
-    ...
-}</code></pre>
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="kt">void</span> <span class="nf">testBasicUsage</span><span class="o">()</span> <span class="o">{</span>
+    <span class="o">...</span>
+    <span class="nc">AuditReader</span> <span class="n">reader</span> <span class="o">=</span> <span class="nc">AuditReaderFactory</span><span class="o">.</span><span class="na">get</span><span class="o">(</span> <span class="n">entityManager</span> <span class="o">);</span>   <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="nc">Event</span> <span class="n">firstRevision</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="na">find</span><span class="o">(</span> <span class="nc">Event</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="mi">2L</span><span class="o">,</span> <span class="mi">1</span> <span class="o">);</span>        <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="o">...</span>
+    <span class="nc">Event</span> <span class="n">secondRevision</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="na">find</span><span class="o">(</span> <span class="nc">Event</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="mi">2L</span><span class="o">,</span> <span class="mi">2</span> <span class="o">);</span>       <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="o">...</span>
+<span class="o">}</span></code></pre>
 </div>
 </div>
-</div>
-</div>
-<div class="paragraph">
-<p>We see that an <code>org.hibernate.envers.AuditReader</code> is obtained from the <code>org.hibernate.envers.AuditReaderFactory</code>
-which wraps the <code>jakarta.persistence.EntityManager</code>.</p>
-</div>
-<div class="paragraph">
-<p>Next, the <code>find</code> method retrieves specific revisions of the entity.  The first call says to find revision number
-1 of Event with id 2.  The second call says to find revision number 2 of Event with id 2.</p>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>An <code>org.hibernate.envers.AuditReader</code> is obtained from the <code>org.hibernate.envers.AuditReaderFactory</code> which wraps the JPA <code>EntityManager</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The <code>find</code> method retrieves specific revisions of the entity. The first call retrieves revision number 1 of the <code>Event</code> with id 2.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Later, the second call asks for revision number 2 of the <code>Event</code> with id 2.</td>
+</tr>
+</table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="hibernate-gsg-tutorial-annotations-further">5.4. Take it further!</h3>
+<h3 id="hibernate-gsg-tutorial-envers-further">4.4. Take it further!</h3>
 <div class="ulist checklist">
 <div class="title">Practice Exercises</div>
 <ul class="checklist">
@@ -1416,14 +937,31 @@ retrieving historical versions (revisions) of such entities and navigating the o
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="credits">5. Credits</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The full list of contributors to Hibernate ORM can be found on the
+<a href="https://github.com/hibernate/hibernate-orm/graphs/contributors">GitHub repository</a>.</p>
+</div>
+<div class="paragraph">
+<p>The following contributors were involved in this documentation:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Steve Ebersole</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 6.2.0.CR1<br>
-Last updated 2022-12-22 23:34:56 UTC
+Version 6.2.36.Final<br>
+Last updated 2025-03-16 00:01:40 UTC
 </div>
 </div>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/run_prettify.min.js"></script>
 </body>
 </html>

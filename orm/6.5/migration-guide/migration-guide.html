@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.18">
+<title>6.5 Migration Guide</title>
+<link rel="stylesheet" href="./css/hibernate.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="./rouge-github.css">
+</head>
+<body class="article">
+<div id="header">
+<h1>6.5 Migration Guide</h1>
+<div class="details">
+<span id="revnumber">version 6.5.3.Final</span>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#java-time">Java Time Handling</a></li>
+<li><a href="#query-cache-layout">Configurable Query Cache Layout</a></li>
+<li><a href="#ddl-implicit-datatype-enum">Datatype for enums (H2)</a></li>
+<li><a href="#jdbc-metadata-on-boot">hibernate.boot.allow_jdbc_metadata_access</a></li>
+<li><a href="#generic-generator">Deprecation of <code>@GenericGenerator</code></a></li>
+<li><a href="#query-result-validation">Validation of Query Result Type</a></li>
+<li><a href="#sql-expectation">SQL Execution Expectation</a></li>
+<li><a href="#uk-naming">Unique Key Naming</a></li>
+<li><a href="#annotation-problems">Annotation Problems</a></li>
+<li><a href="#annotation-processor-rename">Annotation Processor Rename</a></li>
+<li><a href="#jakarta-data">Jakarta Data</a></li>
+<li><a href="#auto-flush">Auto Flush</a></li>
+<li><a href="#bytecode-enhancement">Bytecode Enhancement</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>This guide discusses migration to Hibernate ORM version 6.5. For migration from
+earlier versions, see any other pertinent migration guides as well.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://docs.jboss.org/hibernate/orm/6.4/migration-guide/migration-guide.html">6.4 Migration guide</a></p>
+</li>
+<li>
+<p><a href="https://docs.jboss.org/hibernate/orm/6.3/migration-guide/migration-guide.html">6.3 Migration guide</a></p>
+</li>
+<li>
+<p><a href="https://docs.jboss.org/hibernate/orm/6.2/migration-guide/migration-guide.html">6.2 Migration guide</a></p>
+</li>
+<li>
+<p><a href="https://docs.jboss.org/hibernate/orm/6.1/migration-guide/migration-guide.html">6.1 Migration guide</a></p>
+</li>
+<li>
+<p><a href="https://docs.jboss.org/hibernate/orm/6.0/migration-guide/migration-guide.html">6.0 Migration guide</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="java-time">Java Time Handling</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>6.5 adds support for marshalling Java Time objects directly through the JDBC driver as defined by JDBC 4.2.
+In previous versions, Hibernate would handle Java Time objects using <code>java.sql.Date</code>, <code>java.sql.Time</code> or
+<code>java.sql.Timestamp</code> references as intermediate forms.</p>
+</div>
+<div class="paragraph">
+<p>Another behavioral change with this is handling for timezones.  <code>OffsetDateTime</code>, <code>OffsetTime</code> and
+<code>ZonedDateTime</code> all encode explicit timezone information.  With direct marshalling, Hibernate simply
+passes along the value as-is.  In the legacy behavior, since the <code>java.sql</code> variants do not
+encode timezone information, Hibernate generally has to specially handle timezones when converting to
+those intermediate forms.</p>
+</div>
+<div class="paragraph">
+<p>For 6.5 this behavior is disabled by default.  To opt-in,</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="properties"><span class="py">hibernate.type.java_time_use_direct_jdbc</span><span class="p">=</span><span class="s">true</span></code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The name of this setting has been changed from <code>hibernate.type.prefer_java_type_jdbc_types</code> as first introduced in 6.5 CR1 to avoid confusion with the numerous <code>hibernate.type.prefer_&lt;xyz&gt;</code> settings.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+This feature is known to not work with the Sybase jConnect driver despite
+this feature being part of JDBC since 4.2 (Java 8).  We have notified the Sybase development team, but this seems unlikely to change.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>It is expected the default will flip for 7.0.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="query-cache-layout">Configurable Query Cache Layout</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In Hibernate ORM 6.0 the query cache layout changed from a "shallow" representation of entities and collections,
+to a "full" representation. This was done to support re-materializing join fetched data from the query cache data
+without hitting the database.  Storing the full data in the query cache leads to a higher memory consumption,
+which in turn might also hurt application throughput due to a higher garbage collection activity.</p>
+</div>
+<div class="paragraph">
+<p>6.5 adds the ability to configure the format in which query results are stored in the query cache, either</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>globally via the <code>hibernate.cache.query_cache_layout</code> setting</p>
+</li>
+<li>
+<p>per entity or collection via the <code>@QueryCacheLayout</code> annotation</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The global <code>hibernate.cache.query_cache_layout</code> setting defaults to the <code>AUTO</code> value,
+which will automatically choose <code>SHALLOW</code> or <code>FULL</code> for an entity/collection,
+depending on whether the entity/collection is cacheable.</p>
+</div>
+<div class="paragraph">
+<p>Applications that want to retain the <code>FULL</code> cache layout that Hibernate ORM 6.0 used should configure
+the global property <code>hibernate.cache.query_cache_layout=FULL</code>.
+Applications that want the cache layout that Hibernate ORM 5 and older versions used should configure
+the global property <code>hibernate.cache.query_cache_layout=SHALLOW</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Even with the <code>SHALLOW</code> cache layout, the association eagerness implied through join fetches will be respected,
+and associations will be eagerly initialized. So there is no change of behavior when choosing a different cache layout.</p>
+</div>
+<div class="paragraph">
+<p>With <code>SHALLOW</code>, Hibernate might need to hit the database to materialize the associated data <strong>if it does not exist in the second level cache</strong>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="ddl-implicit-datatype-enum">Datatype for enums (H2)</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Hibernate ORM 6.5 now uses the <code>ENUM</code> datatype for <code>@Enumerated(EnumType.STRING)</code> enumeration mappings by default on H2,
+just like <a href="https://docs.jboss.org/hibernate/orm/6.2/migration-guide/migration-guide.html#ddl-implicit-datatype-enum">ORM 6.2 already started doing for MySQL/MariaDB</a>.</p>
+</div>
+<div class="paragraph">
+<p>The change is backwards compatible, though schema validation might produce an error now as the expected type is <code>enum</code>,
+whereas it was <code>varchar</code> of <code>char</code> before. To revert to the original mapping,
+annotate the enum attribute with <code>@JdbcTypeCode(SqlTypes.VARCHAR)</code> or <code>@Column(columnDefinition = "varchar(255)")</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="jdbc-metadata-on-boot">hibernate.boot.allow_jdbc_metadata_access</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>6.5 adds a new setting named <code>hibernate.boot.allow_jdbc_metadata_access</code> as a supported replacement for
+the legacy <code>hibernate.temp.use_jdbc_metadata_defaults</code> setting which was only ever considered internal and
+unsupported for use by applications (as should have been obvious from the name).</p>
+</div>
+<div class="paragraph">
+<p>This setting controls whether Hibernate should be allowed to access the JDBC <code>DatabaseMetaData</code> during bootstrapping.
+With this setting enabled (the default), Hibernate will access the <code>DatabaseMetaData</code> to perform some internal
+configuration based on the reported capabilities of the underlying database.</p>
+</div>
+<div class="paragraph">
+<p>Disabling this setting requires explicit, additional settings for this configuration.  At a minimum, this
+includes <code>hibernate.dialect</code> or <code>jakarta.persistence.database-product-name</code> to indicate the type of database.
+In such cases, Hibernate will assume the <a href="https://docs.jboss.org/hibernate/orm/6.5/userguide/html_single/Hibernate_User_Guide.html#compatibility-database">minimum supported version</a>
+of the database (as reported by the <a href="https://docs.jboss.org/hibernate/orm/6.5/javadocs/org/hibernate/dialect/Dialect.html#getMinimumSupportedVersion()">Dialect</a>).
+Users may also configure <code>jakarta.persistence.database-product-version</code> to indicate a specific database version.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="generic-generator">Deprecation of <code>@GenericGenerator</code></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <code>@GenericGenerator</code> annotation was deprecated, in favor of the much more typesafe approach provided by <code>@IdGeneratorType</code> which was first introduced in 6.0.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="query-result-validation">Validation of Query Result Type</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>6.5 does more stringent checks that the reported query result type (if one) matches the actual query return type.
+This will show up as a <code>org.hibernate.TypeMismatchException</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="sql-expectation">SQL Execution Expectation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>6.5 moves away from an enumeration approach to specifying the expected outcome of specific SQL executions to
+a more extendable approach of directly specifying the <code>Expectation</code> implementation to use.
+<code>ExecuteUpdateResultCheckStyle</code> and <code>ResultCheckStyle</code> approaches are still available, though deprecated.</p>
+</div>
+<div class="paragraph">
+<p>The enumerated values are replaced by -</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>org.hibernate.jdbc.Expectation.None</code></p>
+</li>
+<li>
+<p><code>org.hibernate.jdbc.Expectation.RowCount</code></p>
+</li>
+<li>
+<p><code>org.hibernate.jdbc.Expectation.OutParameter</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>To update, change e.g.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@SQLInsert</span><span class="o">(</span><span class="n">check</span><span class="o">=</span><span class="nc">ResultCheckStyle</span><span class="o">.</span><span class="na">COUNT</span><span class="o">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>to</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@SQLInsert</span><span class="o">(</span><span class="n">verify</span><span class="o">=</span><span class="nc">Expectation</span><span class="o">.</span><span class="na">RowCount</span><span class="o">.</span><span class="na">class</span><span class="o">)</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="uk-naming">Unique Key Naming</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Previous 6.x versions did not apply <code>ImplicitNamingStrategy</code> when determining the name of a unique key implicitly.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="annotation-problems">Annotation Problems</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>6.5 makes various problems in annotations errors (fail fast) as opposed to logged warnings.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="annotation-processor-rename">Annotation Processor Rename</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The name of Hibernate&#8217;s Annotation Processor has been changed to <code>org.hibernate.processor.HibernateProcessor</code>.
+This change will not affect most users as such processors are normally discovered from the <code>javac</code> "processor path", but is important to know for users using the processor manually.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="jakarta-data">Jakarta Data</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>6.5 adds support for the Jakarta Data specification, though this support is considered tech preview as the specification is still being actively developed.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="auto-flush">Auto Flush</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The auto flush event has been split in two parts a pre-partialFlush and a partialFlush and in order to track the start and the end fo the pre-partialFlush two new methods (<code>void prePartialFlushStart()</code> and
+<code>void prePartialFlushEnd()</code>) have been added to the <code>SessionEventListener</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="bytecode-enhancement">Bytecode Enhancement</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The enhanced bytecode format generated by Hibernate&#8217;s enhancer has changed to handle some issues with merge operations.
+This change requires applications using bytecode enhancement to re-run bytecode enhancement.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 6.5.3.Final<br>
+Last updated 2024-09-18 16:36:48 UTC
+</div>
+</div>
+</body>
+</html>

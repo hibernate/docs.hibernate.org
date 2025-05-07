@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 1.5.6.1">
 <meta name="author" content="Emmanuel Bernard, Sanne Grinovero, Gunnar Morling, Davide D'Alto, Guillaume Scheibel, Mark Paluch, Guillaume Smet, Fabio Massimo Ercoli">
-<title>Hibernate OGM 5.4.1.Final: Reference Guide</title>
+<title>Hibernate OGM 5.4.2.Final: Reference Guide</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /* Asciidoctor default stylesheet | MIT License | http://asciidoctor.org */
@@ -433,21 +433,10 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <!-- /HibernateDoc.Meta -->
 
 <link rel="stylesheet" href="css/hibernate.css" type="text/css" />
-
-<!-- Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-282CVRCQHZ"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-282CVRCQHZ');
-</script>
-<!-- /Google Analytics -->
 </head>
 <body class="book toc2 toc-left">
 <div id="header">
-<h1>Hibernate OGM 5.4.1.Final: Reference Guide</h1>
+<h1>Hibernate OGM 5.4.2.Final: Reference Guide</h1>
 <div class="details">
 <span id="author" class="author">Emmanuel Bernard</span><br>
 <span id="author2" class="author">Sanne Grinovero</span><br>
@@ -457,7 +446,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <span id="author6" class="author">Mark Paluch</span><br>
 <span id="author7" class="author">Guillaume Smet</span><br>
 <span id="author8" class="author">Fabio Massimo Ercoli</span><br>
-<span id="revdate">2018-12-18</span>
+<span id="revdate">2024-09-24</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -493,190 +482,201 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </ul>
 </li>
 <li><a href="#ogm-gettingstarted">2. Getting started with Hibernate OGM</a></li>
-<li><a href="#ogm-architecture">3. Architecture</a>
+<li><a href="#ogm-migrating">3. Migrating from 5.4.1.Final</a>
 <ul class="sectlevel2">
-<li><a href="#_general_architecture">3.1. General architecture</a></li>
-<li><a href="#ogm-architecture-datapersisted">3.2. How is data persisted</a></li>
-<li><a href="#ogm-architecture-sequences">3.3. Id generation using sequences</a></li>
-<li><a href="#ogm-architecture-dataqueried">3.4. How is data queried</a></li>
+<li><a href="#_mongodb">3.1. MongoDB</a>
+<ul class="sectlevel3">
+<li><a href="#_mongodb_java_driver">3.1.1. MongoDB Java Driver</a></li>
 </ul>
 </li>
-<li><a href="#ogm-configuration">4. Configure and start Hibernate OGM</a>
+<li><a href="#_mongodb_server">3.2. MongoDB Server</a></li>
+<li><a href="#_older_versions">3.3. Older versions</a></li>
+</ul>
+</li>
+<li><a href="#ogm-architecture">4. Architecture</a>
 <ul class="sectlevel2">
-<li><a href="#_bootstrapping_hibernate_ogm">4.1. Bootstrapping Hibernate OGM</a>
-<ul class="sectlevel3">
-<li><a href="#_using_jpa">4.1.1. Using JPA</a></li>
-<li><a href="#_using_hibernate_orm_native_apis">4.1.2. Using Hibernate ORM native APIs</a></li>
+<li><a href="#_general_architecture">4.1. General architecture</a></li>
+<li><a href="#ogm-architecture-datapersisted">4.2. How is data persisted</a></li>
+<li><a href="#ogm-architecture-sequences">4.3. Id generation using sequences</a></li>
+<li><a href="#ogm-architecture-dataqueried">4.4. How is data queried</a></li>
 </ul>
 </li>
-<li><a href="#ogm-configuration-environments">4.2. Environments</a>
-<ul class="sectlevel3">
-<li><a href="#ogm-configuration-environments-javaee">4.2.1. In a Java EE container</a></li>
-<li><a href="#ogm-configuration-environments-standalonejta">4.2.2. In a standalone JTA environment</a></li>
-<li><a href="#_without_jta">4.2.3. Without JTA</a></li>
-</ul>
-</li>
-<li><a href="#ogm-configuration-optionsogm-configuration-options">4.3. Configuration options</a></li>
-<li><a href="#_configuring_hibernate_search">4.4. Configuring Hibernate Search</a></li>
-<li><a href="#ogm-configuration-jbossmodule">4.5. How to package Hibernate OGM applications for WildFly 14.0</a>
-<ul class="sectlevel3">
-<li><a href="#_packaging_hibernate_ogm_applications_for_wildfly_14_0">4.5.1. Packaging Hibernate OGM applications for WildFly 14.0</a></li>
-<li><a href="#hibernate-ogm-jboss-modules-feature-packs">4.5.2. List of the Hibernate OGM WildFly/JBoss feature packs</a></li>
-<li><a href="#_configure_your_persistence_xml_to_use_your_choice_of_persistence_provider">4.5.3. Configure your persistence.xml to use your choice of persistence provider</a></li>
-<li><a href="#_enable_support_for_ee_8">4.5.4. Enable support for EE 8</a></li>
-<li><a href="#_using_the_hibernate_ogm_modules_with_infinispan">4.5.5. Using the Hibernate OGM modules with Infinispan</a></li>
-</ul>
-</li>
-<li><a href="#integration-with-wildfly-nosql">4.6. Integration with WildFly NoSQL</a>
-<ul class="sectlevel3">
-<li><a href="#_how_to_use_wildfly_nosql_with_hibernate_ogm">4.6.1. How to use WildFly NoSQL with Hibernate OGM</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#ogm-mapping">5. Map your entities</a>
+<li><a href="#ogm-configuration">5. Configure and start Hibernate OGM</a>
 <ul class="sectlevel2">
-<li><a href="#_supported_entity_mapping">5.1. Supported entity mapping</a></li>
-<li><a href="#ogm-mapping-supported-types">5.2. Supported Types</a></li>
-<li><a href="#_supported_association_mapping">5.3. Supported association mapping</a>
+<li><a href="#_bootstrapping_hibernate_ogm">5.1. Bootstrapping Hibernate OGM</a>
 <ul class="sectlevel3">
-<li><a href="#_elements_order_in_associations">5.3.1. Elements order in associations</a></li>
+<li><a href="#_using_jpa">5.1.1. Using JPA</a></li>
+<li><a href="#_using_hibernate_orm_native_apis">5.1.2. Using Hibernate ORM native APIs</a></li>
+</ul>
+</li>
+<li><a href="#ogm-configuration-environments">5.2. Environments</a>
+<ul class="sectlevel3">
+<li><a href="#ogm-configuration-environments-javaee">5.2.1. In a Java EE container</a></li>
+<li><a href="#ogm-configuration-environments-standalonejta">5.2.2. In a standalone JTA environment</a></li>
+<li><a href="#_without_jta">5.2.3. Without JTA</a></li>
+</ul>
+</li>
+<li><a href="#ogm-configuration-optionsogm-configuration-options">5.3. Configuration options</a></li>
+<li><a href="#_configuring_hibernate_search">5.4. Configuring Hibernate Search</a></li>
+<li><a href="#ogm-configuration-jbossmodule">5.5. How to package Hibernate OGM applications for WildFly 14.0</a>
+<ul class="sectlevel3">
+<li><a href="#_packaging_hibernate_ogm_applications_for_wildfly_14_0">5.5.1. Packaging Hibernate OGM applications for WildFly 14.0</a></li>
+<li><a href="#hibernate-ogm-jboss-modules-feature-packs">5.5.2. List of the Hibernate OGM WildFly/JBoss feature packs</a></li>
+<li><a href="#_configure_your_persistence_xml_to_use_your_choice_of_persistence_provider">5.5.3. Configure your persistence.xml to use your choice of persistence provider</a></li>
+<li><a href="#_enable_support_for_ee_8">5.5.4. Enable support for EE 8</a></li>
+<li><a href="#_using_the_hibernate_ogm_modules_with_infinispan">5.5.5. Using the Hibernate OGM modules with Infinispan</a></li>
+</ul>
+</li>
+<li><a href="#integration-with-wildfly-nosql">5.6. Integration with WildFly NoSQL</a>
+<ul class="sectlevel3">
+<li><a href="#_how_to_use_wildfly_nosql_with_hibernate_ogm">5.6.1. How to use WildFly NoSQL with Hibernate OGM</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#ogm-api">6. Hibernate OGM APIs</a>
+<li><a href="#ogm-mapping">6. Map your entities</a>
 <ul class="sectlevel2">
-<li><a href="#_bootstrap_hibernate_ogm">6.1. Bootstrap Hibernate OGM</a></li>
-<li><a href="#_jpa_and_native_hibernate_orm_apis">6.2. JPA and native Hibernate ORM APIs</a>
+<li><a href="#_supported_entity_mapping">6.1. Supported entity mapping</a></li>
+<li><a href="#ogm-mapping-supported-types">6.2. Supported Types</a></li>
+<li><a href="#_supported_association_mapping">6.3. Supported association mapping</a>
 <ul class="sectlevel3">
-<li><a href="#_accessing_the_code_ogmsession_code_api">6.2.1. Accessing the <code>OgmSession</code> API</a></li>
+<li><a href="#_elements_order_in_associations">6.3.1. Elements order in associations</a></li>
 </ul>
 </li>
-<li><a href="#_on_flush_and_transactions">6.3. On flush and transactions</a>
-<ul class="sectlevel3">
-<li><a href="#ogm-api-error-handler">6.3.1. Acting upon errors during application of changes</a></li>
 </ul>
 </li>
-<li><a href="#_spis">6.4. SPIs</a></li>
-</ul>
-</li>
-<li><a href="#ogm-query">7. Query your entities</a>
+<li><a href="#ogm-api">7. Hibernate OGM APIs</a>
 <ul class="sectlevel2">
-<li><a href="#ogm-jpql-query">7.1. Using JPQL</a></li>
-<li><a href="#ogm-query-native">7.2. Using the native query language of your NoSQL</a></li>
-<li><a href="#ogm-query-using-hibernate-search">7.3. Using Hibernate Search</a></li>
-<li><a href="#_using_the_criteria_api">7.4. Using the Criteria API</a></li>
-<li><a href="#_using_stored_procedures">7.5. Using stored procedures</a></li>
+<li><a href="#_bootstrap_hibernate_ogm">7.1. Bootstrap Hibernate OGM</a></li>
+<li><a href="#_jpa_and_native_hibernate_orm_apis">7.2. JPA and native Hibernate ORM APIs</a>
+<ul class="sectlevel3">
+<li><a href="#_accessing_the_code_ogmsession_code_api">7.2.1. Accessing the <code>OgmSession</code> API</a></li>
 </ul>
 </li>
-<li><a href="#ogm-datastore-providers">8. NoSQL datastores</a>
+<li><a href="#_on_flush_and_transactions">7.3. On flush and transactions</a>
+<ul class="sectlevel3">
+<li><a href="#ogm-api-error-handler">7.3.1. Acting upon errors during application of changes</a></li>
+</ul>
+</li>
+<li><a href="#_spis">7.4. SPIs</a></li>
+</ul>
+</li>
+<li><a href="#ogm-query">8. Query your entities</a>
 <ul class="sectlevel2">
-<li><a href="#_using_a_specific_nosql_datastore">8.1. Using a specific NoSQL datastore</a></li>
+<li><a href="#ogm-jpql-query">8.1. Using JPQL</a></li>
+<li><a href="#ogm-query-native">8.2. Using the native query language of your NoSQL</a></li>
+<li><a href="#ogm-query-using-hibernate-search">8.3. Using Hibernate Search</a></li>
+<li><a href="#_using_the_criteria_api">8.4. Using the Criteria API</a></li>
+<li><a href="#_using_stored_procedures">8.5. Using stored procedures</a></li>
 </ul>
 </li>
-<li><a href="#ogm-infinispan">9. Infinispan</a>
+<li><a href="#ogm-datastore-providers">9. NoSQL datastores</a>
 <ul class="sectlevel2">
-<li><a href="#_why_use_hibernate_ogm_with_infinispan">9.1. Why use Hibernate OGM with Infinispan?</a></li>
-<li><a href="#_infinispan_choosing_between_embedded_mode_and_hot_rod">9.2. Infinispan: Choosing between Embedded Mode and Hot Rod</a></li>
-<li><a href="#ogm-infinispan-embedded">9.3. Hibernate OGM &amp; Infinispan Embedded</a>
-<ul class="sectlevel3">
-<li><a href="#ogm-infinispan-configuration">9.3.1. Configure Hibernate OGM for Infinispan Embedded</a></li>
-<li><a href="#ogm-infinispan-add-dependencies">9.3.2. Adding Infinispan dependencies</a></li>
-<li><a href="#ogm-infinispan-configuration-properties">9.3.3. Infinispan specific configuration properties</a></li>
-<li><a href="#_cache_names_used_by_hibernate_ogm">9.3.4. Cache names used by Hibernate OGM</a></li>
-<li><a href="#ogm-infinispan-storage">9.3.5. Manage data size</a></li>
-<li><a href="#ogm-infinispan-clustering">9.3.6. Clustering: store data on multiple Infinispan nodes</a></li>
-<li><a href="#ogm-infinispan-transactions">9.3.7. Transactions</a></li>
-<li><a href="#_infinispan_embedded_stored_procedures">9.3.8. Infinispan Embedded Stored Procedures</a></li>
-<li><a href="#ogm-infinispan-indexstorage">9.3.9. Storing a Lucene index in Infinispan</a></li>
+<li><a href="#_using_a_specific_nosql_datastore">9.1. Using a specific NoSQL datastore</a></li>
 </ul>
 </li>
-<li><a href="#ogm-infinispan-remote">9.4. Hibernate OGM &amp; Infinispan Server over Hot Rod</a>
-<ul class="sectlevel3">
-<li><a href="#_adding_infinispan_remote_dependencies">9.4.1. Adding Infinispan Remote dependencies</a></li>
-<li><a href="#_configuration_properties_for_infinispan_remote">9.4.2. Configuration properties for Infinispan Remote</a></li>
-<li><a href="#_data_encoding_protobuf_schema">9.4.3. Data encoding: Protobuf Schema</a></li>
-<li><a href="#storage-principles-of-infinispan-dataprovider">9.4.4. Storage Principles of the Infinispan Remote dataprovider</a></li>
-<li><a href="#infinispan-remote-cache-configuration">9.4.5. Caches creation and configuration</a></li>
-<li><a href="#_remote_query_capabilities">9.4.6. Remote Query Capabilities</a></li>
-<li><a href="#infinispan-remote-transaction">9.4.7. Infinispan Remote Transaction</a></li>
-<li><a href="#_infinispan_remote_stored_procedures">9.4.8. Infinispan Remote Stored Procedures</a></li>
-<li><a href="#_known_limitations_future_improvements">9.4.9. Known Limitations &amp; Future improvements</a></li>
-</ul>
-</li>
-<li><a href="#ogm-infinispan-storage-principles">9.5. Storage principles</a>
-<ul class="sectlevel3">
-<li><a href="#ogm-infinispan-built-in-types">9.5.1. Properties and built-in types</a></li>
-<li><a href="#_identifiers">9.5.2. Identifiers</a></li>
-<li><a href="#_entities_2">9.5.3. Entities</a></li>
-<li><a href="#_associations_2">9.5.4. Associations</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#ogm-mongodb">10. MongoDB</a>
+<li><a href="#ogm-infinispan">10. Infinispan</a>
 <ul class="sectlevel2">
-<li><a href="#_why_should_i_use_hibernate_ogm_with_mongodb">10.1. Why should I use Hibernate OGM with MongoDB</a></li>
-<li><a href="#_configuring_mongodb">10.2. Configuring MongoDB</a>
+<li><a href="#_why_use_hibernate_ogm_with_infinispan">10.1. Why use Hibernate OGM with Infinispan?</a></li>
+<li><a href="#_infinispan_choosing_between_embedded_mode_and_hot_rod">10.2. Infinispan: Choosing between Embedded Mode and Hot Rod</a></li>
+<li><a href="#ogm-infinispan-embedded">10.3. Hibernate OGM &amp; Infinispan Embedded</a>
 <ul class="sectlevel3">
-<li><a href="#_adding_mongodb_dependencies">10.2.1. Adding MongoDB dependencies</a></li>
-<li><a href="#_mongodb_specific_configuration_properties">10.2.2. MongoDB specific configuration properties</a></li>
-<li><a href="#ogm-mongodb-annotation-configuration">10.2.3. Annotation based configuration</a></li>
-<li><a href="#ogm-mongodb-programmatic-configuration">10.2.4. Programmatic configuration</a></li>
+<li><a href="#ogm-infinispan-configuration">10.3.1. Configure Hibernate OGM for Infinispan Embedded</a></li>
+<li><a href="#ogm-infinispan-add-dependencies">10.3.2. Adding Infinispan dependencies</a></li>
+<li><a href="#ogm-infinispan-configuration-properties">10.3.3. Infinispan specific configuration properties</a></li>
+<li><a href="#_cache_names_used_by_hibernate_ogm">10.3.4. Cache names used by Hibernate OGM</a></li>
+<li><a href="#ogm-infinispan-storage">10.3.5. Manage data size</a></li>
+<li><a href="#ogm-infinispan-clustering">10.3.6. Clustering: store data on multiple Infinispan nodes</a></li>
+<li><a href="#ogm-infinispan-transactions">10.3.7. Transactions</a></li>
+<li><a href="#_infinispan_embedded_stored_procedures">10.3.8. Infinispan Embedded Stored Procedures</a></li>
+<li><a href="#ogm-infinispan-indexstorage">10.3.9. Storing a Lucene index in Infinispan</a></li>
 </ul>
 </li>
-<li><a href="#ogm-mongodb-storage-principles">10.3. Storage principles</a>
+<li><a href="#ogm-infinispan-remote">10.4. Hibernate OGM &amp; Infinispan Server over Hot Rod</a>
 <ul class="sectlevel3">
-<li><a href="#mongodb-built-in-types">10.3.1. Properties and built-in types</a></li>
-<li><a href="#mongodb-gridfs-support">10.3.2. GridFS Support</a></li>
-<li><a href="#_entities_3">10.3.3. Entities</a></li>
-<li><a href="#mongodb-associations">10.3.4. Associations</a></li>
+<li><a href="#_adding_infinispan_remote_dependencies">10.4.1. Adding Infinispan Remote dependencies</a></li>
+<li><a href="#_configuration_properties_for_infinispan_remote">10.4.2. Configuration properties for Infinispan Remote</a></li>
+<li><a href="#_data_encoding_protobuf_schema">10.4.3. Data encoding: Protobuf Schema</a></li>
+<li><a href="#storage-principles-of-infinispan-dataprovider">10.4.4. Storage Principles of the Infinispan Remote dataprovider</a></li>
+<li><a href="#infinispan-remote-cache-configuration">10.4.5. Caches creation and configuration</a></li>
+<li><a href="#_remote_query_capabilities">10.4.6. Remote Query Capabilities</a></li>
+<li><a href="#infinispan-remote-transaction">10.4.7. Infinispan Remote Transaction</a></li>
+<li><a href="#_infinispan_remote_stored_procedures">10.4.8. Infinispan Remote Stored Procedures</a></li>
+<li><a href="#_known_limitations_future_improvements">10.4.9. Known Limitations &amp; Future improvements</a></li>
 </ul>
 </li>
-<li><a href="#ogm-mongodb-indexes-unique-constraints">10.4. Indexes and unique constraints</a>
+<li><a href="#ogm-infinispan-storage-principles">10.5. Storage principles</a>
 <ul class="sectlevel3">
-<li><a href="#_standard_indexes_and_unique_constraints">10.4.1. Standard indexes and unique constraints</a></li>
-<li><a href="#_using_mongodb_specific_index_options">10.4.2. Using MongoDB specific index options</a></li>
-<li><a href="#_full_text_indexes">10.4.3. Full text indexes</a></li>
-</ul>
-</li>
-<li><a href="#_transactions">10.5. Transactions</a></li>
-<li><a href="#ogm-mongodb-optimisticlocking">10.6. Optimistic Locking</a></li>
-<li><a href="#ogm-mongodb-queries">10.7. Queries</a>
-<ul class="sectlevel3">
-<li><a href="#_jpql_queries">10.7.1. JPQL queries</a></li>
-<li><a href="#ogm-mongodb-queries-native">10.7.2. Native MongoDB queries</a></li>
-<li><a href="#ogm-mongodb-stored-proc-native">10.7.3. Server-side JavaScript and stored procedures</a></li>
-<li><a href="#_hibernate_search">10.7.4. Hibernate Search</a></li>
-</ul>
-</li>
-<li><a href="#_geospatial_support">10.8. Geospatial support</a>
-<ul class="sectlevel3">
-<li><a href="#_geospatial_fields">10.8.1. Geospatial fields</a></li>
-<li><a href="#_geospatial_indexes_and_queries">10.8.2. Geospatial indexes and queries</a></li>
+<li><a href="#ogm-infinispan-built-in-types">10.5.1. Properties and built-in types</a></li>
+<li><a href="#_identifiers">10.5.2. Identifiers</a></li>
+<li><a href="#_entities_2">10.5.3. Entities</a></li>
+<li><a href="#_associations_2">10.5.4. Associations</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#ogm-neo4j">11. Neo4j</a>
+<li><a href="#ogm-mongodb">11. MongoDB</a>
 <ul class="sectlevel2">
-<li><a href="#_how_to_add_neo4j_integration">11.1. How to add Neo4j integration</a></li>
-<li><a href="#_configuring_neo4j">11.2. Configuring Neo4j</a></li>
-<li><a href="#ogm-neo4j-storage-principles">11.3. Storage principles</a>
+<li><a href="#_why_should_i_use_hibernate_ogm_with_mongodb">11.1. Why should I use Hibernate OGM with MongoDB</a></li>
+<li><a href="#_configuring_mongodb">11.2. Configuring MongoDB</a>
 <ul class="sectlevel3">
-<li><a href="#ogm-neo4j-built-in-types">11.3.1. Properties and built-in types</a></li>
-<li><a href="#_entities_4">11.3.2. Entities</a></li>
-<li><a href="#_associations_3">11.3.3. Associations</a></li>
-<li><a href="#_auto_generated_values">11.3.4. Auto-generated Values</a></li>
-<li><a href="#_labels_summary">11.3.5. Labels summary</a></li>
+<li><a href="#_adding_mongodb_dependencies">11.2.1. Adding MongoDB dependencies</a></li>
+<li><a href="#_mongodb_specific_configuration_properties">11.2.2. MongoDB specific configuration properties</a></li>
+<li><a href="#ogm-mongodb-annotation-configuration">11.2.3. Annotation based configuration</a></li>
+<li><a href="#ogm-mongodb-programmatic-configuration">11.2.4. Programmatic configuration</a></li>
 </ul>
 </li>
-<li><a href="#ogm-neo4j-transactions">11.4. Transactions</a></li>
-<li><a href="#ogm-neo4j-queries">11.5. Queries</a>
+<li><a href="#ogm-mongodb-storage-principles">11.3. Storage principles</a>
 <ul class="sectlevel3">
-<li><a href="#_jpql_queries_2">11.5.1. JPQL queries</a></li>
-<li><a href="#ogm-neo4j-queries-native">11.5.2. Cypher queries</a></li>
+<li><a href="#mongodb-built-in-types">11.3.1. Properties and built-in types</a></li>
+<li><a href="#mongodb-gridfs-support">11.3.2. GridFS Support</a></li>
+<li><a href="#_entities_3">11.3.3. Entities</a></li>
+<li><a href="#mongodb-associations">11.3.4. Associations</a></li>
+</ul>
+</li>
+<li><a href="#ogm-mongodb-indexes-unique-constraints">11.4. Indexes and unique constraints</a>
+<ul class="sectlevel3">
+<li><a href="#_standard_indexes_and_unique_constraints">11.4.1. Standard indexes and unique constraints</a></li>
+<li><a href="#_using_mongodb_specific_index_options">11.4.2. Using MongoDB specific index options</a></li>
+<li><a href="#_full_text_indexes">11.4.3. Full text indexes</a></li>
+</ul>
+</li>
+<li><a href="#_transactions">11.5. Transactions</a></li>
+<li><a href="#ogm-mongodb-optimisticlocking">11.6. Optimistic Locking</a></li>
+<li><a href="#ogm-mongodb-queries">11.7. Queries</a>
+<ul class="sectlevel3">
+<li><a href="#_jpql_queries">11.7.1. JPQL queries</a></li>
+<li><a href="#ogm-mongodb-queries-native">11.7.2. Native MongoDB queries</a></li>
+<li><a href="#ogm-mongodb-stored-proc-native">11.7.3. Server-side JavaScript and stored procedures</a></li>
+<li><a href="#_hibernate_search">11.7.4. Hibernate Search</a></li>
+</ul>
+</li>
+<li><a href="#_geospatial_support">11.8. Geospatial support</a>
+<ul class="sectlevel3">
+<li><a href="#_geospatial_fields">11.8.1. Geospatial fields</a></li>
+<li><a href="#_geospatial_indexes_and_queries">11.8.2. Geospatial indexes and queries</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#ogm-neo4j">12. Neo4j</a>
+<ul class="sectlevel2">
+<li><a href="#_how_to_add_neo4j_integration">12.1. How to add Neo4j integration</a></li>
+<li><a href="#_configuring_neo4j">12.2. Configuring Neo4j</a></li>
+<li><a href="#ogm-neo4j-storage-principles">12.3. Storage principles</a>
+<ul class="sectlevel3">
+<li><a href="#ogm-neo4j-built-in-types">12.3.1. Properties and built-in types</a></li>
+<li><a href="#_entities_4">12.3.2. Entities</a></li>
+<li><a href="#_associations_3">12.3.3. Associations</a></li>
+<li><a href="#_auto_generated_values">12.3.4. Auto-generated Values</a></li>
+<li><a href="#_labels_summary">12.3.5. Labels summary</a></li>
+</ul>
+</li>
+<li><a href="#ogm-neo4j-transactions">12.4. Transactions</a></li>
+<li><a href="#ogm-neo4j-queries">12.5. Queries</a>
+<ul class="sectlevel3">
+<li><a href="#_jpql_queries_2">12.5.1. JPQL queries</a></li>
+<li><a href="#ogm-neo4j-queries-native">12.5.2. Cypher queries</a></li>
 </ul>
 </li>
 </ul>
@@ -1039,36 +1039,15 @@ cd hibernate-ogm</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">#build project
-mvn clean install -s settings-example.xml</code></pre>
+mvn clean install</code></pre>
 </div>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-<div class="paragraph">
-<p>Note that Hibernate OGM uses artifacts from the Maven repository hosted by JBoss.
-Make sure to either use the <code class="code">-s settings-example.xml</code> option
-or adjust your <code class="filename">~/.m2/settings.xml</code>
-according to the descriptions available
-<a href="http://community.jboss.org/wiki/MavenGettingStarted-Users">on this jboss.org wiki page</a>.</p>
-</div>
-<div class="paragraph">
-<p>These settings are required for development of Hibernate OGM but should not be needed to use it.</p>
-</div>
-</td>
-</tr>
-</table>
 </div>
 <div class="paragraph">
 <p>To skip building the documentation, set the <code>skipDocs</code> property to true:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">mvn clean install -DskipDocs=true -s settings-example.xml</code></pre>
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">mvn clean install -DskipDocs=true</code></pre>
 </div>
 </div>
 <div class="admonitionblock tip">
@@ -1093,7 +1072,7 @@ run it from the <code class="filename">hibernate-ogm-documentation/manual</code>
 <p>The best way to share code is to fork the Hibernate OGM repository on GitHub,
 create a branch and open a pull request when you are ready.
 Make sure to rebase your pull request
-on the latest version of the master branch before offering it.</p>
+on the latest version of the main branch before offering it.</p>
 </div>
 <div class="paragraph">
 <p>Here are a couple of approaches the team follows:</p>
@@ -1586,8 +1565,8 @@ and retrieving an entity using Hibernate OGM.</p>
 <p>Hibernate OGM is published in the Maven central repository.</p>
 </div>
 <div class="paragraph">
-<p>Add <code>org.hibernate.ogm:hibernate-ogm-bom:5.4.1.Final</code> to your dependency management block
-and <code>org.hibernate.ogm:hibernate-ogm-infinispan-embedded:5.4.1.Final</code>
+<p>Add <code>org.hibernate.ogm:hibernate-ogm-bom:5.4.2.Final</code> to your dependency management block
+and <code>org.hibernate.ogm:hibernate-ogm-infinispan-embedded:5.4.2.Final</code>
 to your project dependencies:</p>
 </div>
 <div class="listingblock">
@@ -1597,7 +1576,7 @@ to your project dependencies:</p>
         &lt;dependency&gt;
             &lt;groupId&gt;org.hibernate.ogm&lt;/groupId&gt;
             &lt;artifactId&gt;hibernate-ogm-bom&lt;/artifactId&gt;
-            &lt;version&gt;5.4.1.Final&lt;/version&gt;
+            &lt;version&gt;5.4.2.Final&lt;/version&gt;
             &lt;type&gt;pom&lt;/type&gt;
             &lt;scope&gt;import&lt;/scope&gt;
         &lt;/dependency&gt;
@@ -1871,7 +1850,54 @@ in the <a href="#ogm-configuration-jbossmodule">How to package Hibernate OGM app
 </div>
 </div>
 <div class="sect1">
-<h2 id="ogm-architecture"><a class="anchor" href="#ogm-architecture"></a>3. Architecture</h2>
+<h2 id="ogm-migrating"><a class="anchor" href="#ogm-migrating"></a>3. Migrating from 5.4.1.Final</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_mongodb"><a class="anchor" href="#_mongodb"></a>3.1. MongoDB</h3>
+<div class="sect3">
+<h4 id="_mongodb_java_driver"><a class="anchor" href="#_mongodb_java_driver"></a>3.1.1. MongoDB Java Driver</h4>
+<div class="paragraph">
+<p>This patch release updates the underlying MongoDB Java driver from 3.11 to 4.11. It also fixes some incompatibilities
+with more recent versions of MongoDB that prevent 5.4.1.Final from executing native queries.</p>
+</div>
+<div class="paragraph">
+<p>As a consequence of the driver update, the oldest MongoDB server release that Hibernate OGM will connect to is now 3.6 (which reached
+end of life in April 2021).</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_mongodb_server"><a class="anchor" href="#_mongodb_server"></a>3.2. MongoDB Server</h3>
+<div class="paragraph">
+<p>Recent versions of the MongoDB server have removed support for some features on which Hibernate OGM depend. In particular:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>MongoDB 4.2 removed support for the <code>$eval</code> command, on which Hibernate OGM support for stored procedures depends.</p>
+</li>
+<li>
+<p>MongoDB 4.0 removed support for the <code>$snapshot</code> and <code>$maxscan</code> query modifiers, and these modifiers are now ignored for
+native queries.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>All other Hibernate OGM tests of MongoDB support are passing with MongoDB 3.6, up through the latest release of MongoDB
+(currently MongoDB 8.0).</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_older_versions"><a class="anchor" href="#_older_versions"></a>3.3. Older versions</h3>
+<div class="paragraph">
+<p>The migration guide for the previous versions of Hibernate OGM is available on the
+<a href="https://developer.jboss.org/docs/DOC-52281">JBoss Community Archive</a> website.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="ogm-architecture"><a class="anchor" href="#ogm-architecture"></a>4. Architecture</h2>
 <div class="sectionbody">
 <div class="admonitionblock note">
 <table>
@@ -1911,7 +1937,7 @@ We are working on testing it on other NoSQL families.</p>
 <p>Let&#8217;s start with the general architecture.</p>
 </div>
 <div class="sect2">
-<h3 id="_general_architecture"><a class="anchor" href="#_general_architecture"></a>3.1. General architecture</h3>
+<h3 id="_general_architecture"><a class="anchor" href="#_general_architecture"></a>4.1. General architecture</h3>
 <div class="paragraph">
 <p>Hibernate OGM is made possible by the reuse of a few key components:</p>
 </div>
@@ -2032,7 +2058,7 @@ We explain how to in <a href="#ogm-configuration-environments-standalonejta">In 
 </div>
 </div>
 <div class="sect2">
-<h3 id="ogm-architecture-datapersisted"><a class="anchor" href="#ogm-architecture-datapersisted"></a>3.2. How is data persisted</h3>
+<h3 id="ogm-architecture-datapersisted"><a class="anchor" href="#ogm-architecture-datapersisted"></a>4.2. How is data persisted</h3>
 <div class="paragraph">
 <p>Hibernate OGM tries to reuse as much as possible the relational model concepts,
 at least when they are practical and make sense in OGM&#8217;s case.
@@ -2292,7 +2318,7 @@ and the totally schema-less approach pushed by some NoSQL families.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="ogm-architecture-sequences"><a class="anchor" href="#ogm-architecture-sequences"></a>3.3. Id generation using sequences</h3>
+<h3 id="ogm-architecture-sequences"><a class="anchor" href="#ogm-architecture-sequences"></a>4.3. Id generation using sequences</h3>
 <div class="paragraph">
 <p>You can use sequences with the following annotations:</p>
 </div>
@@ -2333,7 +2359,7 @@ mapping paragraph in the documentation related to the dialect you are using.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="ogm-architecture-dataqueried"><a class="anchor" href="#ogm-architecture-dataqueried"></a>3.4. How is data queried</h3>
+<h3 id="ogm-architecture-dataqueried"><a class="anchor" href="#ogm-architecture-dataqueried"></a>4.4. How is data queried</h3>
 <div class="paragraph">
 <p>Since Hibernate OGM wants to offer all of JPA, it needs to support JPQL queries.
 Hibernate OGM parses the JPQL query string and extracts its meaning.
@@ -2440,21 +2466,21 @@ brand etc)</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="ogm-configuration"><a class="anchor" href="#ogm-configuration"></a>4. Configure and start Hibernate OGM</h2>
+<h2 id="ogm-configuration"><a class="anchor" href="#ogm-configuration"></a>5. Configure and start Hibernate OGM</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Hibernate OGM favors ease of use and convention over configuration.
 This makes its configuration quite simple by default.</p>
 </div>
 <div class="sect2">
-<h3 id="_bootstrapping_hibernate_ogm"><a class="anchor" href="#_bootstrapping_hibernate_ogm"></a>4.1. Bootstrapping Hibernate OGM</h3>
+<h3 id="_bootstrapping_hibernate_ogm"><a class="anchor" href="#_bootstrapping_hibernate_ogm"></a>5.1. Bootstrapping Hibernate OGM</h3>
 <div class="paragraph">
 <p>Hibernate OGM can be used via the Hibernate native APIs (<code>Session</code>)
 or via the JPA APIs (<code>EntityManager</code>).
 Depending on your choice, the bootstrapping strategy is slightly different.</p>
 </div>
 <div class="sect3">
-<h4 id="_using_jpa"><a class="anchor" href="#_using_jpa"></a>4.1.1. Using JPA</h4>
+<h4 id="_using_jpa"><a class="anchor" href="#_using_jpa"></a>5.1.1. Using JPA</h4>
 <div class="paragraph">
 <p>If you use JPA as your primary API, the configuration is extremely simple.
 Hibernate OGM is seen as a persistence provider
@@ -2559,7 +2585,7 @@ datasource will be used.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_using_hibernate_orm_native_apis"><a class="anchor" href="#_using_hibernate_orm_native_apis"></a>4.1.2. Using Hibernate ORM native APIs</h4>
+<h4 id="_using_hibernate_orm_native_apis"><a class="anchor" href="#_using_hibernate_orm_native_apis"></a>5.1.2. Using Hibernate ORM native APIs</h4>
 <div class="paragraph">
 <p>If you want to bootstrap Hibernate OGM using the native Hibernate APIs,
 use the new bootstrap API from Hibernate ORM 5.
@@ -2621,7 +2647,7 @@ In this case, we have used the defaults settings for Infinispan.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="ogm-configuration-environments"><a class="anchor" href="#ogm-configuration-environments"></a>4.2. Environments</h3>
+<h3 id="ogm-configuration-environments"><a class="anchor" href="#ogm-configuration-environments"></a>5.2. Environments</h3>
 <div class="paragraph">
 <p>Hibernate OGM runs in various environments: it should work pretty much in all environments in which Hibernate ORM runs.
 There are however some selected environments in which it was tested more thoroughly than others.
@@ -2630,7 +2656,7 @@ at time of writing this there&#8217;s no known reason for it to not work in diff
 specific version of Hibernate ORM: some containers might package a conflicting version.</p>
 </div>
 <div class="sect3">
-<h4 id="ogm-configuration-environments-javaee"><a class="anchor" href="#ogm-configuration-environments-javaee"></a>4.2.1. In a Java EE container</h4>
+<h4 id="ogm-configuration-environments-javaee"><a class="anchor" href="#ogm-configuration-environments-javaee"></a>5.2.1. In a Java EE container</h4>
 <div class="paragraph">
 <p>You don&#8217;t have to do much in this case. You need three specific settings:</p>
 </div>
@@ -2697,7 +2723,7 @@ This is not needed by Hibernate OGM: it will ignore the datasource, but JPA spec
 </div>
 </div>
 <div class="sect3">
-<h4 id="ogm-configuration-environments-standalonejta"><a class="anchor" href="#ogm-configuration-environments-standalonejta"></a>4.2.2. In a standalone JTA environment</h4>
+<h4 id="ogm-configuration-environments-standalonejta"><a class="anchor" href="#ogm-configuration-environments-standalonejta"></a>5.2.2. In a standalone JTA environment</h4>
 <div class="paragraph">
 <p>There is a set of common misconceptions in the Java community about JTA:</p>
 </div>
@@ -2809,7 +2835,7 @@ Check their respective documentation.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_without_jta"><a class="anchor" href="#_without_jta"></a>4.2.3. Without JTA</h4>
+<h4 id="_without_jta"><a class="anchor" href="#_without_jta"></a>5.2.3. Without JTA</h4>
 <div class="paragraph">
 <p>While this approach works today, it does not ensure that operations are done transactionally
 and hence won&#8217;t be able to rollback your work.
@@ -2833,7 +2859,7 @@ such an environment is not recommended.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="ogm-configuration-optionsogm-configuration-options"><a class="anchor" href="#ogm-configuration-optionsogm-configuration-options"></a>4.3. Configuration options</h3>
+<h3 id="ogm-configuration-optionsogm-configuration-options"><a class="anchor" href="#ogm-configuration-optionsogm-configuration-options"></a>5.3. Configuration options</h3>
 <div class="paragraph">
 <p>The most important options when configuring Hibernate OGM are related to the datastore.
 They are explained in <a href="#ogm-datastore-providers">NoSQL datastores</a>.</p>
@@ -2876,7 +2902,7 @@ and that should not be set:</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_configuring_hibernate_search"><a class="anchor" href="#_configuring_hibernate_search"></a>4.4. Configuring Hibernate Search</h3>
+<h3 id="_configuring_hibernate_search"><a class="anchor" href="#_configuring_hibernate_search"></a>5.4. Configuring Hibernate Search</h3>
 <div class="paragraph">
 <p>Hibernate Search integrates with Hibernate OGM just like it does with Hibernate ORM.
 The Hibernate Search version tested is 5.10.4.Final.
@@ -2912,7 +2938,7 @@ to the datastore of your choice to see if it requires Hibernate Search or not.</
 </div>
 </div>
 <div class="sect2">
-<h3 id="ogm-configuration-jbossmodule"><a class="anchor" href="#ogm-configuration-jbossmodule"></a>4.5. How to package Hibernate OGM applications for WildFly 14.0</h3>
+<h3 id="ogm-configuration-jbossmodule"><a class="anchor" href="#ogm-configuration-jbossmodule"></a>5.5. How to package Hibernate OGM applications for WildFly 14.0</h3>
 <div class="paragraph">
 <p>Provided you&#8217;re deploying on WildFly,
 there is an additional way to add the OGM dependencies to your application.</p>
@@ -2937,7 +2963,7 @@ These are documented in <a href="https://docs.jboss.org/author/display/WFLY10/JP
 as you can include your favourite version of Hibernate OGM directly to the collection of container provided libraries.</p>
 </div>
 <div class="sect3">
-<h4 id="_packaging_hibernate_ogm_applications_for_wildfly_14_0"><a class="anchor" href="#_packaging_hibernate_ogm_applications_for_wildfly_14_0"></a>4.5.1. Packaging Hibernate OGM applications for WildFly 14.0</h4>
+<h4 id="_packaging_hibernate_ogm_applications_for_wildfly_14_0"><a class="anchor" href="#_packaging_hibernate_ogm_applications_for_wildfly_14_0"></a>5.5.1. Packaging Hibernate OGM applications for WildFly 14.0</h4>
 <div class="paragraph">
 <p>When using WildFly several of the technologies it includes are automatically enabled.
 For example Hibernate ORM is made available to your applications if your <code>persistence.xml</code>
@@ -2955,7 +2981,7 @@ for a full list of properties you can explicitly set.</p>
 <p>WildFly 14.0 however does not include Hibernate OGM and it will require some configuration to make everything works.</p>
 </div>
 <div class="paragraph">
-<p>Hibernate OGM 5.4.1.Final requires Hibernate ORM 5.3.6.Final and Hibernate Search 5.10.4.Final.</p>
+<p>Hibernate OGM 5.4.2.Final requires Hibernate ORM 5.3.6.Final and Hibernate Search 5.10.4.Final.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -3019,22 +3045,22 @@ to create a custom WildFly server including the Hibernate OGM modules:</p>
         &lt;feature-pack
             groupId="org.hibernate.ogm"
             artifactId="hibernate-ogm-featurepack-infinispan-remote"
-            version="5.4.1.Final" /&gt; <i class="conum" data-value="1"></i><b>(1)</b>
+            version="5.4.2.Final" /&gt; <i class="conum" data-value="1"></i><b>(1)</b>
 
         &lt;feature-pack
             groupId="org.hibernate.ogm"
             artifactId="hibernate-ogm-featurepack-infinispan-embedded"
-            version="5.4.1.Final" /&gt; <i class="conum" data-value="1"></i><b>(1)</b>
+            version="5.4.2.Final" /&gt; <i class="conum" data-value="1"></i><b>(1)</b>
 
         &lt;feature-pack
             groupId="org.hibernate.ogm"
             artifactId="hibernate-ogm-featurepack-mongodb"
-            version="5.4.1.Final" /&gt; <i class="conum" data-value="1"></i><b>(1)</b>
+            version="5.4.2.Final" /&gt; <i class="conum" data-value="1"></i><b>(1)</b>
 
         &lt;feature-pack
             groupId="org.hibernate.ogm"
             artifactId="hibernate-ogm-featurepack-neo4j"
-            version="5.4.1.Final" /&gt; <i class="conum" data-value="1"></i><b>(1)</b>
+            version="5.4.2.Final" /&gt; <i class="conum" data-value="1"></i><b>(1)</b>
 
     &lt;/feature-packs&gt;
 &lt;/server-provisioning&gt;</code></pre>
@@ -3079,7 +3105,7 @@ The modules included are:</p>
 </ul>
 </div>
 <div class="paragraph">
-<p>The module slot to use for Hibernate OGM 5.4.1.Final is <code>5.4</code>
+<p>The module slot to use for Hibernate OGM 5.4.2.Final is <code>5.4</code>
 as the format of the slot name does not include the "micro" part of the project version.</p>
 </div>
 <div class="paragraph">
@@ -3135,7 +3161,7 @@ available on the official portal.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="hibernate-ogm-jboss-modules-feature-packs"><a class="anchor" href="#hibernate-ogm-jboss-modules-feature-packs"></a>4.5.2. List of the Hibernate OGM WildFly/JBoss feature packs</h4>
+<h4 id="hibernate-ogm-jboss-modules-feature-packs"><a class="anchor" href="#hibernate-ogm-jboss-modules-feature-packs"></a>5.5.2. List of the Hibernate OGM WildFly/JBoss feature packs</h4>
 <div class="sect4">
 <h5 id="_core_feature_pack"><a class="anchor" href="#_core_feature_pack"></a>Core feature pack</h5>
 <div class="paragraph">
@@ -3143,11 +3169,11 @@ available on the official portal.</p>
 </div>
 <div class="paragraph">
 <p>It extends the base WildFly feature pack distribution.
-It includes Hibernate ORM 5.3.6.Final modules, required by Hibernate OGM 5.4.1.Final.</p>
+It includes Hibernate ORM 5.3.6.Final modules, required by Hibernate OGM 5.4.2.Final.</p>
 </div>
 <div class="paragraph">
-<p>The feature pack is published on the JBoss Nexus repository and Maven Central as
-<a href="https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate.ogm~hibernate-ogm-featurepack-core~{hibernate-ogm-version}~~">org.hibernate.ogm:hibernate-ogm-featurepack-core:5.4.1.Final:zip</a>.</p>
+<p>The feature pack is published on Maven Central as
+<a href="https://central.sonatype.com/artifact/org.hibernate.ogm/hibernate-ogm-featurepack-core/{hibernate-ogm-version}">org.hibernate.ogm:hibernate-ogm-featurepack-core:5.4.2.Final:zip</a>.</p>
 </div>
 </div>
 <div class="sect4">
@@ -3165,8 +3191,8 @@ It includes the main module:</p>
 </div>
 <div class="paragraph">
 <p>It includes Hibernate OGM core feature pack and Infinispan client Wildfly modules.
-The feature pack is published on the JBoss Nexus repository and Maven Central as
-<a href="https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate.ogm~hibernate-ogm-featurepack-infinispan-remote~{hibernate-ogm-version}~~">org.hibernate.ogm:hibernate-ogm-featurepack-infinispan-remote:5.4.1.Final:zip</a>.</p>
+The feature pack is published on Maven Central as
+<a href="https://central.sonatype.com/artifact/org.hibernate.ogm/hibernate-ogm-featurepack-infinispan-remote/{hibernate-ogm-version}">org.hibernate.ogm:hibernate-ogm-featurepack-infinispan-remote:5.4.2.Final:zip</a>.</p>
 </div>
 </div>
 <div class="sect4">
@@ -3184,8 +3210,8 @@ It includes the main module:</p>
 </div>
 <div class="paragraph">
 <p>It includes Hibernate OGM core feature pack and Infinispan client Wildfly modules.
-The feature pack is published on the JBoss Nexus repository and Maven Central as
-<a href="https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate.ogm~hibernate-ogm-featurepack-infinispan-embedded~{hibernate-ogm-version}~~">org.hibernate.ogm:hibernate-ogm-featurepack-infinispan-embedded:5.4.1.Final:zip</a>.</p>
+The feature pack is published on Maven Central as
+<a href="https://central.sonatype.com/artifact/org.hibernate.ogm/hibernate-ogm-featurepack-infinispan-embedded/{hibernate-ogm-version}">org.hibernate.ogm:hibernate-ogm-featurepack-infinispan-embedded:5.4.2.Final:zip</a>.</p>
 </div>
 </div>
 <div class="sect4">
@@ -3203,8 +3229,8 @@ It includes the main module:</p>
 </div>
 <div class="paragraph">
 <p>It includes Hibernate OGM core feature pack and MongoDB Java client.
-The feature pack is published on the JBoss Nexus repository and Maven Central as
-<a href="https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate.ogm~hibernate-ogm-featurepack-mongodb~{hibernate-ogm-version}~~">org.hibernate.ogm:hibernate-ogm-featurepack-mongodb:5.4.1.Final:zip</a>.</p>
+The feature pack is published on Maven Central as
+<a href="https://central.sonatype.com/artifact/org.hibernate.ogm/hibernate-ogm-featurepack-mongodb/{hibernate-ogm-version}">org.hibernate.ogm:hibernate-ogm-featurepack-mongodb:5.4.2.Final:zip</a>.</p>
 </div>
 </div>
 <div class="sect4">
@@ -3222,21 +3248,21 @@ It includes the main module:</p>
 </div>
 <div class="paragraph">
 <p>It includes Hibernate OGM core feature pack and Neo4j client libraries.
-The feature pack is published on the JBoss Nexus repository and Maven Central as
-<a href="https://repository.jboss.org/nexus/index.html#nexus-search;gav~org.hibernate.ogm~hibernate-ogm-featurepack-neo4j~{hibernate-ogm-version}~~">org.hibernate.ogm:hibernate-ogm-featurepack-neo4j:5.4.1.Final:zip</a>.</p>
+The feature pack is published on Maven Central as
+<a href="https://central.sonatype.com/artifact/org.hibernate.ogm/hibernate-ogm-featurepack-neo4j/{hibernate-ogm-version}">org.hibernate.ogm:hibernate-ogm-featurepack-neo4j:5.4.2.Final:zip</a>.</p>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_configure_your_persistence_xml_to_use_your_choice_of_persistence_provider"><a class="anchor" href="#_configure_your_persistence_xml_to_use_your_choice_of_persistence_provider"></a>4.5.3. Configure your persistence.xml to use your choice of persistence provider</h4>
+<h4 id="_configure_your_persistence_xml_to_use_your_choice_of_persistence_provider"><a class="anchor" href="#_configure_your_persistence_xml_to_use_your_choice_of_persistence_provider"></a>5.5.3. Configure your persistence.xml to use your choice of persistence provider</h4>
 <div class="paragraph">
 <p>WildFly will by default attempt to guess which Persistence Provider you need by having a look at the <code>provider</code> section of the <code>persistence.xml</code>.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_enable_support_for_ee_8"><a class="anchor" href="#_enable_support_for_ee_8"></a>4.5.4. Enable support for EE 8</h4>
+<h4 id="_enable_support_for_ee_8"><a class="anchor" href="#_enable_support_for_ee_8"></a>5.5.4. Enable support for EE 8</h4>
 <div class="paragraph">
-<p>Hibernate OGM 5.4.1.Final requires <strong>CDI 2.0</strong> and <strong>JPA 2.2</strong>, that belong to <strong>EE 8</strong> specification.
+<p>Hibernate OGM 5.4.2.Final requires <strong>CDI 2.0</strong> and <strong>JPA 2.2</strong>, that belong to <strong>EE 8</strong> specification.
 WildFly 13 has support for JavaEE 8.</p>
 </div>
 <div class="paragraph">
@@ -3249,7 +3275,7 @@ WildFly 13 has support for JavaEE 8.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_using_the_hibernate_ogm_modules_with_infinispan"><a class="anchor" href="#_using_the_hibernate_ogm_modules_with_infinispan"></a>4.5.5. Using the Hibernate OGM modules with Infinispan</h4>
+<h4 id="_using_the_hibernate_ogm_modules_with_infinispan"><a class="anchor" href="#_using_the_hibernate_ogm_modules_with_infinispan"></a>5.5.5. Using the Hibernate OGM modules with Infinispan</h4>
 <div class="paragraph">
 <p>The Infinispan project also provides custom modules for WildFly 14.0.
 Hibernate OGM modules require these modules if you&#8217;re planning to use the Hibernate OGM / Infinispan combination on WildFly.</p>
@@ -3293,10 +3319,10 @@ the module identifiers are hardcoded in the XML files representing the module.</
 </div>
 </div>
 <div class="sect2">
-<h3 id="integration-with-wildfly-nosql"><a class="anchor" href="#integration-with-wildfly-nosql"></a>4.6. Integration with WildFly NoSQL</h3>
+<h3 id="integration-with-wildfly-nosql"><a class="anchor" href="#integration-with-wildfly-nosql"></a>5.6. Integration with WildFly NoSQL</h3>
 <div class="paragraph">
 <p><em>WildFly NoSQL</em> project allows to configure a NoSQL datastore client within a WildFly subsystem.
-See <a href="https://github.com/wildfly/wildfly-nosql/tree/master/doc">WildFly NoSQL Documentation</a>.
+See <a href="https://github.com/wildfly/wildfly-nosql/tree/1.0.2.Final/doc">WildFly NoSQL Documentation</a>.
 In a nutshell it provides the analogous concept of a <em>SQL DataSource</em> for a NoSQL datastore.</p>
 </div>
 <div class="paragraph">
@@ -3318,7 +3344,7 @@ using a special Hibernate property: <code>hibernate.connection.resource</code>.<
 </table>
 </div>
 <div class="sect3">
-<h4 id="_how_to_use_wildfly_nosql_with_hibernate_ogm"><a class="anchor" href="#_how_to_use_wildfly_nosql_with_hibernate_ogm"></a>4.6.1. How to use WildFly NoSQL with Hibernate OGM</h4>
+<h4 id="_how_to_use_wildfly_nosql_with_hibernate_ogm"><a class="anchor" href="#_how_to_use_wildfly_nosql_with_hibernate_ogm"></a>5.6.1. How to use WildFly NoSQL with Hibernate OGM</h4>
 <div class="paragraph">
 <p>A typical Hibernate OGM persistence configuration, without the support of WildFly NoSQL, looks like this:</p>
 </div>
@@ -3420,7 +3446,7 @@ to integrate WildFly NoSQL with your Hibernate OGM.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="ogm-mapping"><a class="anchor" href="#ogm-mapping"></a>5. Map your entities</h2>
+<h2 id="ogm-mapping"><a class="anchor" href="#ogm-mapping"></a>6. Map your entities</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>This section mainly describes the specificities of Hibernate OGM mappings.
@@ -3430,7 +3456,7 @@ the complete guide is
 after all Hibernate OGM <em>is</em> Hibernate ORM.</p>
 </div>
 <div class="sect2">
-<h3 id="_supported_entity_mapping"><a class="anchor" href="#_supported_entity_mapping"></a>5.1. Supported entity mapping</h3>
+<h3 id="_supported_entity_mapping"><a class="anchor" href="#_supported_entity_mapping"></a>6.1. Supported entity mapping</h3>
 <div class="paragraph">
 <p>Pretty much all entity related constructs should work out of the box in Hibernate OGM.
 <code>@Entity</code>, <code>@Table</code>, <code>@Column</code>,
@@ -3507,7 +3533,7 @@ public class Breed {
 </div>
 </div>
 <div class="sect2">
-<h3 id="ogm-mapping-supported-types"><a class="anchor" href="#ogm-mapping-supported-types"></a>5.2. Supported Types</h3>
+<h3 id="ogm-mapping-supported-types"><a class="anchor" href="#ogm-mapping-supported-types"></a>6.2. Supported Types</h3>
 <div class="paragraph">
 <p>Most Java built-in types are supported at this stage.
 However, custom types (<code>@Type</code>) are not supported.</p>
@@ -3578,7 +3604,7 @@ However, custom types (<code>@Type</code>) are not supported.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_supported_association_mapping"><a class="anchor" href="#_supported_association_mapping"></a>5.3. Supported association mapping</h3>
+<h3 id="_supported_association_mapping"><a class="anchor" href="#_supported_association_mapping"></a>6.3. Supported association mapping</h3>
 <div class="paragraph">
 <p>All association types are supported (<code>@OneToOne</code>,
 <code>@OneToMany</code>, <code>@ManyToOne</code>, <code>@ManyToMany</code>).
@@ -3601,7 +3627,7 @@ treated as a pure key/value store, while the Infinispan Remote dialect does not
 as it is more similar to a document store.</p>
 </div>
 <div class="sect3">
-<h4 id="_elements_order_in_associations"><a class="anchor" href="#_elements_order_in_associations"></a>5.3.1. Elements order in associations</h4>
+<h4 id="_elements_order_in_associations"><a class="anchor" href="#_elements_order_in_associations"></a>6.3.1. Elements order in associations</h4>
 <div class="paragraph">
 <p>Hibernate OGM, by default, does not guarantee that elements in an association will
 be retrieved in the same order each time you load the association from the datastore.</p>
@@ -3655,7 +3681,7 @@ the same id.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="ogm-api"><a class="anchor" href="#ogm-api"></a>6. Hibernate OGM APIs</h2>
+<h2 id="ogm-api"><a class="anchor" href="#ogm-api"></a>7. Hibernate OGM APIs</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Hibernate OGM has very few specific APIs.
@@ -3677,7 +3703,7 @@ If you need to learn JPA or the native Hibernate APIs,
 check out <a href="http://hibernate.org/orm/documentation/">the Hibernate ORM documentation</a>.</p>
 </div>
 <div class="sect2">
-<h3 id="_bootstrap_hibernate_ogm"><a class="anchor" href="#_bootstrap_hibernate_ogm"></a>6.1. Bootstrap Hibernate OGM</h3>
+<h3 id="_bootstrap_hibernate_ogm"><a class="anchor" href="#_bootstrap_hibernate_ogm"></a>7.1. Bootstrap Hibernate OGM</h3>
 <div class="paragraph">
 <p>We already discussed this subject earlier, have a look at <a href="#ogm-configuration">Configure and start Hibernate OGM</a> for all the details.</p>
 </div>
@@ -3698,7 +3724,7 @@ to boot a <code>SessionFactory</code></p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_jpa_and_native_hibernate_orm_apis"><a class="anchor" href="#_jpa_and_native_hibernate_orm_apis"></a>6.2. JPA and native Hibernate ORM APIs</h3>
+<h3 id="_jpa_and_native_hibernate_orm_apis"><a class="anchor" href="#_jpa_and_native_hibernate_orm_apis"></a>7.2. JPA and native Hibernate ORM APIs</h3>
 <div class="paragraph">
 <p>You know of the Java Persistence and Hibernate ORM native APIs?
 You are pretty much good to go.
@@ -3751,7 +3777,7 @@ Here are the few exceptions:</p>
 </ul>
 </div>
 <div class="sect3">
-<h4 id="_accessing_the_code_ogmsession_code_api"><a class="anchor" href="#_accessing_the_code_ogmsession_code_api"></a>6.2.1. Accessing the <code>OgmSession</code> API</h4>
+<h4 id="_accessing_the_code_ogmsession_code_api"><a class="anchor" href="#_accessing_the_code_ogmsession_code_api"></a>7.2.1. Accessing the <code>OgmSession</code> API</h4>
 <div class="paragraph">
 <p>To execute NoSQL native queries, one approach is to use <code>OgmSession#createNativeQuery</code>.
 You can read more about it in <a href="#ogm-query-native">Using the native query language of your NoSQL</a>.
@@ -3800,7 +3826,7 @@ NativeQuery query = ogmSession.createNativeQuery(...);</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_on_flush_and_transactions"><a class="anchor" href="#_on_flush_and_transactions"></a>6.3. On flush and transactions</h3>
+<h3 id="_on_flush_and_transactions"><a class="anchor" href="#_on_flush_and_transactions"></a>7.3. On flush and transactions</h3>
 <div class="paragraph">
 <p>Even though some underlying NoSQL datastores do not support transaction,
 it is important to demarcate transaction via the Hibernate OGM APIs.
@@ -3873,7 +3899,7 @@ transactionManager.commit(); // will flush changes to the datastore</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="ogm-api-error-handler"><a class="anchor" href="#ogm-api-error-handler"></a>6.3.1. Acting upon errors during application of changes</h4>
+<h4 id="ogm-api-error-handler"><a class="anchor" href="#ogm-api-error-handler"></a>7.3.1. Acting upon errors during application of changes</h4>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -4018,7 +4044,7 @@ e.g. as a persistence unit property in <code class="filename">META-INF/persisten
 </div>
 </div>
 <div class="sect2">
-<h3 id="_spis"><a class="anchor" href="#_spis"></a>6.4. SPIs</h3>
+<h3 id="_spis"><a class="anchor" href="#_spis"></a>7.4. SPIs</h3>
 <div class="paragraph">
 <p>Some of the Hibernate OGM public contracts are geared towards either integrators
 or implementors of datastore providers.
@@ -4049,7 +4075,7 @@ beware that we can break these without notice.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="ogm-query"><a class="anchor" href="#ogm-query"></a>7. Query your entities</h2>
+<h2 id="ogm-query"><a class="anchor" href="#ogm-query"></a>8. Query your entities</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Once your data is in the datastore, it&#8217;s time for some query fun!
@@ -4072,7 +4098,7 @@ With Hibernate OGM, you have a few alternatives that should get you covered:</p>
 </ul>
 </div>
 <div class="sect2">
-<h3 id="ogm-jpql-query"><a class="anchor" href="#ogm-jpql-query"></a>7.1. Using JPQL</h3>
+<h3 id="ogm-jpql-query"><a class="anchor" href="#ogm-jpql-query"></a>8.1. Using JPQL</h3>
 <div class="paragraph">
 <p>For Hibernate OGM, we developed a brand new JPQL parser
 which is already able to convert simple queries into the native underlying datastore query language
@@ -4372,7 +4398,7 @@ Bear in mind though that query results will then not reflect changes applied wit
 </div>
 </div>
 <div class="sect2">
-<h3 id="ogm-query-native"><a class="anchor" href="#ogm-query-native"></a>7.2. Using the native query language of your NoSQL</h3>
+<h3 id="ogm-query-native"><a class="anchor" href="#ogm-query-native"></a>8.2. Using the native query language of your NoSQL</h3>
 <div class="paragraph">
 <p>Often you want the raw power of the underlying NoSQL query engine.
 Even if that costs you portability.</p>
@@ -4464,7 +4490,7 @@ In particular <a href="#ogm-neo4j-queries-native">Neo4J</a> and <a href="#ogm-mo
 </div>
 </div>
 <div class="sect2">
-<h3 id="ogm-query-using-hibernate-search"><a class="anchor" href="#ogm-query-using-hibernate-search"></a>7.3. Using Hibernate Search</h3>
+<h3 id="ogm-query-using-hibernate-search"><a class="anchor" href="#ogm-query-using-hibernate-search"></a>8.3. Using Hibernate Search</h3>
 <div class="paragraph">
 <p>Hibernate Search offers a way to index Java objects into Lucene indexes
 and to execute full-text queries on them.
@@ -4584,13 +4610,13 @@ go check the <a href="https://docs.jboss.org/hibernate/search/5.10/reference/en-
 </div>
 </div>
 <div class="sect2">
-<h3 id="_using_the_criteria_api"><a class="anchor" href="#_using_the_criteria_api"></a>7.4. Using the Criteria API</h3>
+<h3 id="_using_the_criteria_api"><a class="anchor" href="#_using_the_criteria_api"></a>8.4. Using the Criteria API</h3>
 <div class="paragraph">
 <p>At this time, we have not implemented support for the Criteria APIs (neither Hibernate native nor JPA).</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_using_stored_procedures"><a class="anchor" href="#_using_stored_procedures"></a>7.5. Using stored procedures</h3>
+<h3 id="_using_stored_procedures"><a class="anchor" href="#_using_stored_procedures"></a>8.5. Using stored procedures</h3>
 <div class="paragraph">
 <p>Often you want the raw power of the underlying NoSQL query engine.
 Even if that costs you portability.</p>
@@ -4678,7 +4704,7 @@ Main reason of it is supported data storages support 'IN' parameters only.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="ogm-datastore-providers"><a class="anchor" href="#ogm-datastore-providers"></a>8. NoSQL datastores</h2>
+<h2 id="ogm-datastore-providers"><a class="anchor" href="#ogm-datastore-providers"></a>9. NoSQL datastores</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Currently Hibernate OGM supports the following NoSQL datastores:</p>
@@ -4758,7 +4784,7 @@ converting an Hibernate OGM operation into a datastore specific operation</p>
 </ul>
 </div>
 <div class="sect2">
-<h3 id="_using_a_specific_nosql_datastore"><a class="anchor" href="#_using_a_specific_nosql_datastore"></a>8.1. Using a specific NoSQL datastore</h3>
+<h3 id="_using_a_specific_nosql_datastore"><a class="anchor" href="#_using_a_specific_nosql_datastore"></a>9.1. Using a specific NoSQL datastore</h3>
 <div class="paragraph">
 <p>Only a few steps are necessary:</p>
 </div>
@@ -4783,7 +4809,7 @@ converting an Hibernate OGM operation into a datastore specific operation</p>
 <pre class="prettyprint highlight"><code class="language-XML" data-lang="XML">&lt;dependency&gt;
     &lt;groupId&gt;org.hibernate.ogm&lt;/groupId&gt;
     &lt;artifactId&gt;hibernate-ogm-infinispan-embedded&lt;/artifactId&gt;
-    &lt;version&gt;5.4.1.Final&lt;/version&gt;
+    &lt;version&gt;5.4.2.Final&lt;/version&gt;
 &lt;/dependency&gt;</code></pre>
 </div>
 </div>
@@ -4855,7 +4881,7 @@ How to configure it further, what mapping structure is used and more.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="ogm-infinispan"><a class="anchor" href="#ogm-infinispan"></a>9. Infinispan</h2>
+<h2 id="ogm-infinispan"><a class="anchor" href="#ogm-infinispan"></a>10. Infinispan</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Infinispan is an open source in-memory data grid focusing on high performance.
@@ -4878,7 +4904,7 @@ refer to the Infinispan project documentation at
 <a href="http://infinispan.org/documentation/">infinispan.org</a>.</p>
 </div>
 <div class="sect2">
-<h3 id="_why_use_hibernate_ogm_with_infinispan"><a class="anchor" href="#_why_use_hibernate_ogm_with_infinispan"></a>9.1. Why use Hibernate OGM with Infinispan?</h3>
+<h3 id="_why_use_hibernate_ogm_with_infinispan"><a class="anchor" href="#_why_use_hibernate_ogm_with_infinispan"></a>10.1. Why use Hibernate OGM with Infinispan?</h3>
 <div class="paragraph">
 <p>Infinispan provides great scalability and elasticity features but
 it can have a steep learning curve.</p>
@@ -4915,7 +4941,7 @@ done quickly with the example configuration.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_infinispan_choosing_between_embedded_mode_and_hot_rod"><a class="anchor" href="#_infinispan_choosing_between_embedded_mode_and_hot_rod"></a>9.2. Infinispan: Choosing between Embedded Mode and Hot Rod</h3>
+<h3 id="_infinispan_choosing_between_embedded_mode_and_hot_rod"><a class="anchor" href="#_infinispan_choosing_between_embedded_mode_and_hot_rod"></a>10.2. Infinispan: Choosing between Embedded Mode and Hot Rod</h3>
 <div class="paragraph">
 <p>Java applications can use Infinispan in two fundamentally different ways:</p>
 </div>
@@ -5030,7 +5056,7 @@ to additional storage (<code>CacheStore</code>s) can be configured differently f
 </div>
 </div>
 <div class="sect2">
-<h3 id="ogm-infinispan-embedded"><a class="anchor" href="#ogm-infinispan-embedded"></a>9.3. Hibernate OGM &amp; Infinispan Embedded</h3>
+<h3 id="ogm-infinispan-embedded"><a class="anchor" href="#ogm-infinispan-embedded"></a>10.3. Hibernate OGM &amp; Infinispan Embedded</h3>
 <div class="paragraph">
 <p>Let&#8217;s see how to configure and use Hibernate OGM with Infinispan in Embedded Mode.</p>
 </div>
@@ -5038,7 +5064,7 @@ to additional storage (<code>CacheStore</code>s) can be configured differently f
 <p>For usage of Infinispan Server over Hot Rod, skip to <a href="#ogm-infinispan-remote">Hibernate OGM &amp; Infinispan Server over Hot Rod</a>.</p>
 </div>
 <div class="sect3">
-<h4 id="ogm-infinispan-configuration"><a class="anchor" href="#ogm-infinispan-configuration"></a>9.3.1. Configure Hibernate OGM for Infinispan Embedded</h4>
+<h4 id="ogm-infinispan-configuration"><a class="anchor" href="#ogm-infinispan-configuration"></a>10.3.1. Configure Hibernate OGM for Infinispan Embedded</h4>
 <div class="paragraph">
 <p>You configure Hibernate OGM and Infinispan in two steps basically:</p>
 </div>
@@ -5091,7 +5117,7 @@ Infinispan cluster on the network.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="ogm-infinispan-add-dependencies"><a class="anchor" href="#ogm-infinispan-add-dependencies"></a>9.3.2. Adding Infinispan dependencies</h4>
+<h4 id="ogm-infinispan-add-dependencies"><a class="anchor" href="#ogm-infinispan-add-dependencies"></a>10.3.2. Adding Infinispan dependencies</h4>
 <div class="paragraph">
 <p>You can add the Infinispan Embedded dialect to your project using the following Maven GAV:</p>
 </div>
@@ -5100,7 +5126,7 @@ Infinispan cluster on the network.</p>
 <pre class="prettyprint highlight"><code class="language-XML" data-lang="XML">&lt;dependency&gt;
     &lt;groupId&gt;org.hibernate.ogm&lt;/groupId&gt;
     &lt;artifactId&gt;hibernate-ogm-infinispan-embedded&lt;/artifactId&gt;
-    &lt;version&gt;5.4.1.Final&lt;/version&gt;
+    &lt;version&gt;5.4.2.Final&lt;/version&gt;
 &lt;/dependency&gt;</code></pre>
 </div>
 </div>
@@ -5123,7 +5149,7 @@ copy all the dependencies from the distribution in the directories:</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="ogm-infinispan-configuration-properties"><a class="anchor" href="#ogm-infinispan-configuration-properties"></a>9.3.3. Infinispan specific configuration properties</h4>
+<h4 id="ogm-infinispan-configuration-properties"><a class="anchor" href="#ogm-infinispan-configuration-properties"></a>10.3.3. Infinispan specific configuration properties</h4>
 <div class="paragraph">
 <p>The advanced configuration details of an Infinispan Cache
 are defined in an Infinispan specific XML configuration file;
@@ -5201,7 +5227,7 @@ when specifying the configuration properties listed above.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_cache_names_used_by_hibernate_ogm"><a class="anchor" href="#_cache_names_used_by_hibernate_ogm"></a>9.3.4. Cache names used by Hibernate OGM</h4>
+<h4 id="_cache_names_used_by_hibernate_ogm"><a class="anchor" href="#_cache_names_used_by_hibernate_ogm"></a>10.3.4. Cache names used by Hibernate OGM</h4>
 <div class="paragraph">
 <p>Depending on the cache mapping approach, Hibernate OGM will either:</p>
 </div>
@@ -5288,7 +5314,7 @@ This is where we will likely want to configure clustering modes, eviction polici
 </div>
 </div>
 <div class="sect3">
-<h4 id="ogm-infinispan-storage"><a class="anchor" href="#ogm-infinispan-storage"></a>9.3.5. Manage data size</h4>
+<h4 id="ogm-infinispan-storage"><a class="anchor" href="#ogm-infinispan-storage"></a>10.3.5. Manage data size</h4>
 <div class="paragraph">
 <p>In its default configuration Infinispan stores all data in the heap of the JVM;
 in this barebone mode it is conceptually not very different than using a HashMap:
@@ -5377,7 +5403,7 @@ Hibernate OGM will break in such a configuration.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="ogm-infinispan-clustering"><a class="anchor" href="#ogm-infinispan-clustering"></a>9.3.6. Clustering: store data on multiple Infinispan nodes</h4>
+<h4 id="ogm-infinispan-clustering"><a class="anchor" href="#ogm-infinispan-clustering"></a>10.3.6. Clustering: store data on multiple Infinispan nodes</h4>
 <div class="paragraph">
 <p>The best thing about Infinispan is that all nodes are treated equally
 and it requires almost no beforehand capacity planning:
@@ -5565,7 +5591,7 @@ You can fine tune these setting when you are closer to going in production.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="ogm-infinispan-transactions"><a class="anchor" href="#ogm-infinispan-transactions"></a>9.3.7. Transactions</h4>
+<h4 id="ogm-infinispan-transactions"><a class="anchor" href="#ogm-infinispan-transactions"></a>10.3.7. Transactions</h4>
 <div class="paragraph">
 <p>Infinispan supports transactions and integrates with any standard JTA <code>TransactionManager</code>;
 this is a great advantage for JPA users as it allows to experience a <em>similar</em> behaviour
@@ -5608,7 +5634,7 @@ for more advanced configuration options.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_infinispan_embedded_stored_procedures"><a class="anchor" href="#_infinispan_embedded_stored_procedures"></a>9.3.8. Infinispan Embedded Stored Procedures</h4>
+<h4 id="_infinispan_embedded_stored_procedures"><a class="anchor" href="#_infinispan_embedded_stored_procedures"></a>10.3.8. Infinispan Embedded Stored Procedures</h4>
 <div class="paragraph">
 <p>A stored procedure for Infinispan embedded dialect is just a Java <code>Runnable</code> or <code>Callable</code> class.
 The class must be defined on application classpath, then the JPA stored procedure API can be used to execute it.</p>
@@ -5623,7 +5649,7 @@ The class must be defined on application classpath, then the JPA stored procedur
 </div>
 </div>
 <div class="sect3">
-<h4 id="ogm-infinispan-indexstorage"><a class="anchor" href="#ogm-infinispan-indexstorage"></a>9.3.9. Storing a Lucene index in Infinispan</h4>
+<h4 id="ogm-infinispan-indexstorage"><a class="anchor" href="#ogm-infinispan-indexstorage"></a>10.3.9. Storing a Lucene index in Infinispan</h4>
 <div class="paragraph">
 <p>Hibernate Search, which can be used for advanced query capabilities (see <a href="#ogm-query">Query your entities</a>),
 needs some place to store the indexes for its embedded <code>Apache Lucene</code> engine.</p>
@@ -5758,7 +5784,7 @@ It should also define three cache names:</p>
 </table>
 <div class="paragraph">
 <p>This configuration is not going to scale well on write operations:
-to do that you should read about the master/slave and sharding options in Hibernate Search.
+to do that you should read about the controller/worker and sharding options in Hibernate Search.
 The complete explanation and configuration options can be found in the
 <a href="https://docs.jboss.org/hibernate/search/5.10/reference/en-US/html_single/#infinispan-directories">Hibernate Search Reference Guide</a></p>
 </div>
@@ -5772,7 +5798,7 @@ and have it merged in Hibernate Search for others to use, inspect, improve and m
 </div>
 </div>
 <div class="sect2">
-<h3 id="ogm-infinispan-remote"><a class="anchor" href="#ogm-infinispan-remote"></a>9.4. Hibernate OGM &amp; Infinispan Server over Hot Rod</h3>
+<h3 id="ogm-infinispan-remote"><a class="anchor" href="#ogm-infinispan-remote"></a>10.4. Hibernate OGM &amp; Infinispan Server over Hot Rod</h3>
 <div class="paragraph">
 <p>In this section we&#8217;ll see how to configure Hibernate OGM to connect to
 "Infinispan Server using the Hot Rod protocol", which we will call "Infinispan Remote"
@@ -5804,7 +5830,7 @@ In particular, the storage format is not set in stone.</p>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_adding_infinispan_remote_dependencies"><a class="anchor" href="#_adding_infinispan_remote_dependencies"></a>9.4.1. Adding Infinispan Remote dependencies</h4>
+<h4 id="_adding_infinispan_remote_dependencies"><a class="anchor" href="#_adding_infinispan_remote_dependencies"></a>10.4.1. Adding Infinispan Remote dependencies</h4>
 <div class="paragraph">
 <p>To use Hibernate OGM to connect to an Infinispan Server using the Hot Rod protocol, you will need the following extension
 and its transitive dependencies (which include, among others, the Hot Rod client):</p>
@@ -5814,13 +5840,13 @@ and its transitive dependencies (which include, among others, the Hot Rod client
 <pre class="prettyprint highlight"><code class="language-XML" data-lang="XML">&lt;dependency&gt;
     &lt;groupId&gt;org.hibernate.ogm&lt;/groupId&gt;
     &lt;artifactId&gt;hibernate-ogm-infinispan-remote&lt;/artifactId&gt;
-    &lt;version&gt;5.4.1.Final&lt;/version&gt;
+    &lt;version&gt;5.4.2.Final&lt;/version&gt;
 &lt;/dependency&gt;</code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_configuration_properties_for_infinispan_remote"><a class="anchor" href="#_configuration_properties_for_infinispan_remote"></a>9.4.2. Configuration properties for Infinispan Remote</h4>
+<h4 id="_configuration_properties_for_infinispan_remote"><a class="anchor" href="#_configuration_properties_for_infinispan_remote"></a>10.4.2. Configuration properties for Infinispan Remote</h4>
 <div class="paragraph">
 <p>First, let Hibernate know that you want to use the OGM Infinispan Remote datastore by setting the
 <code>hibernate.ogm.datastore.provider</code> property to <code>infinispan_remote</code>.</p>
@@ -6071,7 +6097,7 @@ For more information see the chapter <a href="#infinispan-remote-transaction">In
 </div>
 </div>
 <div class="sect3">
-<h4 id="_data_encoding_protobuf_schema"><a class="anchor" href="#_data_encoding_protobuf_schema"></a>9.4.3. Data encoding: Protobuf Schema</h4>
+<h4 id="_data_encoding_protobuf_schema"><a class="anchor" href="#_data_encoding_protobuf_schema"></a>10.4.3. Data encoding: Protobuf Schema</h4>
 <div class="paragraph">
 <p>Using the <em>Infinispan Remote</em> backend your data will be encoded using Protocol Buffers,
 also known as Protobuf.</p>
@@ -6148,7 +6174,7 @@ logs the generated schemas at <code>INFO</code> level in the logging category
 </div>
 </div>
 <div class="sect3">
-<h4 id="storage-principles-of-infinispan-dataprovider"><a class="anchor" href="#storage-principles-of-infinispan-dataprovider"></a>9.4.4. Storage Principles of the Infinispan Remote dataprovider</h4>
+<h4 id="storage-principles-of-infinispan-dataprovider"><a class="anchor" href="#storage-principles-of-infinispan-dataprovider"></a>10.4.4. Storage Principles of the Infinispan Remote dataprovider</h4>
 <div class="paragraph">
 <p>This is actually very simple.</p>
 </div>
@@ -6309,7 +6335,7 @@ or none at all, to favour performance over redundancy.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="infinispan-remote-cache-configuration"><a class="anchor" href="#infinispan-remote-cache-configuration"></a>9.4.5. Caches creation and configuration</h4>
+<h4 id="infinispan-remote-cache-configuration"><a class="anchor" href="#infinispan-remote-cache-configuration"></a>10.4.5. Caches creation and configuration</h4>
 <div class="paragraph">
 <p>Hibernate OGM can create a cache on the remote Infinispan cluster if it doesn&#8217;t exist.
 You can enable this behavior by setting the property
@@ -6484,7 +6510,7 @@ is not important for your use case.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_remote_query_capabilities"><a class="anchor" href="#_remote_query_capabilities"></a>9.4.6. Remote Query Capabilities</h4>
+<h4 id="_remote_query_capabilities"><a class="anchor" href="#_remote_query_capabilities"></a>10.4.6. Remote Query Capabilities</h4>
 <div class="paragraph">
 <p>Hibernate OGM backend can translate JPQL queries to the <strong>corresponding</strong> Infinispan remote
 native queries, or it can execute native queries directly.
@@ -6502,7 +6528,7 @@ There are some limitations, though:</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="infinispan-remote-transaction"><a class="anchor" href="#infinispan-remote-transaction"></a>9.4.7. Infinispan Remote Transaction</h4>
+<h4 id="infinispan-remote-transaction"><a class="anchor" href="#infinispan-remote-transaction"></a>10.4.7. Infinispan Remote Transaction</h4>
 <div class="paragraph">
 <p>Since version <em>5.4.0.CR1</em>, transactions over HotRot client are finally available.
 In order to fallback to the previous behavior will be necessary just to set property 'hibernate.ogm.cache.transaction.mode' property to <code>NONE</code> value.
@@ -6538,7 +6564,7 @@ the behavior seen by the client it is the same that we would have with an optimi
 </div>
 </div>
 <div class="sect3">
-<h4 id="_infinispan_remote_stored_procedures"><a class="anchor" href="#_infinispan_remote_stored_procedures"></a>9.4.8. Infinispan Remote Stored Procedures</h4>
+<h4 id="_infinispan_remote_stored_procedures"><a class="anchor" href="#_infinispan_remote_stored_procedures"></a>10.4.8. Infinispan Remote Stored Procedures</h4>
 <div class="paragraph">
 <p>Stored procedures are now supported by the remote dialect.
 There are two ways to execute code in the remote grid: <em>server task</em> and <em>remote script</em>.</p>
@@ -6565,7 +6591,7 @@ For more information see <a href="http://infinispan.org/docs/dev/user_guide/user
 </div>
 </div>
 <div class="sect3">
-<h4 id="_known_limitations_future_improvements"><a class="anchor" href="#_known_limitations_future_improvements"></a>9.4.9. Known Limitations &amp; Future improvements</h4>
+<h4 id="_known_limitations_future_improvements"><a class="anchor" href="#_known_limitations_future_improvements"></a>10.4.9. Known Limitations &amp; Future improvements</h4>
 <div class="paragraph">
 <p>The Infinispan Remote dataprovider has some known limitations, some of which are
 unsolvable without further development of Infinispan itself.</p>
@@ -6609,7 +6635,7 @@ This is currently not allowed over the Hot Rod protocol.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="ogm-infinispan-storage-principles"><a class="anchor" href="#ogm-infinispan-storage-principles"></a>9.5. Storage principles</h3>
+<h3 id="ogm-infinispan-storage-principles"><a class="anchor" href="#ogm-infinispan-storage-principles"></a>10.5. Storage principles</h3>
 <div class="paragraph">
 <p>To describe things simply, each entity is stored under a single key.
 The value itself is a map containing the columns / values pair.</p>
@@ -6619,7 +6645,7 @@ The value itself is a map containing the columns / values pair.</p>
 The value contains the navigational information to the (set of) entity.</p>
 </div>
 <div class="sect3">
-<h4 id="ogm-infinispan-built-in-types"><a class="anchor" href="#ogm-infinispan-built-in-types"></a>9.5.1. Properties and built-in types</h4>
+<h4 id="ogm-infinispan-built-in-types"><a class="anchor" href="#ogm-infinispan-built-in-types"></a>10.5.1. Properties and built-in types</h4>
 <div class="paragraph">
 <p>Each entity is represented by a map.
 Each property or more precisely column is represented by an entry in this map,
@@ -6701,7 +6727,7 @@ from Infinispan.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_identifiers"><a class="anchor" href="#_identifiers"></a>9.5.2. Identifiers</h4>
+<h4 id="_identifiers"><a class="anchor" href="#_identifiers"></a>10.5.2. Identifiers</h4>
 <div class="paragraph">
 <p>Entity identifiers are used to build the key in which the entity is stored in the cache.</p>
 </div>
@@ -7218,7 +7244,7 @@ public class Song {
 </div>
 </div>
 <div class="sect3">
-<h4 id="_entities_2"><a class="anchor" href="#_entities_2"></a>9.5.3. Entities</h4>
+<h4 id="_entities_2"><a class="anchor" href="#_entities_2"></a>10.5.3. Entities</h4>
 <div class="paragraph">
 <p>Entities are stored in the cache named after the entity name when using the <code>CACHE_PER_TABLE</code> strategy.
 In the <code>CACHE_PER_KIND</code> strategy, entities are stored in a single cache named <code>ENTITIES</code>.</p>
@@ -7814,7 +7840,7 @@ public class JiraIssue {
 </div>
 </div>
 <div class="sect3">
-<h4 id="_associations_2"><a class="anchor" href="#_associations_2"></a>9.5.4. Associations</h4>
+<h4 id="_associations_2"><a class="anchor" href="#_associations_2"></a>10.5.4. Associations</h4>
 <div class="paragraph">
 <p>Associations between entities are mapped like (collection of) embeddables
 except that the target entity is represented by its identifier(s).</p>
@@ -9274,7 +9300,7 @@ public class BankAccount {
 </div>
 </div>
 <div class="sect1">
-<h2 id="ogm-mongodb"><a class="anchor" href="#ogm-mongodb"></a>10. MongoDB</h2>
+<h2 id="ogm-mongodb"><a class="anchor" href="#ogm-mongodb"></a>11. MongoDB</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p><a href="http://www.mongodb.org">MongoDB</a> is a document oriented datastore
@@ -9286,7 +9312,7 @@ The nested nature of documents make it a particularly natural fit for most objec
 The currently supported version is 3.6.</p>
 </div>
 <div class="sect2">
-<h3 id="_why_should_i_use_hibernate_ogm_with_mongodb"><a class="anchor" href="#_why_should_i_use_hibernate_ogm_with_mongodb"></a>10.1. Why should I use Hibernate OGM with MongoDB</h3>
+<h3 id="_why_should_i_use_hibernate_ogm_with_mongodb"><a class="anchor" href="#_why_should_i_use_hibernate_ogm_with_mongodb"></a>11.1. Why should I use Hibernate OGM with MongoDB</h3>
 <div class="paragraph">
 <p>It is possible that in your project you have some entities that might benefit from MongoDB
 dynamic schema, but having a schema makes it possible to obtain better performance because
@@ -9330,7 +9356,7 @@ native queries occasionally.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_configuring_mongodb"><a class="anchor" href="#_configuring_mongodb"></a>10.2. Configuring MongoDB</h3>
+<h3 id="_configuring_mongodb"><a class="anchor" href="#_configuring_mongodb"></a>11.2. Configuring MongoDB</h3>
 <div class="paragraph">
 <p>Configuring Hibernate OGM to use MongoDb is easy:</p>
 </div>
@@ -9345,7 +9371,7 @@ native queries occasionally.</p>
 </ul>
 </div>
 <div class="sect3">
-<h4 id="_adding_mongodb_dependencies"><a class="anchor" href="#_adding_mongodb_dependencies"></a>10.2.1. Adding MongoDB dependencies</h4>
+<h4 id="_adding_mongodb_dependencies"><a class="anchor" href="#_adding_mongodb_dependencies"></a>11.2.1. Adding MongoDB dependencies</h4>
 <div class="paragraph">
 <p>To add the dependencies via Maven, add the following module:</p>
 </div>
@@ -9354,7 +9380,7 @@ native queries occasionally.</p>
 <pre class="prettyprint highlight"><code class="language-XML" data-lang="XML">&lt;dependency&gt;
     &lt;groupId&gt;org.hibernate.ogm&lt;/groupId&gt;
     &lt;artifactId&gt;hibernate-ogm-mongodb&lt;/artifactId&gt;
-    &lt;version&gt;5.4.1.Final&lt;/version&gt;
+    &lt;version&gt;5.4.2.Final&lt;/version&gt;
 &lt;/dependency&gt;</code></pre>
 </div>
 </div>
@@ -9383,7 +9409,7 @@ copy all the dependencies from the distribution in the directories:</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_mongodb_specific_configuration_properties"><a class="anchor" href="#_mongodb_specific_configuration_properties"></a>10.2.2. MongoDB specific configuration properties</h4>
+<h4 id="_mongodb_specific_configuration_properties"><a class="anchor" href="#_mongodb_specific_configuration_properties"></a>11.2.2. MongoDB specific configuration properties</h4>
 <div class="paragraph">
 <p>To get started quickly, pay attention to the following options:</p>
 </div>
@@ -9623,7 +9649,7 @@ when specifying the configuration properties listed above.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="ogm-mongodb-annotation-configuration"><a class="anchor" href="#ogm-mongodb-annotation-configuration"></a>10.2.3. Annotation based configuration</h4>
+<h4 id="ogm-mongodb-annotation-configuration"><a class="anchor" href="#ogm-mongodb-annotation-configuration"></a>11.2.3. Annotation based configuration</h4>
 <div class="paragraph">
 <p>Hibernate OGM allows to configure store-specific options via Java annotations.
 You can override global configurations for a specific entity or even a specify property
@@ -9694,7 +9720,7 @@ as per the configuration of that specific property which takes precedence over t
 </div>
 </div>
 <div class="sect3">
-<h4 id="ogm-mongodb-programmatic-configuration"><a class="anchor" href="#ogm-mongodb-programmatic-configuration"></a>10.2.4. Programmatic configuration</h4>
+<h4 id="ogm-mongodb-programmatic-configuration"><a class="anchor" href="#ogm-mongodb-programmatic-configuration"></a>11.2.4. Programmatic configuration</h4>
 <div class="paragraph">
 <p>In addition to the annotation mechanism,
 Hibernate OGM also provides a programmatic API for applying store-specific configuration options.
@@ -9788,7 +9814,7 @@ you also can pass in an <code>OptionConfigurator</code> instance or the class ob
 </div>
 </div>
 <div class="sect2">
-<h3 id="ogm-mongodb-storage-principles"><a class="anchor" href="#ogm-mongodb-storage-principles"></a>10.3. Storage principles</h3>
+<h3 id="ogm-mongodb-storage-principles"><a class="anchor" href="#ogm-mongodb-storage-principles"></a>11.3. Storage principles</h3>
 <div class="paragraph">
 <p>Hibernate OGM tries to make the mapping to the underlying datastore as natural as possible
 so that third party applications not using Hibernate OGM can still read
@@ -9804,7 +9830,7 @@ The navigational information for each association from one entity to (a set of) 
 is stored in the document representing the entity we are departing from.</p>
 </div>
 <div class="sect3">
-<h4 id="mongodb-built-in-types"><a class="anchor" href="#mongodb-built-in-types"></a>10.3.1. Properties and built-in types</h4>
+<h4 id="mongodb-built-in-types"><a class="anchor" href="#mongodb-built-in-types"></a>11.3.1. Properties and built-in types</h4>
 <div class="paragraph">
 <p>Each entity is represented by a document.
 Each property or more precisely column is represented by a field in this document,
@@ -10041,7 +10067,7 @@ in the corresponding object in the db.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="mongodb-gridfs-support"><a class="anchor" href="#mongodb-gridfs-support"></a>10.3.2. GridFS Support</h4>
+<h4 id="mongodb-gridfs-support"><a class="anchor" href="#mongodb-gridfs-support"></a>11.3.2. GridFS Support</h4>
 <div class="paragraph">
 <p>This feature is experimental.</p>
 </div>
@@ -10142,7 +10168,7 @@ public class Photo {
 </div>
 </div>
 <div class="sect3">
-<h4 id="_entities_3"><a class="anchor" href="#_entities_3"></a>10.3.3. Entities</h4>
+<h4 id="_entities_3"><a class="anchor" href="#_entities_3"></a>11.3.3. Entities</h4>
 <div class="paragraph">
 <p>Entities are stored as MongoDB documents and not as BLOBs:
 each entity property will be translated into a document field.
@@ -11108,7 +11134,7 @@ This approach might not be supported in the future.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="mongodb-associations"><a class="anchor" href="#mongodb-associations"></a>10.3.4. Associations</h4>
+<h4 id="mongodb-associations"><a class="anchor" href="#mongodb-associations"></a>11.3.4. Associations</h4>
 <div class="paragraph">
 <p>Hibernate OGM MongoDB proposes three strategies to store navigation information for associations.
 The three possible strategies are:</p>
@@ -13042,9 +13068,9 @@ public class BankAccount {
 </div>
 </div>
 <div class="sect2">
-<h3 id="ogm-mongodb-indexes-unique-constraints"><a class="anchor" href="#ogm-mongodb-indexes-unique-constraints"></a>10.4. Indexes and unique constraints</h3>
+<h3 id="ogm-mongodb-indexes-unique-constraints"><a class="anchor" href="#ogm-mongodb-indexes-unique-constraints"></a>11.4. Indexes and unique constraints</h3>
 <div class="sect3">
-<h4 id="_standard_indexes_and_unique_constraints"><a class="anchor" href="#_standard_indexes_and_unique_constraints"></a>10.4.1. Standard indexes and unique constraints</h4>
+<h4 id="_standard_indexes_and_unique_constraints"><a class="anchor" href="#_standard_indexes_and_unique_constraints"></a>11.4.1. Standard indexes and unique constraints</h4>
 <div class="paragraph">
 <p>You can create your index and unique constraints in MongoDB using the standard JPA annotations.</p>
 </div>
@@ -13093,7 +13119,7 @@ unique constraints accept multiple <code>null</code> values.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_using_mongodb_specific_index_options"><a class="anchor" href="#_using_mongodb_specific_index_options"></a>10.4.2. Using MongoDB specific index options</h4>
+<h4 id="_using_mongodb_specific_index_options"><a class="anchor" href="#_using_mongodb_specific_index_options"></a>11.4.2. Using MongoDB specific index options</h4>
 <div class="paragraph">
 <p>MongoDB supports <a href="https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/">a number of options for
 index creation</a>.</p>
@@ -13131,7 +13157,7 @@ public class Poem {
 </div>
 </div>
 <div class="sect3">
-<h4 id="_full_text_indexes"><a class="anchor" href="#_full_text_indexes"></a>10.4.3. Full text indexes</h4>
+<h4 id="_full_text_indexes"><a class="anchor" href="#_full_text_indexes"></a>11.4.3. Full text indexes</h4>
 <div class="paragraph">
 <p>MongoDB supports the ability to create one (and only one) full text index per collection.</p>
 </div>
@@ -13168,7 +13194,7 @@ public class Poem {
 </div>
 </div>
 <div class="sect2">
-<h3 id="_transactions"><a class="anchor" href="#_transactions"></a>10.5. Transactions</h3>
+<h3 id="_transactions"><a class="anchor" href="#_transactions"></a>11.5. Transactions</h3>
 <div class="paragraph">
 <p>MongoDB does not support transactions.
 Only changes applied to the same document are done atomically.
@@ -13184,7 +13210,7 @@ But do not consider rollback as a possibility, this won&#8217;t work.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="ogm-mongodb-optimisticlocking"><a class="anchor" href="#ogm-mongodb-optimisticlocking"></a>10.6. Optimistic Locking</h3>
+<h3 id="ogm-mongodb-optimisticlocking"><a class="anchor" href="#ogm-mongodb-optimisticlocking"></a>11.6. Optimistic Locking</h3>
 <div class="paragraph">
 <p>MongoDB does not provide a built-in mechanism for detecting concurrent updates to the same document
 but it provides a way to execute atomic find and update operations.
@@ -13264,7 +13290,7 @@ public class Planet implements Nameable {
 </div>
 </div>
 <div class="sect2">
-<h3 id="ogm-mongodb-queries"><a class="anchor" href="#ogm-mongodb-queries"></a>10.7. Queries</h3>
+<h3 id="ogm-mongodb-queries"><a class="anchor" href="#ogm-mongodb-queries"></a>11.7. Queries</h3>
 <div class="paragraph">
 <p>You can express queries in a few different ways:</p>
 </div>
@@ -13316,7 +13342,7 @@ Bear in mind though that query results will then not reflect changes applied wit
 </table>
 </div>
 <div class="sect3">
-<h4 id="_jpql_queries"><a class="anchor" href="#_jpql_queries"></a>10.7.1. JPQL queries</h4>
+<h4 id="_jpql_queries"><a class="anchor" href="#_jpql_queries"></a>11.7.1. JPQL queries</h4>
 <div class="paragraph">
 <p>Hibernate OGM is a work in progress, so only a sub-set of JPQL constructs is available
 when using the JPQL query support. This includes:</p>
@@ -13367,7 +13393,7 @@ Expanding our support in this area is high on our priority list.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="ogm-mongodb-queries-native"><a class="anchor" href="#ogm-mongodb-queries-native"></a>10.7.2. Native MongoDB queries</h4>
+<h4 id="ogm-mongodb-queries-native"><a class="anchor" href="#ogm-mongodb-queries-native"></a>11.7.2. Native MongoDB queries</h4>
 <div class="paragraph">
 <p>Hibernate OGM also supports certain forms of native queries for MongoDB.
 Currently two forms of native queries are available via the MongoDB backend:</p>
@@ -13649,7 +13675,7 @@ List&lt;Poem&gt; result = session.createNativeQuery( nativeQuery ).addEntity( Po
 </div>
 </div>
 <div class="sect3">
-<h4 id="ogm-mongodb-stored-proc-native"><a class="anchor" href="#ogm-mongodb-stored-proc-native"></a>10.7.3. Server-side JavaScript and stored procedures</h4>
+<h4 id="ogm-mongodb-stored-proc-native"><a class="anchor" href="#ogm-mongodb-stored-proc-native"></a>11.7.3. Server-side JavaScript and stored procedures</h4>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -13717,7 +13743,7 @@ and that the result of the function is a list of cars that can be mapped to the 
 </div>
 </div>
 <div class="sect3">
-<h4 id="_hibernate_search"><a class="anchor" href="#_hibernate_search"></a>10.7.4. Hibernate Search</h4>
+<h4 id="_hibernate_search"><a class="anchor" href="#_hibernate_search"></a>11.7.4. Hibernate Search</h4>
 <div class="paragraph">
 <p>You can index your entities using Hibernate Search.
 That way, a set of secondary indexes independent of MongoDB is maintained by Hibernate Search
@@ -13732,9 +13758,9 @@ for more info on how to use Hibernate Search.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_geospatial_support"><a class="anchor" href="#_geospatial_support"></a>10.8. Geospatial support</h3>
+<h3 id="_geospatial_support"><a class="anchor" href="#_geospatial_support"></a>11.8. Geospatial support</h3>
 <div class="sect3">
-<h4 id="_geospatial_fields"><a class="anchor" href="#_geospatial_fields"></a>10.8.1. Geospatial fields</h4>
+<h4 id="_geospatial_fields"><a class="anchor" href="#_geospatial_fields"></a>11.8.1. Geospatial fields</h4>
 <div class="paragraph">
 <p>Our MongoDB integration supports the ability to declare geospatial fields by using specific Java types that will be
 automatically converted to GeoJSON objects stored in MongoDB.</p>
@@ -13805,7 +13831,7 @@ public class Restaurant {
 </div>
 </div>
 <div class="sect3">
-<h4 id="_geospatial_indexes_and_queries"><a class="anchor" href="#_geospatial_indexes_and_queries"></a>10.8.2. Geospatial indexes and queries</h4>
+<h4 id="_geospatial_indexes_and_queries"><a class="anchor" href="#_geospatial_indexes_and_queries"></a>11.8.2. Geospatial indexes and queries</h4>
 <div class="paragraph">
 <p>To be able to run optimized queries on geospatial fields, you need to declare spatial indexes.</p>
 </div>
@@ -13885,7 +13911,7 @@ List&lt;Restaurant&gt; result = query.list();</code></pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="ogm-neo4j"><a class="anchor" href="#ogm-neo4j"></a>11. Neo4j</h2>
+<h2 id="ogm-neo4j"><a class="anchor" href="#ogm-neo4j"></a>12. Neo4j</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p><a href="http://www.neo4j.org">Neo4j</a> is a robust (fully ACID) transactional property graph database.
@@ -13897,7 +13923,7 @@ like social relationships or road maps for example.</p>
 The connection to the remote server can occur via the Bolt protocol or the HTTP API.</p>
 </div>
 <div class="sect2">
-<h3 id="_how_to_add_neo4j_integration"><a class="anchor" href="#_how_to_add_neo4j_integration"></a>11.1. How to add Neo4j integration</h3>
+<h3 id="_how_to_add_neo4j_integration"><a class="anchor" href="#_how_to_add_neo4j_integration"></a>12.1. How to add Neo4j integration</h3>
 <div class="paragraph">
 <div class="title">1. Add the dependencies to your project</div>
 <p>If your project uses Maven you can add this to the pom.xml:</p>
@@ -13907,13 +13933,13 @@ The connection to the remote server can occur via the Bolt protocol or the HTTP 
 <pre class="prettyprint highlight"><code class="language-XML" data-lang="XML">&lt;dependency&gt;
     &lt;groupId&gt;org.hibernate.ogm&lt;/groupId&gt;
     &lt;artifactId&gt;hibernate-ogm-neo4j&lt;/artifactId&gt;
-    &lt;version&gt;5.4.1.Final&lt;/version&gt;
+    &lt;version&gt;5.4.2.Final&lt;/version&gt;
 &lt;/dependency&gt;</code></pre>
 </div>
 </div>
 <div class="paragraph">
 <p>Alternatively you can find the required libraries in the distribution package on
-<a href="https://downloads.sourceforge.net/project/hibernate/hibernate-ogm/5.4.1.Final/hibernate-ogm-5.4.1.Final-dist.zip">SourceForge</a></p>
+<a href="https://downloads.sourceforge.net/project/hibernate/hibernate-ogm/5.4.2.Final/hibernate-ogm-5.4.2.Final-dist.zip">SourceForge</a></p>
 </div>
 <div class="paragraph">
 <div class="title">2. Use the following properties</div>
@@ -13977,7 +14003,7 @@ hibernate.ogm.datastore.password = example_password</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_configuring_neo4j"><a class="anchor" href="#_configuring_neo4j"></a>11.2. Configuring Neo4j</h3>
+<h3 id="_configuring_neo4j"><a class="anchor" href="#_configuring_neo4j"></a>12.2. Configuring Neo4j</h3>
 <div class="paragraph">
 <p>The following properties are available to configure Neo4j support:</p>
 </div>
@@ -14052,7 +14078,7 @@ when specifying the configuration properties listed above.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="ogm-neo4j-storage-principles"><a class="anchor" href="#ogm-neo4j-storage-principles"></a>11.3. Storage principles</h3>
+<h3 id="ogm-neo4j-storage-principles"><a class="anchor" href="#ogm-neo4j-storage-principles"></a>12.3. Storage principles</h3>
 <div class="paragraph">
 <p>Hibernate OGM tries to make the mapping to the underlying datastore as natural as possible
 so that third party applications not using Hibernate OGM can still read
@@ -14066,7 +14092,7 @@ are represented by relationships between nodes.
 Entity and embedded nodes are labelled <code>ENTITY</code> and <code>EMBEDDED</code> respectively.</p>
 </div>
 <div class="sect3">
-<h4 id="ogm-neo4j-built-in-types"><a class="anchor" href="#ogm-neo4j-built-in-types"></a>11.3.1. Properties and built-in types</h4>
+<h4 id="ogm-neo4j-built-in-types"><a class="anchor" href="#ogm-neo4j-built-in-types"></a>12.3.1. Properties and built-in types</h4>
 <div class="paragraph">
 <p>Each entity is represented by a node.
 Each property or more precisely column is represented by an attribute of this node.</p>
@@ -14161,7 +14187,7 @@ from Neo4J.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_entities_4"><a class="anchor" href="#_entities_4"></a>11.3.2. Entities</h4>
+<h4 id="_entities_4"><a class="anchor" href="#_entities_4"></a>12.3.2. Entities</h4>
 <div class="paragraph">
 <p>Entities are stored as Neo4j nodes,
 which means each entity property will be translated into a property of the node.
@@ -14474,7 +14500,7 @@ We don&#8217;t think this is a natural mapping and expect it to change in the up
 </div>
 </div>
 <div class="sect3">
-<h4 id="_associations_3"><a class="anchor" href="#_associations_3"></a>11.3.3. Associations</h4>
+<h4 id="_associations_3"><a class="anchor" href="#_associations_3"></a>12.3.3. Associations</h4>
 <div class="paragraph">
 <p>An association, bidirectional or unidirectional, is always mapped using one relationship,
 beginning at the owning side of the association.
@@ -14854,7 +14880,7 @@ public class Person {
 </div>
 </div>
 <div class="sect3">
-<h4 id="_auto_generated_values"><a class="anchor" href="#_auto_generated_values"></a>11.3.4. Auto-generated Values</h4>
+<h4 id="_auto_generated_values"><a class="anchor" href="#_auto_generated_values"></a>12.3.4. Auto-generated Values</h4>
 <div class="paragraph">
 <p>Hibernate OGM supports the table generation strategy as well as the sequence generation strategy with Neo4j.
 It is generally recommended to work with the latter,
@@ -14955,7 +14981,7 @@ The options <code>@TableGenerator#catalog()</code>, <code>@TableGenerator#schema
 </div>
 </div>
 <div class="sect3">
-<h4 id="_labels_summary"><a class="anchor" href="#_labels_summary"></a>11.3.5. Labels summary</h4>
+<h4 id="_labels_summary"><a class="anchor" href="#_labels_summary"></a>12.3.5. Labels summary</h4>
 <div class="paragraph">
 <p>The maximum number of labels the database can contain is roughly 2 billion.</p>
 </div>
@@ -14996,7 +15022,7 @@ The options <code>@TableGenerator#catalog()</code>, <code>@TableGenerator#schema
 </div>
 </div>
 <div class="sect2">
-<h3 id="ogm-neo4j-transactions"><a class="anchor" href="#ogm-neo4j-transactions"></a>11.4. Transactions</h3>
+<h3 id="ogm-neo4j-transactions"><a class="anchor" href="#ogm-neo4j-transactions"></a>12.4. Transactions</h3>
 <div class="paragraph">
 <p>In Neo4j, operations must be executed inside a transaction.
 Make sure your interactions with Hibernate OGM are within a transaction when you target Neo4J.</p>
@@ -15053,7 +15079,7 @@ if the JTA transaction will.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="ogm-neo4j-queries"><a class="anchor" href="#ogm-neo4j-queries"></a>11.5. Queries</h3>
+<h3 id="ogm-neo4j-queries"><a class="anchor" href="#ogm-neo4j-queries"></a>12.5. Queries</h3>
 <div class="paragraph">
 <p>You can express queries in a few different ways:</p>
 </div>
@@ -15076,7 +15102,7 @@ if your query involves nested (list of) elements.</p>
 <p>You don&#8217;t need Hibernate Search on the classpath to run queries.</p>
 </div>
 <div class="sect3">
-<h4 id="_jpql_queries_2"><a class="anchor" href="#_jpql_queries_2"></a>11.5.1. JPQL queries</h4>
+<h4 id="_jpql_queries_2"><a class="anchor" href="#_jpql_queries_2"></a>12.5.1. JPQL queries</h4>
 <div class="paragraph">
 <p>Hibernate OGM is a work in progress, so only a sub-set of JPQL constructs is available
 when using the JPQL query support. This includes:</p>
@@ -15127,7 +15153,7 @@ Expanding our support in this area is high on our priority list.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="ogm-neo4j-queries-native"><a class="anchor" href="#ogm-neo4j-queries-native"></a>11.5.2. Cypher queries</h4>
+<h4 id="ogm-neo4j-queries-native"><a class="anchor" href="#ogm-neo4j-queries-native"></a>12.5.2. Cypher queries</h4>
 <div class="paragraph">
 <p>Hibernate OGM also supports <a href="http://docs.neo4j.org/chunked/stable/cypher-query-lang.html">Cypher queries</a> for Neo4j.
 You can execute Cypher queries as shown in the following example:</p>
@@ -15237,9 +15263,20 @@ the main drawback is that the results are going to be raw Neo4j elements and not
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-12-18 12:13:28 UTC
+Last updated 2024-09-24 16:15:41 UTC
 </div>
 </div>
+<!-- Google Analytics -->
+<script type="text/javascript">
+	dataLayer = [{'channel' : 'Hibernate', 'additional_tracking_code' : 'UA-45270411-3'}];
+	(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+		new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+		j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+	})(window,document,'script','dataLayer','GTM-NJWS5L');
+</script>
+<noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-NJWS5L" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- /Google Analytics -->
+
 <!-- HibernateDoc.OutdatedContent -->
 <script src="//code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
 <script src="/hibernate/_outdated-content/outdated-content.js" type="text/javascript"></script>
