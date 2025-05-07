@@ -2,16 +2,6 @@
 <!DOCTYPE html
   PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title>Chapter 5. Grouping constraints</title><link rel="stylesheet" type="text/css" href="css/hibernate.css"/><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"/><link rel="home" href="index.html" title="Hibernate Validator 5.2.5.Final"/><link rel="up" href="index.html" title="Hibernate Validator 5.2.5.Final"/><link rel="prev" href="ch04.html" title="Chapter 4. Interpolating constraint error messages"/><link rel="next" href="ch06.html" title="Chapter 6. Creating custom constraints"/><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-<!-- Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-282CVRCQHZ"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-282CVRCQHZ');
-</script>
-<!-- /Google Analytics -->
 </head><body><p id="title"><a href="http://www.hibernate.org" class="site_href"><strong>Hibernate.org</strong></a><a href="http://hibernate.org/Documentation/DocumentationOverview" class="doc_href"><strong>Community Documentation</strong></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="ch04.html"><strong>Prev</strong></a></li><li class="next"><a accesskey="n" href="ch06.html"><strong>Next</strong></a></li></ul><div class="chapter" title="Chapter 5. Grouping constraints"><div class="titlepage"><div><div><h2 class="title"><a id="chapter-groups"/>Chapter 5. Grouping constraints</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="ch05.html#_requesting_groups">5.1. Requesting groups</a></span></dt><dt><span class="section"><a href="ch05.html#section-defining-group-sequences">5.2. Defining group sequences</a></span></dt><dt><span class="section"><a href="ch05.html#section-default-group-class">5.3. Redefining the default group sequence</a></span></dt><dd><dl><dt><span class="section"><a href="ch05.html#__literal_groupsequence_literal">5.3.1. <code class="literal">@GroupSequence</code></a></span></dt><dt><span class="section"><a href="ch05.html#__literal_groupsequenceprovider_literal">5.3.2. <code class="literal">@GroupSequenceProvider</code></a></span></dt></dl></dd><dt><span class="section"><a href="ch05.html#section-group-conversion">5.4. Group conversion</a></span></dt></dl></div><p>All validation methods on <code class="literal">Validator</code> and <code class="literal">ExecutableValidator</code> discussed in earlier chapters also take
 a var-arg argument groups. So far we have been ignoring this parameter, but it is time to have a
 closer look.</p><div class="section" title="5.1. Requesting groups"><div class="titlepage"><div><div><h2 class="title"><a id="_requesting_groups"/>5.1. Requesting groups</h2></div></div></div><p>Groups allow you to restrict the set of constraints applied during validation. One use case for

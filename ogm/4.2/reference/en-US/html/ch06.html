@@ -2,16 +2,6 @@
 <!DOCTYPE html
   PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title>Chapter 6. Hibernate OGM APIs</title><!-- HibernateDoc.Meta --><meta name="description" content="Hibernate OGM, JPA for NoSQL datastores - Reference Documentation" /><meta name="keywords" content="hibernate, ogm, hibernate ogm, nosql, jpa, infinispan, mongodb, neo4j, cassandra, couchdb, ehcache, redis" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://docs.jboss.org/hibernate/stable/ogm/reference/en-US/html_single/" /><!-- /HibernateDoc.Meta --><link rel="stylesheet" type="text/css" href="css/hibernate.css"/><meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1"/><link rel="home" href="index.html" title="Hibernate OGM Reference Guide"/><link rel="up" href="index.html" title="Hibernate OGM Reference Guide"/><link rel="prev" href="ch05.html" title="Chapter 5. Map your entities"/><link rel="next" href="ch07.html" title="Chapter 7. Query your entities"/><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-<!-- Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-282CVRCQHZ"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-282CVRCQHZ');
-</script>
-<!-- /Google Analytics -->
 </head><body><p id="title"><a href="http://www.hibernate.org" class="site_href"><strong>Hibernate.org</strong></a><a href="http://hibernate.org/Documentation/DocumentationOverview" class="doc_href"><strong>Community Documentation</strong></a></p><ul class="docnav"><li class="previous"><a accesskey="p" href="ch05.html"><strong>Prev</strong></a></li><li class="next"><a accesskey="n" href="ch07.html"><strong>Next</strong></a></li></ul><div class="chapter" title="Chapter 6. Hibernate OGM APIs"><div class="titlepage"><div><div><h2 class="title"><a id="ogm-api"/>Chapter 6. Hibernate OGM APIs</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="ch06.html#bootstrap_hibernate_ogm">6.1. Bootstrap Hibernate OGM</a></span></dt><dt><span class="section"><a href="ch06.html#jpa_and_native_hibernate_orm_apis">6.2. JPA and native Hibernate ORM APIs</a></span></dt><dd><dl><dt><span class="section"><a href="ch06.html#accessing_the_literal_ogmsession_literal_api">6.2.1. Accessing the <code class="literal">OgmSession</code> API</a></span></dt></dl></dd><dt><span class="section"><a href="ch06.html#on_flush_and_transactions">6.3. On flush and transactions</a></span></dt><dd><dl><dt><span class="section"><a href="ch06.html#ogm-api-error-handler">6.3.1. Acting upon errors during application of changes</a></span></dt></dl></dd><dt><span class="section"><a href="ch06.html#spis">6.4. SPIs</a></span></dt></dl></div><p>Hibernate OGM has very few specific APIs.
 For the most part, you will interact with it via either:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem">the JPA APIs</li><li class="listitem">the native Hibernate ORM APIs</li></ul></div><p>This chapter will only discuss the Hibernate OGM specific behaviors regarding these APIs.
 If you need to learn JPA or the native Hibernate APIs,
