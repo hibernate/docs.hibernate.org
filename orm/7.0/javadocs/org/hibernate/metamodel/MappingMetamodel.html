@@ -90,6 +90,10 @@ loadScripts(document, 'script');</script>
 </span><span class="modifiers">public interface </span><span class="element-name type-name-label">MappingMetamodel</span><span class="extends-implements">
 extends <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Metamodel.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Metamodel</a></span></div>
 <div class="block">Access to information about the runtime relational O/R mapping model.</div>
+<dl class="notes">
+<dt>API Note:</dt>
+<dd>This is an incubating SPI. Its name and package may change.</dd>
+</dl>
 </section>
 <section class="summary">
 <ul class="summary-list">
@@ -104,9 +108,9 @@ extends <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/p
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;T&gt;&nbsp;void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#addNamedEntityGraph(java.lang.String,org.hibernate.graph.spi.RootGraphImplementor)" class="member-name-link">addNamedEntityGraph</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;graphName,
- <a href="../graph/spi/RootGraphImplementor.html" title="interface in org.hibernate.graph.spi">RootGraphImplementor</a>&lt;T&gt;&nbsp;entityGraph)</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#addNamedEntityGraph(java.lang.String,org.hibernate.graph.RootGraph)" class="member-name-link">addNamedEntityGraph</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;graphName,
+ <a href="../graph/RootGraph.html" title="interface in org.hibernate.graph">RootGraph</a>&lt;?&gt;&nbsp;entityGraph)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="../graph/RootGraph.html" title="interface in org.hibernate.graph">RootGraph</a>&lt;?&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#defaultGraph(java.lang.Class)" class="member-name-link">defaultGraph</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;entityJavaType)</code></div>
@@ -217,20 +221,14 @@ extends <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/p
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#resolveMappingExpressible(org.hibernate.query.sqm.SqmExpressible,java.util.function.Function)" class="member-name-link">resolveMappingExpressible</a><wbr>(<a href="../query/sqm/SqmExpressible.html" title="interface in org.hibernate.query.sqm">SqmExpressible</a>&lt;?&gt;&nbsp;sqmExpressible,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="../spi/NavigablePath.html" title="class in org.hibernate.spi">NavigablePath</a>,<wbr><a href="../sql/ast/tree/from/TableGroup.html" title="interface in org.hibernate.sql.ast.tree.from">TableGroup</a>&gt;&nbsp;tableGroupLocator)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;T&gt;&nbsp;<a href="../query/BindableType.html" title="interface in org.hibernate.query">BindableType</a>&lt;T&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#resolveQueryParameterType(java.lang.Class)" class="member-name-link">resolveQueryParameterType</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;javaType)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Given a Java type, determine the corresponding BindableType to
- use implicitly</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/Stream.html" title="class or interface in java.util.stream" class="external-link">Stream</a>&lt;<a href="../persister/collection/CollectionPersister.html" title="interface in org.hibernate.persister.collection">CollectionPersister</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="#streamCollectionDescriptors()" class="member-name-link">streamCollectionDescriptors</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/Stream.html" title="class or interface in java.util.stream" class="external-link">Stream</a>&lt;<a href="../persister/collection/CollectionPersister.html" title="interface in org.hibernate.persister.collection">CollectionPersister</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="#streamCollectionDescriptors()" class="member-name-link">streamCollectionDescriptors</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6">
 <div class="block"><span class="deprecated-label">Deprecated, for removal: This API element is subject to removal in a future version.</span></div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/Stream.html" title="class or interface in java.util.stream" class="external-link">Stream</a>&lt;<a href="../persister/entity/EntityPersister.html" title="interface in org.hibernate.persister.entity">EntityPersister</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="#streamEntityDescriptors()" class="member-name-link">streamEntityDescriptors</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/Stream.html" title="class or interface in java.util.stream" class="external-link">Stream</a>&lt;<a href="../persister/entity/EntityPersister.html" title="interface in org.hibernate.persister.entity">EntityPersister</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="#streamEntityDescriptors()" class="member-name-link">streamEntityDescriptors</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6">
 <div class="block"><span class="deprecated-label">Deprecated, for removal: This API element is subject to removal in a future version.</span></div>
 </div>
 </div>
@@ -255,22 +253,6 @@ extends <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/p
 <h3>getTypeConfiguration</h3>
 <div class="member-signature"><span class="return-type"><a href="../type/spi/TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a></span>&nbsp;<span class="element-name">getTypeConfiguration</span>()</div>
 <div class="block">The <a href="../type/spi/TypeConfiguration.html" title="class in org.hibernate.type.spi"><code>TypeConfiguration</code></a> this metamodel is associated with</div>
-</section>
-</li>
-<li>
-<section class="detail" id="resolveMappingExpressible(org.hibernate.query.sqm.SqmExpressible,java.util.function.Function)">
-<h3>resolveMappingExpressible</h3>
-<div class="member-signature"><span class="annotations"><a href="../Internal.html" title="annotation interface in org.hibernate">@Internal</a>
-</span><span class="return-type"><a href="mapping/MappingModelExpressible.html" title="interface in org.hibernate.metamodel.mapping">MappingModelExpressible</a>&lt;?&gt;</span>&nbsp;<span class="element-name">resolveMappingExpressible</span><wbr><span class="parameters">(<a href="../query/sqm/SqmExpressible.html" title="interface in org.hibernate.query.sqm">SqmExpressible</a>&lt;?&gt;&nbsp;sqmExpressible,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="../spi/NavigablePath.html" title="class in org.hibernate.spi">NavigablePath</a>,<wbr><a href="../sql/ast/tree/from/TableGroup.html" title="interface in org.hibernate.sql.ast.tree.from">TableGroup</a>&gt;&nbsp;tableGroupLocator)</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="resolveQueryParameterType(java.lang.Class)">
-<h3>resolveQueryParameterType</h3>
-<div class="member-signature"><span class="type-parameters">&lt;T&gt;</span>&nbsp;<span class="return-type"><a href="../query/BindableType.html" title="interface in org.hibernate.query">BindableType</a>&lt;T&gt;</span>&nbsp;<span class="element-name">resolveQueryParameterType</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;javaType)</span></div>
-<div class="block">Given a Java type, determine the corresponding BindableType to
- use implicitly</div>
 </section>
 </li>
 <li>
@@ -499,10 +481,10 @@ extends <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/p
 </section>
 </li>
 <li>
-<section class="detail" id="addNamedEntityGraph(java.lang.String,org.hibernate.graph.spi.RootGraphImplementor)">
+<section class="detail" id="addNamedEntityGraph(java.lang.String,org.hibernate.graph.RootGraph)">
 <h3>addNamedEntityGraph</h3>
-<div class="member-signature"><span class="type-parameters">&lt;T&gt;</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addNamedEntityGraph</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;graphName,
- <a href="../graph/spi/RootGraphImplementor.html" title="interface in org.hibernate.graph.spi">RootGraphImplementor</a>&lt;T&gt;&nbsp;entityGraph)</span></div>
+<div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name">addNamedEntityGraph</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;graphName,
+ <a href="../graph/RootGraph.html" title="interface in org.hibernate.graph">RootGraph</a>&lt;?&gt;&nbsp;entityGraph)</span></div>
 </section>
 </li>
 <li>
@@ -551,6 +533,14 @@ extends <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/p
 <section class="detail" id="findRootGraphsForType(org.hibernate.persister.entity.EntityPersister)">
 <h3>findRootGraphsForType</h3>
 <div class="member-signature"><span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../graph/RootGraph.html" title="interface in org.hibernate.graph">RootGraph</a>&lt;?&gt;&gt;</span>&nbsp;<span class="element-name">findRootGraphsForType</span><wbr><span class="parameters">(<a href="../persister/entity/EntityPersister.html" title="interface in org.hibernate.persister.entity">EntityPersister</a>&nbsp;baseEntityDescriptor)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="resolveMappingExpressible(org.hibernate.query.sqm.SqmExpressible,java.util.function.Function)">
+<h3>resolveMappingExpressible</h3>
+<div class="member-signature"><span class="annotations"><a href="../Internal.html" title="annotation interface in org.hibernate">@Internal</a>
+</span><span class="return-type"><a href="mapping/MappingModelExpressible.html" title="interface in org.hibernate.metamodel.mapping">MappingModelExpressible</a>&lt;?&gt;</span>&nbsp;<span class="element-name">resolveMappingExpressible</span><wbr><span class="parameters">(<a href="../query/sqm/SqmExpressible.html" title="interface in org.hibernate.query.sqm">SqmExpressible</a>&lt;?&gt;&nbsp;sqmExpressible,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="../spi/NavigablePath.html" title="class in org.hibernate.spi">NavigablePath</a>,<wbr><a href="../sql/ast/tree/from/TableGroup.html" title="interface in org.hibernate.sql.ast.tree.from">TableGroup</a>&gt;&nbsp;tableGroupLocator)</span></div>
 </section>
 </li>
 </ul>

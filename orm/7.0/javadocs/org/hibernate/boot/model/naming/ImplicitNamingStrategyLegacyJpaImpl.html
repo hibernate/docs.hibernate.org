@@ -147,20 +147,33 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Identifier.html" title="class in org.hibernate.boot.model.naming">Identifier</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#determineCollectionTableName(org.hibernate.boot.model.naming.ImplicitCollectionTableNameSource)" class="member-name-link">determineCollectionTableName</a><wbr>(<a href="ImplicitCollectionTableNameSource.html" title="interface in org.hibernate.boot.model.naming">ImplicitCollectionTableNameSource</a>&nbsp;source)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Determine the name of a collection join table given the source naming
- information, when a name is not explicitly given.</div>
+<div class="block">JPA states we should use the following as default:
+ The concatenation of the name of the containing entity and the
+ name of the collection attribute, separated by an underscore.
+ That is, if owning entity has a JPA entity name:</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Identifier.html" title="class in org.hibernate.boot.model.naming">Identifier</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#determineJoinColumnName(org.hibernate.boot.model.naming.ImplicitJoinColumnNameSource)" class="member-name-link">determineJoinColumnName</a><wbr>(<a href="ImplicitJoinColumnNameSource.html" title="interface in org.hibernate.boot.model.naming">ImplicitJoinColumnNameSource</a>&nbsp;source)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Determine the join column name when it is not explicitly specified using
- <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/JoinColumn.html#name()" title="class or interface in jakarta.persistence" class="external-link"><code>JoinColumn.name()</code></a>.</div>
+<div class="block">JPA states we should use the following as default:
+ 
+ If there is a "referencing relationship property":
+     The concatenation of the following: the name of the referencing
+     relationship property or field of the referencing entity or embeddable class;
+     <code>_</code>; the name of the referenced primary key column.
+ If there is no such "referencing relationship property",
+     or if the association is an element collection:
+     The concatenation of the following: the name of the entity;
+     <code>_</code>; the name of the referenced primary key column
+ </div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Identifier.html" title="class in org.hibernate.boot.model.naming">Identifier</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#determineJoinTableName(org.hibernate.boot.model.naming.ImplicitJoinTableNameSource)" class="member-name-link">determineJoinTableName</a><wbr>(<a href="ImplicitJoinTableNameSource.html" title="interface in org.hibernate.boot.model.naming">ImplicitJoinTableNameSource</a>&nbsp;source)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Determine the name of an association join table given the source naming
- information, when a name is not explicitly given.</div>
+<div class="block">JPA states we should use the following as default:
+ The concatenated names of the two associated primary entity
+ tables (owning side first), separated by an underscore.
+ That is:</div>
 </div>
 </div>
 </div>
@@ -215,11 +228,14 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="determineCollectionTableName(org.hibernate.boot.model.naming.ImplicitCollectionTableNameSource)">
 <h3>determineCollectionTableName</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Identifier.html" title="class in org.hibernate.boot.model.naming">Identifier</a></span>&nbsp;<span class="element-name">determineCollectionTableName</span><wbr><span class="parameters">(<a href="ImplicitCollectionTableNameSource.html" title="interface in org.hibernate.boot.model.naming">ImplicitCollectionTableNameSource</a>&nbsp;source)</span></div>
-<div class="block"><span class="descfrm-type-label">Description copied from interface:&nbsp;<code><a href="ImplicitNamingStrategy.html#determineCollectionTableName(org.hibernate.boot.model.naming.ImplicitCollectionTableNameSource)">ImplicitNamingStrategy</a></code></span></div>
-<div class="block">Determine the name of a collection join table given the source naming
- information, when a name is not explicitly given. This method is called
- only for <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/ElementCollection.html" title="class or interface in jakarta.persistence" class="external-link">collections of
- basic or embeddable values</a>, and never for associations.</div>
+<div class="block"><span class="descfrm-type-label">Description copied from class:&nbsp;<code><a href="ImplicitNamingStrategyJpaCompliantImpl.html#determineCollectionTableName(org.hibernate.boot.model.naming.ImplicitCollectionTableNameSource)">ImplicitNamingStrategyJpaCompliantImpl</a></code></span></div>
+<div class="block">JPA states we should use the following as default:
+ <blockquote>The concatenation of the name of the containing entity and the
+ name of the collection attribute, separated by an underscore.</blockquote>
+ That is, if owning entity has a JPA entity name:
+ <pre>{OWNER JPA ENTITY NAME}_{COLLECTION ATTRIBUTE NAME}</pre>
+ otherwise:
+ <pre>{OWNER ENTITY NAME}_{COLLECTION ATTRIBUTE NAME}</pre></div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="ImplicitNamingStrategy.html#determineCollectionTableName(org.hibernate.boot.model.naming.ImplicitCollectionTableNameSource)">determineCollectionTableName</a></code>&nbsp;in interface&nbsp;<code><a href="ImplicitNamingStrategy.html" title="interface in org.hibernate.boot.model.naming">ImplicitNamingStrategy</a></code></dd>
@@ -236,11 +252,12 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="determineJoinTableName(org.hibernate.boot.model.naming.ImplicitJoinTableNameSource)">
 <h3>determineJoinTableName</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Identifier.html" title="class in org.hibernate.boot.model.naming">Identifier</a></span>&nbsp;<span class="element-name">determineJoinTableName</span><wbr><span class="parameters">(<a href="ImplicitJoinTableNameSource.html" title="interface in org.hibernate.boot.model.naming">ImplicitJoinTableNameSource</a>&nbsp;source)</span></div>
-<div class="block"><span class="descfrm-type-label">Description copied from interface:&nbsp;<code><a href="ImplicitNamingStrategy.html#determineJoinTableName(org.hibernate.boot.model.naming.ImplicitJoinTableNameSource)">ImplicitNamingStrategy</a></code></span></div>
-<div class="block">Determine the name of an association join table given the source naming
- information, when a name is not explicitly given. This method is called
- for any sort of association with a join table, no matter what the logical
- cardinality.</div>
+<div class="block"><span class="descfrm-type-label">Description copied from class:&nbsp;<code><a href="ImplicitNamingStrategyJpaCompliantImpl.html#determineJoinTableName(org.hibernate.boot.model.naming.ImplicitJoinTableNameSource)">ImplicitNamingStrategyJpaCompliantImpl</a></code></span></div>
+<div class="block">JPA states we should use the following as default:
+ <blockquote>The concatenated names of the two associated primary entity
+ tables (owning side first), separated by an underscore.</blockquote>
+ That is:
+ <pre>{OWNING SIDE PRIMARY TABLE NAME}_{NON-OWNING SIDE PRIMARY TABLE NAME}</pre></div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="ImplicitNamingStrategy.html#determineJoinTableName(org.hibernate.boot.model.naming.ImplicitJoinTableNameSource)">determineJoinTableName</a></code>&nbsp;in interface&nbsp;<code><a href="ImplicitNamingStrategy.html" title="interface in org.hibernate.boot.model.naming">ImplicitNamingStrategy</a></code></dd>
@@ -257,12 +274,18 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="determineJoinColumnName(org.hibernate.boot.model.naming.ImplicitJoinColumnNameSource)">
 <h3>determineJoinColumnName</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Identifier.html" title="class in org.hibernate.boot.model.naming">Identifier</a></span>&nbsp;<span class="element-name">determineJoinColumnName</span><wbr><span class="parameters">(<a href="ImplicitJoinColumnNameSource.html" title="interface in org.hibernate.boot.model.naming">ImplicitJoinColumnNameSource</a>&nbsp;source)</span></div>
-<div class="block"><span class="descfrm-type-label">Description copied from interface:&nbsp;<code><a href="ImplicitNamingStrategy.html#determineJoinColumnName(org.hibernate.boot.model.naming.ImplicitJoinColumnNameSource)">ImplicitNamingStrategy</a></code></span></div>
-<div class="block">Determine the join column name when it is not explicitly specified using
- <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/JoinColumn.html#name()" title="class or interface in jakarta.persistence" class="external-link"><code>JoinColumn.name()</code></a>.
- <p>
- In <code>hbm.xml</code> terms, this would be a <code>&lt;key/&gt;</code> defined for a
- collection or the column associated with a many-to-one.</div>
+<div class="block"><span class="descfrm-type-label">Description copied from class:&nbsp;<code><a href="ImplicitNamingStrategyJpaCompliantImpl.html#determineJoinColumnName(org.hibernate.boot.model.naming.ImplicitJoinColumnNameSource)">ImplicitNamingStrategyJpaCompliantImpl</a></code></span></div>
+<div class="block">JPA states we should use the following as default:
+ <ul>
+ <li>If there is a "referencing relationship property":
+     <blockquote>The concatenation of the following: the name of the referencing
+     relationship property or field of the referencing entity or embeddable class;
+     <code>_</code>; the name of the referenced primary key column.</blockquote>
+ <li>If there is no such "referencing relationship property",
+     or if the association is an element collection:
+     <blockquote>The concatenation of the following: the name of the entity;
+     <code>_</code>; the name of the referenced primary key column</blockquote>
+ </ul></div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="ImplicitNamingStrategy.html#determineJoinColumnName(org.hibernate.boot.model.naming.ImplicitJoinColumnNameSource)">determineJoinColumnName</a></code>&nbsp;in interface&nbsp;<code><a href="ImplicitNamingStrategy.html" title="interface in org.hibernate.boot.model.naming">ImplicitNamingStrategy</a></code></dd>

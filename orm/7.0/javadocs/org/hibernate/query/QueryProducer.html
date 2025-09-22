@@ -83,15 +83,100 @@ loadScripts(document, 'script');</script>
 </dl>
 <hr>
 <div class="type-signature"><span class="modifiers">public interface </span><span class="element-name type-name-label">QueryProducer</span></div>
-<div class="block">Contract for things that can produce instances of <a href="Query.html" title="interface in org.hibernate.query"><code>Query</code></a> and <a href="NativeQuery.html" title="interface in org.hibernate.query"><code>NativeQuery</code></a>.
+<div class="block">An object which can produce instances of <a href="SelectionQuery.html" title="interface in org.hibernate.query"><code>SelectionQuery</code></a> and <a href="MutationQuery.html" title="interface in org.hibernate.query"><code>MutationQuery</code></a>.
  Implementors include <a href="../Session.html" title="interface in org.hibernate"><code>Session</code></a> and <a href="../StatelessSession.html" title="interface in org.hibernate"><code>StatelessSession</code></a>.
  Many operations of the interface have the same or very similar signatures to operations of
  <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html" title="class or interface in jakarta.persistence" class="external-link"><code>EntityManager</code></a>. They are declared here to allow reuse by
  <code>StatelessSession</code>.
  <p>
- Unlike the corresponding operations of <code>EntityManager</code>, operations for creating untyped
- instances of <code>Query</code> are all marked as deprecated. Clients must migrate to the use of
- the equivalent operations which accept a <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> and return a typed <code>Query</code>.</div>
+ There are three fundamental ways to express a query:
+ <ul>
+ <li>in <em>Hibernate Query Language</em>, an object-oriented query dialect of SQL which is
+     a superset of the <em>Jakarta Persistence Query Language</em>,
+ <li>in the native SQL dialect of the database, or
+ <li>using the <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/criteria/CriteriaBuilder.html" title="class or interface in jakarta.persistence.criteria" class="external-link">Criteria API</a> defined
+     by JPA, along with <a href="criteria/HibernateCriteriaBuilder.html" title="interface in org.hibernate.query.criteria">extensions</a> defined by Hibernate.
+ </ul>
+ <p>
+ In each case, the object used to execute the query depends on whether the query is a
+ selection query or a mutation query.
+ <ul>
+ <li>selection queries are executed via an instance of <a href="SelectionQuery.html" title="interface in org.hibernate.query"><code>SelectionQuery</code></a>, while
+ <li>mutation queries are executed via an instance of <a href="MutationQuery.html" title="interface in org.hibernate.query"><code>MutationQuery</code></a>, but
+ <li>since JPA makes no such distinction within its API, the type <a href="Query.html" title="interface in org.hibernate.query"><code>Query</code></a> is a mixin of
+     <code>SelectionQuery</code>, <code>MutationQuery</code>, and <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/TypedQuery.html" title="class or interface in jakarta.persistence" class="external-link"><code>TypedQuery</code></a>.
+ </ul>
+ This interface declares operations for creating instances of these objects.
+ <table style="width:100%;margin:10px">
+     <tr>
+         <th style="width:10%"></th>
+         <th style="text-align:left;width:45%">Selection</th>
+         <th style="text-align:left;width:45%">Mutation</th>
+     </tr>
+     <tr>
+         <td>HQL</td>
+         <td><a href="#createSelectionQuery(java.lang.String,java.lang.Class)"><code>createSelectionQuery(String,Class)</code></a> and
+             <a href="#createSelectionQuery(java.lang.String,jakarta.persistence.EntityGraph)"><code>createSelectionQuery(String,EntityGraph)</code></a></td>
+         <td><a href="#createMutationQuery(java.lang.String)"><code>createMutationQuery(String)</code></a></td>
+     </tr>
+     <tr>
+         <td>SQL</td>
+         <td><a href="#createNativeQuery(java.lang.String,java.lang.Class)"><code>createNativeQuery(String,Class)</code></a> and
+             <a href="#createNativeQuery(java.lang.String,java.lang.String,java.lang.Class)"><code>createNativeQuery(String,String,Class)</code></a></td>
+         <td><a href="#createNativeMutationQuery(java.lang.String)"><code>createNativeMutationQuery(String)</code></a></td>
+     </tr>
+     <tr>
+         <td>Criteria</td>
+         <td><a href="#createSelectionQuery(jakarta.persistence.criteria.CriteriaQuery)"><code>createSelectionQuery(CriteriaQuery)</code></a></td>
+         <td><a href="#createMutationQuery(jakarta.persistence.criteria.CriteriaUpdate)"><code>createMutationQuery(CriteriaUpdate)</code></a>,
+             <a href="#createMutationQuery(jakarta.persistence.criteria.CriteriaDelete)"><code>createMutationQuery(CriteriaDelete)</code></a>, and
+             <a href="#createMutationQuery(org.hibernate.query.criteria.JpaCriteriaInsert)"><code>createMutationQuery(JpaCriteriaInsert)</code></a></td>
+     </tr>
+     <tr>
+         <td>Named queries</td>
+         <td><a href="#createNamedSelectionQuery(java.lang.String,java.lang.Class)"><code>createNamedSelectionQuery(String,Class)</code></a></td>
+         <td><a href="#createNamedMutationQuery(java.lang.String)"><code>createNamedMutationQuery(String)</code></a></td>
+     </tr>
+ </table>
+ <p>
+ Operations like <a href="#createSelectionQuery(java.lang.String,java.lang.Class)"><code>createSelectionQuery()</code></a>,
+ <a href="#createNamedSelectionQuery(java.lang.String,java.lang.Class)"><code>createNamedSelectionQuery()</code></a>, and
+ <a href="#createNativeQuery(java.lang.String,java.lang.Class)"><code>createNativeQuery()</code></a> accept a Java
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">class object</a> indicating the <em>result type</em> of the query.
+ <ul>
+ <li>The result type might be an <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Entity.html" title="class or interface in jakarta.persistence" class="external-link">entity</a> class, when
+     the query returns an entity:
+ <pre>
+ List&lt;Book&gt; allBooks =
+         session.createNativeQuery("select * from books order by title", Book.class)
+                 .getResultList();
+ </pre>
+ <li>It might be a <a href="../type/descriptor/java/JavaType.html" title="interface in org.hibernate.type.descriptor.java">basic type</a> like
+     <code>String</code> or <code>Long</code>:
+ <pre>
+ List&lt;String&gt; allTitles =
+         session.createNativeQuery("select distinct title from books order by title", String.class)
+                 .getResultList();
+ </pre>
+ <li>Finally, the result type might be a class used to package the elements of a <code>select</code>
+     list, such as a Java record with an appropriate constructor, <code>Map</code>, <code>List</code>, or
+     <code>Object[]</code>:
+ <pre>
+ record IsbnAndTitle(String isbn, String title) {}
+
+ List&lt;IsbnAndTitle&gt; allBooks =
+         session.createNativeQuery("select isbn, title from books order by title", IsbnAndTitle.class)
+                 .getResultList();
+ </pre>
+ </ul>
+ For a <a href="#createQuery(jakarta.persistence.criteria.CriteriaQuery)">criteria query</a>, the result type is already
+ determined by <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/criteria/AbstractQuery.html#getResultType()" title="class or interface in jakarta.persistence.criteria" class="external-link"><code>AbstractQuery.getResultType()</code></a>.</div>
+<dl class="notes">
+<dt>API Note:</dt>
+<dd>Unlike the corresponding operations of <code>EntityManager</code>, operations for creating
+ untyped instances of <code>Query</code> are all marked as deprecated. Clients must migrate to the
+ use of the equivalent operations which accept a <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> and return a typed <code>Query</code>.</dd>
+</dl>
 </section>
 <section class="summary">
 <ul class="summary-list">
@@ -535,8 +620,6 @@ loadScripts(document, 'script');</script>
 <li><a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#createNativeQuery(java.lang.String,java.lang.Class)" title="class or interface in jakarta.persistence" class="external-link"><code>EntityManager.createNativeQuery(String,Class)</code></a></li>
 </ul>
 </dd>
-<dt>API Note:</dt>
-<dd>Changes in JPA 3.2 required de-typing this to be compilable with their changes</dd>
 </dl>
 </section>
 </li>

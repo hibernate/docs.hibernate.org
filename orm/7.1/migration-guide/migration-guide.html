@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.18">
+<title>7.1 Migration Guide</title>
+<link rel="stylesheet" href="./css/hibernate.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="./rouge-github.css">
+</head>
+<body class="article">
+<div id="header">
+<h1>7.1 Migration Guide</h1>
+<div class="details">
+<span id="revnumber">version 7.1.1.Final</span>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#requirements">Requirements</a></li>
+<li><a href="#new-features">New Features</a></li>
+<li><a href="#api-changes">Changes to API</a>
+<ul class="sectlevel2">
+<li><a href="#lock-options">LockOptions</a></li>
+<li><a href="#enhancement-options">Bytecode Enhancement Options</a></li>
+<li><a href="#session-getLobHelper">Session#getLobHelper</a></li>
+<li><a href="#H2-lock-timeout">WAIT, NO WAIT and SKIP LOCKED for H2</a></li>
+</ul>
+</li>
+<li><a href="#spi-changes">Changes to SPI</a>
+<ul class="sectlevel2">
+<li><a href="#force-increment">Force-increment Locking for Version with Custom Generator</a></li>
+<li><a href="#pessimistic-locking">Pessimistic Locking</a></li>
+<li><a href="#format-mapper">JSON FormatMapper Enhancements</a></li>
+<li><a href="#enhancement-option-granularity">Enhancement Option Granularity</a></li>
+</ul>
+</li>
+<li><a href="#ddl-changes">Changes to DDL generation</a>
+<ul class="sectlevel2">
+<li><a href="#single-table-check">Automatic check constraints with single table inheritance mappings</a></li>
+</ul>
+</li>
+<li><a href="#dependency-changes">Changes in Dependencies</a>
+<ul class="sectlevel2">
+<li><a href="#dependency-agroal">Inclusion of Agroal Pool</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>This guide discusses migration to Hibernate ORM version 7.1. For migration from
+earlier versions, see any other pertinent migration guides as well.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="requirements">Requirements</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>See the <a href="https://hibernate.org/orm/releases/7.1/">website</a> for the list of requirements for the 7.1 series.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="new-features">New Features</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>See the <a href="https://hibernate.org/orm/releases/7.1/#whats-new">website</a> for the list of new features in the 7.1 series.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="api-changes">Changes to API</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This section describes changes to contracts (classes, interfaces, methods, etc.) which are considered <a href="https://hibernate.org/community/compatibility-policy/#api">API</a>.</p>
+</div>
+<div class="sect2">
+<h3 id="lock-options">LockOptions</h3>
+<div class="paragraph">
+<p>7.0 begins the process of reducing the visibility of <code>org.hibernate.LockOptions</code>.
+This class was originally exposed as an API, even though it is more properly an SPI.
+From an API perspective, <code>FindOption</code>, <code>LockOption</code> and <code>RefreshOption</code> are much better ways to specify this information.
+The class itself, as well as API methods which expose it, have been deprecated.</p>
+</div>
+<div class="paragraph">
+<p>However, 2 aspects of <code>LockOptions</code> have been completely removed.
+First, <code>LockOptions</code> previously defined a number of constants which have been removed.
+Secondly, the ability to define different LockModes for individual aliases has been removed.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>ALias-specific LockModes was a very misleading feature, as Hibernate would only ever use the "greatest" LockMode.
+We plan to add the ability to specify a list of aliases to be locked in a later release.
+See https://hibernate.atlassian.net/browse/HHH-19664 for details.</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Application code using <code>org.hibernate.LockOptions</code> should migrate to using <code>FindOption</code>,
+<code>LockOption</code> and <code>RefreshOption</code> to control the various aspects of locking.  E.g.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nc">LockOptions</span> <span class="n">lockOptions</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">LockOptions</span><span class="o">();</span>
+<span class="n">lockOptions</span><span class="o">.</span><span class="na">setLockMode</span><span class="o">(</span><span class="no">PESSIMISTIC_WRITE</span><span class="o">);</span>
+<span class="n">lockOptions</span><span class="o">.</span><span class="na">setTimeout</span><span class="o">(</span><span class="mi">1000</span><span class="o">);</span>
+<span class="n">session</span><span class="o">.</span><span class="na">refresh</span><span class="o">(</span><span class="n">book</span><span class="o">,</span> <span class="n">lockOptions</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>can instead be written as</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="n">session</span><span class="o">.</span><span class="na">refresh</span><span class="o">(</span><span class="n">book</span><span class="o">,</span>
+    <span class="no">PESSIMISTIC_WRITE</span><span class="o">,</span>
+    <span class="nc">Timeout</span><span class="o">.</span><span class="na">milliseconds</span><span class="o">(</span><span class="mi">1000</span><span class="o">));</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="enhancement-options">Bytecode Enhancement Options</h3>
+<div class="paragraph">
+<p>We plan to remove two options of bytecode enhancement and have currently marked them as deprecated.</p>
+</div>
+<div class="paragraph">
+<p>First is bidirectional association management.
+Applications should instead manage both sides of such associations directly as we have always recommended.</p>
+</div>
+<div class="paragraph">
+<p>Second is a little-known feature called "extended" enhancement.
+Applications should instead use proper object-oriented encapsulation, exposing managed state via getters and setters.</p>
+</div>
+<div class="paragraph">
+<p>Additionally, attempting to re-enhance a class with different options is no longer allowed and will result in a <code>FeatureMismatchException</code>.</p>
+</div>
+<div class="paragraph">
+<p>The Gradle plugin configuration has changed slightly. When using the default setup:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>hibernate { enhancement }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>it should be updated to:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>hibernate {
+    enhancement {}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>in order to properly enable Bytecode Enhancement.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="session-getLobHelper">Session#getLobHelper</h3>
+<div class="paragraph">
+<p>The <code>Session#getLobHelper</code> method has been marked as deprecated in favor of the static <code>Hibernate#getLobHelper</code> and will be removed in a future <strong>major</strong> version.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="H2-lock-timeout">WAIT, NO WAIT and SKIP LOCKED for H2</h3>
+<div class="paragraph">
+<p>The for-update clause enhancements of H2 2.2.220 are now reflected in the Hibernate ORM dialect, allowing applications to use <code>wait</code>, <code>no wait</code> and <code>skip locked</code> options.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="spi-changes">Changes to SPI</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="force-increment">Force-increment Locking for Version with Custom Generator</h3>
+<div class="paragraph">
+<p>A new event type (<code>FORCE_INCREMENT</code>) has been added to
+<code>org.hibernate.generator.EventType</code> to support
+<code>OPTIMISTIC_FORCE_INCREMENT</code> and <code>PESSIMISTIC_FORCE_INCREMENT</code>
+when used with <code>@Version</code> mappings with custom generators.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="pessimistic-locking">Pessimistic Locking</h3>
+<div class="paragraph">
+<p>A number of changes have been made to pessimistic locking support.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Introduction of <code>org.hibernate.dialect.lock.spi.LockingSupport</code> which represents a Dialect&#8217;s support for pessimistic locking.</p>
+</li>
+<li>
+<p>Introduction of <code>org.hibernate.sql.ast.spi.LockingClauseStrategy</code> to integrate into SQL AST translation.</p>
+</li>
+<li>
+<p>Changed standard implementation of <code>org.hibernate.dialect.lock.LockingStrategy</code> for pessimistic locking to one using SQL AST.</p>
+</li>
+<li>
+<p>Changes to <code>LockOptions</code> as <a href="#lock-options">already discussed</a>.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+More changes related to pessimistic locking are coming in later 7.x releases.
+We&#8217;ve opted to tackle these in stages since they all relate and build on top of each other.
+See <a href="https://hibernate.atlassian.net/browse/HHH-19551" class="bare">https://hibernate.atlassian.net/browse/HHH-19551</a> for details.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="format-mapper">JSON FormatMapper Enhancements</h3>
+<div class="paragraph">
+<p>JSON mappings on Oracle 21+ will now try to leverage driver built-in OSON decoding to improve JSON parsing performance. In case of trouble, this can be disabled with the <code>hibernate.dialect.oracle.oson_format_disabled</code> configuration option.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="enhancement-option-granularity">Enhancement Option Granularity</h3>
+<div class="paragraph">
+<p>The actual enhancements written into bytecode were previously allowed to vary by class and sometimes even by attribute.
+However, all Hibernate tooling only supported setting those "globally" per enhancement.
+To this end, all <code>org.hibernate.bytecode.enhance.spi.EnhancementContext</code> methods which determine whether certain aspects of enhancement are applied have changed to no longer accept class/attribute.
+Specifically:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>doDirtyCheckingInline(UnloadedClass classDescriptor)</code> &#8594; <code>doDirtyCheckingInline()</code></p>
+</li>
+<li>
+<p><code>doExtendedEnhancement(UnloadedClass classDescriptor)</code> &#8594; <code>doExtendedEnhancement()</code></p>
+</li>
+<li>
+<p><code>doBiDirectionalAssociationManagement(UnloadedField field)</code> &#8594; <code>doBiDirectionalAssociationManagement()</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>See also <a href="#enhancement-options">Bytecode Enhancement Options</a>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="ddl-changes">Changes to DDL generation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This section describes changes to DDL generated by the schema export tooling.
+Such changes typically do not impact programs using a relational schema managed externally to Hibernate.</p>
+</div>
+<div class="sect2">
+<h3 id="single-table-check">Automatic check constraints with single table inheritance mappings</h3>
+<div class="paragraph">
+<p>Previously, the non-nullability of the column mapped by an attribute declared <code>optional=false</code> by a subclass in a single table inheritance hierarchy was not enforced by the database.
+Hibernate now automatically generates DDL <code>check</code> constraints to enforce the non-nullability of such columns.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="dependency-changes">Changes in Dependencies</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This section describes changes to dependencies used by Hibernate ORM.</p>
+</div>
+<div class="sect2">
+<h3 id="dependency-agroal">Inclusion of Agroal Pool</h3>
+<div class="paragraph">
+<p><code>agroal-pool</code> is now a transitive implementation (runtime) dependency of the <code>hibernate-agroal</code> module.  Applications using <code>hibernate-agroal</code> no longer need to manually depend on it.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 7.1.1.Final<br>
+Last updated 2025-09-14 00:04:38 UTC
+</div>
+</div>
+</body>
+</html>

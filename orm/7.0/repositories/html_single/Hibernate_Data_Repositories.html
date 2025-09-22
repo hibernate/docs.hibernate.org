@@ -14,7 +14,7 @@
 <div id="header">
 <h1>Introducing Hibernate Data Repositories</h1>
 <div class="details">
-<span id="revnumber">version 7.0.0.CR1</span>
+<span id="revnumber">version 7.0.10.Final</span>
 </div>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
@@ -1375,10 +1375,10 @@ But since Hibernate Data Repositories already validates the content of the <code
 <div class="ulist">
 <ul>
 <li>
-<p>an instance of <code>Sort</code> represents a single criterion for sorting query results, and</p>
+<p>an instance of <a href="https://jakarta.ee/specifications/data/1.0/apidocs/jakarta.data/jakarta/data/sort"><code>Sort</code></a> represents a single criterion for sorting query results, and</p>
 </li>
 <li>
-<p>an instance of <code>Order</code> packages multiple <code>Sort</code>s together.</p>
+<p>an instance of <a href="https://jakarta.ee/specifications/data/1.0/apidocs/jakarta.data/jakarta/data/order"><code>Order</code></a> packages multiple <code>Sort</code>ing criteria together.</p>
 </li>
 </ul>
 </div>
@@ -1426,6 +1426,30 @@ But since Hibernate Data Repositories already validates the content of the <code
 <div class="paragraph">
 <p>Dynamic sorting criteria may be combined with static criteria.</p>
 </div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If the entity has entity supertypes, use a lower bounded wildcard in the repository method declaration, for example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Find</span>
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="nf">books</span><span class="o">(</span><span class="nd">@Pattern</span> <span class="nc">String</span> <span class="n">title</span><span class="o">,</span> <span class="nc">Year</span> <span class="n">yearPublished</span><span class="o">,</span>
+                 <span class="nc">Order</span><span class="o">&lt;?</span> <span class="kd">super</span> <span class="nc">Book</span><span class="o">&gt;</span> <span class="n">order</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This lets the caller sort by fields of the supertype.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="java"><span class="nd">@Find</span>
@@ -1441,7 +1465,7 @@ But since Hibernate Data Repositories already validates the content of the <code
 <div class="sect2">
 <h3 id="limits">3.3. Limits</h3>
 <div class="paragraph">
-<p>A <code>Limit</code> is the simplest way to express a subrange of query results.
+<p>A <a href="https://jakarta.ee/specifications/data/1.0/apidocs/jakarta.data/jakarta/data/limit"><code>Limit</code></a> is the simplest way to express a subrange of query results.
 It specifies:</p>
 </div>
 <div class="ulist">
@@ -1450,12 +1474,12 @@ It specifies:</p>
 <p><code>maxResults</code>, the maximum number of results to be returned from the database server to the client, and,</p>
 </li>
 <li>
-<p>optionally, <code>startAt</code>, an offset from the very first result.</p>
+<p>optionally, <code>startAt</code>, the position of the first result to be returned to the client.</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>These values map directly the familiar <code>setMaxResults()</code> and <code>setFirstResults()</code> of the Jakarta Persistence <code>Query</code> interface.</p>
+<p>These values map directly to the familiar <code>setMaxResults()</code> and <code>setFirstResult()</code> of the Jakarta Persistence <code>Query</code> interface.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1472,6 +1496,18 @@ It specifies:</p>
                       <span class="nc">Limit</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="no">MAX_RESULTS</span><span class="o">));</span></code></pre>
 </div>
 </div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+Whereas <code>Query.setFirstResult()</code> is an <em>offset</em> of the first result to be returned, with <code>setFirstResult(0)</code> meaning "no offset", <code>Limit.startAt</code> numbers results from one, with <code>Limit.range(1, n)</code> meaning "at most <em>n</em> results, starting from the first result".
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
 <p>A more sophisticated approach is provided by <code>PageRequest</code>.</p>
 </div>
@@ -1479,7 +1515,7 @@ It specifies:</p>
 <div class="sect2">
 <h3 id="offset-based-pagination">3.4. Offset-based pagination</h3>
 <div class="paragraph">
-<p>A <code>PageRequest</code> is superficially similar to a <code>Limit</code>, except that it&#8217;s specified in terms of:</p>
+<p>A <a href="https://jakarta.ee/specifications/data/1.0/apidocs/jakarta.data/jakarta/data/page/pagerequest"><code>PageRequest</code></a> is superficially similar to a <code>Limit</code>, except that it&#8217;s specified in terms of:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -1527,7 +1563,7 @@ For this reason, we specified <code>@OrderBy("isbn")</code> in the previous exam
 </table>
 </div>
 <div class="paragraph">
-<p>However, a repository method which accepts a <code>PageRequest</code> may return a <code>Page</code> instead of a <code>List</code>, making it easier to implement pagination.</p>
+<p>However, a repository method which accepts a <code>PageRequest</code> may return a <a href="https://jakarta.ee/specifications/data/1.0/apidocs/jakarta.data/jakarta/data/page/page"><code>Page</code></a> of results instead of a <code>List</code>, making it easier to implement pagination.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1618,7 +1654,7 @@ The SQL offset is replaced with a restriction on the unique key, appended to the
 </div>
 <div class="paragraph">
 <p>From our point of view as users of Jakarta Data, key-based pagination works almost exactly like offset-based pagination.
-The difference is that we must declare our repository method to return <code>CursoredPage</code>.</p>
+The difference is that we must declare our repository method to return <a href="https://jakarta.ee/specifications/data/1.0/apidocs/jakarta.data/jakarta/data/page/cursoredpage"><code>CursoredPage</code></a>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1766,8 +1802,7 @@ It was adopted from there by the Jakarta Data specification, and is now even ava
 <div class="sectionbody">
 <div class="paragraph">
 <p>Hibernate Data Repositories provides repositories backed by <a href="https://hibernate.org/reactive/">Hibernate Reactive</a> for use in reactive programming.
-The methods of a reactive repository are non-blocking, and so every operation returns a reactive stream.
-This is an extension to the programming model defined by Jakarta Data.</p>
+The methods of a reactive repository are non-blocking, and so every operation returns a reactive stream.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -1777,7 +1812,8 @@ This is an extension to the programming model defined by Jakarta Data.</p>
 </td>
 <td class="content">
 <div class="paragraph">
-<p>The Jakarta Data specification has not yet defined a way to write repositories for use in reactive programming, but the spec was written to accommodate such extensions, and this capability might be standardized in a future release.</p>
+<p>Jakarta Data 1.0 does not define a way to write repositories for use in reactive programming, but the spec was written to accommodate such extensions.
+This capability is being written into Data 1.1 under the more general category of <em>asynchronous repositories</em>.</p>
 </div>
 </td>
 </tr>
@@ -1786,15 +1822,16 @@ This is an extension to the programming model defined by Jakarta Data.</p>
 <div class="paragraph">
 <p>In Hibernate Data Repositories we use <a href="https://smallrye.io/smallrye-mutiny/">Mutiny</a> to work with reactive streams.</p>
 </div>
-<div class="admonitionblock warning">
+<div class="admonitionblock caution">
 <table>
 <tr>
 <td class="icon">
-<i class="fa icon-warning" title="Warning"></i>
+<i class="fa icon-caution" title="Caution"></i>
 </td>
 <td class="content">
 <div class="paragraph">
-<p>If and when Jakarta Data <em>does</em> provide standard support for reactive repositories, the functionality will almost certainly be based on Java&#8217;s <code>CompletionStage</code>, and not on Mutiny.</p>
+<p>A future version of Hibernate Data Repositories will also allow the use of <code>CompletionStage</code> from <code>java.util.concurrent</code>.
+Asynchronous repositories based on Mutiny are unlikely to ever be portable to other implementations of Jakarta Data.</p>
 </div>
 </td>
 </tr>
@@ -1802,6 +1839,18 @@ This is an extension to the programming model defined by Jakarta Data.</p>
 </div>
 <div class="paragraph">
 <p>In our opinion, Mutiny is a <em>much</em> more comfortable API than <code>CompletionStage</code>.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+The documentation for Hibernate Reactive contains a <a href="https://hibernate.org/reactive/documentation/3.0/reference/html_single/#_apis_for_chaining_reactive_operations">comparison table</a> that&#8217;s useful if you&#8217;re more familiar with <code>CompletionStage</code>.
+</td>
+</tr>
+</table>
 </div>
 <div class="sect2">
 <h3 id="_defining_a_reactive_repository">4.1. Defining a reactive repository</h3>
@@ -1947,8 +1996,8 @@ Instead, what we usually do is simply return the stream, allowing it to be execu
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 7.0.0.CR1<br>
-Last updated 2025-04-24 19:31:08 UTC
+Version 7.0.10.Final<br>
+Last updated 2025-08-10 00:01:18 UTC
 </div>
 </div>
 </body>

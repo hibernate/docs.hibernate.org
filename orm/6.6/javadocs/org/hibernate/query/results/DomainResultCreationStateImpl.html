@@ -14,7 +14,7 @@
 <!--[if IE]>
 <script type="text/javascript" src="../../../../jquery/jszip-utils/dist/jszip-utils-ie.min.js"></script>
 <![endif]-->
-<script type="text/javascript" src="../../../../jquery/jquery-3.6.1.min.js"></script>
+<script type="text/javascript" src="../../../../jquery/jquery-3.7.1.min.js"></script>
 <script type="text/javascript" src="../../../../jquery/jquery-ui.min.js"></script>
 </head>
 <body>
@@ -27,7 +27,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10,"i24":10,"i25":10,"i26":10,"i27":10,"i28":10,"i29":10,"i30":10,"i31":10,"i32":10,"i33":10,"i34":10,"i35":10};
+var data = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10,"i24":10,"i25":10,"i26":10,"i27":10,"i28":10,"i29":10,"i30":10,"i31":10,"i32":10,"i33":10,"i34":10,"i35":10,"i36":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -177,11 +177,12 @@ implements <a href="../../sql/results/graph/DomainResultCreationState.html" titl
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr class="altColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(java.lang.String,org.hibernate.sql.results.jdbc.spi.JdbcValuesMetadata,java.util.Map,java.util.function.Consumer,org.hibernate.engine.spi.LoadQueryInfluencers,org.hibernate.engine.spi.SessionFactoryImplementor)">DomainResultCreationStateImpl</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;stateIdentifier,
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(java.lang.String,org.hibernate.sql.results.jdbc.spi.JdbcValuesMetadata,java.util.Map,java.util.function.Consumer,org.hibernate.engine.spi.LoadQueryInfluencers,boolean,org.hibernate.engine.spi.SessionFactoryImplementor)">DomainResultCreationStateImpl</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;stateIdentifier,
                              <a href="../../sql/results/jdbc/spi/JdbcValuesMetadata.html" title="interface in org.hibernate.sql.results.jdbc.spi">JdbcValuesMetadata</a>&nbsp;jdbcResultsMetadata,
                              <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>,&#8203;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>,&#8203;<a href="dynamic/DynamicFetchBuilderLegacy.html" title="class in org.hibernate.query.results.dynamic">DynamicFetchBuilderLegacy</a>&gt;&gt;&nbsp;legacyFetchBuilders,
                              <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/function/Consumer.html?is-external=true" title="class or interface in java.util.function" class="externalLink">Consumer</a>&lt;<a href="../../sql/ast/spi/SqlSelection.html" title="interface in org.hibernate.sql.ast.spi">SqlSelection</a>&gt;&nbsp;sqlSelectionConsumer,
                              <a href="../../engine/spi/LoadQueryInfluencers.html" title="class in org.hibernate.engine.spi">LoadQueryInfluencers</a>&nbsp;loadQueryInfluencers,
+                             boolean&nbsp;isProcedureOrNativeQuery,
                              <a href="../../engine/spi/SessionFactoryImplementor.html" title="interface in org.hibernate.engine.spi">SessionFactoryImplementor</a>&nbsp;sessionFactory)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -327,40 +328,45 @@ implements <a href="../../sql/results/graph/DomainResultCreationState.html" titl
 </tr>
 <tr id="i22" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isResolvingCircularFetch()">isResolvingCircularFetch</a></span>()</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isProcedureOrNativeQuery()">isProcedureOrNativeQuery</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i23" class="rowColor">
+<td class="colFirst"><code>boolean</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isResolvingCircularFetch()">isResolvingCircularFetch</a></span>()</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr id="i24" class="altColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/function/Function.html?is-external=true" title="class or interface in java.util.function" class="externalLink">Function</a>&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>,&#8203;<a href="FetchBuilder.html" title="interface in org.hibernate.query.results">FetchBuilder</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#popExplicitFetchMementoResolver()">popExplicitFetchMementoResolver</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i24" class="altColor">
+<tr id="i25" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#pushExplicitFetchMementoResolver(java.util.function.Function)">pushExplicitFetchMementoResolver</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/function/Function.html?is-external=true" title="class or interface in java.util.function" class="externalLink">Function</a>&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>,&#8203;<a href="FetchBuilder.html" title="interface in org.hibernate.query.results">FetchBuilder</a>&gt;&nbsp;resolver)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i25" class="rowColor">
+<tr id="i26" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#registerLockMode(java.lang.String,org.hibernate.LockMode)">registerLockMode</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;identificationVariable,
                 <a href="../../LockMode.html" title="enum in org.hibernate">LockMode</a>&nbsp;explicitLockMode)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i26" class="altColor">
+<tr id="i27" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#registerVisitedAssociationKey(org.hibernate.metamodel.mapping.AssociationKey)">registerVisitedAssociationKey</a></span>&#8203;(<a href="../../metamodel/mapping/AssociationKey.html" title="class in org.hibernate.metamodel.mapping">AssociationKey</a>&nbsp;associationKey)</code></th>
 <td class="colLast">
 <div class="block">Registers a circularity detection key</div>
 </td>
 </tr>
-<tr id="i27" class="rowColor">
+<tr id="i28" class="altColor">
 <td class="colFirst"><code><a href="../../metamodel/mapping/ModelPart.html" title="interface in org.hibernate.metamodel.mapping">ModelPart</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#resolveModelPart(org.hibernate.spi.NavigablePath)">resolveModelPart</a></span>&#8203;(<a href="../../spi/NavigablePath.html" title="class in org.hibernate.spi">NavigablePath</a>&nbsp;navigablePath)</code></th>
 <td class="colLast">
 <div class="block">Resolve the ModelPart associated with a given NavigablePath.</div>
 </td>
 </tr>
-<tr id="i28" class="altColor">
+<tr id="i29" class="rowColor">
 <td class="colFirst"><code><a href="../../sql/ast/tree/expression/Expression.html" title="interface in org.hibernate.sql.ast.tree.expression">Expression</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#resolveSqlExpression(org.hibernate.sql.ast.spi.SqlExpressionResolver.ColumnReferenceKey,java.util.function.Function)">resolveSqlExpression</a></span>&#8203;(<a href="../../sql/ast/spi/SqlExpressionResolver.ColumnReferenceKey.html" title="class in org.hibernate.sql.ast.spi">SqlExpressionResolver.ColumnReferenceKey</a>&nbsp;key,
                     <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/function/Function.html?is-external=true" title="class or interface in java.util.function" class="externalLink">Function</a>&lt;<a href="../../sql/ast/spi/SqlAstProcessingState.html" title="interface in org.hibernate.sql.ast.spi">SqlAstProcessingState</a>,&#8203;<a href="../../sql/ast/tree/expression/Expression.html" title="interface in org.hibernate.sql.ast.tree.expression">Expression</a>&gt;&nbsp;creator)</code></th>
@@ -369,7 +375,7 @@ implements <a href="../../sql/results/graph/DomainResultCreationState.html" titl
  resolve the (Sql)Expression reference.</div>
 </td>
 </tr>
-<tr id="i29" class="rowColor">
+<tr id="i30" class="altColor">
 <td class="colFirst"><code><a href="../../sql/ast/spi/SqlSelection.html" title="interface in org.hibernate.sql.ast.spi">SqlSelection</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#resolveSqlSelection(org.hibernate.sql.ast.tree.expression.Expression,org.hibernate.type.descriptor.java.JavaType,org.hibernate.sql.results.graph.FetchParent,org.hibernate.type.spi.TypeConfiguration)">resolveSqlSelection</a></span>&#8203;(<a href="../../sql/ast/tree/expression/Expression.html" title="interface in org.hibernate.sql.ast.tree.expression">Expression</a>&nbsp;expression,
                    <a href="../../type/descriptor/java/JavaType.html" title="interface in org.hibernate.type.descriptor.java">JavaType</a>&lt;?&gt;&nbsp;javaType,
@@ -379,35 +385,35 @@ implements <a href="../../sql/results/graph/DomainResultCreationState.html" titl
 <div class="block">Resolve the SqlSelection for the given expression</div>
 </td>
 </tr>
-<tr id="i30" class="altColor">
+<tr id="i31" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setCurrentlyResolvingForeignKeyPart(org.hibernate.metamodel.mapping.ForeignKeyDescriptor.Nature)">setCurrentlyResolvingForeignKeyPart</a></span>&#8203;(<a href="../../metamodel/mapping/ForeignKeyDescriptor.Nature.html" title="enum in org.hibernate.metamodel.mapping">ForeignKeyDescriptor.Nature</a>&nbsp;currentlyResolvingForeignKeySide)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i31" class="rowColor">
+<tr id="i32" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#setResolvingCircularFetch(boolean)">setResolvingCircularFetch</a></span>&#8203;(boolean&nbsp;resolvingCircularFetch)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i32" class="altColor">
+<tr id="i33" class="rowColor">
 <td class="colFirst"><code><a href="../../sql/results/graph/internal/ImmutableFetchList.html" title="class in org.hibernate.sql.results.graph.internal">ImmutableFetchList</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#visitFetches(org.hibernate.sql.results.graph.FetchParent)">visitFetches</a></span>&#8203;(<a href="../../sql/results/graph/FetchParent.html" title="interface in org.hibernate.sql.results.graph">FetchParent</a>&nbsp;fetchParent)</code></th>
 <td class="colLast">
 <div class="block">Visit fetches for the given parent.</div>
 </td>
 </tr>
-<tr id="i33" class="rowColor">
+<tr id="i34" class="altColor">
 <td class="colFirst"><code><a href="../../sql/results/graph/Fetch.html" title="interface in org.hibernate.sql.results.graph">Fetch</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#visitIdentifierFetch(org.hibernate.sql.results.graph.entity.EntityResultGraphNode)">visitIdentifierFetch</a></span>&#8203;(<a href="../../sql/results/graph/entity/EntityResultGraphNode.html" title="interface in org.hibernate.sql.results.graph.entity">EntityResultGraphNode</a>&nbsp;fetchParent)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i34" class="altColor">
+<tr id="i35" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#withExplicitFetchMementoResolver(java.util.function.Function,java.lang.Runnable)">withExplicitFetchMementoResolver</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/function/Function.html?is-external=true" title="class or interface in java.util.function" class="externalLink">Function</a>&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>,&#8203;<a href="FetchBuilder.html" title="interface in org.hibernate.query.results">FetchBuilder</a>&gt;&nbsp;resolver,
                                 <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Runnable.html?is-external=true" title="class or interface in java.lang" class="externalLink">Runnable</a>&nbsp;runnable)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr id="i35" class="rowColor">
+<tr id="i36" class="altColor">
 <td class="colFirst"><code>&lt;R&gt;&nbsp;R</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#withNestedFetchParent(org.hibernate.sql.results.graph.FetchParent,java.util.function.Function)">withNestedFetchParent</a></span>&#8203;(<a href="../../sql/results/graph/FetchParent.html" title="interface in org.hibernate.sql.results.graph">FetchParent</a>&nbsp;fetchParent,
                      <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/function/Function.html?is-external=true" title="class or interface in java.util.function" class="externalLink">Function</a>&lt;<a href="../../sql/results/graph/FetchParent.html" title="interface in org.hibernate.sql.results.graph">FetchParent</a>,&#8203;R&gt;&nbsp;action)</code></th>
@@ -465,7 +471,7 @@ implements <a href="../../sql/results/graph/DomainResultCreationState.html" titl
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a id="&lt;init&gt;(java.lang.String,org.hibernate.sql.results.jdbc.spi.JdbcValuesMetadata,java.util.Map,java.util.function.Consumer,org.hibernate.engine.spi.LoadQueryInfluencers,org.hibernate.engine.spi.SessionFactoryImplementor)">
+<a id="&lt;init&gt;(java.lang.String,org.hibernate.sql.results.jdbc.spi.JdbcValuesMetadata,java.util.Map,java.util.function.Consumer,org.hibernate.engine.spi.LoadQueryInfluencers,boolean,org.hibernate.engine.spi.SessionFactoryImplementor)">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -476,6 +482,7 @@ implements <a href="../../sql/results/graph/DomainResultCreationState.html" titl
                                      <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>,&#8203;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Map.html?is-external=true" title="class or interface in java.util" class="externalLink">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>,&#8203;<a href="dynamic/DynamicFetchBuilderLegacy.html" title="class in org.hibernate.query.results.dynamic">DynamicFetchBuilderLegacy</a>&gt;&gt;&nbsp;legacyFetchBuilders,
                                      <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/function/Consumer.html?is-external=true" title="class or interface in java.util.function" class="externalLink">Consumer</a>&lt;<a href="../../sql/ast/spi/SqlSelection.html" title="interface in org.hibernate.sql.ast.spi">SqlSelection</a>&gt;&nbsp;sqlSelectionConsumer,
                                      <a href="../../engine/spi/LoadQueryInfluencers.html" title="class in org.hibernate.engine.spi">LoadQueryInfluencers</a>&nbsp;loadQueryInfluencers,
+                                     boolean&nbsp;isProcedureOrNativeQuery,
                                      <a href="../../engine/spi/SessionFactoryImplementor.html" title="interface in org.hibernate.engine.spi">SessionFactoryImplementor</a>&nbsp;sessionFactory)</pre>
 </li>
 </ul>
@@ -937,13 +944,26 @@ implements <a href="../../sql/results/graph/DomainResultCreationState.html" titl
 <a id="setCurrentlyResolvingForeignKeyPart(org.hibernate.metamodel.mapping.ForeignKeyDescriptor.Nature)">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>setCurrentlyResolvingForeignKeyPart</h4>
 <pre class="methodSignature">public&nbsp;void&nbsp;setCurrentlyResolvingForeignKeyPart&#8203;(<a href="../../metamodel/mapping/ForeignKeyDescriptor.Nature.html" title="enum in org.hibernate.metamodel.mapping">ForeignKeyDescriptor.Nature</a>&nbsp;currentlyResolvingForeignKeySide)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../sql/results/graph/DomainResultCreationState.html#setCurrentlyResolvingForeignKeyPart(org.hibernate.metamodel.mapping.ForeignKeyDescriptor.Nature)">setCurrentlyResolvingForeignKeyPart</a></code>&nbsp;in interface&nbsp;<code><a href="../../sql/results/graph/DomainResultCreationState.html" title="interface in org.hibernate.sql.results.graph">DomainResultCreationState</a></code></dd>
+</dl>
+</li>
+</ul>
+<a id="isProcedureOrNativeQuery()">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>isProcedureOrNativeQuery</h4>
+<pre class="methodSignature">public&nbsp;boolean&nbsp;isProcedureOrNativeQuery()</pre>
+<dl>
+<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
+<dd><code><a href="../../sql/ast/spi/SqlAstCreationState.html#isProcedureOrNativeQuery()">isProcedureOrNativeQuery</a></code>&nbsp;in interface&nbsp;<code><a href="../../sql/ast/spi/SqlAstCreationState.html" title="interface in org.hibernate.sql.ast.spi">SqlAstCreationState</a></code></dd>
 </dl>
 </li>
 </ul>

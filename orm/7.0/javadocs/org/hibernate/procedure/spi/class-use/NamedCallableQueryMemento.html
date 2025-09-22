@@ -61,13 +61,13 @@ loadScripts(document, 'script');</script>
 <div class="col-last odd-row-color">
 <div class="block">Support for handling named queries during the bootstrap process.</div>
 </div>
-<div class="col-first even-row-color"><a href="#org.hibernate.procedure">org.hibernate.procedure</a></div>
+<div class="col-first even-row-color"><a href="#org.hibernate.procedure.internal">org.hibernate.procedure.internal</a></div>
 <div class="col-last even-row-color">
-<div class="block">Defines support for executing database stored procedures and functions and accessing their outputs.</div>
-</div>
-<div class="col-first odd-row-color"><a href="#org.hibernate.procedure.internal">org.hibernate.procedure.internal</a></div>
-<div class="col-last odd-row-color">
 <div class="block">Defines the internal implementation of the stored procedure SPI.</div>
+</div>
+<div class="col-first odd-row-color"><a href="#org.hibernate.procedure.spi">org.hibernate.procedure.spi</a></div>
+<div class="col-last odd-row-color">
+<div class="block">Defines an SPI for calling stored procedures and functions.</div>
 </div>
 <div class="col-first even-row-color"><a href="#org.hibernate.query.internal">org.hibernate.query.internal</a></div>
 <div class="col-last even-row-color">&nbsp;</div>
@@ -107,20 +107,6 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="org.hibernate.procedure">
-<h2>Uses of <a href="../NamedCallableQueryMemento.html" title="interface in org.hibernate.procedure.spi">NamedCallableQueryMemento</a> in <a href="../../package-summary.html">org.hibernate.procedure</a></h2>
-<div class="caption"><span>Methods in <a href="../../package-summary.html">org.hibernate.procedure</a> that return <a href="../NamedCallableQueryMemento.html" title="interface in org.hibernate.procedure.spi">NamedCallableQueryMemento</a></span></div>
-<div class="summary-table three-column-summary">
-<div class="table-header col-first">Modifier and Type</div>
-<div class="table-header col-second">Method</div>
-<div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code><a href="../NamedCallableQueryMemento.html" title="interface in org.hibernate.procedure.spi">NamedCallableQueryMemento</a></code></div>
-<div class="col-second even-row-color"><span class="type-name-label">ProcedureCall.</span><code><a href="../../ProcedureCall.html#toMemento(java.lang.String)" class="member-name-link">toMemento</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-</div>
-</section>
-</li>
-<li>
 <section class="detail" id="org.hibernate.procedure.internal">
 <h2>Uses of <a href="../NamedCallableQueryMemento.html" title="interface in org.hibernate.procedure.spi">NamedCallableQueryMemento</a> in <a href="../../internal/package-summary.html">org.hibernate.procedure.internal</a></h2>
 <div class="caption"><span>Classes in <a href="../../internal/package-summary.html">org.hibernate.procedure.internal</a> that implement <a href="../NamedCallableQueryMemento.html" title="interface in org.hibernate.procedure.spi">NamedCallableQueryMemento</a></span></div>
@@ -143,15 +129,6 @@ loadScripts(document, 'script');</script>
 <div class="col-second even-row-color"><span class="type-name-label">ProcedureCallImpl.</span><code><a href="../../internal/ProcedureCallImpl.html#toMemento(java.lang.String)" class="member-name-link">toMemento</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 </div>
-<div class="caption"><span>Methods in <a href="../../internal/package-summary.html">org.hibernate.procedure.internal</a> with parameters of type <a href="../NamedCallableQueryMemento.html" title="interface in org.hibernate.procedure.spi">NamedCallableQueryMemento</a></span></div>
-<div class="summary-table three-column-summary">
-<div class="table-header col-first">Modifier and Type</div>
-<div class="table-header col-second">Method</div>
-<div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>protected void</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">ProcedureCallImpl.</span><code><a href="../../internal/ProcedureCallImpl.html#applyOptions(org.hibernate.procedure.spi.NamedCallableQueryMemento)" class="member-name-link">applyOptions</a><wbr>(<a href="../NamedCallableQueryMemento.html" title="interface in org.hibernate.procedure.spi">NamedCallableQueryMemento</a>&nbsp;memento)</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-</div>
 <div class="caption"><span>Constructors in <a href="../../internal/package-summary.html">org.hibernate.procedure.internal</a> with parameters of type <a href="../NamedCallableQueryMemento.html" title="interface in org.hibernate.procedure.spi">NamedCallableQueryMemento</a></span></div>
 <div class="summary-table three-column-summary">
 <div class="table-header col-first">Modifier</div>
@@ -160,6 +137,20 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color"><code>&nbsp;</code></div>
 <div class="col-second even-row-color"><code><a href="../../internal/ProcedureParameterMetadataImpl.html#%3Cinit%3E(org.hibernate.procedure.spi.NamedCallableQueryMemento,org.hibernate.engine.spi.SharedSessionContractImplementor)" class="member-name-link">ProcedureParameterMetadataImpl</a><wbr>(<a href="../NamedCallableQueryMemento.html" title="interface in org.hibernate.procedure.spi">NamedCallableQueryMemento</a>&nbsp;memento,
  <a href="../../../engine/spi/SharedSessionContractImplementor.html" title="interface in org.hibernate.engine.spi">SharedSessionContractImplementor</a>&nbsp;session)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="org.hibernate.procedure.spi">
+<h2>Uses of <a href="../NamedCallableQueryMemento.html" title="interface in org.hibernate.procedure.spi">NamedCallableQueryMemento</a> in <a href="../package-summary.html">org.hibernate.procedure.spi</a></h2>
+<div class="caption"><span>Methods in <a href="../package-summary.html">org.hibernate.procedure.spi</a> that return <a href="../NamedCallableQueryMemento.html" title="interface in org.hibernate.procedure.spi">NamedCallableQueryMemento</a></span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Method</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code><a href="../NamedCallableQueryMemento.html" title="interface in org.hibernate.procedure.spi">NamedCallableQueryMemento</a></code></div>
+<div class="col-second even-row-color"><span class="type-name-label">ProcedureCallImplementor.</span><code><a href="../ProcedureCallImplementor.html#toMemento(java.lang.String)" class="member-name-link">toMemento</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>

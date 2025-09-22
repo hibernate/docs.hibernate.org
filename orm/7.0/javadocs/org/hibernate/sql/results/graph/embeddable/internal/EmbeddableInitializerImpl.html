@@ -135,12 +135,15 @@ implements <a href="../EmbeddableInitializer.html" title="interface in org.hiber
 <div class="col-first even-row-color"><code>protected final boolean</code></div>
 <div class="col-second even-row-color"><code><a href="#lazyCapable" class="member-name-link">lazyCapable</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>protected final @Nullable <a href="../../Initializer.html" title="interface in org.hibernate.sql.results.graph">Initializer</a>&lt;<a href="../../InitializerData.html" title="class in org.hibernate.sql.results.graph">InitializerData</a>&gt;[][]</code></div>
-<div class="col-second odd-row-color"><code><a href="#subInitializers" class="member-name-link">subInitializers</a></code></div>
+<div class="col-first odd-row-color"><code>protected final @Nullable <a href="../../DomainResultAssembler.html" title="interface in org.hibernate.sql.results.graph">DomainResultAssembler</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;</code></div>
+<div class="col-second odd-row-color"><code><a href="#nullIndicatorAssembler" class="member-name-link">nullIndicatorAssembler</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>protected final @Nullable <a href="../../Initializer.html" title="interface in org.hibernate.sql.results.graph">Initializer</a>&lt;<a href="../../InitializerData.html" title="class in org.hibernate.sql.results.graph">InitializerData</a>&gt;[][]</code></div>
-<div class="col-second even-row-color"><code><a href="#subInitializersForResolveFromInitialized" class="member-name-link">subInitializersForResolveFromInitialized</a></code></div>
+<div class="col-second even-row-color"><code><a href="#subInitializers" class="member-name-link">subInitializers</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>protected final @Nullable <a href="../../Initializer.html" title="interface in org.hibernate.sql.results.graph">Initializer</a>&lt;<a href="../../InitializerData.html" title="class in org.hibernate.sql.results.graph">InitializerData</a>&gt;[][]</code></div>
+<div class="col-second odd-row-color"><code><a href="#subInitializersForResolveFromInitialized" class="member-name-link">subInitializersForResolveFromInitialized</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
 </div>
 <div class="inherited-list">
 <h3 id="fields-inherited-from-class-org.hibernate.sql.results.graph.internal.AbstractInitializer">Fields inherited from class&nbsp;org.hibernate.sql.results.graph.internal.<a href="../../internal/AbstractInitializer.html" title="class in org.hibernate.sql.results.graph.internal">AbstractInitializer</a></h3>
@@ -158,12 +161,21 @@ implements <a href="../EmbeddableInitializer.html" title="interface in org.hiber
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(org.hibernate.sql.results.graph.embeddable.EmbeddableResultGraphNode,org.hibernate.sql.results.graph.basic.BasicFetch,org.hibernate.sql.results.graph.InitializerParent,org.hibernate.sql.results.graph.AssemblerCreationState,boolean)" class="member-name-link">EmbeddableInitializerImpl</a><wbr>(<a href="../EmbeddableResultGraphNode.html" title="interface in org.hibernate.sql.results.graph.embeddable">EmbeddableResultGraphNode</a>&nbsp;resultDescriptor,
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(org.hibernate.sql.results.graph.embeddable.EmbeddableResultGraphNode,org.hibernate.sql.results.graph.basic.BasicFetch,org.hibernate.sql.results.graph.DomainResult,org.hibernate.sql.results.graph.InitializerParent,org.hibernate.sql.results.graph.AssemblerCreationState,boolean)" class="member-name-link">EmbeddableInitializerImpl</a><wbr>(<a href="../EmbeddableResultGraphNode.html" title="interface in org.hibernate.sql.results.graph.embeddable">EmbeddableResultGraphNode</a>&nbsp;resultDescriptor,
  <a href="../../basic/BasicFetch.html" title="class in org.hibernate.sql.results.graph.basic">BasicFetch</a>&lt;?&gt;&nbsp;discriminatorFetch,
+ @Nullable <a href="../../DomainResult.html" title="interface in org.hibernate.sql.results.graph">DomainResult</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;&nbsp;nullIndicatorResult,
  <a href="../../InitializerParent.html" title="interface in org.hibernate.sql.results.graph">InitializerParent</a>&lt;?&gt;&nbsp;parent,
  <a href="../../AssemblerCreationState.html" title="interface in org.hibernate.sql.results.graph">AssemblerCreationState</a>&nbsp;creationState,
  boolean&nbsp;isResultInitializer)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
+<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(org.hibernate.sql.results.graph.embeddable.EmbeddableResultGraphNode,org.hibernate.sql.results.graph.basic.BasicFetch,org.hibernate.sql.results.graph.InitializerParent,org.hibernate.sql.results.graph.AssemblerCreationState,boolean)" class="member-name-link">EmbeddableInitializerImpl</a><wbr>(<a href="../EmbeddableResultGraphNode.html" title="interface in org.hibernate.sql.results.graph.embeddable">EmbeddableResultGraphNode</a>&nbsp;resultDescriptor,
+ <a href="../../basic/BasicFetch.html" title="class in org.hibernate.sql.results.graph.basic">BasicFetch</a>&lt;?&gt;&nbsp;discriminatorFetch,
+ <a href="../../InitializerParent.html" title="interface in org.hibernate.sql.results.graph">InitializerParent</a>&lt;?&gt;&nbsp;parent,
+ <a href="../../AssemblerCreationState.html" title="interface in org.hibernate.sql.results.graph">AssemblerCreationState</a>&nbsp;creationState,
+ boolean&nbsp;isResultInitializer)</code></div>
+<div class="col-last odd-row-color">
+<div class="block"><span class="deprecated-label">Deprecated, for removal: This API element is subject to removal in a future version.</span></div>
+</div>
 </div>
 </section>
 </li>
@@ -182,48 +194,54 @@ implements <a href="../EmbeddableInitializer.html" title="interface in org.hiber
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#createInitializerData(org.hibernate.sql.results.jdbc.spi.RowProcessingState)" class="member-name-link">createInitializerData</a><wbr>(<a href="../../../jdbc/spi/RowProcessingState.html" title="interface in org.hibernate.sql.results.jdbc.spi">RowProcessingState</a>&nbsp;rowProcessingState)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#forEachSubInitializer(java.util.function.BiConsumer,org.hibernate.sql.results.graph.InitializerData)" class="member-name-link">forEachSubInitializer</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/BiConsumer.html" title="class or interface in java.util.function" class="external-link">BiConsumer</a>&lt;<a href="../../Initializer.html" title="interface in org.hibernate.sql.results.graph">Initializer</a>&lt;?&gt;,<wbr><a href="../../../jdbc/spi/RowProcessingState.html" title="interface in org.hibernate.sql.results.jdbc.spi">RowProcessingState</a>&gt;&nbsp;consumer,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#extractRowState(org.hibernate.sql.results.graph.embeddable.internal.EmbeddableInitializerImpl.EmbeddableInitializerData)" class="member-name-link">extractRowState</a><wbr>(<a href="EmbeddableInitializerImpl.EmbeddableInitializerData.html" title="class in org.hibernate.sql.results.graph.embeddable.internal">EmbeddableInitializerImpl.EmbeddableInitializerData</a>&nbsp;data)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#forEachSubInitializer(java.util.function.BiConsumer,org.hibernate.sql.results.graph.InitializerData)" class="member-name-link">forEachSubInitializer</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/BiConsumer.html" title="class or interface in java.util.function" class="external-link">BiConsumer</a>&lt;<a href="../../Initializer.html" title="interface in org.hibernate.sql.results.graph">Initializer</a>&lt;?&gt;,<wbr><a href="../../../jdbc/spi/RowProcessingState.html" title="interface in org.hibernate.sql.results.jdbc.spi">RowProcessingState</a>&gt;&nbsp;consumer,
  <a href="../../InitializerData.html" title="class in org.hibernate.sql.results.graph">InitializerData</a>&nbsp;data)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../../../../metamodel/mapping/EmbeddableValuedModelPart.html" title="interface in org.hibernate.metamodel.mapping">EmbeddableValuedModelPart</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getInitializedPart()" class="member-name-link">getInitializedPart</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../../../../spi/NavigablePath.html" title="class in org.hibernate.spi">NavigablePath</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getNavigablePath()" class="member-name-link">getNavigablePath</a>()</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../../../../metamodel/mapping/EmbeddableValuedModelPart.html" title="interface in org.hibernate.metamodel.mapping">EmbeddableValuedModelPart</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getInitializedPart()" class="member-name-link">getInitializedPart</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable <a href="../../InitializerParent.html" title="interface in org.hibernate.sql.results.graph">InitializerParent</a>&lt;?&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getParent()" class="member-name-link">getParent</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../../../../spi/NavigablePath.html" title="class in org.hibernate.spi">NavigablePath</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getNavigablePath()" class="member-name-link">getNavigablePath</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable <a href="../../InitializerParent.html" title="interface in org.hibernate.sql.results.graph">InitializerParent</a>&lt;?&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getParent()" class="member-name-link">getParent</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the parent <a href="../../Initializer.html" title="interface in org.hibernate.sql.results.graph"><code>Initializer</code></a> or <code>null</code> if this is a result initializer.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#hasLazySubInitializers()" class="member-name-link">hasLazySubInitializers</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#hasLazySubInitializers()" class="member-name-link">hasLazySubInitializers</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Indicates whether this initializer has sub-initializers which are lazy.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#initializeInstance(org.hibernate.sql.results.graph.embeddable.internal.EmbeddableInitializerImpl.EmbeddableInitializerData)" class="member-name-link">initializeInstance</a><wbr>(<a href="EmbeddableInitializerImpl.EmbeddableInitializerData.html" title="class in org.hibernate.sql.results.graph.embeddable.internal">EmbeddableInitializerImpl.EmbeddableInitializerData</a>&nbsp;data)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#initializeInstance(org.hibernate.sql.results.graph.embeddable.internal.EmbeddableInitializerImpl.EmbeddableInitializerData)" class="member-name-link">initializeInstance</a><wbr>(<a href="EmbeddableInitializerImpl.EmbeddableInitializerData.html" title="class in org.hibernate.sql.results.graph.embeddable.internal">EmbeddableInitializerImpl.EmbeddableInitializerData</a>&nbsp;data)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Step 3 - Initialize the state of the instance resolved in
  <a href="../../Initializer.html#resolveInstance(Data)"><code>Initializer.resolveInstance(Data)</code></a> from the current row values.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#initializeInstanceFromParent(java.lang.Object,org.hibernate.sql.results.graph.embeddable.internal.EmbeddableInitializerImpl.EmbeddableInitializerData)" class="member-name-link">initializeInstanceFromParent</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;parentInstance,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#initializeInstanceFromParent(java.lang.Object,org.hibernate.sql.results.graph.embeddable.internal.EmbeddableInitializerImpl.EmbeddableInitializerData)" class="member-name-link">initializeInstanceFromParent</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;parentInstance,
  <a href="EmbeddableInitializerImpl.EmbeddableInitializerData.html" title="class in org.hibernate.sql.results.graph.embeddable.internal">EmbeddableInitializerImpl.EmbeddableInitializerData</a>&nbsp;data)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Step 3.1 - Initialize the state of the instance as extracted from the given
  <code>parentInstance</code>.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isEager()" class="member-name-link">isEager</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isEager()" class="member-name-link">isEager</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Indicates whether calling resolve is needed when the object for this initializer is initialized already.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isLazyCapable()" class="member-name-link">isLazyCapable</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isLazyCapable()" class="member-name-link">isLazyCapable</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Indicates whether this initializer or one of its sub-parts could be made lazy.</div>
 </div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isNull(org.hibernate.sql.results.graph.embeddable.internal.EmbeddableInitializerImpl.EmbeddableInitializerData)" class="member-name-link">isNull</a><wbr>(<a href="EmbeddableInitializerImpl.EmbeddableInitializerData.html" title="class in org.hibernate.sql.results.graph.embeddable.internal">EmbeddableInitializerImpl.EmbeddableInitializerData</a>&nbsp;data)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isPartOfKey()" class="member-name-link">isPartOfKey</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
@@ -308,6 +326,12 @@ implements <a href="../EmbeddableInitializer.html" title="interface in org.hiber
 </section>
 </li>
 <li>
+<section class="detail" id="nullIndicatorAssembler">
+<h3>nullIndicatorAssembler</h3>
+<div class="member-signature"><span class="modifiers">protected final</span>&nbsp;<span class="return-type">@Nullable <a href="../../DomainResultAssembler.html" title="interface in org.hibernate.sql.results.graph">DomainResultAssembler</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;</span>&nbsp;<span class="element-name">nullIndicatorAssembler</span></div>
+</section>
+</li>
+<li>
 <section class="detail" id="subInitializers">
 <h3>subInitializers</h3>
 <div class="member-signature"><span class="modifiers">protected final</span>&nbsp;<span class="return-type">@Nullable <a href="../../Initializer.html" title="interface in org.hibernate.sql.results.graph">Initializer</a>&lt;<a href="../../InitializerData.html" title="class in org.hibernate.sql.results.graph">InitializerData</a>&gt;[][]</span>&nbsp;<span class="element-name">subInitializers</span></div>
@@ -348,8 +372,21 @@ implements <a href="../EmbeddableInitializer.html" title="interface in org.hiber
 <li>
 <section class="detail" id="&lt;init&gt;(org.hibernate.sql.results.graph.embeddable.EmbeddableResultGraphNode,org.hibernate.sql.results.graph.basic.BasicFetch,org.hibernate.sql.results.graph.InitializerParent,org.hibernate.sql.results.graph.AssemblerCreationState,boolean)">
 <h3>EmbeddableInitializerImpl</h3>
+<div class="member-signature"><span class="annotations"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html" title="class or interface in java.lang" class="external-link">@Deprecated</a>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html#forRemoval()" title="class or interface in java.lang" class="external-link">forRemoval</a>=true)
+</span><span class="modifiers">public</span>&nbsp;<span class="element-name">EmbeddableInitializerImpl</span><wbr><span class="parameters">(<a href="../EmbeddableResultGraphNode.html" title="interface in org.hibernate.sql.results.graph.embeddable">EmbeddableResultGraphNode</a>&nbsp;resultDescriptor,
+ <a href="../../basic/BasicFetch.html" title="class in org.hibernate.sql.results.graph.basic">BasicFetch</a>&lt;?&gt;&nbsp;discriminatorFetch,
+ <a href="../../InitializerParent.html" title="interface in org.hibernate.sql.results.graph">InitializerParent</a>&lt;?&gt;&nbsp;parent,
+ <a href="../../AssemblerCreationState.html" title="interface in org.hibernate.sql.results.graph">AssemblerCreationState</a>&nbsp;creationState,
+ boolean&nbsp;isResultInitializer)</span></div>
+<div class="deprecation-block"><span class="deprecated-label">Deprecated, for removal: This API element is subject to removal in a future version.</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="&lt;init&gt;(org.hibernate.sql.results.graph.embeddable.EmbeddableResultGraphNode,org.hibernate.sql.results.graph.basic.BasicFetch,org.hibernate.sql.results.graph.DomainResult,org.hibernate.sql.results.graph.InitializerParent,org.hibernate.sql.results.graph.AssemblerCreationState,boolean)">
+<h3>EmbeddableInitializerImpl</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">EmbeddableInitializerImpl</span><wbr><span class="parameters">(<a href="../EmbeddableResultGraphNode.html" title="interface in org.hibernate.sql.results.graph.embeddable">EmbeddableResultGraphNode</a>&nbsp;resultDescriptor,
  <a href="../../basic/BasicFetch.html" title="class in org.hibernate.sql.results.graph.basic">BasicFetch</a>&lt;?&gt;&nbsp;discriminatorFetch,
+ @Nullable <a href="../../DomainResult.html" title="interface in org.hibernate.sql.results.graph">DomainResult</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&gt;&nbsp;nullIndicatorResult,
  <a href="../../InitializerParent.html" title="interface in org.hibernate.sql.results.graph">InitializerParent</a>&lt;?&gt;&nbsp;parent,
  <a href="../../AssemblerCreationState.html" title="interface in org.hibernate.sql.results.graph">AssemblerCreationState</a>&nbsp;creationState,
  boolean&nbsp;isResultInitializer)</span></div>
@@ -600,6 +637,18 @@ implements <a href="../EmbeddableInitializer.html" title="interface in org.hiber
 <dt>Specified by:</dt>
 <dd><code><a href="../../Initializer.html#initializeInstanceFromParent(java.lang.Object,Data)">initializeInstanceFromParent</a></code>&nbsp;in interface&nbsp;<code><a href="../../Initializer.html" title="interface in org.hibernate.sql.results.graph">Initializer</a>&lt;<a href="EmbeddableInitializerImpl.EmbeddableInitializerData.html" title="class in org.hibernate.sql.results.graph.embeddable.internal">EmbeddableInitializerImpl.EmbeddableInitializerData</a>&gt;</code></dd>
 </dl>
+</section>
+</li>
+<li>
+<section class="detail" id="extractRowState(org.hibernate.sql.results.graph.embeddable.internal.EmbeddableInitializerImpl.EmbeddableInitializerData)">
+<h3>extractRowState</h3>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">extractRowState</span><wbr><span class="parameters">(<a href="EmbeddableInitializerImpl.EmbeddableInitializerData.html" title="class in org.hibernate.sql.results.graph.embeddable.internal">EmbeddableInitializerImpl.EmbeddableInitializerData</a>&nbsp;data)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="isNull(org.hibernate.sql.results.graph.embeddable.internal.EmbeddableInitializerImpl.EmbeddableInitializerData)">
+<h3>isNull</h3>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isNull</span><wbr><span class="parameters">(<a href="EmbeddableInitializerImpl.EmbeddableInitializerData.html" title="class in org.hibernate.sql.results.graph.embeddable.internal">EmbeddableInitializerImpl.EmbeddableInitializerData</a>&nbsp;data)</span></div>
 </section>
 </li>
 <li>

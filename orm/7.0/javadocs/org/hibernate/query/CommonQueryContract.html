@@ -96,8 +96,26 @@ loadScripts(document, 'script');</script>
  Queries may have <em>parameters</em>, either ordinal or named, and the various
  <code>setParameter()</code> operations of this interface allow an argument to be
  bound to a parameter. It's not usually necessary to explicitly specify the type
- of an argument, but in rare cases where this is needed, <a href="TypedParameterValue.html" title="class in org.hibernate.query"><code>TypedParameterValue</code></a>
- may be used.
+ of an argument, but in rare cases where this is needed:
+ <ul>
+ <li>an instance of an appropriate metamodel <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a> may be passed to
+     <a href="#setParameter(int,P,jakarta.persistence.metamodel.Type)"><code>setParameter(int, Object, Type)</code></a>, or
+ <li>the argument may be wrapped in a <a href="TypedParameterValue.html" title="class in org.hibernate.query"><code>TypedParameterValue</code></a>. (For JPA users,
+     this second option avoids the need to cast the <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Query.html" title="class or interface in jakarta.persistence" class="external-link"><code>Query</code></a>
+     to a Hibernate-specific type.)
+ </ul>
+ <p>
+ For example:
+ <pre>
+ session.createSelectionQuery("from Person where address = :address", Person.class)
+         .setParameter("address", address, Person_.address.getType())
+         .getResultList()
+ </pre>
+ <pre>
+ entityManager.createQuery( "from Person where address = :address", Person.class)
+         .setParameter("address", TypedParameterValue.of(Person_.address.getType(), address))
+         .getResultList()
+ </pre>
  <p>
  The operation <a href="#setQueryFlushMode(org.hibernate.query.QueryFlushMode)"><code>setQueryFlushMode(QueryFlushMode)</code></a> allows a temporary flush
  mode to be specified, which is in effect only during the execution of this query.
@@ -227,20 +245,20 @@ loadScripts(document, 'script');</script>
 </div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;P&gt;&nbsp;<a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameter(int,P,java.lang.Class)" class="member-name-link">setParameter</a><wbr>(int&nbsp;parameter,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameter(int,P,jakarta.persistence.metamodel.Type)" class="member-name-link">setParameter</a><wbr>(int&nbsp;parameter,
  P&nbsp;value,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;type)</code></div>
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Type</a>&lt;P&gt;&nbsp;type)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Bind the given argument to an ordinal query parameter using the given
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> reference to attempt to infer the <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>.</div>
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;P&gt;&nbsp;<a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameter(int,P,org.hibernate.query.BindableType)" class="member-name-link">setParameter</a><wbr>(int&nbsp;parameter,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameter(int,P,java.lang.Class)" class="member-name-link">setParameter</a><wbr>(int&nbsp;parameter,
  P&nbsp;value,
- <a href="BindableType.html" title="interface in org.hibernate.query">BindableType</a>&lt;P&gt;&nbsp;type)</code></div>
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;type)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Bind the given argument to an ordinal query parameter using the given
- <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>.</div>
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> reference to attempt to infer the <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="#setParameter(jakarta.persistence.Parameter,java.util.Calendar,jakarta.persistence.TemporalType)" class="member-name-link">setParameter</a><wbr>(<a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Parameter.html" title="class or interface in jakarta.persistence" class="external-link">Parameter</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Calendar.html" title="class or interface in java.util" class="external-link">Calendar</a>&gt;&nbsp;param,
@@ -298,37 +316,37 @@ loadScripts(document, 'script');</script>
 </div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;P&gt;&nbsp;<a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameter(java.lang.String,P,java.lang.Class)" class="member-name-link">setParameter</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;parameter,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameter(java.lang.String,P,jakarta.persistence.metamodel.Type)" class="member-name-link">setParameter</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;parameter,
  P&nbsp;value,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;type)</code></div>
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Type</a>&lt;P&gt;&nbsp;type)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Bind the given argument to a named query parameter using the given
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> reference to attempt to infer the <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>.</div>
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;P&gt;&nbsp;<a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameter(java.lang.String,P,org.hibernate.query.BindableType)" class="member-name-link">setParameter</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;parameter,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameter(java.lang.String,P,java.lang.Class)" class="member-name-link">setParameter</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;parameter,
  P&nbsp;value,
- <a href="BindableType.html" title="interface in org.hibernate.query">BindableType</a>&lt;P&gt;&nbsp;type)</code></div>
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;type)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Bind the given argument to a named query parameter using the given
- <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>.</div>
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> reference to attempt to infer the <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;P&gt;&nbsp;<a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameter(org.hibernate.query.QueryParameter,P,java.lang.Class)" class="member-name-link">setParameter</a><wbr>(<a href="QueryParameter.html" title="interface in org.hibernate.query">QueryParameter</a>&lt;P&gt;&nbsp;parameter,
- P&nbsp;value,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;type)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameter(org.hibernate.query.QueryParameter,P,jakarta.persistence.metamodel.Type)" class="member-name-link">setParameter</a><wbr>(<a href="QueryParameter.html" title="interface in org.hibernate.query">QueryParameter</a>&lt;P&gt;&nbsp;parameter,
+ P&nbsp;val,
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Type</a>&lt;P&gt;&nbsp;type)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Bind an argument to the query parameter represented by the given
- <a href="QueryParameter.html" title="interface in org.hibernate.query"><code>QueryParameter</code></a>, using the given <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> reference to attempt
- to infer the <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a> to use.</div>
+ <a href="QueryParameter.html" title="interface in org.hibernate.query"><code>QueryParameter</code></a>, using the given <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;P&gt;&nbsp;<a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameter(org.hibernate.query.QueryParameter,P,org.hibernate.query.BindableType)" class="member-name-link">setParameter</a><wbr>(<a href="QueryParameter.html" title="interface in org.hibernate.query">QueryParameter</a>&lt;P&gt;&nbsp;parameter,
- P&nbsp;val,
- <a href="BindableType.html" title="interface in org.hibernate.query">BindableType</a>&lt;P&gt;&nbsp;type)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameter(org.hibernate.query.QueryParameter,P,java.lang.Class)" class="member-name-link">setParameter</a><wbr>(<a href="QueryParameter.html" title="interface in org.hibernate.query">QueryParameter</a>&lt;P&gt;&nbsp;parameter,
+ P&nbsp;value,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;type)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Bind an argument to the query parameter represented by the given
- <a href="QueryParameter.html" title="interface in org.hibernate.query"><code>QueryParameter</code></a>, using the given <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>.</div>
+ <a href="QueryParameter.html" title="interface in org.hibernate.query"><code>QueryParameter</code></a>, using the given <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> reference to attempt
+ to infer the <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a> to use.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;T&gt;&nbsp;<a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameter(org.hibernate.query.QueryParameter,T)" class="member-name-link">setParameter</a><wbr>(<a href="QueryParameter.html" title="interface in org.hibernate.query">QueryParameter</a>&lt;T&gt;&nbsp;parameter,
@@ -350,36 +368,36 @@ loadScripts(document, 'script');</script>
 <div class="block">Bind multiple arguments to an ordinal query parameter.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;P&gt;&nbsp;<a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameterList(int,java.util.Collection,java.lang.Class)" class="member-name-link">setParameterList</a><wbr>(int&nbsp;parameter,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameterList(int,java.util.Collection,jakarta.persistence.metamodel.Type)" class="member-name-link">setParameterList</a><wbr>(int&nbsp;parameter,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;? extends P&gt;&nbsp;values,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;javaType)</code></div>
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Type</a>&lt;P&gt;&nbsp;type)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Bind multiple arguments to an ordinal query parameter using the given
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> reference to attempt to infer the <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>.</div>
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;P&gt;&nbsp;<a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameterList(int,java.util.Collection,org.hibernate.query.BindableType)" class="member-name-link">setParameterList</a><wbr>(int&nbsp;parameter,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameterList(int,java.util.Collection,java.lang.Class)" class="member-name-link">setParameterList</a><wbr>(int&nbsp;parameter,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;? extends P&gt;&nbsp;values,
- <a href="BindableType.html" title="interface in org.hibernate.query">BindableType</a>&lt;P&gt;&nbsp;type)</code></div>
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;javaType)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Bind multiple arguments to an ordinal query parameter using the given
- <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>.</div>
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> reference to attempt to infer the <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;P&gt;&nbsp;<a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameterList(int,P%5B%5D,java.lang.Class)" class="member-name-link">setParameterList</a><wbr>(int&nbsp;parameter,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameterList(int,P%5B%5D,jakarta.persistence.metamodel.Type)" class="member-name-link">setParameterList</a><wbr>(int&nbsp;parameter,
  P[]&nbsp;values,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;javaType)</code></div>
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Type</a>&lt;P&gt;&nbsp;type)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Bind multiple arguments to an ordinal query parameter using the given
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> reference to attempt to infer the <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>.</div>
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;P&gt;&nbsp;<a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameterList(int,P%5B%5D,org.hibernate.query.BindableType)" class="member-name-link">setParameterList</a><wbr>(int&nbsp;parameter,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameterList(int,P%5B%5D,java.lang.Class)" class="member-name-link">setParameterList</a><wbr>(int&nbsp;parameter,
  P[]&nbsp;values,
- <a href="BindableType.html" title="interface in org.hibernate.query">BindableType</a>&lt;P&gt;&nbsp;type)</code></div>
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;javaType)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Bind multiple arguments to an ordinal query parameter using the given
- <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>.</div>
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> reference to attempt to infer the <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameterList(java.lang.String,java.lang.Object%5B%5D)" class="member-name-link">setParameterList</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;parameter,
@@ -394,39 +412,39 @@ loadScripts(document, 'script');</script>
 <div class="block">Bind multiple arguments to a named query parameter.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;P&gt;&nbsp;<a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameterList(java.lang.String,java.util.Collection,java.lang.Class)" class="member-name-link">setParameterList</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;parameter,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameterList(java.lang.String,java.util.Collection,jakarta.persistence.metamodel.Type)" class="member-name-link">setParameterList</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;parameter,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;? extends P&gt;&nbsp;values,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;javaType)</code></div>
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Type</a>&lt;P&gt;&nbsp;type)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Bind multiple arguments to a named query parameter using the given
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> reference to attempt to infer the <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>
- If unable to infer an appropriate <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>, fall back to
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;P&gt;&nbsp;<a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameterList(java.lang.String,java.util.Collection,java.lang.Class)" class="member-name-link">setParameterList</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;parameter,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;? extends P&gt;&nbsp;values,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;javaType)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Bind multiple arguments to a named query parameter using the given
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> reference to attempt to infer the <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>
+ If unable to infer an appropriate <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>, fall back to
  <a href="#setParameterList(java.lang.String,java.util.Collection)"><code>setParameterList(String, Collection)</code></a>.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;P&gt;&nbsp;<a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameterList(java.lang.String,java.util.Collection,org.hibernate.query.BindableType)" class="member-name-link">setParameterList</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;parameter,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;? extends P&gt;&nbsp;values,
- <a href="BindableType.html" title="interface in org.hibernate.query">BindableType</a>&lt;P&gt;&nbsp;type)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Bind multiple arguments to a named query parameter using the given
- <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>.</div>
-</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;P&gt;&nbsp;<a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameterList(java.lang.String,P%5B%5D,java.lang.Class)" class="member-name-link">setParameterList</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;parameter,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameterList(java.lang.String,P%5B%5D,jakarta.persistence.metamodel.Type)" class="member-name-link">setParameterList</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;parameter,
  P[]&nbsp;values,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;javaType)</code></div>
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Type</a>&lt;P&gt;&nbsp;type)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Bind multiple arguments to a named query parameter using the given
- Class reference to attempt to determine the <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>
- to use.</div>
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;P&gt;&nbsp;<a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameterList(java.lang.String,P%5B%5D,org.hibernate.query.BindableType)" class="member-name-link">setParameterList</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;parameter,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameterList(java.lang.String,P%5B%5D,java.lang.Class)" class="member-name-link">setParameterList</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;parameter,
  P[]&nbsp;values,
- <a href="BindableType.html" title="interface in org.hibernate.query">BindableType</a>&lt;P&gt;&nbsp;type)</code></div>
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;javaType)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Bind multiple arguments to a named query parameter using the given
- <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>.</div>
+ Class reference to attempt to determine the <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>
+ to use.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;P&gt;&nbsp;<a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameterList(org.hibernate.query.QueryParameter,java.util.Collection)" class="member-name-link">setParameterList</a><wbr>(<a href="QueryParameter.html" title="interface in org.hibernate.query">QueryParameter</a>&lt;P&gt;&nbsp;parameter,
@@ -436,21 +454,21 @@ loadScripts(document, 'script');</script>
  given <a href="QueryParameter.html" title="interface in org.hibernate.query"><code>QueryParameter</code></a>.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;P&gt;&nbsp;<a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameterList(org.hibernate.query.QueryParameter,java.util.Collection,java.lang.Class)" class="member-name-link">setParameterList</a><wbr>(<a href="QueryParameter.html" title="interface in org.hibernate.query">QueryParameter</a>&lt;P&gt;&nbsp;parameter,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameterList(org.hibernate.query.QueryParameter,java.util.Collection,jakarta.persistence.metamodel.Type)" class="member-name-link">setParameterList</a><wbr>(<a href="QueryParameter.html" title="interface in org.hibernate.query">QueryParameter</a>&lt;P&gt;&nbsp;parameter,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;? extends P&gt;&nbsp;values,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;javaType)</code></div>
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Type</a>&lt;P&gt;&nbsp;type)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Bind multiple arguments to the query parameter represented by the
- given <a href="QueryParameter.html" title="interface in org.hibernate.query"><code>QueryParameter</code></a> using the given <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> reference
- to attempt to infer the <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a> to use.</div>
+ given <a href="QueryParameter.html" title="interface in org.hibernate.query"><code>QueryParameter</code></a>, using the given <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;P&gt;&nbsp;<a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameterList(org.hibernate.query.QueryParameter,java.util.Collection,org.hibernate.query.BindableType)" class="member-name-link">setParameterList</a><wbr>(<a href="QueryParameter.html" title="interface in org.hibernate.query">QueryParameter</a>&lt;P&gt;&nbsp;parameter,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameterList(org.hibernate.query.QueryParameter,java.util.Collection,java.lang.Class)" class="member-name-link">setParameterList</a><wbr>(<a href="QueryParameter.html" title="interface in org.hibernate.query">QueryParameter</a>&lt;P&gt;&nbsp;parameter,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;? extends P&gt;&nbsp;values,
- <a href="BindableType.html" title="interface in org.hibernate.query">BindableType</a>&lt;P&gt;&nbsp;type)</code></div>
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;javaType)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Bind multiple arguments to the query parameter represented by the
- given <a href="QueryParameter.html" title="interface in org.hibernate.query"><code>QueryParameter</code></a>, using the given <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>.</div>
+ given <a href="QueryParameter.html" title="interface in org.hibernate.query"><code>QueryParameter</code></a> using the given <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> reference
+ to attempt to infer the <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a> to use.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;P&gt;&nbsp;<a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameterList(org.hibernate.query.QueryParameter,P%5B%5D)" class="member-name-link">setParameterList</a><wbr>(<a href="QueryParameter.html" title="interface in org.hibernate.query">QueryParameter</a>&lt;P&gt;&nbsp;parameter,
@@ -460,21 +478,21 @@ loadScripts(document, 'script');</script>
  given <a href="QueryParameter.html" title="interface in org.hibernate.query"><code>QueryParameter</code></a>.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;P&gt;&nbsp;<a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameterList(org.hibernate.query.QueryParameter,P%5B%5D,java.lang.Class)" class="member-name-link">setParameterList</a><wbr>(<a href="QueryParameter.html" title="interface in org.hibernate.query">QueryParameter</a>&lt;P&gt;&nbsp;parameter,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameterList(org.hibernate.query.QueryParameter,P%5B%5D,jakarta.persistence.metamodel.Type)" class="member-name-link">setParameterList</a><wbr>(<a href="QueryParameter.html" title="interface in org.hibernate.query">QueryParameter</a>&lt;P&gt;&nbsp;parameter,
  P[]&nbsp;values,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;javaType)</code></div>
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Type</a>&lt;P&gt;&nbsp;type)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Bind multiple arguments to the query parameter represented by the
- given <a href="QueryParameter.html" title="interface in org.hibernate.query"><code>QueryParameter</code></a> using the given <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> reference
- to attempt to infer the <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a> to use.</div>
+ given <a href="QueryParameter.html" title="interface in org.hibernate.query"><code>QueryParameter</code></a>, using the given the <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;P&gt;&nbsp;<a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameterList(org.hibernate.query.QueryParameter,P%5B%5D,org.hibernate.query.BindableType)" class="member-name-link">setParameterList</a><wbr>(<a href="QueryParameter.html" title="interface in org.hibernate.query">QueryParameter</a>&lt;P&gt;&nbsp;parameter,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameterList(org.hibernate.query.QueryParameter,P%5B%5D,java.lang.Class)" class="member-name-link">setParameterList</a><wbr>(<a href="QueryParameter.html" title="interface in org.hibernate.query">QueryParameter</a>&lt;P&gt;&nbsp;parameter,
  P[]&nbsp;values,
- <a href="BindableType.html" title="interface in org.hibernate.query">BindableType</a>&lt;P&gt;&nbsp;type)</code></div>
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;javaType)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Bind multiple arguments to the query parameter represented by the
- given <a href="QueryParameter.html" title="interface in org.hibernate.query"><code>QueryParameter</code></a>, using the given the <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>.</div>
+ given <a href="QueryParameter.html" title="interface in org.hibernate.query"><code>QueryParameter</code></a> using the given <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> reference
+ to attempt to infer the <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a> to use.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setProperties(java.lang.Object)" class="member-name-link">setProperties</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;bean)</code></div>
@@ -499,6 +517,11 @@ loadScripts(document, 'script');</script>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setTimeout(int)" class="member-name-link">setTimeout</a><wbr>(int&nbsp;timeout)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Set the query timeout <em>in seconds</em>.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setTimeout(jakarta.persistence.Timeout)" class="member-name-link">setTimeout</a><wbr>(<a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Timeout.html" title="class or interface in jakarta.persistence" class="external-link">Timeout</a>&nbsp;timeout)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Apply a timeout to the corresponding database query.</div>
 </div>
 </div>
 </div>
@@ -678,7 +701,9 @@ loadScripts(document, 'script');</script>
  Any value set here is eventually passed directly along to the
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.sql/java/sql/Statement.html#setQueryTimeout(int)" title="class or interface in java.sql" class="external-link">JDBC
  statement</a>, which expressly disallows negative values.  So
- negative values should be avoided as a general rule.
+ negative values should be avoided <em>as a general rule</em>,
+ although certain "magic values" are handled - see
+ <a href="../Timeouts.html#NO_WAIT">Timeouts.NO_WAIT</a>.
  <p>
  A value of zero indicates no timeout.</div>
 <dl class="notes">
@@ -689,9 +714,24 @@ loadScripts(document, 'script');</script>
 <dt>See Also:</dt>
 <dd>
 <ul class="see-list">
+<li><a href="../Timeouts.html" title="interface in org.hibernate"><code>Timeouts</code></a></li>
+<li><a href="#setTimeout(jakarta.persistence.Timeout)"><code>setTimeout(Timeout)</code></a></li>
 <li><a href="#getTimeout()"><code>getTimeout()</code></a></li>
 </ul>
 </dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="setTimeout(jakarta.persistence.Timeout)">
+<h3>setTimeout</h3>
+<div class="member-signature"><span class="return-type"><a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></span>&nbsp;<span class="element-name">setTimeout</span><wbr><span class="parameters">(<a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Timeout.html" title="class or interface in jakarta.persistence" class="external-link">Timeout</a>&nbsp;timeout)</span></div>
+<div class="block">Apply a timeout to the corresponding database query.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>timeout</code> - The timeout to apply</dd>
+<dt>Returns:</dt>
+<dd><code>this</code>, for method chaining</dd>
 </dl>
 </section>
 </li>
@@ -770,7 +810,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <ul class="see-list-long">
 <li><a href="#setParameter(java.lang.String,P,java.lang.Class)"><code>setParameter(String, Object, Class)</code></a></li>
-<li><a href="#setParameter(java.lang.String,P,org.hibernate.query.BindableType)"><code>setParameter(String, Object, BindableType)</code></a></li>
+<li><a href="#setParameter(java.lang.String,P,jakarta.persistence.metamodel.Type)"><code>setParameter(String, Object, Type)</code></a></li>
 <li><a href="TypedParameterValue.html" title="class in org.hibernate.query"><code>TypedParameterValue</code></a></li>
 </ul>
 </dd>
@@ -784,27 +824,27 @@ loadScripts(document, 'script');</script>
  P&nbsp;value,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;type)</span></div>
 <div class="block">Bind the given argument to a named query parameter using the given
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> reference to attempt to infer the <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>.
- If unable to infer an appropriate <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>, fall back to
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> reference to attempt to infer the <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>.
+ If unable to infer an appropriate <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>, fall back to
  <a href="#setParameter(java.lang.String,java.lang.Object)"><code>setParameter(String, Object)</code></a>.</div>
 <dl class="notes">
 <dt>See Also:</dt>
 <dd>
 <ul class="see-list-long">
-<li><a href="#setParameter(java.lang.String,P,org.hibernate.query.BindableType)"><code>setParameter(String, Object, BindableType)</code></a></li>
+<li><a href="#setParameter(java.lang.String,P,jakarta.persistence.metamodel.Type)"><code>setParameter(String, Object, Type)</code></a></li>
 </ul>
 </dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="setParameter(java.lang.String,P,org.hibernate.query.BindableType)">
-<h3 id="setParameter(java.lang.String,java.lang.Object,org.hibernate.query.BindableType)">setParameter</h3>
+<section class="detail" id="setParameter(java.lang.String,P,jakarta.persistence.metamodel.Type)">
+<h3 id="setParameter(java.lang.String,java.lang.Object,jakarta.persistence.metamodel.Type)">setParameter</h3>
 <div class="member-signature"><span class="type-parameters">&lt;P&gt;</span>&nbsp;<span class="return-type"><a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></span>&nbsp;<span class="element-name">setParameter</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;parameter,
  P&nbsp;value,
- <a href="BindableType.html" title="interface in org.hibernate.query">BindableType</a>&lt;P&gt;&nbsp;type)</span></div>
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Type</a>&lt;P&gt;&nbsp;type)</span></div>
 <div class="block">Bind the given argument to a named query parameter using the given
- <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>.</div>
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>.</div>
 </section>
 </li>
 <li>
@@ -876,7 +916,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <ul class="see-list-long">
 <li><a href="#setParameter(int,P,java.lang.Class)"><code>setParameter(int, Object, Class)</code></a></li>
-<li><a href="#setParameter(int,P,org.hibernate.query.BindableType)"><code>setParameter(int, Object, BindableType)</code></a></li>
+<li><a href="#setParameter(int,P,jakarta.persistence.metamodel.Type)"><code>setParameter(int, Object, Type)</code></a></li>
 <li><a href="TypedParameterValue.html" title="class in org.hibernate.query"><code>TypedParameterValue</code></a></li>
 </ul>
 </dd>
@@ -890,27 +930,27 @@ loadScripts(document, 'script');</script>
  P&nbsp;value,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;type)</span></div>
 <div class="block">Bind the given argument to an ordinal query parameter using the given
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> reference to attempt to infer the <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>.
- If unable to infer an appropriate <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>, fall back to
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> reference to attempt to infer the <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>.
+ If unable to infer an appropriate <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>, fall back to
  <a href="#setParameter(int,java.lang.Object)"><code>setParameter(int, Object)</code></a>.</div>
 <dl class="notes">
 <dt>See Also:</dt>
 <dd>
 <ul class="see-list-long">
-<li><a href="#setParameter(int,P,org.hibernate.query.BindableType)"><code>setParameter(int, Object, BindableType)</code></a></li>
+<li><a href="#setParameter(int,P,jakarta.persistence.metamodel.Type)"><code>setParameter(int, Object, Type)</code></a></li>
 </ul>
 </dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="setParameter(int,P,org.hibernate.query.BindableType)">
-<h3 id="setParameter(int,java.lang.Object,org.hibernate.query.BindableType)">setParameter</h3>
+<section class="detail" id="setParameter(int,P,jakarta.persistence.metamodel.Type)">
+<h3 id="setParameter(int,java.lang.Object,jakarta.persistence.metamodel.Type)">setParameter</h3>
 <div class="member-signature"><span class="type-parameters">&lt;P&gt;</span>&nbsp;<span class="return-type"><a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></span>&nbsp;<span class="element-name">setParameter</span><wbr><span class="parameters">(int&nbsp;parameter,
  P&nbsp;value,
- <a href="BindableType.html" title="interface in org.hibernate.query">BindableType</a>&lt;P&gt;&nbsp;type)</span></div>
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Type</a>&lt;P&gt;&nbsp;type)</span></div>
 <div class="block">Bind the given argument to an ordinal query parameter using the given
- <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>.</div>
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>.</div>
 </section>
 </li>
 <li>
@@ -986,7 +1026,7 @@ loadScripts(document, 'script');</script>
 <dt>See Also:</dt>
 <dd>
 <ul class="see-list-long">
-<li><a href="#setParameter(org.hibernate.query.QueryParameter,P,org.hibernate.query.BindableType)"><code>setParameter(QueryParameter, Object, BindableType)</code></a></li>
+<li><a href="#setParameter(org.hibernate.query.QueryParameter,P,jakarta.persistence.metamodel.Type)"><code>setParameter(QueryParameter, Object, Type)</code></a></li>
 </ul>
 </dd>
 </dl>
@@ -1000,37 +1040,37 @@ loadScripts(document, 'script');</script>
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;type)</span></div>
 <div class="block">Bind an argument to the query parameter represented by the given
  <a href="QueryParameter.html" title="interface in org.hibernate.query"><code>QueryParameter</code></a>, using the given <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> reference to attempt
- to infer the <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a> to use.  If unable to infer an appropriate
- <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>, fall back to <a href="#setParameter(org.hibernate.query.QueryParameter,T)"><code>setParameter(QueryParameter, Object)</code></a>.</div>
+ to infer the <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a> to use.  If unable to infer an appropriate
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>, fall back to <a href="#setParameter(org.hibernate.query.QueryParameter,T)"><code>setParameter(QueryParameter, Object)</code></a>.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>parameter</code> - the query parameter memento</dd>
 <dd><code>value</code> - the argument, which might be null</dd>
-<dd><code>type</code> - a <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a> representing the type of the parameter</dd>
+<dd><code>type</code> - a <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a> representing the type of the parameter</dd>
 <dt>Returns:</dt>
 <dd><code>this</code>, for method chaining</dd>
 <dt>See Also:</dt>
 <dd>
 <ul class="see-list-long">
-<li><a href="#setParameter(org.hibernate.query.QueryParameter,P,org.hibernate.query.BindableType)"><code>setParameter(QueryParameter, Object, BindableType)</code></a></li>
+<li><a href="#setParameter(org.hibernate.query.QueryParameter,P,jakarta.persistence.metamodel.Type)"><code>setParameter(QueryParameter, Object, Type)</code></a></li>
 </ul>
 </dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="setParameter(org.hibernate.query.QueryParameter,P,org.hibernate.query.BindableType)">
-<h3 id="setParameter(org.hibernate.query.QueryParameter,java.lang.Object,org.hibernate.query.BindableType)">setParameter</h3>
+<section class="detail" id="setParameter(org.hibernate.query.QueryParameter,P,jakarta.persistence.metamodel.Type)">
+<h3 id="setParameter(org.hibernate.query.QueryParameter,java.lang.Object,jakarta.persistence.metamodel.Type)">setParameter</h3>
 <div class="member-signature"><span class="type-parameters">&lt;P&gt;</span>&nbsp;<span class="return-type"><a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></span>&nbsp;<span class="element-name">setParameter</span><wbr><span class="parameters">(<a href="QueryParameter.html" title="interface in org.hibernate.query">QueryParameter</a>&lt;P&gt;&nbsp;parameter,
  P&nbsp;val,
- <a href="BindableType.html" title="interface in org.hibernate.query">BindableType</a>&lt;P&gt;&nbsp;type)</span></div>
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Type</a>&lt;P&gt;&nbsp;type)</span></div>
 <div class="block">Bind an argument to the query parameter represented by the given
- <a href="QueryParameter.html" title="interface in org.hibernate.query"><code>QueryParameter</code></a>, using the given <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>.</div>
+ <a href="QueryParameter.html" title="interface in org.hibernate.query"><code>QueryParameter</code></a>, using the given <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>parameter</code> - the query parameter memento</dd>
 <dd><code>val</code> - the argument, which might be null</dd>
-<dd><code>type</code> - a <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a> representing the type of the parameter</dd>
+<dd><code>type</code> - a <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a> representing the type of the parameter</dd>
 <dt>Returns:</dt>
 <dd><code>this</code>, for method chaining</dd>
 </dl>
@@ -1106,7 +1146,7 @@ loadScripts(document, 'script');</script>
 <dt>See Also:</dt>
 <dd>
 <ul class="see-list-long">
-<li><a href="#setParameterList(java.lang.String,java.util.Collection,org.hibernate.query.BindableType)"><code>setParameterList(java.lang.String, java.util.Collection, BindableType)</code></a></li>
+<li><a href="#setParameterList(java.lang.String,java.util.Collection,jakarta.persistence.metamodel.Type)"><code>setParameterList(java.lang.String, java.util.Collection, Type)</code></a></li>
 </ul>
 </dd>
 <dt>API Note:</dt>
@@ -1122,8 +1162,8 @@ loadScripts(document, 'script');</script>
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;? extends P&gt;&nbsp;values,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;javaType)</span></div>
 <div class="block">Bind multiple arguments to a named query parameter using the given
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> reference to attempt to infer the <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>
- If unable to infer an appropriate <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>, fall back to
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> reference to attempt to infer the <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>
+ If unable to infer an appropriate <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>, fall back to
  <a href="#setParameterList(java.lang.String,java.util.Collection)"><code>setParameterList(String, Collection)</code></a>.</div>
 <dl class="notes">
 <dt>Returns:</dt>
@@ -1131,7 +1171,7 @@ loadScripts(document, 'script');</script>
 <dt>See Also:</dt>
 <dd>
 <ul class="see-list-long">
-<li><a href="#setParameterList(java.lang.String,java.util.Collection,org.hibernate.query.BindableType)"><code>setParameterList(java.lang.String, java.util.Collection, BindableType)</code></a></li>
+<li><a href="#setParameterList(java.lang.String,java.util.Collection,jakarta.persistence.metamodel.Type)"><code>setParameterList(java.lang.String, java.util.Collection, Type)</code></a></li>
 </ul>
 </dd>
 <dt>API Note:</dt>
@@ -1141,13 +1181,13 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="setParameterList(java.lang.String,java.util.Collection,org.hibernate.query.BindableType)">
+<section class="detail" id="setParameterList(java.lang.String,java.util.Collection,jakarta.persistence.metamodel.Type)">
 <h3>setParameterList</h3>
 <div class="member-signature"><span class="type-parameters">&lt;P&gt;</span>&nbsp;<span class="return-type"><a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></span>&nbsp;<span class="element-name">setParameterList</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;parameter,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;? extends P&gt;&nbsp;values,
- <a href="BindableType.html" title="interface in org.hibernate.query">BindableType</a>&lt;P&gt;&nbsp;type)</span></div>
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Type</a>&lt;P&gt;&nbsp;type)</span></div>
 <div class="block">Bind multiple arguments to a named query parameter using the given
- <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>.</div>
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>.</div>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd><code>this</code>, for method chaining</dd>
@@ -1182,8 +1222,8 @@ loadScripts(document, 'script');</script>
  P[]&nbsp;values,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;javaType)</span></div>
 <div class="block">Bind multiple arguments to a named query parameter using the given
- Class reference to attempt to determine the <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>
- to use.  If unable to determine an appropriate <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>,
+ Class reference to attempt to determine the <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>
+ to use.  If unable to determine an appropriate <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>,
  <a href="#setParameterList(java.lang.String,java.util.Collection)"><code>setParameterList(String, Collection)</code></a> is used</div>
 <dl class="notes">
 <dt>Returns:</dt>
@@ -1191,7 +1231,7 @@ loadScripts(document, 'script');</script>
 <dt>See Also:</dt>
 <dd>
 <ul class="see-list-long">
-<li><a href="#setParameterList(java.lang.String,P%5B%5D,org.hibernate.query.BindableType)"><code>setParameterList(java.lang.String, Object[], BindableType)</code></a></li>
+<li><a href="#setParameterList(java.lang.String,P%5B%5D,jakarta.persistence.metamodel.Type)"><code>setParameterList(java.lang.String, Object[], Type)</code></a></li>
 </ul>
 </dd>
 <dt>API Note:</dt>
@@ -1201,13 +1241,13 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="setParameterList(java.lang.String,P[],org.hibernate.query.BindableType)">
-<h3 id="setParameterList(java.lang.String,java.lang.Object[],org.hibernate.query.BindableType)">setParameterList</h3>
+<section class="detail" id="setParameterList(java.lang.String,P[],jakarta.persistence.metamodel.Type)">
+<h3 id="setParameterList(java.lang.String,java.lang.Object[],jakarta.persistence.metamodel.Type)">setParameterList</h3>
 <div class="member-signature"><span class="type-parameters">&lt;P&gt;</span>&nbsp;<span class="return-type"><a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></span>&nbsp;<span class="element-name">setParameterList</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;parameter,
  P[]&nbsp;values,
- <a href="BindableType.html" title="interface in org.hibernate.query">BindableType</a>&lt;P&gt;&nbsp;type)</span></div>
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Type</a>&lt;P&gt;&nbsp;type)</span></div>
 <div class="block">Bind multiple arguments to a named query parameter using the given
- <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>.</div>
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>.</div>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd><code>this</code>, for method chaining</dd>
@@ -1242,8 +1282,8 @@ loadScripts(document, 'script');</script>
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;? extends P&gt;&nbsp;values,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;javaType)</span></div>
 <div class="block">Bind multiple arguments to an ordinal query parameter using the given
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> reference to attempt to infer the <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>.
- If unable to infer an appropriate <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>, fall back to
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> reference to attempt to infer the <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>.
+ If unable to infer an appropriate <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>, fall back to
  <a href="#setParameterList(java.lang.String,java.util.Collection)"><code>setParameterList(String, Collection)</code></a>.</div>
 <dl class="notes">
 <dt>Returns:</dt>
@@ -1251,7 +1291,7 @@ loadScripts(document, 'script');</script>
 <dt>See Also:</dt>
 <dd>
 <ul class="see-list-long">
-<li><a href="#setParameterList(int,java.util.Collection,org.hibernate.query.BindableType)"><code>setParameterList(int, Collection, BindableType)</code></a></li>
+<li><a href="#setParameterList(int,java.util.Collection,jakarta.persistence.metamodel.Type)"><code>setParameterList(int, Collection, Type)</code></a></li>
 </ul>
 </dd>
 <dt>API Note:</dt>
@@ -1261,13 +1301,13 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="setParameterList(int,java.util.Collection,org.hibernate.query.BindableType)">
+<section class="detail" id="setParameterList(int,java.util.Collection,jakarta.persistence.metamodel.Type)">
 <h3>setParameterList</h3>
 <div class="member-signature"><span class="type-parameters">&lt;P&gt;</span>&nbsp;<span class="return-type"><a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></span>&nbsp;<span class="element-name">setParameterList</span><wbr><span class="parameters">(int&nbsp;parameter,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;? extends P&gt;&nbsp;values,
- <a href="BindableType.html" title="interface in org.hibernate.query">BindableType</a>&lt;P&gt;&nbsp;type)</span></div>
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Type</a>&lt;P&gt;&nbsp;type)</span></div>
 <div class="block">Bind multiple arguments to an ordinal query parameter using the given
- <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>.</div>
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>.</div>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd><code>this</code>, for method chaining</dd>
@@ -1302,8 +1342,8 @@ loadScripts(document, 'script');</script>
  P[]&nbsp;values,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;javaType)</span></div>
 <div class="block">Bind multiple arguments to an ordinal query parameter using the given
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> reference to attempt to infer the <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>.
- If unable to infer an appropriate <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>, fall back to
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> reference to attempt to infer the <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>.
+ If unable to infer an appropriate <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>, fall back to
  <a href="#setParameterList(java.lang.String,java.util.Collection)"><code>setParameterList(String, Collection)</code></a>.</div>
 <dl class="notes">
 <dt>Returns:</dt>
@@ -1311,7 +1351,7 @@ loadScripts(document, 'script');</script>
 <dt>See Also:</dt>
 <dd>
 <ul class="see-list-long">
-<li><a href="#setParameterList(int,P%5B%5D,org.hibernate.query.BindableType)"><code>setParameterList(int, Object[], BindableType)</code></a></li>
+<li><a href="#setParameterList(int,P%5B%5D,jakarta.persistence.metamodel.Type)"><code>setParameterList(int, Object[], Type)</code></a></li>
 </ul>
 </dd>
 <dt>API Note:</dt>
@@ -1321,13 +1361,13 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="setParameterList(int,P[],org.hibernate.query.BindableType)">
-<h3 id="setParameterList(int,java.lang.Object[],org.hibernate.query.BindableType)">setParameterList</h3>
+<section class="detail" id="setParameterList(int,P[],jakarta.persistence.metamodel.Type)">
+<h3 id="setParameterList(int,java.lang.Object[],jakarta.persistence.metamodel.Type)">setParameterList</h3>
 <div class="member-signature"><span class="type-parameters">&lt;P&gt;</span>&nbsp;<span class="return-type"><a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></span>&nbsp;<span class="element-name">setParameterList</span><wbr><span class="parameters">(int&nbsp;parameter,
  P[]&nbsp;values,
- <a href="BindableType.html" title="interface in org.hibernate.query">BindableType</a>&lt;P&gt;&nbsp;type)</span></div>
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Type</a>&lt;P&gt;&nbsp;type)</span></div>
 <div class="block">Bind multiple arguments to an ordinal query parameter using the given
- <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>.</div>
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>.</div>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd><code>this</code>, for method chaining</dd>
@@ -1364,8 +1404,8 @@ loadScripts(document, 'script');</script>
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;javaType)</span></div>
 <div class="block">Bind multiple arguments to the query parameter represented by the
  given <a href="QueryParameter.html" title="interface in org.hibernate.query"><code>QueryParameter</code></a> using the given <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> reference
- to attempt to infer the <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a> to use.  If unable to
- infer an appropriate <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>, fall back to using
+ to attempt to infer the <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a> to use.  If unable to
+ infer an appropriate <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>, fall back to using
  <a href="#setParameterList(java.lang.String,java.util.Collection)"><code>setParameterList(String, Collection)</code></a>.</div>
 <dl class="notes">
 <dt>Returns:</dt>
@@ -1373,7 +1413,7 @@ loadScripts(document, 'script');</script>
 <dt>See Also:</dt>
 <dd>
 <ul class="see-list-long">
-<li><a href="#setParameterList(org.hibernate.query.QueryParameter,java.util.Collection,org.hibernate.query.BindableType)"><code>setParameterList(QueryParameter, java.util.Collection, BindableType)</code></a></li>
+<li><a href="#setParameterList(org.hibernate.query.QueryParameter,java.util.Collection,jakarta.persistence.metamodel.Type)"><code>setParameterList(QueryParameter, java.util.Collection, Type)</code></a></li>
 </ul>
 </dd>
 <dt>API Note:</dt>
@@ -1383,13 +1423,13 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="setParameterList(org.hibernate.query.QueryParameter,java.util.Collection,org.hibernate.query.BindableType)">
+<section class="detail" id="setParameterList(org.hibernate.query.QueryParameter,java.util.Collection,jakarta.persistence.metamodel.Type)">
 <h3>setParameterList</h3>
 <div class="member-signature"><span class="type-parameters">&lt;P&gt;</span>&nbsp;<span class="return-type"><a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></span>&nbsp;<span class="element-name">setParameterList</span><wbr><span class="parameters">(<a href="QueryParameter.html" title="interface in org.hibernate.query">QueryParameter</a>&lt;P&gt;&nbsp;parameter,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;? extends P&gt;&nbsp;values,
- <a href="BindableType.html" title="interface in org.hibernate.query">BindableType</a>&lt;P&gt;&nbsp;type)</span></div>
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Type</a>&lt;P&gt;&nbsp;type)</span></div>
 <div class="block">Bind multiple arguments to the query parameter represented by the
- given <a href="QueryParameter.html" title="interface in org.hibernate.query"><code>QueryParameter</code></a>, using the given <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>.</div>
+ given <a href="QueryParameter.html" title="interface in org.hibernate.query"><code>QueryParameter</code></a>, using the given <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>.</div>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd><code>this</code>, for method chaining</dd>
@@ -1427,8 +1467,8 @@ loadScripts(document, 'script');</script>
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;P&gt;&nbsp;javaType)</span></div>
 <div class="block">Bind multiple arguments to the query parameter represented by the
  given <a href="QueryParameter.html" title="interface in org.hibernate.query"><code>QueryParameter</code></a> using the given <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link"><code>Class</code></a> reference
- to attempt to infer the <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a> to use.  If unable to
- infer an appropriate <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>, fall back to using
+ to attempt to infer the <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a> to use.  If unable to
+ infer an appropriate <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>, fall back to using
  <a href="#setParameterList(java.lang.String,java.util.Collection)"><code>setParameterList(String, Collection)</code></a>.</div>
 <dl class="notes">
 <dt>Returns:</dt>
@@ -1436,7 +1476,7 @@ loadScripts(document, 'script');</script>
 <dt>See Also:</dt>
 <dd>
 <ul class="see-list-long">
-<li><a href="#setParameterList(org.hibernate.query.QueryParameter,P%5B%5D,org.hibernate.query.BindableType)"><code>setParameterList(QueryParameter, Object[], BindableType)</code></a></li>
+<li><a href="#setParameterList(org.hibernate.query.QueryParameter,P%5B%5D,jakarta.persistence.metamodel.Type)"><code>setParameterList(QueryParameter, Object[], Type)</code></a></li>
 </ul>
 </dd>
 <dt>API Note:</dt>
@@ -1446,13 +1486,13 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="setParameterList(org.hibernate.query.QueryParameter,P[],org.hibernate.query.BindableType)">
-<h3 id="setParameterList(org.hibernate.query.QueryParameter,java.lang.Object[],org.hibernate.query.BindableType)">setParameterList</h3>
+<section class="detail" id="setParameterList(org.hibernate.query.QueryParameter,P[],jakarta.persistence.metamodel.Type)">
+<h3 id="setParameterList(org.hibernate.query.QueryParameter,java.lang.Object[],jakarta.persistence.metamodel.Type)">setParameterList</h3>
 <div class="member-signature"><span class="type-parameters">&lt;P&gt;</span>&nbsp;<span class="return-type"><a href="CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></span>&nbsp;<span class="element-name">setParameterList</span><wbr><span class="parameters">(<a href="QueryParameter.html" title="interface in org.hibernate.query">QueryParameter</a>&lt;P&gt;&nbsp;parameter,
  P[]&nbsp;values,
- <a href="BindableType.html" title="interface in org.hibernate.query">BindableType</a>&lt;P&gt;&nbsp;type)</span></div>
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Type</a>&lt;P&gt;&nbsp;type)</span></div>
 <div class="block">Bind multiple arguments to the query parameter represented by the
- given <a href="QueryParameter.html" title="interface in org.hibernate.query"><code>QueryParameter</code></a>, using the given the <a href="BindableType.html" title="interface in org.hibernate.query"><code>BindableType</code></a>.</div>
+ given <a href="QueryParameter.html" title="interface in org.hibernate.query"><code>QueryParameter</code></a>, using the given the <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link"><code>Type</code></a>.</div>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd><code>this</code>, for method chaining</dd>

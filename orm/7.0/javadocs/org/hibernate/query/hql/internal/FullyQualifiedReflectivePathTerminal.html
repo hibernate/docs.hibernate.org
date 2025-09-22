@@ -145,7 +145,7 @@ implements <a href="../../sqm/tree/expression/SqmExpression.html" title="interfa
  <a href="../../sqm/tree/SqmRenderContext.html" title="interface in org.hibernate.query.sqm.tree">SqmRenderContext</a>&nbsp;context)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#applyInferableType(org.hibernate.query.sqm.SqmExpressible)" class="member-name-link">applyInferableType</a><wbr>(@Nullable <a href="../../sqm/SqmExpressible.html" title="interface in org.hibernate.query.sqm">SqmExpressible</a>&lt;?&gt;&nbsp;type)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#applyInferableType(org.hibernate.query.sqm.SqmBindableType)" class="member-name-link">applyInferableType</a><wbr>(@Nullable <a href="../../sqm/SqmBindableType.html" title="interface in org.hibernate.query.sqm">SqmBindableType</a>&lt;?&gt;&nbsp;type)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Used to apply type information based on the expression's usage
  within the query.</div>
@@ -192,7 +192,7 @@ implements <a href="../../sqm/tree/expression/SqmExpression.html" title="interfa
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../../type/descriptor/java/JavaType.html" title="interface in org.hibernate.type.descriptor.java">JavaType</a>&lt;<a href="FullyQualifiedReflectivePathTerminal.html" title="type parameter in FullyQualifiedReflectivePathTerminal">E</a>&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getJavaTypeDescriptor()" class="member-name-link">getJavaTypeDescriptor</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable <a href="../../sqm/SqmExpressible.html" title="interface in org.hibernate.query.sqm">SqmExpressible</a>&lt;<a href="FullyQualifiedReflectivePathTerminal.html" title="type parameter in FullyQualifiedReflectivePathTerminal">E</a>&gt;</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable <a href="../../sqm/SqmBindableType.html" title="interface in org.hibernate.query.sqm">SqmBindableType</a>&lt;<a href="FullyQualifiedReflectivePathTerminal.html" title="type parameter in FullyQualifiedReflectivePathTerminal">E</a>&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getNodeType()" class="member-name-link">getNodeType</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">The expression's type.</div>
@@ -309,11 +309,11 @@ implements <a href="../../sqm/tree/expression/SqmExpression.html" title="interfa
 <li>
 <section class="detail" id="getNodeType()">
 <h3>getNodeType</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">@Nullable <a href="../../sqm/SqmExpressible.html" title="interface in org.hibernate.query.sqm">SqmExpressible</a>&lt;<a href="FullyQualifiedReflectivePathTerminal.html" title="type parameter in FullyQualifiedReflectivePathTerminal">E</a>&gt;</span>&nbsp;<span class="element-name">getNodeType</span>()</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">@Nullable <a href="../../sqm/SqmBindableType.html" title="interface in org.hibernate.query.sqm">SqmBindableType</a>&lt;<a href="FullyQualifiedReflectivePathTerminal.html" title="type parameter in FullyQualifiedReflectivePathTerminal">E</a>&gt;</span>&nbsp;<span class="element-name">getNodeType</span>()</div>
 <div class="block"><span class="descfrm-type-label">Description copied from interface:&nbsp;<code><a href="../../sqm/tree/expression/SqmExpression.html#getNodeType()">SqmExpression</a></code></span></div>
 <div class="block">The expression's type.
  <p>
- Can change as a result of calls to <a href="../../sqm/tree/expression/SqmExpression.html#applyInferableType(org.hibernate.query.sqm.SqmExpressible)"><code>SqmExpression.applyInferableType(org.hibernate.query.sqm.SqmExpressible&lt;?&gt;)</code></a></div>
+ Can change as a result of calls to <a href="../../sqm/tree/expression/SqmExpression.html#applyInferableType(org.hibernate.query.sqm.SqmBindableType)"><code>SqmExpression.applyInferableType(org.hibernate.query.sqm.SqmBindableType&lt;?&gt;)</code></a></div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../../sqm/tree/expression/SqmExpression.html#getNodeType()">getNodeType</a></code>&nbsp;in interface&nbsp;<code><a href="../../sqm/tree/expression/SqmExpression.html" title="interface in org.hibernate.query.sqm.tree.expression">SqmExpression</a>&lt;<a href="FullyQualifiedReflectivePathTerminal.html" title="type parameter in FullyQualifiedReflectivePathTerminal">E</a>&gt;</code></dd>
@@ -345,15 +345,15 @@ implements <a href="../../sqm/tree/expression/SqmExpression.html" title="interfa
 </section>
 </li>
 <li>
-<section class="detail" id="applyInferableType(org.hibernate.query.sqm.SqmExpressible)">
+<section class="detail" id="applyInferableType(org.hibernate.query.sqm.SqmBindableType)">
 <h3>applyInferableType</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">applyInferableType</span><wbr><span class="parameters">(@Nullable <a href="../../sqm/SqmExpressible.html" title="interface in org.hibernate.query.sqm">SqmExpressible</a>&lt;?&gt;&nbsp;type)</span></div>
-<div class="block"><span class="descfrm-type-label">Description copied from interface:&nbsp;<code><a href="../../sqm/tree/expression/SqmExpression.html#applyInferableType(org.hibernate.query.sqm.SqmExpressible)">SqmExpression</a></code></span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">applyInferableType</span><wbr><span class="parameters">(@Nullable <a href="../../sqm/SqmBindableType.html" title="interface in org.hibernate.query.sqm">SqmBindableType</a>&lt;?&gt;&nbsp;type)</span></div>
+<div class="block"><span class="descfrm-type-label">Description copied from interface:&nbsp;<code><a href="../../sqm/tree/expression/SqmExpression.html#applyInferableType(org.hibernate.query.sqm.SqmBindableType)">SqmExpression</a></code></span></div>
 <div class="block">Used to apply type information based on the expression's usage
  within the query.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="../../sqm/tree/expression/SqmExpression.html#applyInferableType(org.hibernate.query.sqm.SqmExpressible)">applyInferableType</a></code>&nbsp;in interface&nbsp;<code><a href="../../sqm/tree/expression/SqmExpression.html" title="interface in org.hibernate.query.sqm.tree.expression">SqmExpression</a>&lt;<a href="FullyQualifiedReflectivePathTerminal.html" title="type parameter in FullyQualifiedReflectivePathTerminal">E</a>&gt;</code></dd>
+<dd><code><a href="../../sqm/tree/expression/SqmExpression.html#applyInferableType(org.hibernate.query.sqm.SqmBindableType)">applyInferableType</a></code>&nbsp;in interface&nbsp;<code><a href="../../sqm/tree/expression/SqmExpression.html" title="interface in org.hibernate.query.sqm.tree.expression">SqmExpression</a>&lt;<a href="FullyQualifiedReflectivePathTerminal.html" title="type parameter in FullyQualifiedReflectivePathTerminal">E</a>&gt;</code></dd>
 </dl>
 </section>
 </li>

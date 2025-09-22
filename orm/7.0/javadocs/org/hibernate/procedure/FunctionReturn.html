@@ -75,7 +75,7 @@ loadScripts(document, 'script');</script>
 <section class="class-description" id="class-description">
 <dl class="notes">
 <dt>All Superinterfaces:</dt>
-<dd><code><a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Parameter.html" title="class or interface in jakarta.persistence" class="external-link">Parameter</a>&lt;T&gt;</code>, <code><a href="../query/procedure/ProcedureParameter.html" title="interface in org.hibernate.query.procedure">ProcedureParameter</a>&lt;T&gt;</code>, <code><a href="../query/QueryParameter.html" title="interface in org.hibernate.query">QueryParameter</a>&lt;T&gt;</code></dd>
+<dd><code><a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Parameter.html" title="class or interface in jakarta.persistence" class="external-link">Parameter</a>&lt;T&gt;</code>, <code><a href="ProcedureParameter.html" title="interface in org.hibernate.procedure">ProcedureParameter</a>&lt;T&gt;</code>, <code><a href="../query/QueryParameter.html" title="interface in org.hibernate.query">QueryParameter</a>&lt;T&gt;</code></dd>
 </dl>
 <dl class="notes">
 <dt>All Known Subinterfaces:</dt>
@@ -86,10 +86,16 @@ loadScripts(document, 'script');</script>
 <dd><code><a href="internal/FunctionReturnImpl.html" title="class in org.hibernate.procedure.internal">FunctionReturnImpl</a></code></dd>
 </dl>
 <hr>
-<div class="type-signature"><span class="modifiers">public interface </span><span class="element-name type-name-label">FunctionReturn&lt;T&gt;</span><span class="extends-implements">
-extends <a href="../query/procedure/ProcedureParameter.html" title="interface in org.hibernate.query.procedure">ProcedureParameter</a>&lt;T&gt;</span></div>
-<div class="block">Describes the function return for ProcedureCalls that represent calls to
- a function (<code>"{? = call ...}</code> syntax) rather that a proc (<code>{call ...}</code> syntax)</div>
+<div class="type-signature"><span class="annotations"><a href="../Incubating.html" title="annotation interface in org.hibernate">@Incubating</a>
+</span><span class="modifiers">public interface </span><span class="element-name type-name-label">FunctionReturn&lt;T&gt;</span><span class="extends-implements">
+extends <a href="ProcedureParameter.html" title="interface in org.hibernate.procedure">ProcedureParameter</a>&lt;T&gt;</span></div>
+<div class="block">Describes the function return value of a <a href="ProcedureCall.html" title="interface in org.hibernate.procedure"><code>ProcedureCall</code></a>
+ executed via a JDBC escape of form (<code>"{? = call ...}</code>.
+ That is, the <code>?</code> parameter occurring before the <code>=</code>.</div>
+<dl class="notes">
+<dt>Since:</dt>
+<dd>6.0</dd>
+</dl>
 </section>
 <section class="summary">
 <ul class="summary-list">
@@ -106,7 +112,10 @@ extends <a href="../query/procedure/ProcedureParameter.html" title="interface in
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>int</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getJdbcTypeCode()" class="member-name-link">getJdbcTypeCode</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">The <a href="../type/SqlTypes.html" title="class in org.hibernate.type">JDBC type code</a>
+ representing the SQL type of the function return value.</div>
+</div>
 </div>
 </div>
 </div>
@@ -114,8 +123,8 @@ extends <a href="../query/procedure/ProcedureParameter.html" title="interface in
 <h3 id="methods-inherited-from-class-jakarta.persistence.Parameter">Methods inherited from interface&nbsp;jakarta.persistence.<a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Parameter.html" title="class or interface in jakarta.persistence" class="external-link">Parameter</a></h3>
 <code><a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Parameter.html#getName()" title="class or interface in jakarta.persistence" class="external-link">getName</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Parameter.html#getParameterType()" title="class or interface in jakarta.persistence" class="external-link">getParameterType</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Parameter.html#getPosition()" title="class or interface in jakarta.persistence" class="external-link">getPosition</a></code></div>
 <div class="inherited-list">
-<h3 id="methods-inherited-from-class-org.hibernate.query.procedure.ProcedureParameter">Methods inherited from interface&nbsp;org.hibernate.query.procedure.<a href="../query/procedure/ProcedureParameter.html" title="interface in org.hibernate.query.procedure">ProcedureParameter</a></h3>
-<code><a href="../query/procedure/ProcedureParameter.html#getMode()">getMode</a></code></div>
+<h3 id="methods-inherited-from-class-org.hibernate.procedure.ProcedureParameter">Methods inherited from interface&nbsp;org.hibernate.procedure.<a href="ProcedureParameter.html" title="interface in org.hibernate.procedure">ProcedureParameter</a></h3>
+<code><a href="ProcedureParameter.html#getMode()">getMode</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.hibernate.query.QueryParameter">Methods inherited from interface&nbsp;org.hibernate.query.<a href="../query/QueryParameter.html" title="interface in org.hibernate.query">QueryParameter</a></h3>
 <code><a href="../query/QueryParameter.html#allowsMultiValuedBinding()">allowsMultiValuedBinding</a>, <a href="../query/QueryParameter.html#getHibernateType()">getHibernateType</a>, <a href="../query/QueryParameter.html#isNamed()">isNamed</a>, <a href="../query/QueryParameter.html#isOrdinal()">isOrdinal</a></code></div>
@@ -134,6 +143,8 @@ extends <a href="../query/procedure/ProcedureParameter.html" title="interface in
 <section class="detail" id="getJdbcTypeCode()">
 <h3>getJdbcTypeCode</h3>
 <div class="member-signature"><span class="return-type">int</span>&nbsp;<span class="element-name">getJdbcTypeCode</span>()</div>
+<div class="block">The <a href="../type/SqlTypes.html" title="class in org.hibernate.type">JDBC type code</a>
+ representing the SQL type of the function return value.</div>
 </section>
 </li>
 </ul>

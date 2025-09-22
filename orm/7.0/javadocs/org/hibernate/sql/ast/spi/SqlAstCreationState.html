@@ -126,20 +126,23 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="../../../query/sqm/spi/SqmCreationContext.html" title="interface in org.hibernate.query.sqm.spi">SqmCreationContext</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#getSqmCreationContext()" class="member-name-link">getSqmCreationContext</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#registerEntityNameUsage(org.hibernate.sql.ast.tree.from.TableGroup,org.hibernate.persister.entity.EntityNameUse,java.lang.String)" class="member-name-link">registerEntityNameUsage</a><wbr>(<a href="../tree/from/TableGroup.html" title="interface in org.hibernate.sql.ast.tree.from">TableGroup</a>&nbsp;tableGroup,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#isProcedureOrNativeQuery()" class="member-name-link">isProcedureOrNativeQuery</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#registerEntityNameUsage(org.hibernate.sql.ast.tree.from.TableGroup,org.hibernate.persister.entity.EntityNameUse,java.lang.String)" class="member-name-link">registerEntityNameUsage</a><wbr>(<a href="../tree/from/TableGroup.html" title="interface in org.hibernate.sql.ast.tree.from">TableGroup</a>&nbsp;tableGroup,
  <a href="../../../persister/entity/EntityNameUse.html" title="class in org.hibernate.persister.entity">EntityNameUse</a>&nbsp;entityNameUse,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;hibernateEntityName)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
 <div class="block">This callback is for handling of filters and is necessary to allow correct treat optimizations.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#registerLockMode(java.lang.String,org.hibernate.LockMode)" class="member-name-link">registerLockMode</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;identificationVariable,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#registerLockMode(java.lang.String,org.hibernate.LockMode)" class="member-name-link">registerLockMode</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;identificationVariable,
  <a href="../../../LockMode.html" title="enum class in org.hibernate">LockMode</a>&nbsp;explicitLockMode)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#supportsEntityNameUsage()" class="member-name-link">supportsEntityNameUsage</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#supportsEntityNameUsage()" class="member-name-link">supportsEntityNameUsage</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -232,6 +235,12 @@ loadScripts(document, 'script');</script>
 <div class="member-signature"><span class="annotations"><a href="../../../Internal.html" title="annotation interface in org.hibernate">@Internal</a>
 </span><span class="modifiers">default</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">applyOrdering</span><wbr><span class="parameters">(<a href="../tree/from/TableGroup.html" title="interface in org.hibernate.sql.ast.tree.from">TableGroup</a>&nbsp;tableGroup,
  <a href="../../../metamodel/mapping/ordering/OrderByFragment.html" title="interface in org.hibernate.metamodel.mapping.ordering">OrderByFragment</a>&nbsp;orderByFragment)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="isProcedureOrNativeQuery()">
+<h3>isProcedureOrNativeQuery</h3>
+<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isProcedureOrNativeQuery</span>()</div>
 </section>
 </li>
 </ul>

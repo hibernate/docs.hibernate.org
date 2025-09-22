@@ -426,9 +426,9 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>protected </code></div>
 <div class="col-second odd-row-color"><code><a href="../../../metamodel/model/domain/internal/EmbeddedDiscriminatorSqmPath.html#%3Cinit%3E(org.hibernate.spi.NavigablePath,org.hibernate.query.sqm.SqmPathSource,org.hibernate.query.sqm.tree.domain.SqmPath,org.hibernate.metamodel.model.domain.EmbeddableDomainType,org.hibernate.query.sqm.NodeBuilder)" class="member-name-link">EmbeddedDiscriminatorSqmPath</a><wbr>(<a href="../../../spi/NavigablePath.html" title="class in org.hibernate.spi">NavigablePath</a>&nbsp;navigablePath,
- <a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&nbsp;referencedPathSource,
+ <a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;<a href="../../../metamodel/model/domain/internal/EmbeddedDiscriminatorSqmPath.html" title="type parameter in EmbeddedDiscriminatorSqmPath">T</a>&gt;&nbsp;referencedPathSource,
  <a href="../tree/domain/SqmPath.html" title="interface in org.hibernate.query.sqm.tree.domain">SqmPath</a>&lt;?&gt;&nbsp;lhs,
- <a href="../../../metamodel/model/domain/EmbeddableDomainType.html" title="interface in org.hibernate.metamodel.model.domain">EmbeddableDomainType</a>&nbsp;embeddableDomainType,
+ <a href="../../../metamodel/model/domain/EmbeddableDomainType.html" title="interface in org.hibernate.metamodel.model.domain">EmbeddableDomainType</a>&lt;<a href="../../../metamodel/model/domain/internal/EmbeddedDiscriminatorSqmPath.html" title="type parameter in EmbeddedDiscriminatorSqmPath">T</a>&gt;&nbsp;embeddableDomainType,
  <a href="../NodeBuilder.html" title="interface in org.hibernate.query.sqm">NodeBuilder</a>&nbsp;nodeBuilder)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>&nbsp;</code></div>
@@ -477,7 +477,7 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>static &lt;T&gt;&nbsp;<a href="../SqmExpressible.html" title="interface in org.hibernate.query.sqm">SqmExpressible</a>&lt;? super T&gt;</code></div>
+<div class="col-first even-row-color"><code>static &lt;T&gt;&nbsp;<a href="../SqmBindableType.html" title="interface in org.hibernate.query.sqm">SqmBindableType</a>&lt;? super T&gt;</code></div>
 <div class="col-second even-row-color"><span class="type-name-label">DiscriminatorHelper.</span><code><a href="../../../persister/entity/DiscriminatorHelper.html#getDiscriminatorType(org.hibernate.query.sqm.SqmPathSource,org.hibernate.query.sqm.NodeBuilder)" class="member-name-link">getDiscriminatorType</a><wbr>(<a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;T&gt;&nbsp;domainType,
  <a href="../NodeBuilder.html" title="interface in org.hibernate.query.sqm">NodeBuilder</a>&nbsp;nodeBuilder)</code></div>
 <div class="col-last even-row-color">
@@ -506,37 +506,21 @@ loadScripts(document, 'script');</script>
 <div class="block">Find a <a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm"><code>SqmPathSource</code></a> by name relative to this source.</div>
 </div>
 <div class="col-first even-row-color"><code>default <a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;?&gt;</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">SqmPathSource.</span><code><a href="../SqmPathSource.html#findSubPathSource(java.lang.String,org.hibernate.metamodel.model.domain.JpaMetamodel)" class="member-name-link">findSubPathSource</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
- <a href="../../../metamodel/model/domain/JpaMetamodel.html" title="interface in org.hibernate.metamodel.model.domain">JpaMetamodel</a>&nbsp;metamodel)</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">SqmPathSource.</span><code><a href="../SqmPathSource.html#getIntermediatePathSource(org.hibernate.query.sqm.SqmPathSource)" class="member-name-link">getIntermediatePathSource</a><wbr>(<a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;?&gt;&nbsp;pathSource)</code></div>
 <div class="col-last even-row-color">
-<div class="block"><span class="deprecated-label">Deprecated, for removal: This API element is subject to removal in a future version.</span>
-<div class="deprecation-comment">Use <a href="../SqmPathSource.html#findSubPathSource(java.lang.String,boolean)"><code>findSubPathSource(String, boolean)</code></a> instead</div>
-</div>
-</div>
-<div class="col-first odd-row-color"><code>default <a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;?&gt;</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">SqmPathSource.</span><code><a href="../SqmPathSource.html#getIntermediatePathSource(org.hibernate.query.sqm.SqmPathSource)" class="member-name-link">getIntermediatePathSource</a><wbr>(<a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;?&gt;&nbsp;pathSource)</code></div>
-<div class="col-last odd-row-color">
 <div class="block">Returns the intermediate <a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm"><code>SqmPathSource</code></a> for a path source
  previously acquired via <a href="../SqmPathSource.html#findSubPathSource(java.lang.String)"><code>findSubPathSource(String)</code></a>.</div>
 </div>
-<div class="col-first even-row-color"><code>default <a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;?&gt;</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">SqmPathSource.</span><code><a href="../SqmPathSource.html#getSubPathSource(java.lang.String)" class="member-name-link">getSubPathSource</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
-<div class="col-last even-row-color">
-<div class="block">Find a <a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm"><code>SqmPathSource</code></a> by name relative to this source.</div>
-</div>
 <div class="col-first odd-row-color"><code>default <a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;?&gt;</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">SqmPathSource.</span><code><a href="../SqmPathSource.html#getSubPathSource(java.lang.String,boolean)" class="member-name-link">getSubPathSource</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
- boolean&nbsp;subtypes)</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">SqmPathSource.</span><code><a href="../SqmPathSource.html#getSubPathSource(java.lang.String)" class="member-name-link">getSubPathSource</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
 <div class="col-last odd-row-color">
 <div class="block">Find a <a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm"><code>SqmPathSource</code></a> by name relative to this source.</div>
 </div>
 <div class="col-first even-row-color"><code>default <a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;?&gt;</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">SqmPathSource.</span><code><a href="../SqmPathSource.html#getSubPathSource(java.lang.String,org.hibernate.metamodel.model.domain.JpaMetamodel)" class="member-name-link">getSubPathSource</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
- <a href="../../../metamodel/model/domain/JpaMetamodel.html" title="interface in org.hibernate.metamodel.model.domain">JpaMetamodel</a>&nbsp;metamodel)</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">SqmPathSource.</span><code><a href="../SqmPathSource.html#getSubPathSource(java.lang.String,boolean)" class="member-name-link">getSubPathSource</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
+ boolean&nbsp;subtypes)</code></div>
 <div class="col-last even-row-color">
-<div class="block"><span class="deprecated-label">Deprecated, for removal: This API element is subject to removal in a future version.</span>
-<div class="deprecation-comment">Use #<a href="../SqmPathSource.html#getSubPathSource(java.lang.String,boolean)"><code>getSubPathSource(String, boolean)</code></a> instead</div>
-</div>
+<div class="block">Find a <a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm"><code>SqmPathSource</code></a> by name relative to this source.</div>
 </div>
 </div>
 <div class="caption"><span>Methods in <a href="../package-summary.html">org.hibernate.query.sqm</a> with parameters of type <a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a></span></div>
@@ -703,66 +687,10 @@ A&gt;&nbsp;<a href="../tree/from/SqmAttributeJoin.html" title="interface in org.
 <div class="col-second even-row-color"><span class="type-name-label">AbstractSqmSimplePath.</span><code><a href="../tree/domain/AbstractSqmSimplePath.html#getModel()" class="member-name-link">getModel</a>()</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code><a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;<a href="../tree/domain/AbstractSqmPath.html" title="type parameter in AbstractSqmPath">T</a>&gt;</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">AbstractSqmPath.</span><code><a href="../tree/domain/AbstractSqmPath.html#getNodeType()" class="member-name-link">getNodeType</a>()</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">AbstractSqmPath.</span><code><a href="../tree/domain/AbstractSqmPath.html#getReferencedPathSource()" class="member-name-link">getReferencedPathSource</a>()</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code><a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;<a href="../tree/domain/AbstractSqmSimplePath.html" title="type parameter in AbstractSqmSimplePath">T</a>&gt;</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">AbstractSqmSimplePath.</span><code><a href="../tree/domain/AbstractSqmSimplePath.html#getNodeType()" class="member-name-link">getNodeType</a>()</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code><a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;<a href="../tree/domain/SqmBasicValuedSimplePath.html" title="type parameter in SqmBasicValuedSimplePath">T</a>&gt;</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">SqmBasicValuedSimplePath.</span><code><a href="../tree/domain/SqmBasicValuedSimplePath.html#getNodeType()" class="member-name-link">getNodeType</a>()</code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code><a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;<a href="../tree/domain/SqmEntityValuedSimplePath.html" title="type parameter in SqmEntityValuedSimplePath">T</a>&gt;</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">SqmEntityValuedSimplePath.</span><code><a href="../tree/domain/SqmEntityValuedSimplePath.html#getNodeType()" class="member-name-link">getNodeType</a>()</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code><a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;<a href="../tree/domain/SqmPath.html" title="type parameter in SqmPath">T</a>&gt;</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">SqmPath.</span><code><a href="../tree/domain/SqmPath.html#getNodeType()" class="member-name-link">getNodeType</a>()</code></div>
-<div class="col-last odd-row-color">
-<div class="block">This node's type is its "referenced path source"</div>
-</div>
-<div class="col-first even-row-color"><code><a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;<a href="../tree/domain/SqmSingularJoin.html" title="type parameter in SqmSingularJoin">T</a>&gt;</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">SqmSingularJoin.</span><code><a href="../tree/domain/SqmSingularJoin.html#getNodeType()" class="member-name-link">getNodeType</a>()</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code><a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;<a href="../tree/domain/SqmTreatedBagJoin.html" title="type parameter in SqmTreatedBagJoin">S</a>&gt;</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">SqmTreatedBagJoin.</span><code><a href="../tree/domain/SqmTreatedBagJoin.html#getNodeType()" class="member-name-link">getNodeType</a>()</code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code><a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a></code></div>
-<div class="col-second even-row-color"><span class="type-name-label">SqmTreatedCrossJoin.</span><code><a href="../tree/domain/SqmTreatedCrossJoin.html#getNodeType()" class="member-name-link">getNodeType</a>()</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code><a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;<a href="../tree/domain/SqmTreatedEmbeddedValuedSimplePath.html" title="type parameter in SqmTreatedEmbeddedValuedSimplePath">S</a>&gt;</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">SqmTreatedEmbeddedValuedSimplePath.</span><code><a href="../tree/domain/SqmTreatedEmbeddedValuedSimplePath.html#getNodeType()" class="member-name-link">getNodeType</a>()</code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code><a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;<a href="../tree/domain/SqmTreatedEntityJoin.html" title="type parameter in SqmTreatedEntityJoin">S</a>&gt;</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">SqmTreatedEntityJoin.</span><code><a href="../tree/domain/SqmTreatedEntityJoin.html#getNodeType()" class="member-name-link">getNodeType</a>()</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code><a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;<a href="../tree/domain/SqmTreatedListJoin.html" title="type parameter in SqmTreatedListJoin">S</a>&gt;</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">SqmTreatedListJoin.</span><code><a href="../tree/domain/SqmTreatedListJoin.html#getNodeType()" class="member-name-link">getNodeType</a>()</code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code><a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;<a href="../tree/domain/SqmTreatedMapJoin.html" title="type parameter in SqmTreatedMapJoin">S</a>&gt;</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">SqmTreatedMapJoin.</span><code><a href="../tree/domain/SqmTreatedMapJoin.html#getNodeType()" class="member-name-link">getNodeType</a>()</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code><a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a></code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">SqmTreatedPluralPartJoin.</span><code><a href="../tree/domain/SqmTreatedPluralPartJoin.html#getNodeType()" class="member-name-link">getNodeType</a>()</code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code><a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a></code></div>
-<div class="col-second even-row-color"><span class="type-name-label">SqmTreatedRoot.</span><code><a href="../tree/domain/SqmTreatedRoot.html#getNodeType()" class="member-name-link">getNodeType</a>()</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code><a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;<a href="../tree/domain/SqmTreatedSetJoin.html" title="type parameter in SqmTreatedSetJoin">S</a>&gt;</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">SqmTreatedSetJoin.</span><code><a href="../tree/domain/SqmTreatedSetJoin.html#getNodeType()" class="member-name-link">getNodeType</a>()</code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code><a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;<a href="../tree/domain/SqmTreatedSimplePath.html" title="type parameter in SqmTreatedSimplePath">S</a>&gt;</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">SqmTreatedSimplePath.</span><code><a href="../tree/domain/SqmTreatedSimplePath.html#getNodeType()" class="member-name-link">getNodeType</a>()</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code><a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;<a href="../tree/domain/SqmTreatedSingularJoin.html" title="type parameter in SqmTreatedSingularJoin">S</a>&gt;</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">SqmTreatedSingularJoin.</span><code><a href="../tree/domain/SqmTreatedSingularJoin.html#getNodeType()" class="member-name-link">getNodeType</a>()</code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code><a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;<a href="../tree/domain/AbstractSqmPath.html" title="type parameter in AbstractSqmPath">T</a>&gt;</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">AbstractSqmPath.</span><code><a href="../tree/domain/AbstractSqmPath.html#getReferencedPathSource()" class="member-name-link">getReferencedPathSource</a>()</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code><a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;<a href="../tree/domain/AbstractSqmSimplePath.html" title="type parameter in AbstractSqmSimplePath">T</a>&gt;</code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">AbstractSqmSimplePath.</span><code><a href="../tree/domain/AbstractSqmSimplePath.html#getReferencedPathSource()" class="member-name-link">getReferencedPathSource</a>()</code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code><a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;<a href="../tree/domain/SqmBasicValuedSimplePath.html" title="type parameter in SqmBasicValuedSimplePath">T</a>&gt;</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">SqmBasicValuedSimplePath.</span><code><a href="../tree/domain/SqmBasicValuedSimplePath.html#getReferencedPathSource()" class="member-name-link">getReferencedPathSource</a>()</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">AbstractSqmSimplePath.</span><code><a href="../tree/domain/AbstractSqmSimplePath.html#getReferencedPathSource()" class="member-name-link">getReferencedPathSource</a>()</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code><a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;?&gt;</code></div>
 <div class="col-second odd-row-color"><span class="type-name-label">SqmPath.</span><code><a href="../tree/domain/SqmPath.html#getReferencedPathSource()" class="member-name-link">getReferencedPathSource</a>()</code></div>
@@ -787,6 +715,12 @@ A&gt;&nbsp;<a href="../tree/from/SqmAttributeJoin.html" title="interface in org.
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code><a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;<a href="../tree/domain/AbstractSqmPath.html" title="type parameter in AbstractSqmPath">T</a>&gt;</code></div>
 <div class="col-second odd-row-color"><span class="type-name-label">AbstractSqmPath.</span><code><a href="../tree/domain/AbstractSqmPath.html#getResolvedModel()" class="member-name-link">getResolvedModel</a>()</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code><a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;<a href="../tree/domain/SqmCorrelatedDerivedRoot.html" title="type parameter in SqmCorrelatedDerivedRoot">T</a>&gt;</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">SqmCorrelatedDerivedRoot.</span><code><a href="../tree/domain/SqmCorrelatedDerivedRoot.html#getResolvedModel()" class="member-name-link">getResolvedModel</a>()</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code><a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;<a href="../tree/domain/SqmCorrelatedDerivedRootJoin.html" title="type parameter in SqmCorrelatedDerivedRootJoin">T</a>&gt;</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">SqmCorrelatedDerivedRootJoin.</span><code><a href="../tree/domain/SqmCorrelatedDerivedRootJoin.html#getResolvedModel()" class="member-name-link">getResolvedModel</a>()</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code><a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;<a href="../tree/domain/SqmCteRoot.html" title="type parameter in SqmCteRoot">T</a>&gt;</code></div>
 <div class="col-second even-row-color"><span class="type-name-label">SqmCteRoot.</span><code><a href="../tree/domain/SqmCteRoot.html#getResolvedModel()" class="member-name-link">getResolvedModel</a>()</code></div>
@@ -950,6 +884,17 @@ A&gt;&nbsp;<a href="../tree/from/SqmAttributeJoin.html" title="interface in org.
  <a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;<a href="../tree/domain/SqmBasicValuedSimplePath.html" title="type parameter in SqmBasicValuedSimplePath">T</a>&gt;&nbsp;referencedPathSource,
  <a href="../tree/domain/SqmPath.html" title="interface in org.hibernate.query.sqm.tree.domain">SqmPath</a>&lt;?&gt;&nbsp;lhs,
  <a href="../NodeBuilder.html" title="interface in org.hibernate.query.sqm">NodeBuilder</a>&nbsp;nodeBuilder)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>&nbsp;</code></div>
+<div class="col-second even-row-color"><code><a href="../tree/domain/SqmCorrelatedDerivedRootJoin.html#%3Cinit%3E(org.hibernate.spi.NavigablePath,org.hibernate.query.sqm.SqmPathSource,org.hibernate.query.sqm.NodeBuilder)" class="member-name-link">SqmCorrelatedDerivedRootJoin</a><wbr>(<a href="../../../spi/NavigablePath.html" title="class in org.hibernate.spi">NavigablePath</a>&nbsp;navigablePath,
+ <a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;<a href="../tree/domain/SqmCorrelatedDerivedRootJoin.html" title="type parameter in SqmCorrelatedDerivedRootJoin">T</a>&gt;&nbsp;referencedNavigable,
+ <a href="../NodeBuilder.html" title="interface in org.hibernate.query.sqm">NodeBuilder</a>&nbsp;nodeBuilder)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>protected </code></div>
+<div class="col-second odd-row-color"><code><a href="../tree/domain/SqmCorrelatedRoot.html#%3Cinit%3E(org.hibernate.spi.NavigablePath,org.hibernate.query.sqm.SqmPathSource,org.hibernate.query.sqm.NodeBuilder,org.hibernate.query.sqm.tree.from.SqmRoot)" class="member-name-link">SqmCorrelatedRoot</a><wbr>(<a href="../../../spi/NavigablePath.html" title="class in org.hibernate.spi">NavigablePath</a>&nbsp;navigablePath,
+ <a href="../SqmPathSource.html" title="interface in org.hibernate.query.sqm">SqmPathSource</a>&lt;<a href="../tree/domain/SqmCorrelatedRoot.html" title="type parameter in SqmCorrelatedRoot">T</a>&gt;&nbsp;referencedNavigable,
+ <a href="../NodeBuilder.html" title="interface in org.hibernate.query.sqm">NodeBuilder</a>&nbsp;nodeBuilder,
+ <a href="../tree/from/SqmRoot.html" title="class in org.hibernate.query.sqm.tree.from">SqmRoot</a>&lt;<a href="../tree/domain/SqmCorrelatedRoot.html" title="type parameter in SqmCorrelatedRoot">T</a>&gt;&nbsp;correlationParent)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>&nbsp;</code></div>
 <div class="col-second even-row-color"><code><a href="../tree/domain/SqmCorrelatedRootJoin.html#%3Cinit%3E(org.hibernate.spi.NavigablePath,org.hibernate.query.sqm.SqmPathSource,org.hibernate.query.sqm.NodeBuilder)" class="member-name-link">SqmCorrelatedRootJoin</a><wbr>(<a href="../../../spi/NavigablePath.html" title="class in org.hibernate.spi">NavigablePath</a>&nbsp;navigablePath,

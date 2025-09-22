@@ -84,8 +84,8 @@ loadScripts(document, 'script');</script>
 <div class="type-signature"><span class="modifiers">public final class </span><span class="element-name type-name-label">IdentityMap&lt;K,<wbr>V&gt;</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>
 implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;K,<wbr>V&gt;</span></div>
-<div class="block">A <code>Map</code> where keys are compared by object identity,
- rather than <code>equals()</code>.</div>
+<div class="block">A <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link"><code>Map</code></a> where keys are compared by object identity,
+ rather than using <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="class or interface in java.lang" class="external-link"><code>Object.equals(Object)</code></a>.</div>
 </section>
 <section class="summary">
 <ul class="summary-list">
@@ -134,7 +134,7 @@ V&gt;&nbsp;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#forEach(java.util.function.BiConsumer)" class="member-name-link">forEach</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/BiConsumer.html" title="class or interface in java.util.function" class="external-link">BiConsumer</a>&lt;? super <a href="IdentityMap.html" title="type parameter in IdentityMap">K</a>,<wbr>? super <a href="IdentityMap.html" title="type parameter in IdentityMap">V</a>&gt;&nbsp;action)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Override Map<a href="#forEach(java.util.function.BiConsumer)"><code>forEach(BiConsumer)</code></a> to provide a more efficient implementation</div>
+<div class="block">Overrides <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html#forEach(java.util.function.BiConsumer)" title="class or interface in java.util" class="external-link"><code>Map.forEach(BiConsumer)</code></a> with a more efficient implementation.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="IdentityMap.html" title="type parameter in IdentityMap">V</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#get(java.lang.Object)" class="member-name-link">get</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;key)</code></div>
@@ -220,13 +220,11 @@ V&gt;</span>&nbsp;<span class="return-type"><a href="IdentityMap.html" title="cl
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="type-parameters">&lt;K,<wbr>
 V&gt;</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.Entry.html" title="class or interface in java.util" class="external-link">Map.Entry</a>&lt;K,<wbr>V&gt;[]</span>&nbsp;<span class="element-name">concurrentEntries</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;K,<wbr>V&gt;&nbsp;map)</span></div>
 <div class="block">Return the map entries (as instances of <code>Map.Entry</code> in a collection that
- is safe from concurrent modification). ie. we may safely add new instances to
- the underlying <code>Map</code> during iteration of the <code>entries()</code>.</div>
+ is safe from concurrent modification). That is, we may safely add new instances
+ to the underlying <code>Map</code> during iteration of the <code>entries()</code>.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>map</code> - The map of entries</dd>
-<dt>Returns:</dt>
-<dd>Collection</dd>
 </dl>
 </section>
 </li>
@@ -242,7 +240,7 @@ V&gt;</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="elemen
 <section class="detail" id="forEach(java.util.function.BiConsumer)">
 <h3>forEach</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">forEach</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/BiConsumer.html" title="class or interface in java.util.function" class="external-link">BiConsumer</a>&lt;? super <a href="IdentityMap.html" title="type parameter in IdentityMap">K</a>,<wbr>? super <a href="IdentityMap.html" title="type parameter in IdentityMap">V</a>&gt;&nbsp;action)</span></div>
-<div class="block">Override Map<a href="#forEach(java.util.function.BiConsumer)"><code>forEach(BiConsumer)</code></a> to provide a more efficient implementation</div>
+<div class="block">Overrides <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html#forEach(java.util.function.BiConsumer)" title="class or interface in java.util" class="external-link"><code>Map.forEach(BiConsumer)</code></a> with a more efficient implementation.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html#forEach(java.util.function.BiConsumer)" title="class or interface in java.util" class="external-link">forEach</a></code>&nbsp;in interface&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="IdentityMap.html" title="type parameter in IdentityMap">K</a>,<wbr><a href="IdentityMap.html" title="type parameter in IdentityMap">V</a>&gt;</code></dd>

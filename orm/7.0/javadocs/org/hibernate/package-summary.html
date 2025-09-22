@@ -257,9 +257,10 @@ loadScripts(document, 'script');</script>
  database table.</div>
 </div>
 <div class="col-first odd-row-color class-summary class-summary-tab2"><a href="LockOptions.html" title="class in org.hibernate">LockOptions</a></div>
-<div class="col-last odd-row-color class-summary class-summary-tab2">
-<div class="block">Contains a set of options describing how a row of a database table
- mapped by an entity should be locked.</div>
+<div class="col-last odd-row-color class-summary class-summary-tab2">Deprecated, for removal: This API element is subject to removal in a future version.
+<div class="deprecation-comment">Since JPA 3.2 and Hibernate 7, a <a href="LockMode.html" title="enum class in org.hibernate"><code>LockMode</code></a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Timeout.html" title="class or interface in jakarta.persistence" class="external-link"><code>Timeout</code></a>,
+ or <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/PessimisticLockScope.html" title="class or interface in jakarta.persistence" class="external-link"><code>PessimisticLockScope</code></a> may be passed directly as an option
+ to <code>find()</code>, <code>refresh()</code>, or <code>lock()</code>.</div>
 </div>
 <div class="col-first even-row-color class-summary class-summary-tab5"><a href="MappingException.html" title="class in org.hibernate">MappingException</a></div>
 <div class="col-last even-row-color class-summary class-summary-tab5">
@@ -439,64 +440,69 @@ loadScripts(document, 'script');</script>
 <div class="col-last odd-row-color class-summary class-summary-tab1">
 <div class="block">Allows creation of a new <a href="StatelessSession.html" title="interface in org.hibernate"><code>StatelessSession</code></a> with specific options.</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab1"><a href="Transaction.html" title="interface in org.hibernate">Transaction</a></div>
+<div class="col-first even-row-color class-summary class-summary-tab1"><a href="Timeouts.html" title="interface in org.hibernate">Timeouts</a></div>
 <div class="col-last even-row-color class-summary class-summary-tab1">
+<div class="block">Helpers for dealing with <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Timeout.html" title="class or interface in jakarta.persistence" class="external-link">timeout</a>
+ values, including some "magic values".</div>
+</div>
+<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="Transaction.html" title="interface in org.hibernate">Transaction</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab1">
 <div class="block">Represents a resource-local transaction, where <em>resource-local</em> is interpreted
  by Hibernate to mean any transaction under the control of Hibernate.</div>
 </div>
-<div class="col-first odd-row-color class-summary class-summary-tab5"><a href="TransactionException.html" title="class in org.hibernate">TransactionException</a></div>
-<div class="col-last odd-row-color class-summary class-summary-tab5">
+<div class="col-first even-row-color class-summary class-summary-tab5"><a href="TransactionException.html" title="class in org.hibernate">TransactionException</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab5">
 <div class="block">Indicates that a transaction could not be begun, committed
  or rolled back.</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab5"><a href="TransactionManagementException.html" title="class in org.hibernate">TransactionManagementException</a></div>
-<div class="col-last even-row-color class-summary class-summary-tab5">
+<div class="col-first odd-row-color class-summary class-summary-tab5"><a href="TransactionManagementException.html" title="class in org.hibernate">TransactionManagementException</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab5">
 <div class="block">Thrown when user code causes the end of a transaction that is
  being managed by the <a href="SessionFactory.html" title="interface in org.hibernate"><code>SessionFactory</code></a>.</div>
 </div>
-<div class="col-first odd-row-color class-summary class-summary-tab5"><a href="TransientObjectException.html" title="class in org.hibernate">TransientObjectException</a></div>
-<div class="col-last odd-row-color class-summary class-summary-tab5">
+<div class="col-first even-row-color class-summary class-summary-tab5"><a href="TransientObjectException.html" title="class in org.hibernate">TransientObjectException</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab5">
 <div class="block">Thrown when the user passes a transient instance to a <a href="Session.html" title="interface in org.hibernate"><code>Session</code></a>
  method that expects a persistent instance.</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab5"><a href="TransientPropertyValueException.html" title="class in org.hibernate">TransientPropertyValueException</a></div>
-<div class="col-last even-row-color class-summary class-summary-tab5">
+<div class="col-first odd-row-color class-summary class-summary-tab5"><a href="TransientPropertyValueException.html" title="class in org.hibernate">TransientPropertyValueException</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab5">
 <div class="block">Thrown when a property cannot be persisted because it is an association
  with a transient unsaved entity instance.</div>
 </div>
-<div class="col-first odd-row-color class-summary class-summary-tab5"><a href="TypeMismatchException.html" title="class in org.hibernate">TypeMismatchException</a></div>
-<div class="col-last odd-row-color class-summary class-summary-tab5">
+<div class="col-first even-row-color class-summary class-summary-tab5"><a href="TypeMismatchException.html" title="class in org.hibernate">TypeMismatchException</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab5">
 <div class="block">Used when a user provided type does not match the expected one.</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab5"><a href="UnknownEntityTypeException.html" title="class in org.hibernate">UnknownEntityTypeException</a></div>
-<div class="col-last even-row-color class-summary class-summary-tab5">
+<div class="col-first odd-row-color class-summary class-summary-tab5"><a href="UnknownEntityTypeException.html" title="class in org.hibernate">UnknownEntityTypeException</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab5">
 <div class="block">Indicates an attempt was made to refer to an unknown entity name or class.</div>
 </div>
-<div class="col-first odd-row-color class-summary class-summary-tab5"><a href="UnknownFilterException.html" title="class in org.hibernate">UnknownFilterException</a></div>
-<div class="col-last odd-row-color class-summary class-summary-tab5">
+<div class="col-first even-row-color class-summary class-summary-tab5"><a href="UnknownFilterException.html" title="class in org.hibernate">UnknownFilterException</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab5">
 <div class="block">Indicates a request against an unknown filter name.</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab5"><a href="UnknownProfileException.html" title="class in org.hibernate">UnknownProfileException</a></div>
-<div class="col-last even-row-color class-summary class-summary-tab5">
+<div class="col-first odd-row-color class-summary class-summary-tab5"><a href="UnknownProfileException.html" title="class in org.hibernate">UnknownProfileException</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab5">
 <div class="block">Indicates a request against an unknown fetch profile name.</div>
 </div>
-<div class="col-first odd-row-color class-summary class-summary-tab5"><a href="UnresolvableObjectException.html" title="class in org.hibernate">UnresolvableObjectException</a></div>
-<div class="col-last odd-row-color class-summary class-summary-tab5">
+<div class="col-first even-row-color class-summary class-summary-tab5"><a href="UnresolvableObjectException.html" title="class in org.hibernate">UnresolvableObjectException</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab5">
 <div class="block">Thrown when Hibernate could not resolve an object by id, especially when
  loading an association.</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab5"><a href="UnsupportedLockAttemptException.html" title="class in org.hibernate">UnsupportedLockAttemptException</a></div>
-<div class="col-last even-row-color class-summary class-summary-tab5">
+<div class="col-first odd-row-color class-summary class-summary-tab5"><a href="UnsupportedLockAttemptException.html" title="class in org.hibernate">UnsupportedLockAttemptException</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab5">
 <div class="block">Thrown when an invalid <a href="LockMode.html" title="enum class in org.hibernate"><code>LockMode</code></a> is requested for a given entity, in
  particular, when a <a href="Session.html#setReadOnly(java.lang.Object,boolean)">read only</a>
  entity is locked with a mode stricter than <a href="LockMode.html#READ"><code>READ</code></a>.</div>
 </div>
-<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="Version.html" title="class in org.hibernate">Version</a></div>
-<div class="col-last odd-row-color class-summary class-summary-tab2">
+<div class="col-first even-row-color class-summary class-summary-tab2"><a href="Version.html" title="class in org.hibernate">Version</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab2">
 <div class="block">Information about the version of Hibernate.</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab5"><a href="WrongClassException.html" title="class in org.hibernate">WrongClassException</a></div>
-<div class="col-last even-row-color class-summary class-summary-tab5">
+<div class="col-first odd-row-color class-summary class-summary-tab5"><a href="WrongClassException.html" title="class in org.hibernate">WrongClassException</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab5">
 <div class="block">Thrown when loading an entity (by identifier) results in a value that
  cannot be treated as the subclass type requested by the caller.</div>
 </div>

@@ -75,7 +75,7 @@ loadScripts(document, 'script');</script>
 <section class="class-description" id="class-description">
 <dl class="notes">
 <dt>All Superinterfaces:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/AutoCloseable.html" title="class or interface in java.lang" class="external-link">AutoCloseable</a></code>, <code><a href="../query/CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></code>, <code><a href="../query/named/NameableQuery.html" title="interface in org.hibernate.query.named">NameableQuery</a></code>, <code><a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Query.html" title="class or interface in jakarta.persistence" class="external-link">Query</a></code>, <code><a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/StoredProcedureQuery.html" title="class or interface in jakarta.persistence" class="external-link">StoredProcedureQuery</a></code>, <code><a href="../query/SynchronizeableQuery.html" title="interface in org.hibernate.query">SynchronizeableQuery</a></code></dd>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/AutoCloseable.html" title="class or interface in java.lang" class="external-link">AutoCloseable</a></code>, <code><a href="../query/CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></code>, <code><a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Query.html" title="class or interface in jakarta.persistence" class="external-link">Query</a></code>, <code><a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/StoredProcedureQuery.html" title="class or interface in jakarta.persistence" class="external-link">StoredProcedureQuery</a></code>, <code><a href="../query/SynchronizeableQuery.html" title="interface in org.hibernate.query">SynchronizeableQuery</a></code></dd>
 </dl>
 <dl class="notes">
 <dt>All Known Subinterfaces:</dt>
@@ -87,36 +87,58 @@ loadScripts(document, 'script');</script>
 </dl>
 <hr>
 <div class="type-signature"><span class="modifiers">public interface </span><span class="element-name type-name-label">ProcedureCall</span><span class="extends-implements">
-extends <a href="../query/CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a>, <a href="../query/SynchronizeableQuery.html" title="interface in org.hibernate.query">SynchronizeableQuery</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/StoredProcedureQuery.html" title="class or interface in jakarta.persistence" class="external-link">StoredProcedureQuery</a>, <a href="../query/named/NameableQuery.html" title="interface in org.hibernate.query.named">NameableQuery</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/AutoCloseable.html" title="class or interface in java.lang" class="external-link">AutoCloseable</a></span></div>
-<div class="block">Defines support for executing database stored procedures and functions.
+extends <a href="../query/CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a>, <a href="../query/SynchronizeableQuery.html" title="interface in org.hibernate.query">SynchronizeableQuery</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/StoredProcedureQuery.html" title="class or interface in jakarta.persistence" class="external-link">StoredProcedureQuery</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/AutoCloseable.html" title="class or interface in java.lang" class="external-link">AutoCloseable</a></span></div>
+<div class="block">Defines support for executing database stored procedures and functions using the
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.sql/java/sql/CallableStatement.html" title="class or interface in java.sql" class="external-link">JDBC stored procedure SQL escape syntax</a>.
  <p>
- Note that here we use the terms "procedure" and "function" as follows:<ul>
-     <li>procedure is a named database executable we expect to call via : <code>{call procedureName(...)}</code></li>
-     <li>function is a named database executable we expect to call via : <code>{? = call functionName(...)}</code></li>
+ Here we use the terms "procedure" and "function" as follows:<ul>
+     <li>A <em>procedure</em> is a named database executable called via:
+         <code>{call procedureName(...)}</code></li>
+     <li>A <em>function</em> is a named database executable called via:
+         <code>{? = call functionName(...)}</code></li>
  </ul>
  <p>
- Unless explicitly specified, the ProcedureCall is assumed to follow the
- procedure call syntax.  To explicitly specify that this should be a function
- call, use <a href="#markAsFunctionCall(int)"><code>markAsFunctionCall(int)</code></a>.  JPA users could either:<ul>
-     <li>use <code>storedProcedureQuery.unwrap( ProcedureCall.class </code>.markAsFunctionCall()</li>
-     <li>set the <a href="#FUNCTION_RETURN_TYPE_HINT"><code>FUNCTION_RETURN_TYPE_HINT</code></a> hint (avoids casting to Hibernate-specific classes)</li>
+ Unless explicitly specified, the <code>ProcedureCall</code> is executed using the
+ procedure call syntax. To explicitly specify that the function call syntax
+ should be used, call <a href="#markAsFunctionCall(int)"><code>markAsFunctionCall(int)</code></a>. Clients of the JPA-standard
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/StoredProcedureQuery.html" title="class or interface in jakarta.persistence" class="external-link"><code>StoredProcedureQuery</code></a> interface may choose between:
+ <ul>
+ <li>using <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Query.html#unwrap(java.lang.Class)" title="class or interface in jakarta.persistence" class="external-link"><code>storedProcedureQuery.unwrap(ProcedureCall.class).markAsFunctionCall(returnType)</code></a>,
+     or
+ <li>setting the <a href="../jpa/HibernateHints.html#HINT_CALLABLE_FUNCTION">"org.hibernate.callableFunction"</a>
+     or <a href="../jpa/HibernateHints.html#HINT_CALLABLE_FUNCTION_RETURN_TYPE">"hibernate.procedure.function_return_jdbc_type_code"</a>
+     <a href="#setHint(java.lang.String,java.lang.Object)">hint</a> to avoid the cast to a
+     Hibernate-specific class.
  </ul>
  <p>
- When using function-call syntax:<ul>
-     <li>parameters must be registered by position (not name)</li>
-     <li>The first parameter is considered to be the function return (the `?` before the call)</li>
-     <li>the first parameter must have mode of OUT, INOUT or REF_CURSOR; IN is invalid</li>
+ When the function call syntax is used:
+ <ul>
+ <li>parameters must be registered by position (not name),
+ <li>the first parameter is considered to represent the function return value
+     (corresponding to the <code>?</code> which occurs before the <code>=</code>), and
+ <li>the first parameter must have <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/ParameterMode.html" title="class or interface in jakarta.persistence" class="external-link">mode</a> OUT, INOUT,
+     or REF_CURSOR; <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/ParameterMode.html#IN" title="class or interface in jakarta.persistence" class="external-link">IN</a> is illegal.
  </ul>
  <p>
- In some cases, based on the Dialect, we will have other validations and
- assumptions as well.  For example, on PGSQL, whenever we see a REF_CURSOR mode
- parameter, we know that:<ul>
-     <li>
-         this will be a function call (so we call <a href="#markAsFunctionCall(int)"><code>markAsFunctionCall(int)</code></a> implicitly) because
-         that is the only way PGSQL supports returning REF_CURSOR results.
-     </li>
-     <li>there can be only one REF_CURSOR mode parameter</li>
+ Depending on the <a href="../dialect/Dialect.html" title="class in org.hibernate.dialect">SQL dialect</a>,
+ further constraints are enforced or inferred. For example, on PostgreSQL:
+ <ul>
+ <li>If a parameter has mode <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/ParameterMode.html#REF_CURSOR" title="class or interface in jakarta.persistence" class="external-link">REF_CURSOR</a>,
+     it's automatically inferred that the call is a function call because this
+     is the only context in which PostgreSQL returns REF_CURSOR results.
+     So it's not necessary to call <a href="#markAsFunctionCall(int)"><code>markAsFunctionCall(int)</code></a> explicitly.
+ <li>The restriction that there may be at most one REF_CURSOR mode parameter
+     is enforced.
  </ul></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.sql/java/sql/CallableStatement.html" title="class or interface in java.sql" class="external-link"><code>CallableStatement</code></a></li>
+<li><a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/StoredProcedureQuery.html" title="class or interface in jakarta.persistence" class="external-link"><code>StoredProcedureQuery</code></a></li>
+</ul>
+</dd>
+</dl>
 </section>
 <section class="summary">
 <ul class="summary-list">
@@ -132,8 +154,9 @@ extends <a href="../query/CommonQueryContract.html" title="interface in org.hibe
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second even-row-color"><code><a href="#FUNCTION_RETURN_TYPE_HINT" class="member-name-link">FUNCTION_RETURN_TYPE_HINT</a></code></div>
 <div class="col-last even-row-color">
-<div class="block">The hint key (for use with JPA's "hint system") indicating the function's return JDBC type code
- (aka, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.sql/java/sql/Types.html" title="class or interface in java.sql" class="external-link"><code>Types</code></a> code)</div>
+<div class="block"><span class="deprecated-label">Deprecated, for removal: This API element is subject to removal in a future version.</span>
+<div class="deprecation-comment">Use <a href="../jpa/HibernateHints.html#HINT_CALLABLE_FUNCTION_RETURN_TYPE"><code>HibernateHints.HINT_CALLABLE_FUNCTION_RETURN_TYPE</code></a>.</div>
+</div>
 </div>
 </div>
 </section>
@@ -169,82 +192,97 @@ extends <a href="../query/CommonQueryContract.html" title="interface in org.hibe
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
 <div class="block">Release the underlying JDBC <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.sql/java/sql/CallableStatement.html" title="class or interface in java.sql" class="external-link"><code>CallableStatement</code></a></div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="ProcedureOutputs.html" title="interface in org.hibernate.procedure">ProcedureOutputs</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getOutputs()" class="member-name-link">getOutputs</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="FunctionReturn.html" title="interface in org.hibernate.procedure">FunctionReturn</a>&lt;?&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getFunctionReturn()" class="member-name-link">getFunctionReturn</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">The <a href="FunctionReturn.html" title="interface in org.hibernate.procedure"><code>FunctionReturn</code></a> describing the return value of
+ the function, or <code>null</code> if this <code>ProcedureCall</code>
+ is not a function call.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="ProcedureOutputs.html" title="interface in org.hibernate.procedure">ProcedureOutputs</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getOutputs()" class="member-name-link">getOutputs</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Retrieves access to outputs of this procedure call.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="../query/procedure/ProcedureParameter.html" title="interface in org.hibernate.query.procedure">ProcedureParameter</a>&lt;?&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getParameterRegistration(int)" class="member-name-link">getParameterRegistration</a><wbr>(int&nbsp;position)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="ProcedureParameter.html" title="interface in org.hibernate.procedure">ProcedureParameter</a>&lt;?&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getParameterRegistration(int)" class="member-name-link">getParameterRegistration</a><wbr>(int&nbsp;position)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Retrieve a previously registered parameter memento by the position under which it was registered.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="../query/procedure/ProcedureParameter.html" title="interface in org.hibernate.query.procedure">ProcedureParameter</a>&lt;?&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getParameterRegistration(java.lang.String)" class="member-name-link">getParameterRegistration</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="ProcedureParameter.html" title="interface in org.hibernate.procedure">ProcedureParameter</a>&lt;?&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getParameterRegistration(java.lang.String)" class="member-name-link">getParameterRegistration</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Retrieve a previously registered parameter memento by the name under which it was registered.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getProcedureName()" class="member-name-link">getProcedureName</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getProcedureName()" class="member-name-link">getProcedureName</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Get the name of the stored procedure (or function) to be called.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../query/procedure/ProcedureParameter.html" title="interface in org.hibernate.query.procedure">ProcedureParameter</a>&lt;?&gt;&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getRegisteredParameters()" class="member-name-link">getRegisteredParameters</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="ProcedureParameter.html" title="interface in org.hibernate.procedure">ProcedureParameter</a>&lt;?&gt;&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getRegisteredParameters()" class="member-name-link">getRegisteredParameters</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Retrieve all registered parameters.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#isFunctionCall()" class="member-name-link">isFunctionCall</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#isFunctionCall()" class="member-name-link">isFunctionCall</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Does this <code>ProcedureCall</code> represent a call to a database <code>FUNCTION</code>,
  as opposed to a <code>PROCEDURE</code>?</div>
 </div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#markAsFunctionCall(int)" class="member-name-link">markAsFunctionCall</a><wbr>(int&nbsp;sqlType)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Mark this <code>ProcedureCall</code> as representing a call to a database function,
+ rather than a database procedure.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#markAsFunctionCall(int)" class="member-name-link">markAsFunctionCall</a><wbr>(int&nbsp;sqlType)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#markAsFunctionCall(jakarta.persistence.metamodel.Type)" class="member-name-link">markAsFunctionCall</a><wbr>(<a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Type</a>&lt;?&gt;&nbsp;typeReference)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Mark this ProcedureCall as representing a call to a database function,
+<div class="block">Mark this <code>ProcedureCall</code> as representing a call to a database function,
  rather than a database procedure.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#markAsFunctionCall(java.lang.Class)" class="member-name-link">markAsFunctionCall</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;resultType)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Mark this ProcedureCall as representing a call to a database function,
+<div class="block">Mark this <code>ProcedureCall</code> as representing a call to a database function,
  rather than a database procedure.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#markAsFunctionCall(org.hibernate.type.BasicTypeReference)" class="member-name-link">markAsFunctionCall</a><wbr>(<a href="../type/BasicTypeReference.html" title="class in org.hibernate.type">BasicTypeReference</a>&lt;?&gt;&nbsp;typeReference)</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;T&gt;&nbsp;<a href="ProcedureParameter.html" title="interface in org.hibernate.procedure">ProcedureParameter</a>&lt;T&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#registerParameter(int,jakarta.persistence.metamodel.Type,jakarta.persistence.ParameterMode)" class="member-name-link">registerParameter</a><wbr>(int&nbsp;position,
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Type</a>&lt;T&gt;&nbsp;type,
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/ParameterMode.html" title="class or interface in jakarta.persistence" class="external-link">ParameterMode</a>&nbsp;mode)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Mark this ProcedureCall as representing a call to a database function,
- rather than a database procedure.</div>
+<div class="block">Basic form for registering a positional parameter.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;T&gt;&nbsp;<a href="../query/procedure/ProcedureParameter.html" title="interface in org.hibernate.query.procedure">ProcedureParameter</a>&lt;T&gt;</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;T&gt;&nbsp;<a href="ProcedureParameter.html" title="interface in org.hibernate.procedure">ProcedureParameter</a>&lt;T&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#registerParameter(int,java.lang.Class,jakarta.persistence.ParameterMode)" class="member-name-link">registerParameter</a><wbr>(int&nbsp;position,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;type,
  <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/ParameterMode.html" title="class or interface in jakarta.persistence" class="external-link">ParameterMode</a>&nbsp;mode)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Basic form for registering a positional parameter.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;T&gt;&nbsp;<a href="../query/procedure/ProcedureParameter.html" title="interface in org.hibernate.query.procedure">ProcedureParameter</a>&lt;T&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#registerParameter(int,org.hibernate.type.BasicTypeReference,jakarta.persistence.ParameterMode)" class="member-name-link">registerParameter</a><wbr>(int&nbsp;position,
- <a href="../type/BasicTypeReference.html" title="class in org.hibernate.type">BasicTypeReference</a>&lt;T&gt;&nbsp;type,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;T&gt;&nbsp;<a href="ProcedureParameter.html" title="interface in org.hibernate.procedure">ProcedureParameter</a>&lt;T&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#registerParameter(java.lang.String,jakarta.persistence.metamodel.Type,jakarta.persistence.ParameterMode)" class="member-name-link">registerParameter</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;parameterName,
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Type</a>&lt;T&gt;&nbsp;type,
  <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/ParameterMode.html" title="class or interface in jakarta.persistence" class="external-link">ParameterMode</a>&nbsp;mode)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Basic form for registering a positional parameter.</div>
+<div class="block">Basic form for registering a named parameter.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;T&gt;&nbsp;<a href="../query/procedure/ProcedureParameter.html" title="interface in org.hibernate.query.procedure">ProcedureParameter</a>&lt;T&gt;</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;T&gt;&nbsp;<a href="ProcedureParameter.html" title="interface in org.hibernate.procedure">ProcedureParameter</a>&lt;T&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#registerParameter(java.lang.String,java.lang.Class,jakarta.persistence.ParameterMode)" class="member-name-link">registerParameter</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;parameterName,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;type,
  <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/ParameterMode.html" title="class or interface in jakarta.persistence" class="external-link">ParameterMode</a>&nbsp;mode)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Basic form for registering a named parameter.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;T&gt;&nbsp;<a href="../query/procedure/ProcedureParameter.html" title="interface in org.hibernate.query.procedure">ProcedureParameter</a>&lt;T&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#registerParameter(java.lang.String,org.hibernate.type.BasicTypeReference,jakarta.persistence.ParameterMode)" class="member-name-link">registerParameter</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;parameterName,
- <a href="../type/BasicTypeReference.html" title="class in org.hibernate.type">BasicTypeReference</a>&lt;T&gt;&nbsp;type,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#registerStoredProcedureParameter(int,jakarta.persistence.metamodel.Type,jakarta.persistence.ParameterMode)" class="member-name-link">registerStoredProcedureParameter</a><wbr>(int&nbsp;position,
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Type</a>&lt;?&gt;&nbsp;type,
  <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/ParameterMode.html" title="class or interface in jakarta.persistence" class="external-link">ParameterMode</a>&nbsp;mode)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Basic form for registering a named parameter.</div>
+<div class="block">Like <a href="#registerStoredProcedureParameter(int,java.lang.Class,jakarta.persistence.ParameterMode)"><code>registerStoredProcedureParameter(int, Class, ParameterMode)</code></a> but a type reference is given
+ instead of a class for the parameter type.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#registerStoredProcedureParameter(int,java.lang.Class,jakarta.persistence.ParameterMode)" class="member-name-link">registerStoredProcedureParameter</a><wbr>(int&nbsp;position,
@@ -252,11 +290,11 @@ extends <a href="../query/CommonQueryContract.html" title="interface in org.hibe
  <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/ParameterMode.html" title="class or interface in jakarta.persistence" class="external-link">ParameterMode</a>&nbsp;mode)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#registerStoredProcedureParameter(int,org.hibernate.type.BasicTypeReference,jakarta.persistence.ParameterMode)" class="member-name-link">registerStoredProcedureParameter</a><wbr>(int&nbsp;position,
- <a href="../type/BasicTypeReference.html" title="class in org.hibernate.type">BasicTypeReference</a>&lt;?&gt;&nbsp;type,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#registerStoredProcedureParameter(java.lang.String,jakarta.persistence.metamodel.Type,jakarta.persistence.ParameterMode)" class="member-name-link">registerStoredProcedureParameter</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;parameterName,
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Type</a>&lt;?&gt;&nbsp;type,
  <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/ParameterMode.html" title="class or interface in jakarta.persistence" class="external-link">ParameterMode</a>&nbsp;mode)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Like <a href="#registerStoredProcedureParameter(int,java.lang.Class,jakarta.persistence.ParameterMode)"><code>registerStoredProcedureParameter(int, Class, ParameterMode)</code></a> but a basic type reference is given
+<div class="block">Like <a href="#registerStoredProcedureParameter(java.lang.String,java.lang.Class,jakarta.persistence.ParameterMode)"><code>registerStoredProcedureParameter(String, Class, ParameterMode)</code></a> but a type reference is given
  instead of a class for the parameter type.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></code></div>
@@ -264,94 +302,81 @@ extends <a href="../query/CommonQueryContract.html" title="interface in org.hibe
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;type,
  <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/ParameterMode.html" title="class or interface in jakarta.persistence" class="external-link">ParameterMode</a>&nbsp;mode)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#registerStoredProcedureParameter(java.lang.String,org.hibernate.type.BasicTypeReference,jakarta.persistence.ParameterMode)" class="member-name-link">registerStoredProcedureParameter</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;parameterName,
- <a href="../type/BasicTypeReference.html" title="class in org.hibernate.type">BasicTypeReference</a>&lt;?&gt;&nbsp;type,
- <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/ParameterMode.html" title="class or interface in jakarta.persistence" class="external-link">ParameterMode</a>&nbsp;mode)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Like <a href="#registerStoredProcedureParameter(java.lang.String,java.lang.Class,jakarta.persistence.ParameterMode)"><code>registerStoredProcedureParameter(String, Class, ParameterMode)</code></a> but a basic type reference is given
- instead of a class for the parameter type.</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="#setFlushMode(jakarta.persistence.FlushModeType)" class="member-name-link">setFlushMode</a><wbr>(<a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/FlushModeType.html" title="class or interface in jakarta.persistence" class="external-link">FlushModeType</a>&nbsp;flushMode)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="#setFlushMode(jakarta.persistence.FlushModeType)" class="member-name-link">setFlushMode</a><wbr>(<a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/FlushModeType.html" title="class or interface in jakarta.persistence" class="external-link">FlushModeType</a>&nbsp;flushMode)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6">
 <div class="block"><span class="deprecated-label">Deprecated.</span></div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setHint(java.lang.String,java.lang.Object)" class="member-name-link">setHint</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;hintName,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setHint(java.lang.String,java.lang.Object)" class="member-name-link">setHint</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;hintName,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;value)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Set a hint.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameter(int,java.lang.Object)" class="member-name-link">setParameter</a><wbr>(int&nbsp;position,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameter(int,java.lang.Object)" class="member-name-link">setParameter</a><wbr>(int&nbsp;position,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;value)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Bind the given argument to an ordinal query parameter.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="#setParameter(int,java.util.Calendar,jakarta.persistence.TemporalType)" class="member-name-link">setParameter</a><wbr>(int&nbsp;position,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Calendar.html" title="class or interface in java.util" class="external-link">Calendar</a>&nbsp;value,
- <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/TemporalType.html" title="class or interface in jakarta.persistence" class="external-link">TemporalType</a>&nbsp;temporalType)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6">
-<div class="block"><span class="deprecated-label">Deprecated.</span></div>
-</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="#setParameter(int,java.util.Date,jakarta.persistence.TemporalType)" class="member-name-link">setParameter</a><wbr>(int&nbsp;position,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Date.html" title="class or interface in java.util" class="external-link">Date</a>&nbsp;value,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="#setParameter(int,java.util.Calendar,jakarta.persistence.TemporalType)" class="member-name-link">setParameter</a><wbr>(int&nbsp;position,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Calendar.html" title="class or interface in java.util" class="external-link">Calendar</a>&nbsp;value,
  <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/TemporalType.html" title="class or interface in jakarta.persistence" class="external-link">TemporalType</a>&nbsp;temporalType)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6">
 <div class="block"><span class="deprecated-label">Deprecated.</span></div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="#setParameter(jakarta.persistence.Parameter,java.util.Calendar,jakarta.persistence.TemporalType)" class="member-name-link">setParameter</a><wbr>(<a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Parameter.html" title="class or interface in jakarta.persistence" class="external-link">Parameter</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Calendar.html" title="class or interface in java.util" class="external-link">Calendar</a>&gt;&nbsp;param,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Calendar.html" title="class or interface in java.util" class="external-link">Calendar</a>&nbsp;value,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="#setParameter(int,java.util.Date,jakarta.persistence.TemporalType)" class="member-name-link">setParameter</a><wbr>(int&nbsp;position,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Date.html" title="class or interface in java.util" class="external-link">Date</a>&nbsp;value,
  <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/TemporalType.html" title="class or interface in jakarta.persistence" class="external-link">TemporalType</a>&nbsp;temporalType)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6">
 <div class="block"><span class="deprecated-label">Deprecated.</span></div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="#setParameter(jakarta.persistence.Parameter,java.util.Date,jakarta.persistence.TemporalType)" class="member-name-link">setParameter</a><wbr>(<a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Parameter.html" title="class or interface in jakarta.persistence" class="external-link">Parameter</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Date.html" title="class or interface in java.util" class="external-link">Date</a>&gt;&nbsp;param,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Date.html" title="class or interface in java.util" class="external-link">Date</a>&nbsp;value,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="#setParameter(jakarta.persistence.Parameter,java.util.Calendar,jakarta.persistence.TemporalType)" class="member-name-link">setParameter</a><wbr>(<a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Parameter.html" title="class or interface in jakarta.persistence" class="external-link">Parameter</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Calendar.html" title="class or interface in java.util" class="external-link">Calendar</a>&gt;&nbsp;param,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Calendar.html" title="class or interface in java.util" class="external-link">Calendar</a>&nbsp;value,
  <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/TemporalType.html" title="class or interface in jakarta.persistence" class="external-link">TemporalType</a>&nbsp;temporalType)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6">
 <div class="block"><span class="deprecated-label">Deprecated.</span></div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;T&gt;&nbsp;<a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameter(jakarta.persistence.Parameter,T)" class="member-name-link">setParameter</a><wbr>(<a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Parameter.html" title="class or interface in jakarta.persistence" class="external-link">Parameter</a>&lt;T&gt;&nbsp;param,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="#setParameter(jakarta.persistence.Parameter,java.util.Date,jakarta.persistence.TemporalType)" class="member-name-link">setParameter</a><wbr>(<a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Parameter.html" title="class or interface in jakarta.persistence" class="external-link">Parameter</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Date.html" title="class or interface in java.util" class="external-link">Date</a>&gt;&nbsp;param,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Date.html" title="class or interface in java.util" class="external-link">Date</a>&nbsp;value,
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/TemporalType.html" title="class or interface in jakarta.persistence" class="external-link">TemporalType</a>&nbsp;temporalType)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6">
+<div class="block"><span class="deprecated-label">Deprecated.</span></div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;T&gt;&nbsp;<a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameter(jakarta.persistence.Parameter,T)" class="member-name-link">setParameter</a><wbr>(<a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Parameter.html" title="class or interface in jakarta.persistence" class="external-link">Parameter</a>&lt;T&gt;&nbsp;param,
  T&nbsp;value)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameter(java.lang.String,java.lang.Object)" class="member-name-link">setParameter</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setParameter(java.lang.String,java.lang.Object)" class="member-name-link">setParameter</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;value)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Bind the given argument to a named query parameter.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="#setParameter(java.lang.String,java.util.Calendar,jakarta.persistence.TemporalType)" class="member-name-link">setParameter</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Calendar.html" title="class or interface in java.util" class="external-link">Calendar</a>&nbsp;value,
- <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/TemporalType.html" title="class or interface in jakarta.persistence" class="external-link">TemporalType</a>&nbsp;temporalType)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6">
-<div class="block"><span class="deprecated-label">Deprecated.</span></div>
-</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="#setParameter(java.lang.String,java.util.Date,jakarta.persistence.TemporalType)" class="member-name-link">setParameter</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Date.html" title="class or interface in java.util" class="external-link">Date</a>&nbsp;value,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="#setParameter(java.lang.String,java.util.Calendar,jakarta.persistence.TemporalType)" class="member-name-link">setParameter</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Calendar.html" title="class or interface in java.util" class="external-link">Calendar</a>&nbsp;value,
  <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/TemporalType.html" title="class or interface in jakarta.persistence" class="external-link">TemporalType</a>&nbsp;temporalType)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6">
 <div class="block"><span class="deprecated-label">Deprecated.</span></div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="spi/NamedCallableQueryMemento.html" title="interface in org.hibernate.procedure.spi">NamedCallableQueryMemento</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#toMemento(java.lang.String)" class="member-name-link">toMemento</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Convert this query into the memento.</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="#setParameter(java.lang.String,java.util.Date,jakarta.persistence.TemporalType)" class="member-name-link">setParameter</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Date.html" title="class or interface in java.util" class="external-link">Date</a>&nbsp;value,
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/TemporalType.html" title="class or interface in jakarta.persistence" class="external-link">TemporalType</a>&nbsp;temporalType)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6">
+<div class="block"><span class="deprecated-label">Deprecated.</span></div>
 </div>
 </div>
 </div>
 </div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.hibernate.query.CommonQueryContract">Methods inherited from interface&nbsp;org.hibernate.query.<a href="../query/CommonQueryContract.html" title="interface in org.hibernate.query">CommonQueryContract</a></h3>
-<code><a href="../query/CommonQueryContract.html#getComment()">getComment</a>, <a href="../query/CommonQueryContract.html#getFlushMode()">getFlushMode</a>, <a href="../query/CommonQueryContract.html#getHibernateFlushMode()">getHibernateFlushMode</a>, <a href="../query/CommonQueryContract.html#getParameterMetadata()">getParameterMetadata</a>, <a href="../query/CommonQueryContract.html#getQueryFlushMode()">getQueryFlushMode</a>, <a href="../query/CommonQueryContract.html#getTimeout()">getTimeout</a>, <a href="../query/CommonQueryContract.html#setComment(java.lang.String)">setComment</a>, <a href="../query/CommonQueryContract.html#setHibernateFlushMode(org.hibernate.FlushMode)">setHibernateFlushMode</a>, <a href="../query/CommonQueryContract.html#setParameter(int,java.time.Instant,jakarta.persistence.TemporalType)">setParameter</a>, <a href="../query/CommonQueryContract.html#setParameter(int,P,java.lang.Class)">setParameter</a>, <a href="../query/CommonQueryContract.html#setParameter(int,P,org.hibernate.query.BindableType)">setParameter</a>, <a href="../query/CommonQueryContract.html#setParameter(java.lang.String,java.time.Instant,jakarta.persistence.TemporalType)">setParameter</a>, <a href="../query/CommonQueryContract.html#setParameter(java.lang.String,P,java.lang.Class)">setParameter</a>, <a href="../query/CommonQueryContract.html#setParameter(java.lang.String,P,org.hibernate.query.BindableType)">setParameter</a>, <a href="../query/CommonQueryContract.html#setParameter(org.hibernate.query.QueryParameter,P,java.lang.Class)">setParameter</a>, <a href="../query/CommonQueryContract.html#setParameter(org.hibernate.query.QueryParameter,P,org.hibernate.query.BindableType)">setParameter</a>, <a href="../query/CommonQueryContract.html#setParameter(org.hibernate.query.QueryParameter,T)">setParameter</a>, <a href="../query/CommonQueryContract.html#setParameterList(int,java.lang.Object%5B%5D)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(int,java.util.Collection)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(int,java.util.Collection,java.lang.Class)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(int,java.util.Collection,org.hibernate.query.BindableType)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(int,P%5B%5D,java.lang.Class)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(int,P%5B%5D,org.hibernate.query.BindableType)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(java.lang.String,java.lang.Object%5B%5D)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(java.lang.String,java.util.Collection)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(java.lang.String,java.util.Collection,java.lang.Class)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(java.lang.String,java.util.Collection,org.hibernate.query.BindableType)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(java.lang.String,P%5B%5D,java.lang.Class)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(java.lang.String,P%5B%5D,org.hibernate.query.BindableType)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(org.hibernate.query.QueryParameter,java.util.Collection)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(org.hibernate.query.QueryParameter,java.util.Collection,java.lang.Class)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(org.hibernate.query.QueryParameter,java.util.Collection,org.hibernate.query.BindableType)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(org.hibernate.query.QueryParameter,P%5B%5D)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(org.hibernate.query.QueryParameter,P%5B%5D,java.lang.Class)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(org.hibernate.query.QueryParameter,P%5B%5D,org.hibernate.query.BindableType)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setProperties(java.lang.Object)">setProperties</a>, <a href="../query/CommonQueryContract.html#setProperties(java.util.Map)">setProperties</a>, <a href="../query/CommonQueryContract.html#setQueryFlushMode(org.hibernate.query.QueryFlushMode)">setQueryFlushMode</a>, <a href="../query/CommonQueryContract.html#setTimeout(int)">setTimeout</a></code></div>
+<code><a href="../query/CommonQueryContract.html#getComment()">getComment</a>, <a href="../query/CommonQueryContract.html#getFlushMode()">getFlushMode</a>, <a href="../query/CommonQueryContract.html#getHibernateFlushMode()">getHibernateFlushMode</a>, <a href="../query/CommonQueryContract.html#getParameterMetadata()">getParameterMetadata</a>, <a href="../query/CommonQueryContract.html#getQueryFlushMode()">getQueryFlushMode</a>, <a href="../query/CommonQueryContract.html#getTimeout()">getTimeout</a>, <a href="../query/CommonQueryContract.html#setComment(java.lang.String)">setComment</a>, <a href="../query/CommonQueryContract.html#setHibernateFlushMode(org.hibernate.FlushMode)">setHibernateFlushMode</a>, <a href="../query/CommonQueryContract.html#setParameter(int,java.time.Instant,jakarta.persistence.TemporalType)">setParameter</a>, <a href="../query/CommonQueryContract.html#setParameter(int,P,jakarta.persistence.metamodel.Type)">setParameter</a>, <a href="../query/CommonQueryContract.html#setParameter(int,P,java.lang.Class)">setParameter</a>, <a href="../query/CommonQueryContract.html#setParameter(java.lang.String,java.time.Instant,jakarta.persistence.TemporalType)">setParameter</a>, <a href="../query/CommonQueryContract.html#setParameter(java.lang.String,P,jakarta.persistence.metamodel.Type)">setParameter</a>, <a href="../query/CommonQueryContract.html#setParameter(java.lang.String,P,java.lang.Class)">setParameter</a>, <a href="../query/CommonQueryContract.html#setParameter(org.hibernate.query.QueryParameter,P,jakarta.persistence.metamodel.Type)">setParameter</a>, <a href="../query/CommonQueryContract.html#setParameter(org.hibernate.query.QueryParameter,P,java.lang.Class)">setParameter</a>, <a href="../query/CommonQueryContract.html#setParameter(org.hibernate.query.QueryParameter,T)">setParameter</a>, <a href="../query/CommonQueryContract.html#setParameterList(int,java.lang.Object%5B%5D)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(int,java.util.Collection)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(int,java.util.Collection,jakarta.persistence.metamodel.Type)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(int,java.util.Collection,java.lang.Class)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(int,P%5B%5D,jakarta.persistence.metamodel.Type)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(int,P%5B%5D,java.lang.Class)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(java.lang.String,java.lang.Object%5B%5D)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(java.lang.String,java.util.Collection)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(java.lang.String,java.util.Collection,jakarta.persistence.metamodel.Type)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(java.lang.String,java.util.Collection,java.lang.Class)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(java.lang.String,P%5B%5D,jakarta.persistence.metamodel.Type)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(java.lang.String,P%5B%5D,java.lang.Class)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(org.hibernate.query.QueryParameter,java.util.Collection)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(org.hibernate.query.QueryParameter,java.util.Collection,jakarta.persistence.metamodel.Type)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(org.hibernate.query.QueryParameter,java.util.Collection,java.lang.Class)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(org.hibernate.query.QueryParameter,P%5B%5D)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(org.hibernate.query.QueryParameter,P%5B%5D,jakarta.persistence.metamodel.Type)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setParameterList(org.hibernate.query.QueryParameter,P%5B%5D,java.lang.Class)">setParameterList</a>, <a href="../query/CommonQueryContract.html#setProperties(java.lang.Object)">setProperties</a>, <a href="../query/CommonQueryContract.html#setProperties(java.util.Map)">setProperties</a>, <a href="../query/CommonQueryContract.html#setQueryFlushMode(org.hibernate.query.QueryFlushMode)">setQueryFlushMode</a>, <a href="../query/CommonQueryContract.html#setTimeout(int)">setTimeout</a>, <a href="../query/CommonQueryContract.html#setTimeout(jakarta.persistence.Timeout)">setTimeout</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-jakarta.persistence.Query">Methods inherited from interface&nbsp;jakarta.persistence.<a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Query.html" title="class or interface in jakarta.persistence" class="external-link">Query</a></h3>
 <code><a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Query.html#getCacheRetrieveMode()" title="class or interface in jakarta.persistence" class="external-link">getCacheRetrieveMode</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Query.html#getCacheStoreMode()" title="class or interface in jakarta.persistence" class="external-link">getCacheStoreMode</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Query.html#getFirstResult()" title="class or interface in jakarta.persistence" class="external-link">getFirstResult</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Query.html#getFlushMode()" title="class or interface in jakarta.persistence" class="external-link">getFlushMode</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Query.html#getHints()" title="class or interface in jakarta.persistence" class="external-link">getHints</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Query.html#getLockMode()" title="class or interface in jakarta.persistence" class="external-link">getLockMode</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Query.html#getMaxResults()" title="class or interface in jakarta.persistence" class="external-link">getMaxResults</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Query.html#getParameter(int)" title="class or interface in jakarta.persistence" class="external-link">getParameter</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Query.html#getParameter(int,java.lang.Class)" title="class or interface in jakarta.persistence" class="external-link">getParameter</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Query.html#getParameter(java.lang.String)" title="class or interface in jakarta.persistence" class="external-link">getParameter</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Query.html#getParameter(java.lang.String,java.lang.Class)" title="class or interface in jakarta.persistence" class="external-link">getParameter</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Query.html#getParameters()" title="class or interface in jakarta.persistence" class="external-link">getParameters</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Query.html#getParameterValue(int)" title="class or interface in jakarta.persistence" class="external-link">getParameterValue</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Query.html#getParameterValue(jakarta.persistence.Parameter)" title="class or interface in jakarta.persistence" class="external-link">getParameterValue</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Query.html#getParameterValue(java.lang.String)" title="class or interface in jakarta.persistence" class="external-link">getParameterValue</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Query.html#getResultStream()" title="class or interface in jakarta.persistence" class="external-link">getResultStream</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Query.html#getTimeout()" title="class or interface in jakarta.persistence" class="external-link">getTimeout</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Query.html#isBound(jakarta.persistence.Parameter)" title="class or interface in jakarta.persistence" class="external-link">isBound</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Query.html#setFirstResult(int)" title="class or interface in jakarta.persistence" class="external-link">setFirstResult</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Query.html#setLockMode(jakarta.persistence.LockModeType)" title="class or interface in jakarta.persistence" class="external-link">setLockMode</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Query.html#setMaxResults(int)" title="class or interface in jakarta.persistence" class="external-link">setMaxResults</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Query.html#unwrap(java.lang.Class)" title="class or interface in jakarta.persistence" class="external-link">unwrap</a></code></div>
@@ -375,9 +400,13 @@ extends <a href="../query/CommonQueryContract.html" title="interface in org.hibe
 <li>
 <section class="detail" id="FUNCTION_RETURN_TYPE_HINT">
 <h3>FUNCTION_RETURN_TYPE_HINT</h3>
-<div class="member-signature"><span class="modifiers">static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">FUNCTION_RETURN_TYPE_HINT</span></div>
-<div class="block">The hint key (for use with JPA's "hint system") indicating the function's return JDBC type code
- (aka, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.sql/java/sql/Types.html" title="class or interface in java.sql" class="external-link"><code>Types</code></a> code)</div>
+<div class="member-signature"><span class="annotations"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html" title="class or interface in java.lang" class="external-link">@Deprecated</a>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html#since()" title="class or interface in java.lang" class="external-link">since</a>="7",
+            <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html#forRemoval()" title="class or interface in java.lang" class="external-link">forRemoval</a>=true)
+</span><span class="modifiers">static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">FUNCTION_RETURN_TYPE_HINT</span></div>
+<div class="deprecation-block"><span class="deprecated-label">Deprecated, for removal: This API element is subject to removal in a future version.</span>
+<div class="deprecation-comment">Use <a href="../jpa/HibernateHints.html#HINT_CALLABLE_FUNCTION_RETURN_TYPE"><code>HibernateHints.HINT_CALLABLE_FUNCTION_RETURN_TYPE</code></a>.</div>
+</div>
+<div class="block">The hint key indicating the return <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.sql/java/sql/Types.html" title="class or interface in java.sql" class="external-link">JDBC type code</a> of a function.</div>
 <dl class="notes">
 <dt>See Also:</dt>
 <dd>
@@ -428,7 +457,7 @@ extends <a href="../query/CommonQueryContract.html" title="interface in org.hibe
 <section class="detail" id="markAsFunctionCall(int)">
 <h3>markAsFunctionCall</h3>
 <div class="member-signature"><span class="return-type"><a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></span>&nbsp;<span class="element-name">markAsFunctionCall</span><wbr><span class="parameters">(int&nbsp;sqlType)</span></div>
-<div class="block">Mark this ProcedureCall as representing a call to a database function,
+<div class="block">Mark this <code>ProcedureCall</code> as representing a call to a database function,
  rather than a database procedure.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -442,7 +471,7 @@ extends <a href="../query/CommonQueryContract.html" title="interface in org.hibe
 <section class="detail" id="markAsFunctionCall(java.lang.Class)">
 <h3>markAsFunctionCall</h3>
 <div class="member-signature"><span class="return-type"><a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></span>&nbsp;<span class="element-name">markAsFunctionCall</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;resultType)</span></div>
-<div class="block">Mark this ProcedureCall as representing a call to a database function,
+<div class="block">Mark this <code>ProcedureCall</code> as representing a call to a database function,
  rather than a database procedure.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -455,10 +484,10 @@ extends <a href="../query/CommonQueryContract.html" title="interface in org.hibe
 </section>
 </li>
 <li>
-<section class="detail" id="markAsFunctionCall(org.hibernate.type.BasicTypeReference)">
+<section class="detail" id="markAsFunctionCall(jakarta.persistence.metamodel.Type)">
 <h3>markAsFunctionCall</h3>
-<div class="member-signature"><span class="return-type"><a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></span>&nbsp;<span class="element-name">markAsFunctionCall</span><wbr><span class="parameters">(<a href="../type/BasicTypeReference.html" title="class in org.hibernate.type">BasicTypeReference</a>&lt;?&gt;&nbsp;typeReference)</span></div>
-<div class="block">Mark this ProcedureCall as representing a call to a database function,
+<div class="member-signature"><span class="return-type"><a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></span>&nbsp;<span class="element-name">markAsFunctionCall</span><wbr><span class="parameters">(<a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Type</a>&lt;?&gt;&nbsp;typeReference)</span></div>
+<div class="block">Mark this <code>ProcedureCall</code> as representing a call to a database function,
  rather than a database procedure.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -473,7 +502,7 @@ extends <a href="../query/CommonQueryContract.html" title="interface in org.hibe
 <li>
 <section class="detail" id="registerParameter(int,java.lang.Class,jakarta.persistence.ParameterMode)">
 <h3>registerParameter</h3>
-<div class="member-signature"><span class="type-parameters">&lt;T&gt;</span>&nbsp;<span class="return-type"><a href="../query/procedure/ProcedureParameter.html" title="interface in org.hibernate.query.procedure">ProcedureParameter</a>&lt;T&gt;</span>&nbsp;<span class="element-name">registerParameter</span><wbr><span class="parameters">(int&nbsp;position,
+<div class="member-signature"><span class="type-parameters">&lt;T&gt;</span>&nbsp;<span class="return-type"><a href="ProcedureParameter.html" title="interface in org.hibernate.procedure">ProcedureParameter</a>&lt;T&gt;</span>&nbsp;<span class="element-name">registerParameter</span><wbr><span class="parameters">(int&nbsp;position,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;type,
  <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/ParameterMode.html" title="class or interface in jakarta.persistence" class="external-link">ParameterMode</a>&nbsp;mode)</span></div>
 <div class="block">Basic form for registering a positional parameter.</div>
@@ -490,10 +519,10 @@ extends <a href="../query/CommonQueryContract.html" title="interface in org.hibe
 </section>
 </li>
 <li>
-<section class="detail" id="registerParameter(int,org.hibernate.type.BasicTypeReference,jakarta.persistence.ParameterMode)">
+<section class="detail" id="registerParameter(int,jakarta.persistence.metamodel.Type,jakarta.persistence.ParameterMode)">
 <h3>registerParameter</h3>
-<div class="member-signature"><span class="type-parameters">&lt;T&gt;</span>&nbsp;<span class="return-type"><a href="../query/procedure/ProcedureParameter.html" title="interface in org.hibernate.query.procedure">ProcedureParameter</a>&lt;T&gt;</span>&nbsp;<span class="element-name">registerParameter</span><wbr><span class="parameters">(int&nbsp;position,
- <a href="../type/BasicTypeReference.html" title="class in org.hibernate.type">BasicTypeReference</a>&lt;T&gt;&nbsp;type,
+<div class="member-signature"><span class="type-parameters">&lt;T&gt;</span>&nbsp;<span class="return-type"><a href="ProcedureParameter.html" title="interface in org.hibernate.procedure">ProcedureParameter</a>&lt;T&gt;</span>&nbsp;<span class="element-name">registerParameter</span><wbr><span class="parameters">(int&nbsp;position,
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Type</a>&lt;T&gt;&nbsp;type,
  <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/ParameterMode.html" title="class or interface in jakarta.persistence" class="external-link">ParameterMode</a>&nbsp;mode)</span></div>
 <div class="block">Basic form for registering a positional parameter.</div>
 <dl class="notes">
@@ -509,19 +538,19 @@ extends <a href="../query/CommonQueryContract.html" title="interface in org.hibe
 </section>
 </li>
 <li>
-<section class="detail" id="registerStoredProcedureParameter(int,org.hibernate.type.BasicTypeReference,jakarta.persistence.ParameterMode)">
+<section class="detail" id="registerStoredProcedureParameter(int,jakarta.persistence.metamodel.Type,jakarta.persistence.ParameterMode)">
 <h3>registerStoredProcedureParameter</h3>
 <div class="member-signature"><span class="return-type"><a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></span>&nbsp;<span class="element-name">registerStoredProcedureParameter</span><wbr><span class="parameters">(int&nbsp;position,
- <a href="../type/BasicTypeReference.html" title="class in org.hibernate.type">BasicTypeReference</a>&lt;?&gt;&nbsp;type,
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Type</a>&lt;?&gt;&nbsp;type,
  <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/ParameterMode.html" title="class or interface in jakarta.persistence" class="external-link">ParameterMode</a>&nbsp;mode)</span></div>
-<div class="block">Like <a href="#registerStoredProcedureParameter(int,java.lang.Class,jakarta.persistence.ParameterMode)"><code>registerStoredProcedureParameter(int, Class, ParameterMode)</code></a> but a basic type reference is given
+<div class="block">Like <a href="#registerStoredProcedureParameter(int,java.lang.Class,jakarta.persistence.ParameterMode)"><code>registerStoredProcedureParameter(int, Class, ParameterMode)</code></a> but a type reference is given
  instead of a class for the parameter type.</div>
 </section>
 </li>
 <li>
 <section class="detail" id="getParameterRegistration(int)">
 <h3>getParameterRegistration</h3>
-<div class="member-signature"><span class="return-type"><a href="../query/procedure/ProcedureParameter.html" title="interface in org.hibernate.query.procedure">ProcedureParameter</a>&lt;?&gt;</span>&nbsp;<span class="element-name">getParameterRegistration</span><wbr><span class="parameters">(int&nbsp;position)</span></div>
+<div class="member-signature"><span class="return-type"><a href="ProcedureParameter.html" title="interface in org.hibernate.procedure">ProcedureParameter</a>&lt;?&gt;</span>&nbsp;<span class="element-name">getParameterRegistration</span><wbr><span class="parameters">(int&nbsp;position)</span></div>
 <div class="block">Retrieve a previously registered parameter memento by the position under which it was registered.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -537,7 +566,7 @@ extends <a href="../query/CommonQueryContract.html" title="interface in org.hibe
 <li>
 <section class="detail" id="registerParameter(java.lang.String,java.lang.Class,jakarta.persistence.ParameterMode)">
 <h3>registerParameter</h3>
-<div class="member-signature"><span class="type-parameters">&lt;T&gt;</span>&nbsp;<span class="return-type"><a href="../query/procedure/ProcedureParameter.html" title="interface in org.hibernate.query.procedure">ProcedureParameter</a>&lt;T&gt;</span>&nbsp;<span class="element-name">registerParameter</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;parameterName,
+<div class="member-signature"><span class="type-parameters">&lt;T&gt;</span>&nbsp;<span class="return-type"><a href="ProcedureParameter.html" title="interface in org.hibernate.procedure">ProcedureParameter</a>&lt;T&gt;</span>&nbsp;<span class="element-name">registerParameter</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;parameterName,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;type,
  <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/ParameterMode.html" title="class or interface in jakarta.persistence" class="external-link">ParameterMode</a>&nbsp;mode)</span>
                                      throws <span class="exceptions"><a href="NamedParametersNotSupportedException.html" title="class in org.hibernate.procedure">NamedParametersNotSupportedException</a></span></div>
@@ -558,10 +587,10 @@ extends <a href="../query/CommonQueryContract.html" title="interface in org.hibe
 </section>
 </li>
 <li>
-<section class="detail" id="registerParameter(java.lang.String,org.hibernate.type.BasicTypeReference,jakarta.persistence.ParameterMode)">
+<section class="detail" id="registerParameter(java.lang.String,jakarta.persistence.metamodel.Type,jakarta.persistence.ParameterMode)">
 <h3>registerParameter</h3>
-<div class="member-signature"><span class="type-parameters">&lt;T&gt;</span>&nbsp;<span class="return-type"><a href="../query/procedure/ProcedureParameter.html" title="interface in org.hibernate.query.procedure">ProcedureParameter</a>&lt;T&gt;</span>&nbsp;<span class="element-name">registerParameter</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;parameterName,
- <a href="../type/BasicTypeReference.html" title="class in org.hibernate.type">BasicTypeReference</a>&lt;T&gt;&nbsp;type,
+<div class="member-signature"><span class="type-parameters">&lt;T&gt;</span>&nbsp;<span class="return-type"><a href="ProcedureParameter.html" title="interface in org.hibernate.procedure">ProcedureParameter</a>&lt;T&gt;</span>&nbsp;<span class="element-name">registerParameter</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;parameterName,
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Type</a>&lt;T&gt;&nbsp;type,
  <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/ParameterMode.html" title="class or interface in jakarta.persistence" class="external-link">ParameterMode</a>&nbsp;mode)</span>
                                      throws <span class="exceptions"><a href="NamedParametersNotSupportedException.html" title="class in org.hibernate.procedure">NamedParametersNotSupportedException</a></span></div>
 <div class="block">Basic form for registering a named parameter.</div>
@@ -581,19 +610,19 @@ extends <a href="../query/CommonQueryContract.html" title="interface in org.hibe
 </section>
 </li>
 <li>
-<section class="detail" id="registerStoredProcedureParameter(java.lang.String,org.hibernate.type.BasicTypeReference,jakarta.persistence.ParameterMode)">
+<section class="detail" id="registerStoredProcedureParameter(java.lang.String,jakarta.persistence.metamodel.Type,jakarta.persistence.ParameterMode)">
 <h3>registerStoredProcedureParameter</h3>
 <div class="member-signature"><span class="return-type"><a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></span>&nbsp;<span class="element-name">registerStoredProcedureParameter</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;parameterName,
- <a href="../type/BasicTypeReference.html" title="class in org.hibernate.type">BasicTypeReference</a>&lt;?&gt;&nbsp;type,
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Type</a>&lt;?&gt;&nbsp;type,
  <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/ParameterMode.html" title="class or interface in jakarta.persistence" class="external-link">ParameterMode</a>&nbsp;mode)</span></div>
-<div class="block">Like <a href="#registerStoredProcedureParameter(java.lang.String,java.lang.Class,jakarta.persistence.ParameterMode)"><code>registerStoredProcedureParameter(String, Class, ParameterMode)</code></a> but a basic type reference is given
+<div class="block">Like <a href="#registerStoredProcedureParameter(java.lang.String,java.lang.Class,jakarta.persistence.ParameterMode)"><code>registerStoredProcedureParameter(String, Class, ParameterMode)</code></a> but a type reference is given
  instead of a class for the parameter type.</div>
 </section>
 </li>
 <li>
 <section class="detail" id="getParameterRegistration(java.lang.String)">
 <h3>getParameterRegistration</h3>
-<div class="member-signature"><span class="return-type"><a href="../query/procedure/ProcedureParameter.html" title="interface in org.hibernate.query.procedure">ProcedureParameter</a>&lt;?&gt;</span>&nbsp;<span class="element-name">getParameterRegistration</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</span></div>
+<div class="member-signature"><span class="return-type"><a href="ProcedureParameter.html" title="interface in org.hibernate.procedure">ProcedureParameter</a>&lt;?&gt;</span>&nbsp;<span class="element-name">getParameterRegistration</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</span></div>
 <div class="block">Retrieve a previously registered parameter memento by the name under which it was registered.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -609,7 +638,7 @@ extends <a href="../query/CommonQueryContract.html" title="interface in org.hibe
 <li>
 <section class="detail" id="getRegisteredParameters()">
 <h3>getRegisteredParameters</h3>
-<div class="member-signature"><span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../query/procedure/ProcedureParameter.html" title="interface in org.hibernate.query.procedure">ProcedureParameter</a>&lt;?&gt;&gt;</span>&nbsp;<span class="element-name">getRegisteredParameters</span>()</div>
+<div class="member-signature"><span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="ProcedureParameter.html" title="interface in org.hibernate.procedure">ProcedureParameter</a>&lt;?&gt;&gt;</span>&nbsp;<span class="element-name">getRegisteredParameters</span>()</div>
 <div class="block">Retrieve all registered parameters.</div>
 <dl class="notes">
 <dt>Returns:</dt>
@@ -629,6 +658,20 @@ extends <a href="../query/CommonQueryContract.html" title="interface in org.hibe
 <dl class="notes">
 <dt>Returns:</dt>
 <dd>The ProcedureOutputs representation</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="getFunctionReturn()">
+<h3>getFunctionReturn</h3>
+<div class="member-signature"><span class="annotations"><a href="../Incubating.html" title="annotation interface in org.hibernate">@Incubating</a>
+</span><span class="return-type"><a href="FunctionReturn.html" title="interface in org.hibernate.procedure">FunctionReturn</a>&lt;?&gt;</span>&nbsp;<span class="element-name">getFunctionReturn</span>()</div>
+<div class="block">The <a href="FunctionReturn.html" title="interface in org.hibernate.procedure"><code>FunctionReturn</code></a> describing the return value of
+ the function, or <code>null</code> if this <code>ProcedureCall</code>
+ is not a function call.</div>
+<dl class="notes">
+<dt>Since:</dt>
+<dd>7.0</dd>
 </dl>
 </section>
 </li>
@@ -706,25 +749,6 @@ extends <a href="../query/CommonQueryContract.html" title="interface in org.hibe
 <dd><code>this</code>, for method chaining</dd>
 <dt>Throws:</dt>
 <dd><code><a href="../MappingException.html" title="class in org.hibernate">MappingException</a></code> - Indicates the given class could not be resolved as an entity</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="toMemento(java.lang.String)">
-<h3>toMemento</h3>
-<div class="member-signature"><span class="return-type"><a href="spi/NamedCallableQueryMemento.html" title="interface in org.hibernate.procedure.spi">NamedCallableQueryMemento</a></span>&nbsp;<span class="element-name">toMemento</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</span></div>
-<div class="block"><span class="descfrm-type-label">Description copied from interface:&nbsp;<code><a href="../query/named/NameableQuery.html#toMemento(java.lang.String)">NameableQuery</a></code></span></div>
-<div class="block">Convert this query into the memento.</div>
-<dl class="notes">
-<dt>Specified by:</dt>
-<dd><code><a href="../query/named/NameableQuery.html#toMemento(java.lang.String)">toMemento</a></code>&nbsp;in interface&nbsp;<code><a href="../query/named/NameableQuery.html" title="interface in org.hibernate.query.named">NameableQuery</a></code></dd>
-<dt>See Also:</dt>
-<dd>
-<ul class="see-list-long">
-<li><a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManagerFactory.html#addNamedQuery(java.lang.String,jakarta.persistence.Query)" title="class or interface in jakarta.persistence" class="external-link"><code>EntityManagerFactory.addNamedQuery(String, Query)</code></a></li>
-<li><a href="../query/named/NamedObjectRepository.html#registerNamedQuery(java.lang.String,jakarta.persistence.Query)"><code>NamedObjectRepository.registerNamedQuery(String, Query)</code></a></li>
-</ul>
-</dd>
 </dl>
 </section>
 </li>
@@ -844,7 +868,7 @@ extends <a href="../query/CommonQueryContract.html" title="interface in org.hibe
 <dd>
 <ul class="see-list-long">
 <li><a href="../query/CommonQueryContract.html#setParameter(java.lang.String,P,java.lang.Class)"><code>CommonQueryContract.setParameter(String, Object, Class)</code></a></li>
-<li><a href="../query/CommonQueryContract.html#setParameter(java.lang.String,P,org.hibernate.query.BindableType)"><code>CommonQueryContract.setParameter(String, Object, BindableType)</code></a></li>
+<li><a href="../query/CommonQueryContract.html#setParameter(java.lang.String,P,jakarta.persistence.metamodel.Type)"><code>CommonQueryContract.setParameter(String, Object, Type)</code></a></li>
 <li><a href="../query/TypedParameterValue.html" title="class in org.hibernate.query"><code>TypedParameterValue</code></a></li>
 </ul>
 </dd>
@@ -921,7 +945,7 @@ extends <a href="../query/CommonQueryContract.html" title="interface in org.hibe
 <dd>
 <ul class="see-list-long">
 <li><a href="../query/CommonQueryContract.html#setParameter(int,P,java.lang.Class)"><code>CommonQueryContract.setParameter(int, Object, Class)</code></a></li>
-<li><a href="../query/CommonQueryContract.html#setParameter(int,P,org.hibernate.query.BindableType)"><code>CommonQueryContract.setParameter(int, Object, BindableType)</code></a></li>
+<li><a href="../query/CommonQueryContract.html#setParameter(int,P,jakarta.persistence.metamodel.Type)"><code>CommonQueryContract.setParameter(int, Object, Type)</code></a></li>
 <li><a href="../query/TypedParameterValue.html" title="class in org.hibernate.query"><code>TypedParameterValue</code></a></li>
 </ul>
 </dd>

@@ -136,7 +136,7 @@ loadScripts(document, 'script');</script>
 <div class="col-second even-row-color"><span class="type-name-label">AnnotatedJoinColumn.</span><code><a href="../../boot/model/internal/AnnotatedJoinColumn.html#linkValueUsingAColumnCopy(org.hibernate.mapping.Column,org.hibernate.mapping.SimpleValue)" class="member-name-link">linkValueUsingAColumnCopy</a><wbr>(<a href="../Column.html" title="class in org.hibernate.mapping">Column</a>&nbsp;column,
  <a href="../SimpleValue.html" title="class in org.hibernate.mapping">SimpleValue</a>&nbsp;value)</code></div>
 <div class="col-last even-row-color">
-<div class="block">used for mappedBy cases</div>
+<div class="block">Used for <code>mappedBy</code> cases.</div>
 </div>
 <div class="col-first odd-row-color"><code>void</code></div>
 <div class="col-second odd-row-color"><span class="type-name-label">AnnotatedJoinColumn.</span><code><a href="../../boot/model/internal/AnnotatedJoinColumn.html#linkValueUsingDefaultColumnNaming(int,org.hibernate.mapping.Column,org.hibernate.mapping.PersistentClass,org.hibernate.mapping.SimpleValue)" class="member-name-link">linkValueUsingDefaultColumnNaming</a><wbr>(int&nbsp;columnIndex,
@@ -148,7 +148,11 @@ loadScripts(document, 'script');</script>
 <div class="col-second even-row-color"><span class="type-name-label">AnnotatedJoinColumn.</span><code><a href="../../boot/model/internal/AnnotatedJoinColumn.html#linkValueUsingDefaultColumnNaming(org.hibernate.mapping.Column,org.hibernate.mapping.PersistentClass,org.hibernate.mapping.SimpleValue)" class="member-name-link">linkValueUsingDefaultColumnNaming</a><wbr>(<a href="../Column.html" title="class in org.hibernate.mapping">Column</a>&nbsp;referencedColumn,
  <a href="../PersistentClass.html" title="class in org.hibernate.mapping">PersistentClass</a>&nbsp;referencedEntity,
  <a href="../SimpleValue.html" title="class in org.hibernate.mapping">SimpleValue</a>&nbsp;value)</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-last even-row-color">
+<div class="block">The JPA-specified rules implemented in
+ <a href="../../boot/model/naming/ImplicitNamingStrategyJpaCompliantImpl.html#determineJoinColumnName(org.hibernate.boot.model.naming.ImplicitJoinColumnNameSource)"><code>ImplicitNamingStrategyJpaCompliantImpl.determineJoinColumnName(org.hibernate.boot.model.naming.ImplicitJoinColumnNameSource)</code></a>
+ prevent us from assigning defaulted names to <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/JoinColumn.html" title="class or interface in jakarta.persistence" class="external-link"><code>JoinColumn</code></a> until the second pass.</div>
+</div>
 <div class="col-first odd-row-color"><code>void</code></div>
 <div class="col-second odd-row-color"><span class="type-name-label">AnnotatedJoinColumn.</span><code><a href="../../boot/model/internal/AnnotatedJoinColumn.html#overrideFromReferencedColumnIfNecessary(org.hibernate.mapping.Column)" class="member-name-link">overrideFromReferencedColumnIfNecessary</a><wbr>(<a href="../Column.html" title="class in org.hibernate.mapping">Column</a>&nbsp;column)</code></div>
 <div class="col-last odd-row-color">
@@ -711,7 +715,7 @@ loadScripts(document, 'script');</script>
 <div class="col-second odd-row-color"><span class="type-name-label">Table.</span><code><a href="../Table.html#createUniqueKey(org.hibernate.mapping.Column,org.hibernate.boot.spi.MetadataBuildingContext)" class="member-name-link">createUniqueKey</a><wbr>(<a href="../Column.html" title="class in org.hibernate.mapping">Column</a>&nbsp;column,
  <a href="../../boot/spi/MetadataBuildingContext.html" title="interface in org.hibernate.boot.spi">MetadataBuildingContext</a>&nbsp;context)</code></div>
 <div class="col-last odd-row-color">
-<div class="block">Mark the given column unique.</div>
+<div class="block">Mark the given column unique and assign a name to the unique key.</div>
 </div>
 <div class="col-first even-row-color"><code>void</code></div>
 <div class="col-second even-row-color"><span class="type-name-label">Collection.</span><code><a href="../Collection.html#enableSoftDelete(org.hibernate.mapping.Column,org.hibernate.annotations.SoftDeleteType)" class="member-name-link">enableSoftDelete</a><wbr>(<a href="../Column.html" title="class in org.hibernate.mapping">Column</a>&nbsp;indicatorColumn,
@@ -787,6 +791,14 @@ loadScripts(document, 'script');</script>
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;referencedEntityName,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;keyDefinition,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;options,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../Column.html" title="class in org.hibernate.mapping">Column</a>&gt;&nbsp;referencedColumns)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code><a href="../ForeignKey.html" title="class in org.hibernate.mapping">ForeignKey</a></code></div>
+<div class="col-second even-row-color"><span class="type-name-label">KeyValue.</span><code><a href="../KeyValue.html#createForeignKeyOfEntity(java.lang.String,java.util.List)" class="member-name-link">createForeignKeyOfEntity</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;entityName,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../Column.html" title="class in org.hibernate.mapping">Column</a>&gt;&nbsp;referencedColumns)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code><a href="../ForeignKey.html" title="class in org.hibernate.mapping">ForeignKey</a></code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">SimpleValue.</span><code><a href="../SimpleValue.html#createForeignKeyOfEntity(java.lang.String,java.util.List)" class="member-name-link">createForeignKeyOfEntity</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;entityName,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../Column.html" title="class in org.hibernate.mapping">Column</a>&gt;&nbsp;referencedColumns)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>void</code></div>

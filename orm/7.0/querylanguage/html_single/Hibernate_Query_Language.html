@@ -14,7 +14,7 @@
 <div id="header">
 <h1>A Guide to Hibernate Query Language</h1>
 <div class="details">
-<span id="revnumber">version 7.0.0.CR1</span>
+<span id="revnumber">version 7.0.10.Final</span>
 </div>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
@@ -1664,150 +1664,80 @@ Similarly, the Java-style postfix is case-insensitive.</p>
 <div class="sect3">
 <h4 id="datetime-literals">2.1.4. Date and time literals</h4>
 <div class="paragraph">
-<p>According to the JPQL specification, date and time literals may be specified using the JDBC escape syntax.
-Since this syntax is rather unpleasant to look at, HQL provides not one, but two alternatives.</p>
+<p>According to the JPQL specification, literal dates and times may be specified using the JDBC escape syntax.</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
-<col style="width: 20%;">
-<col style="width: 20%;">
-<col style="width: 20%;">
-<col style="width: 20%;">
-<col style="width: 20%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Date/time type</th>
-<th class="tableblock halign-left valign-top">Recommended Java type</th>
-<th class="tableblock halign-left valign-top">JDBC escape syntax 💀</th>
-<th class="tableblock halign-left valign-top">Braced literal syntax</th>
-<th class="tableblock halign-left valign-top">Explicitly typed literal syntax</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Date</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LocalDate</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{d 'yyyy-mm-dd'}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{yyyy-mm-dd}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>date yyyy-mm-dd</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LocalTime</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{t 'hh:mm'}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{hh:mm}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>time hh:mm</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time with seconds</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LocalTime</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{t 'hh:mm:ss'}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{hh:mm:ss}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>time hh:mm:ss</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Datetime</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LocalDateTime</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{ts 'yyyy-mm-ddThh:mm:ss'}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{yyyy-mm-dd hh:mm:ss}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>datetime yyyy-mm-dd hh:mm:ss</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Datetime with milliseconds</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LocalDateTime</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{ts 'yyyy-mm-ddThh:mm:ss.millis'}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{yyyy-mm-dd hh:mm:ss.millis}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>datetime yyyy-mm-dd hh:mm:ss.millis</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Datetime with an offset</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>OffsetDateTime</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{ts 'yyyy-mm-ddThh:mm:ss+hh:mm'}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{yyyy-mm-dd hh:mm:ss +hh:mm}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>datetime yyyy-mm-dd hh:mm:ss +hh:mm</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Datetime with a time zone</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>OffsetDateTime</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{ts 'yyyy-mm-ddThh:mm:ss GMT'}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{yyyy-mm-dd hh:mm:ss GMT}</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>datetime yyyy-mm-dd hh:mm:ss GMT</code></p></td>
-</tr>
-</tbody>
-</table>
-<div class="paragraph">
-<p>Literals referring to the current date and time are also provided.
-Again there is some flexibility.</p>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 25%;">
-<col style="width: 25%;">
-<col style="width: 25%;">
-<col style="width: 25%;">
+<col>
+<col>
+<col>
+<col style="width: 15.0001%;">
 </colgroup>
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">Date/time type</th>
 <th class="tableblock halign-left valign-top">Java type</th>
-<th class="tableblock halign-left valign-top">Underscored syntax</th>
-<th class="tableblock halign-left valign-top">Spaced syntax</th>
+<th class="tableblock halign-left valign-top">JDBC escape syntax</th>
+<th class="tableblock halign-center valign-top">JPA standard</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Date</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>java.time.LocalDate</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>local_date</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>local date</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>java.time.LocalTime</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>local_time</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>local time</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Datetime</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>java.time.LocalDateTime</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>local_datetime</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>local datetime</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Offset datetime</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>java.time.OffsetDateTime</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>offset_datetime</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>offset datetime</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Instant</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>java.time.Instant</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>instant</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>instant</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Date</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>java.sql.Date</code> 💀</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>current_date</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>current date</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{d 'yyyy-mm-dd'}</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">✔</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Time</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>java.sql.Time</code> 💀</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>current_time</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>current time</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{t 'hh:mm'}</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">✔</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Datetime</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time with seconds</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>java.sql.Time</code> 💀</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{t 'hh:mm:ss'}</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">✔</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Timestamp</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>java.sql.Timestamp</code> 💀</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>current_timestamp</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>current timestamp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{ts 'yyyy-mm-ddThh:mm:ss'}</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">✔</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Timestamp with milliseconds</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>java.sql.Timestamp</code> 💀</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{ts 'yyyy-mm-ddThh:mm:ss.millis'}</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">✔</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Timestamp with an offset</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>java.sql.Timestamp</code> 💀</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{ts 'yyyy-mm-ddThh:mm:ss+hh:mm'}</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">✔</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Timestamp with a time zone</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>java.sql.Timestamp</code> 💀</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{ts 'yyyy-mm-ddThh:mm:ss GMT'}</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">✔</p></td>
 </tr>
 </tbody>
 </table>
 <div class="paragraph">
-<p>Of these, only <code>local date</code>, <code>local time</code>, <code>local datetime</code>, <code>current_date</code>, <code>current_time</code>, and <code>current_timestamp</code> are defined by the JPQL specification.</p>
+<p>There&#8217;s two problems here:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>this syntax is rather unpleasant to look at, and</p>
+</li>
+<li>
+<p>these literals are assigned types defined by JDBC, instead of date/time types defined in <code>java.time</code>.</p>
+</li>
+</ol>
 </div>
 <div class="admonitionblock important">
 <table>
@@ -1818,12 +1748,181 @@ Again there is some flexibility.</p>
 <td class="content">
 <div class="paragraph">
 <p>The use of date and time types from the <code>java.sql</code> package is strongly discouraged!
+Jakarta Persistence 3.2 deprecates support for these types.
 Always use <code>java.time</code> types in new code.</p>
 </div>
 </td>
 </tr>
 </table>
 </div>
+<div class="paragraph">
+<p>HQL provides not one, but two alternatives.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col style="width: 15%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Date/time type</th>
+<th class="tableblock halign-left valign-top">Java type</th>
+<th class="tableblock halign-left valign-top">Braced literal syntax</th>
+<th class="tableblock halign-left valign-top">Explicitly-typed literal syntax</th>
+<th class="tableblock halign-center valign-top">JPA standard</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Date</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LocalDate</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{yyyy-mm-dd}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>date yyyy-mm-dd</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">✖</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LocalTime</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{hh:mm}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>time hh:mm</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">✖</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time with seconds</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LocalTime</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{hh:mm:ss}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>time hh:mm:ss</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">✖</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Datetime</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LocalDateTime</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{yyyy-mm-dd hh:mm:ss}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>datetime yyyy-mm-dd hh:mm:ss</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">✖</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Datetime with milliseconds</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>LocalDateTime</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{yyyy-mm-dd hh:mm:ss.millis}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>datetime yyyy-mm-dd hh:mm:ss.millis</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">✖</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Datetime with an offset</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>OffsetDateTime</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{yyyy-mm-dd hh:mm:ss +hh:mm}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>datetime yyyy-mm-dd hh:mm:ss +hh:mm</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">✖</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Datetime with a time zone</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>OffsetDateTime</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>{yyyy-mm-dd hh:mm:ss GMT}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>datetime yyyy-mm-dd hh:mm:ss GMT</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">✖</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Literals referring to the current date and time are also available.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col>
+<col>
+<col>
+<col style="width: 15.0001%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Date/time type</th>
+<th class="tableblock halign-left valign-top">Java type</th>
+<th class="tableblock halign-left valign-top">Syntax</th>
+<th class="tableblock halign-center valign-top">JPA standard</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Date</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>java.time.LocalDate</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>local date</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">✔</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>java.time.LocalTime</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>local time</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">✔</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Datetime</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>java.time.LocalDateTime</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>local datetime</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">✔</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Offset datetime</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>java.time.OffsetDateTime</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>offset datetime</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">✖</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Instant</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>java.time.Instant</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>instant</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">✖</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The following are deprecated in JPA 3.2.
+We include them here only for completeness:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col style="width: 15%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Date/time type</th>
+<th class="tableblock halign-left valign-top">Java type</th>
+<th class="tableblock halign-left valign-top">JPA syntax ✔</th>
+<th class="tableblock halign-left valign-top">HQL syntax ✖</th>
+<th class="tableblock halign-center valign-top">JPA standard</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JDBC date</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>java.sql.Date</code> 💀</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>current_date</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>current date</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">💀</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JDBC time</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>java.sql.Time</code> 💀</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>current_time</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>current time</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">💀</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JDBC timestamp</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>java.sql.Timestamp</code> 💀</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>current_timestamp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>current timestamp</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">💀</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="sect3">
 <h4 id="duration-literals">2.1.5. Duration literals</h4>
@@ -7115,8 +7214,8 @@ searchSpecification
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 7.0.0.CR1<br>
-Last updated 2025-04-24 19:31:08 UTC
+Version 7.0.10.Final<br>
+Last updated 2025-08-10 00:01:18 UTC
 </div>
 </div>
 </body>

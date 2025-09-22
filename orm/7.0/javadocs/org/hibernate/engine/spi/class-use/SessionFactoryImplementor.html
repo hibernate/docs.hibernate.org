@@ -2371,9 +2371,9 @@ loadScripts(document, 'script');</script>
 <div class="block">Used by <a href="../../../procedure/ProcedureCall.html" title="interface in org.hibernate.procedure"><code>ProcedureCall</code></a></div>
 </div>
 <div class="col-first even-row-color"><code>&nbsp;</code></div>
-<div class="col-second even-row-color"><code><a href="../../../query/internal/QueryParameterBindingImpl.html#%3Cinit%3E(org.hibernate.query.QueryParameter,org.hibernate.engine.spi.SessionFactoryImplementor,org.hibernate.query.BindableType)" class="member-name-link">QueryParameterBindingImpl</a><wbr>(<a href="../../../query/QueryParameter.html" title="interface in org.hibernate.query">QueryParameter</a>&lt;<a href="../../../query/internal/QueryParameterBindingImpl.html" title="type parameter in QueryParameterBindingImpl">T</a>&gt;&nbsp;queryParameter,
+<div class="col-second even-row-color"><code><a href="../../../query/internal/QueryParameterBindingImpl.html#%3Cinit%3E(org.hibernate.query.QueryParameter,org.hibernate.engine.spi.SessionFactoryImplementor,org.hibernate.type.BindableType)" class="member-name-link">QueryParameterBindingImpl</a><wbr>(<a href="../../../query/QueryParameter.html" title="interface in org.hibernate.query">QueryParameter</a>&lt;<a href="../../../query/internal/QueryParameterBindingImpl.html" title="type parameter in QueryParameterBindingImpl">T</a>&gt;&nbsp;queryParameter,
  <a href="../SessionFactoryImplementor.html" title="interface in org.hibernate.engine.spi">SessionFactoryImplementor</a>&nbsp;sessionFactory,
- <a href="../../../query/BindableType.html" title="interface in org.hibernate.query">BindableType</a>&lt;? super <a href="../../../query/internal/QueryParameterBindingImpl.html" title="type parameter in QueryParameterBindingImpl">T</a>&gt;&nbsp;bindType)</code></div>
+ <a href="../../../type/BindableType.html" title="interface in org.hibernate.type">BindableType</a>&lt;? super <a href="../../../query/internal/QueryParameterBindingImpl.html" title="type parameter in QueryParameterBindingImpl">T</a>&gt;&nbsp;bindType)</code></div>
 <div class="col-last even-row-color">
 <div class="block">Used by Query (SQM) and NativeQuery</div>
 </div>
@@ -2537,11 +2537,12 @@ R&gt;&nbsp;<a href="../../../query/results/ResultBuilder.html" title="interface 
 <div class="table-header col-second">Constructor</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>&nbsp;</code></div>
-<div class="col-second even-row-color"><code><a href="../../../query/results/internal/DomainResultCreationStateImpl.html#%3Cinit%3E(java.lang.String,org.hibernate.sql.results.jdbc.spi.JdbcValuesMetadata,java.util.Map,java.util.function.Consumer,org.hibernate.engine.spi.LoadQueryInfluencers,org.hibernate.engine.spi.SessionFactoryImplementor)" class="member-name-link">DomainResultCreationStateImpl</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;stateIdentifier,
+<div class="col-second even-row-color"><code><a href="../../../query/results/internal/DomainResultCreationStateImpl.html#%3Cinit%3E(java.lang.String,org.hibernate.sql.results.jdbc.spi.JdbcValuesMetadata,java.util.Map,java.util.function.Consumer,org.hibernate.engine.spi.LoadQueryInfluencers,boolean,org.hibernate.engine.spi.SessionFactoryImplementor)" class="member-name-link">DomainResultCreationStateImpl</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;stateIdentifier,
  <a href="../../../sql/results/jdbc/spi/JdbcValuesMetadata.html" title="interface in org.hibernate.sql.results.jdbc.spi">JdbcValuesMetadata</a>&nbsp;jdbcResultsMetadata,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="../../../sql/results/graph/Fetchable.html" title="interface in org.hibernate.sql.results.graph">Fetchable</a>,<wbr><a href="../../../query/results/LegacyFetchBuilder.html" title="interface in org.hibernate.query.results">LegacyFetchBuilder</a>&gt;&gt;&nbsp;legacyFetchBuilders,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;<a href="../../../sql/ast/spi/SqlSelection.html" title="interface in org.hibernate.sql.ast.spi">SqlSelection</a>&gt;&nbsp;sqlSelectionConsumer,
  <a href="../LoadQueryInfluencers.html" title="class in org.hibernate.engine.spi">LoadQueryInfluencers</a>&nbsp;loadQueryInfluencers,
+ boolean&nbsp;isProcedureOrNativeQuery,
  <a href="../SessionFactoryImplementor.html" title="interface in org.hibernate.engine.spi">SessionFactoryImplementor</a>&nbsp;sessionFactory)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 </div>
@@ -2585,8 +2586,8 @@ R&gt;&nbsp;<a href="../../../query/results/ResultBuilder.html" title="interface 
 <div class="col-last even-row-color">
 <div class="block"><span class="deprecated-label">Deprecated, for removal: This API element is subject to removal in a future version.</span></div>
 &nbsp;</div>
-<div class="col-first odd-row-color"><code><a href="../SessionFactoryImplementor.html" title="interface in org.hibernate.engine.spi">SessionFactoryImplementor</a></code></div>
-<div class="col-second odd-row-color"><span class="type-name-label">AbstractSelectionQuery.</span><code><a href="../../../query/spi/AbstractSelectionQuery.html#getSessionFactory()" class="member-name-link">getSessionFactory</a>()</code></div>
+<div class="col-first odd-row-color"><code>final <a href="../SessionFactoryImplementor.html" title="interface in org.hibernate.engine.spi">SessionFactoryImplementor</a></code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">AbstractCommonQueryContract.</span><code><a href="../../../query/spi/AbstractCommonQueryContract.html#getSessionFactory()" class="member-name-link">getSessionFactory</a>()</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 </div>
 <div class="caption"><span>Methods in <a href="../../../query/spi/package-summary.html">org.hibernate.query.spi</a> with parameters of type <a href="../SessionFactoryImplementor.html" title="interface in org.hibernate.engine.spi">SessionFactoryImplementor</a></span></div>

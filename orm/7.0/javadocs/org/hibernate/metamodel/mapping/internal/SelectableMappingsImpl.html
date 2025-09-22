@@ -118,9 +118,10 @@ implements <a href="../SelectableMappings.html" title="interface in org.hibernat
 <div class="block">Visit each contained selectable mapping.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="../SelectableMappings.html" title="interface in org.hibernate.metamodel.mapping">SelectableMappings</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#from(java.lang.String,org.hibernate.mapping.Value,int%5B%5D,org.hibernate.type.MappingContext,org.hibernate.type.spi.TypeConfiguration,boolean%5B%5D,boolean%5B%5D,org.hibernate.dialect.Dialect,org.hibernate.query.sqm.function.SqmFunctionRegistry,org.hibernate.metamodel.spi.RuntimeModelCreationContext)" class="member-name-link">from</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;containingTableExpression,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#from(java.lang.String,org.hibernate.mapping.Value,int%5B%5D,org.hibernate.metamodel.mapping.SelectablePath,org.hibernate.type.MappingContext,org.hibernate.type.spi.TypeConfiguration,boolean%5B%5D,boolean%5B%5D,org.hibernate.dialect.Dialect,org.hibernate.query.sqm.function.SqmFunctionRegistry,org.hibernate.metamodel.spi.RuntimeModelCreationContext)" class="member-name-link">from</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;containingTableExpression,
  <a href="../../../mapping/Value.html" title="interface in org.hibernate.mapping">Value</a>&nbsp;value,
  int[]&nbsp;propertyOrder,
+ @Nullable <a href="../SelectablePath.html" title="class in org.hibernate.metamodel.mapping">SelectablePath</a>&nbsp;parentSelectablePath,
  <a href="../../../type/MappingContext.html" title="interface in org.hibernate.type">MappingContext</a>&nbsp;mappingContext,
  <a href="../../../type/spi/TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration,
  boolean[]&nbsp;insertable,
@@ -130,16 +131,28 @@ implements <a href="../SelectableMappings.html" title="interface in org.hibernat
  <a href="../../spi/RuntimeModelCreationContext.html" title="interface in org.hibernate.metamodel.spi">RuntimeModelCreationContext</a>&nbsp;creationContext)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="../SelectableMappings.html" title="interface in org.hibernate.metamodel.mapping">SelectableMappings</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#from(org.hibernate.metamodel.mapping.EmbeddableMappingType)" class="member-name-link">from</a><wbr>(<a href="../EmbeddableMappingType.html" title="interface in org.hibernate.metamodel.mapping">EmbeddableMappingType</a>&nbsp;embeddableMappingType)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#from(java.lang.String,org.hibernate.mapping.Value,int%5B%5D,org.hibernate.type.MappingContext,org.hibernate.type.spi.TypeConfiguration,boolean%5B%5D,boolean%5B%5D,org.hibernate.dialect.Dialect,org.hibernate.query.sqm.function.SqmFunctionRegistry,org.hibernate.metamodel.spi.RuntimeModelCreationContext)" class="member-name-link">from</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;containingTableExpression,
+ <a href="../../../mapping/Value.html" title="interface in org.hibernate.mapping">Value</a>&nbsp;value,
+ int[]&nbsp;propertyOrder,
+ <a href="../../../type/MappingContext.html" title="interface in org.hibernate.type">MappingContext</a>&nbsp;mappingContext,
+ <a href="../../../type/spi/TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration,
+ boolean[]&nbsp;insertable,
+ boolean[]&nbsp;updateable,
+ <a href="../../../dialect/Dialect.html" title="class in org.hibernate.dialect">Dialect</a>&nbsp;dialect,
+ <a href="../../../query/sqm/function/SqmFunctionRegistry.html" title="class in org.hibernate.query.sqm.function">SqmFunctionRegistry</a>&nbsp;sqmFunctionRegistry,
+ <a href="../../spi/RuntimeModelCreationContext.html" title="interface in org.hibernate.metamodel.spi">RuntimeModelCreationContext</a>&nbsp;creationContext)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getJdbcTypeCount()" class="member-name-link">getJdbcTypeCount</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="../SelectableMappings.html" title="interface in org.hibernate.metamodel.mapping">SelectableMappings</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#from(org.hibernate.metamodel.mapping.EmbeddableMappingType)" class="member-name-link">from</a><wbr>(<a href="../EmbeddableMappingType.html" title="interface in org.hibernate.metamodel.mapping">EmbeddableMappingType</a>&nbsp;embeddableMappingType)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getJdbcTypeCount()" class="member-name-link">getJdbcTypeCount</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">The number of selectables</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../SelectableMapping.html" title="interface in org.hibernate.metamodel.mapping">SelectableMapping</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getSelectable(int)" class="member-name-link">getSelectable</a><wbr>(int&nbsp;columnIndex)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../SelectableMapping.html" title="interface in org.hibernate.metamodel.mapping">SelectableMapping</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getSelectable(int)" class="member-name-link">getSelectable</a><wbr>(int&nbsp;columnIndex)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Get the selectable at the given position</div>
 </div>
 </div>
@@ -182,6 +195,22 @@ implements <a href="../SelectableMappings.html" title="interface in org.hibernat
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="../SelectableMappings.html" title="interface in org.hibernate.metamodel.mapping">SelectableMappings</a></span>&nbsp;<span class="element-name">from</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;containingTableExpression,
  <a href="../../../mapping/Value.html" title="interface in org.hibernate.mapping">Value</a>&nbsp;value,
  int[]&nbsp;propertyOrder,
+ <a href="../../../type/MappingContext.html" title="interface in org.hibernate.type">MappingContext</a>&nbsp;mappingContext,
+ <a href="../../../type/spi/TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration,
+ boolean[]&nbsp;insertable,
+ boolean[]&nbsp;updateable,
+ <a href="../../../dialect/Dialect.html" title="class in org.hibernate.dialect">Dialect</a>&nbsp;dialect,
+ <a href="../../../query/sqm/function/SqmFunctionRegistry.html" title="class in org.hibernate.query.sqm.function">SqmFunctionRegistry</a>&nbsp;sqmFunctionRegistry,
+ <a href="../../spi/RuntimeModelCreationContext.html" title="interface in org.hibernate.metamodel.spi">RuntimeModelCreationContext</a>&nbsp;creationContext)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="from(java.lang.String,org.hibernate.mapping.Value,int[],org.hibernate.metamodel.mapping.SelectablePath,org.hibernate.type.MappingContext,org.hibernate.type.spi.TypeConfiguration,boolean[],boolean[],org.hibernate.dialect.Dialect,org.hibernate.query.sqm.function.SqmFunctionRegistry,org.hibernate.metamodel.spi.RuntimeModelCreationContext)">
+<h3>from</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="../SelectableMappings.html" title="interface in org.hibernate.metamodel.mapping">SelectableMappings</a></span>&nbsp;<span class="element-name">from</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;containingTableExpression,
+ <a href="../../../mapping/Value.html" title="interface in org.hibernate.mapping">Value</a>&nbsp;value,
+ int[]&nbsp;propertyOrder,
+ @Nullable <a href="../SelectablePath.html" title="class in org.hibernate.metamodel.mapping">SelectablePath</a>&nbsp;parentSelectablePath,
  <a href="../../../type/MappingContext.html" title="interface in org.hibernate.type">MappingContext</a>&nbsp;mappingContext,
  <a href="../../../type/spi/TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration,
  boolean[]&nbsp;insertable,

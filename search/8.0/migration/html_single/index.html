@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.23">
-<title>Hibernate Search 8.0.0.Alpha3: Migration Guide from 7.2</title>
+<title>Hibernate Search 8.0.0.Final: Migration Guide from 7.2</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -434,6 +434,95 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 @media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
 </style>
 <link rel="stylesheet" href="css/font-awesome/css/font-awesome.min.css">
+<style>
+/*! Stylesheet for CodeRay to loosely match GitHub themes | MIT License */
+pre.CodeRay{background:#f7f7f8}
+.CodeRay .line-numbers{border-right:1px solid;opacity:.35;padding:0 .5em 0 0;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
+.CodeRay span.line-numbers{display:inline-block;margin-right:.75em}
+.CodeRay .line-numbers strong{color:#000}
+table.CodeRay{border-collapse:separate;border:0;margin-bottom:0;background:none}
+table.CodeRay td{vertical-align:top;line-height:inherit}
+table.CodeRay td.line-numbers{text-align:right}
+table.CodeRay td.code{padding:0 0 0 .75em}
+.CodeRay .debug{color:#fff!important;background:navy!important}
+.CodeRay .annotation{color:#007}
+.CodeRay .attribute-name{color:navy}
+.CodeRay .attribute-value{color:#700}
+.CodeRay .binary{color:#509}
+.CodeRay .comment{color:#998;font-style:italic}
+.CodeRay .char{color:#04d}
+.CodeRay .char .content{color:#04d}
+.CodeRay .char .delimiter{color:#039}
+.CodeRay .class{color:#458;font-weight:bold}
+.CodeRay .complex{color:#a08}
+.CodeRay .constant,.CodeRay .predefined-constant{color:teal}
+.CodeRay .color{color:#099}
+.CodeRay .class-variable{color:#369}
+.CodeRay .decorator{color:#b0b}
+.CodeRay .definition{color:#099}
+.CodeRay .delimiter{color:#000}
+.CodeRay .doc{color:#970}
+.CodeRay .doctype{color:#34b}
+.CodeRay .doc-string{color:#d42}
+.CodeRay .escape{color:#666}
+.CodeRay .entity{color:#800}
+.CodeRay .error{color:#808}
+.CodeRay .exception{color:inherit}
+.CodeRay .filename{color:#099}
+.CodeRay .function{color:#900;font-weight:bold}
+.CodeRay .global-variable{color:teal}
+.CodeRay .hex{color:#058}
+.CodeRay .integer,.CodeRay .float{color:#099}
+.CodeRay .include{color:#555}
+.CodeRay .inline{color:#000}
+.CodeRay .inline .inline{background:#ccc}
+.CodeRay .inline .inline .inline{background:#bbb}
+.CodeRay .inline .inline-delimiter{color:#d14}
+.CodeRay .inline-delimiter{color:#d14}
+.CodeRay .important{color:#555;font-weight:bold}
+.CodeRay .interpreted{color:#b2b}
+.CodeRay .instance-variable{color:teal}
+.CodeRay .label{color:#970}
+.CodeRay .local-variable{color:#963}
+.CodeRay .octal{color:#40e}
+.CodeRay .predefined{color:#369}
+.CodeRay .preprocessor{color:#579}
+.CodeRay .pseudo-class{color:#555}
+.CodeRay .directive{font-weight:bold}
+.CodeRay .type{font-weight:bold}
+.CodeRay .predefined-type{color:inherit}
+.CodeRay .reserved,.CodeRay .keyword{color:#000;font-weight:bold}
+.CodeRay .key{color:#808}
+.CodeRay .key .delimiter{color:#606}
+.CodeRay .key .char{color:#80f}
+.CodeRay .value{color:#088}
+.CodeRay .regexp .delimiter{color:#808}
+.CodeRay .regexp .content{color:#808}
+.CodeRay .regexp .modifier{color:#808}
+.CodeRay .regexp .char{color:#d14}
+.CodeRay .regexp .function{color:#404;font-weight:bold}
+.CodeRay .string{color:#d20}
+.CodeRay .string .string .string{background:#ffd0d0}
+.CodeRay .string .content{color:#d14}
+.CodeRay .string .char{color:#d14}
+.CodeRay .string .delimiter{color:#d14}
+.CodeRay .shell{color:#d14}
+.CodeRay .shell .delimiter{color:#d14}
+.CodeRay .symbol{color:#990073}
+.CodeRay .symbol .content{color:#a60}
+.CodeRay .symbol .delimiter{color:#630}
+.CodeRay .tag{color:teal}
+.CodeRay .tag-special{color:#d70}
+.CodeRay .variable{color:#036}
+.CodeRay .insert{background:#afa}
+.CodeRay .delete{background:#faa}
+.CodeRay .change{color:#aaf;background:#007}
+.CodeRay .head{color:#f8f;background:#505}
+.CodeRay .insert .insert{color:#080}
+.CodeRay .delete .delete{color:#800}
+.CodeRay .change .change{color:#66f}
+.CodeRay .head .head{color:#f4f}
+</style>
 <!-- HibernateDoc.Meta -->
 <meta name="description" content="Hibernate Search, full text search for your entities - Migration Guide" />
 <meta name="keywords" content="hibernate, search, hibernate search, full text, lucene, elasticsearch, opensearch" />
@@ -466,9 +555,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </head>
 <body class="book toc2 toc-left">
 <div id="header">
-<h1>Hibernate Search 8.0.0.Alpha3: Migration Guide from 7.2</h1>
+<h1>Hibernate Search 8.0.0.Final: Migration Guide from 7.2</h1>
 <div class="details">
-<span id="revdate">2025-03-24</span>
+<span id="revdate">2025-06-06</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -480,6 +569,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <ul class="sectlevel2">
 <li><a href="#indexes">Indexes</a></li>
 <li><a href="#outboxpolling">Outbox polling database tables</a></li>
+<li><a href="#vectorsize">Vector search max dimension</a></li>
 </ul>
 </li>
 <li><a href="#configuration">Configuration</a></li>
@@ -545,7 +635,7 @@ and only then to later versions (which will be significantly easier).</p>
 <h2 id="requirements"><a class="anchor" href="#requirements"></a>Requirements</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The requirements of Hibernate Search 8.0.0.Alpha3
+<p>The requirements of Hibernate Search 8.0.0.Final
 are mostly the same as those of Hibernate Search 7.2,
 with the differences being Hibernate ORM and minimum JDK version upgrade:</p>
 </div>
@@ -571,7 +661,7 @@ with the differences being Hibernate ORM and minimum JDK version upgrade:</p>
 <h2 id="artifact-changes"><a class="anchor" href="#artifact-changes"></a>Artifacts</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The coordinates of Maven artifacts in Hibernate Search 8.0.0.Alpha3
+<p>The coordinates of Maven artifacts in Hibernate Search 8.0.0.Final
 are the same as in Hibernate Search 7.2.</p>
 </div>
 </div>
@@ -582,7 +672,7 @@ are the same as in Hibernate Search 7.2.</p>
 <div class="sect2">
 <h3 id="indexes"><a class="anchor" href="#indexes"></a>Indexes</h3>
 <div class="paragraph">
-<p>The index format and schema in Hibernate Search 8.0.0.Alpha3
+<p>The index format and schema in Hibernate Search 8.0.0.Final
 is backward-compatible with Hibernate Search 7.2:
 older indexes can be read from and written to without reindexing.</p>
 </div>
@@ -592,9 +682,17 @@ older indexes can be read from and written to without reindexing.</p>
 <div class="paragraph">
 <p>The event and agent database tables used for
 <a href="https://docs.jboss.org/hibernate/search/8.0/reference/en-US/html_single/#coordination-database-polling">outbox-polling</a>
-in Hibernate Search 8.0.0.Alpha3
+in Hibernate Search 8.0.0.Final
 are backward-compatible with Hibernate Search 7.2:
 no database schema update is necessary for these tables.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="vectorsize"><a class="anchor" href="#vectorsize"></a>Vector search max dimension</h3>
+<div class="paragraph">
+<p>For the Lucene backend, the maximum vector dimension has been increased from 4096 to 16000.
+Increasing the vector size, to leverage a different, higher dimensional model, implies a larger memory requirement on behalf of the JVM
+as well as an increase of the index size.</p>
 </div>
 </div>
 </div>
@@ -603,7 +701,7 @@ no database schema update is necessary for these tables.</p>
 <h2 id="configuration"><a class="anchor" href="#configuration"></a>Configuration</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The configuration properties in Hibernate Search 8.0.0.Alpha3
+<p>The configuration properties in Hibernate Search 8.0.0.Final
 , in general, are backward-compatible with Hibernate Search 7.2.
 But some default values have changed:</p>
 </div>
@@ -624,7 +722,7 @@ But some default values have changed:</p>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The <a href="https://hibernate.org/community/compatibility-policy/#code-categorization">API</a>
-in Hibernate Search 8.0.0.Alpha3
+in Hibernate Search 8.0.0.Final
 is, in general, backward-compatible with Hibernate Search 7.2.
 But there are next changes:</p>
 </div>
@@ -660,6 +758,82 @@ to be in a more consistent format compared with other logging categories.</p>
 See <a href="https://docs.jboss.org/hibernate/search/8.0/reference/en-US/html_single/#logging-categories-aggregated">Appendix B: List of all available logging categories</a>
 to find out what categories are available.</p>
 </li>
+<li>
+<p>The method signature changed from <code>SearchSortFactory#composite(Consumer&lt;? super CompositeSortComponentsStep&lt;SR, ?&gt;&gt; elementContributor)</code> to <code>SearchSortFactory#composite(Consumer&lt;? super CompositeSortOptionsCollector&lt;?&gt;&gt; elementContributor)</code>.
+This change should not affect the end user as collecting of elements still works as it was originally intended to.</p>
+</li>
+<li>
+<p>With introduction of the field references (<code>org.hibernate.search.engine.search.reference.*</code>) most of the Search DSL
+interfaces (<code>org.hibernate.search.engine.search.*.dsl.*</code>) got an extra type argument <code>SR</code> (scope root type).
+In most cases, there will be no code changes required:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="predefined-type">List</span>&lt;<span class="predefined-type">Book</span>&gt; result = searchSession.search( <span class="predefined-type">Book</span>.class )
+    .where( f -&gt; f.match().field( <span class="string"><span class="delimiter">&quot;</span><span class="content">title</span><span class="delimiter">&quot;</span></span> ).matching( <span class="string"><span class="delimiter">&quot;</span><span class="content">robot</span><span class="delimiter">&quot;</span></span> ) )
+    .fetchHits( <span class="integer">20</span> );</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In scenarios where there&#8217;s work with the affected Search DSL interfaces is required user can choose between one of the following options:</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> scope = ...; <i class="conum" data-value="1"></i><b>(1)</b>
+AffectedSearchDslInterface&lt;?, ...&gt; instance = ... <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Use <code>var</code> if possible. Otherwise, if you need to pass the DSL interfaces to some other methods as parameters,
+consider one of the following options:</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Use the <code>?</code> wildcard. Or switch to the typed scopes and:</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Otherwise consider switching to the typed scope:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">TypedSearchScope&lt;<span class="predefined-type">Book</span>, <span class="predefined-type">Book</span>&gt; scope = searchSession.typedScope( <span class="predefined-type">Book</span>.class, <span class="predefined-type">Book</span>.class ); <i class="conum" data-value="1"></i><b>(1)</b>
+TypedSearchScope&lt;ReadingMaterial, ReadingMaterial&gt; scope = searchSession.typedScope( ReadingMaterial.class, <span class="predefined-type">List</span>.of( <span class="predefined-type">Book</span>.class, Magazine.class ) ); <i class="conum" data-value="2"></i><b>(2)</b>
+TypedSearchScope&lt;Book__, <span class="predefined-type">Book</span>&gt; scope = searchSession.typedScope( Book__.class, <span class="predefined-type">Book</span>.class ); <i class="conum" data-value="3"></i><b>(3)</b>
+TypedSearchScope&lt;SomeRandomClass, <span class="predefined-type">Book</span>&gt; scope = searchSession.typedScope( SomeRandomClass.class, <span class="predefined-type">Book</span>.class ); <i class="conum" data-value="4"></i><b>(4)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Use the same type as your search entity.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Use the common supertype for a scope of multiple search entities.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Use the class generated for the static metamodel of this search entity.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Use any class.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>And use that type as the scope root type.</p>
+</div>
+</div>
+</div>
+</li>
 </ul>
 </div>
 </div>
@@ -669,7 +843,7 @@ to find out what categories are available.</p>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The <a href="https://hibernate.org/community/compatibility-policy/#code-categorization">SPI</a>
-in Hibernate Search 8.0.0.Alpha3
+in Hibernate Search 8.0.0.Final
 is, in general, backward-compatible with Hibernate Search 7.2.
 But there are next changes:</p>
 </div>
@@ -687,7 +861,7 @@ to reflect the changes in the <code>org.hibernate.search.mapper.pojo.standalone.
 <h2 id="behavior"><a class="anchor" href="#behavior"></a>Behavior</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The behavior of Hibernate Search 8.0.0.Alpha3
+<p>The behavior of Hibernate Search 8.0.0.Final
 is, in general, backward-compatible with Hibernate Search 7.2.</p>
 </div>
 <div class="ulist">
@@ -707,7 +881,7 @@ This is related to <a href="https://hibernate.atlassian.net/browse/HSEARCH-4708"
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-03-24 21:03:25 UTC
+Last updated 2025-06-06 12:01:43 UTC
 </div>
 </div>
 <!-- HibernateDoc.OutdatedContent -->
@@ -776,5 +950,15 @@ Last updated 2025-03-24 21:03:25 UTC
     handleTocOnResize();
 </script>
 <!-- /Dynamic TOC -->
+<script>/*!
+ * clipboard.js v2.0.11
+ * https://clipboardjs.com/
+ *
+ * Licensed MIT © Zeno Rocha
+ */
+!function(t,e){"object"==typeof exports&&"object"==typeof module?module.exports=e():"function"==typeof define&&define.amd?define([],e):"object"==typeof exports?exports.ClipboardJS=e():t.ClipboardJS=e()}(this,function(){return n={686:function(t,e,n){"use strict";n.d(e,{default:function(){return b}});var e=n(279),i=n.n(e),e=n(370),u=n.n(e),e=n(817),r=n.n(e);function c(t){try{return document.execCommand(t)}catch(t){return}}var a=function(t){t=r()(t);return c("cut"),t};function o(t,e){var n,o,t=(n=t,o="rtl"===document.documentElement.getAttribute("dir"),(t=document.createElement("textarea")).style.fontSize="12pt",t.style.border="0",t.style.padding="0",t.style.margin="0",t.style.position="absolute",t.style[o?"right":"left"]="-9999px",o=window.pageYOffset||document.documentElement.scrollTop,t.style.top="".concat(o,"px"),t.setAttribute("readonly",""),t.value=n,t);return e.container.appendChild(t),e=r()(t),c("copy"),t.remove(),e}var f=function(t){var e=1<arguments.length&&void 0!==arguments[1]?arguments[1]:{container:document.body},n="";return"string"==typeof t?n=o(t,e):t instanceof HTMLInputElement&&!["text","search","url","tel","password"].includes(null==t?void 0:t.type)?n=o(t.value,e):(n=r()(t),c("copy")),n};function l(t){return(l="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(t){return typeof t}:function(t){return t&&"function"==typeof Symbol&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":typeof t})(t)}var s=function(){var t=0<arguments.length&&void 0!==arguments[0]?arguments[0]:{},e=t.action,n=void 0===e?"copy":e,o=t.container,e=t.target,t=t.text;if("copy"!==n&&"cut"!==n)throw new Error('Invalid "action" value, use either "copy" or "cut"');if(void 0!==e){if(!e||"object"!==l(e)||1!==e.nodeType)throw new Error('Invalid "target" value, use a valid Element');if("copy"===n&&e.hasAttribute("disabled"))throw new Error('Invalid "target" attribute. Please use "readonly" instead of "disabled" attribute');if("cut"===n&&(e.hasAttribute("readonly")||e.hasAttribute("disabled")))throw new Error('Invalid "target" attribute. You can\'t cut text from elements with "readonly" or "disabled" attributes')}return t?f(t,{container:o}):e?"cut"===n?a(e):f(e,{container:o}):void 0};function p(t){return(p="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(t){return typeof t}:function(t){return t&&"function"==typeof Symbol&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":typeof t})(t)}function d(t,e){for(var n=0;n<e.length;n++){var o=e[n];o.enumerable=o.enumerable||!1,o.configurable=!0,"value"in o&&(o.writable=!0),Object.defineProperty(t,o.key,o)}}function y(t,e){return(y=Object.setPrototypeOf||function(t,e){return t.__proto__=e,t})(t,e)}function h(n){var o=function(){if("undefined"==typeof Reflect||!Reflect.construct)return!1;if(Reflect.construct.sham)return!1;if("function"==typeof Proxy)return!0;try{return Date.prototype.toString.call(Reflect.construct(Date,[],function(){})),!0}catch(t){return!1}}();return function(){var t,e=v(n);return t=o?(t=v(this).constructor,Reflect.construct(e,arguments,t)):e.apply(this,arguments),e=this,!(t=t)||"object"!==p(t)&&"function"!=typeof t?function(t){if(void 0!==t)return t;throw new ReferenceError("this hasn't been initialised - super() hasn't been called")}(e):t}}function v(t){return(v=Object.setPrototypeOf?Object.getPrototypeOf:function(t){return t.__proto__||Object.getPrototypeOf(t)})(t)}function m(t,e){t="data-clipboard-".concat(t);if(e.hasAttribute(t))return e.getAttribute(t)}var b=function(){!function(t,e){if("function"!=typeof e&&null!==e)throw new TypeError("Super expression must either be null or a function");t.prototype=Object.create(e&&e.prototype,{constructor:{value:t,writable:!0,configurable:!0}}),e&&y(t,e)}(r,i());var t,e,n,o=h(r);function r(t,e){var n;return function(t){if(!(t instanceof r))throw new TypeError("Cannot call a class as a function")}(this),(n=o.call(this)).resolveOptions(e),n.listenClick(t),n}return t=r,n=[{key:"copy",value:function(t){var e=1<arguments.length&&void 0!==arguments[1]?arguments[1]:{container:document.body};return f(t,e)}},{key:"cut",value:function(t){return a(t)}},{key:"isSupported",value:function(){var t=0<arguments.length&&void 0!==arguments[0]?arguments[0]:["copy","cut"],t="string"==typeof t?[t]:t,e=!!document.queryCommandSupported;return t.forEach(function(t){e=e&&!!document.queryCommandSupported(t)}),e}}],(e=[{key:"resolveOptions",value:function(){var t=0<arguments.length&&void 0!==arguments[0]?arguments[0]:{};this.action="function"==typeof t.action?t.action:this.defaultAction,this.target="function"==typeof t.target?t.target:this.defaultTarget,this.text="function"==typeof t.text?t.text:this.defaultText,this.container="object"===p(t.container)?t.container:document.body}},{key:"listenClick",value:function(t){var e=this;this.listener=u()(t,"click",function(t){return e.onClick(t)})}},{key:"onClick",value:function(t){var e=t.delegateTarget||t.currentTarget,n=this.action(e)||"copy",t=s({action:n,container:this.container,target:this.target(e),text:this.text(e)});this.emit(t?"success":"error",{action:n,text:t,trigger:e,clearSelection:function(){e&&e.focus(),window.getSelection().removeAllRanges()}})}},{key:"defaultAction",value:function(t){return m("action",t)}},{key:"defaultTarget",value:function(t){t=m("target",t);if(t)return document.querySelector(t)}},{key:"defaultText",value:function(t){return m("text",t)}},{key:"destroy",value:function(){this.listener.destroy()}}])&&d(t.prototype,e),n&&d(t,n),r}()},828:function(t){var e;"undefined"==typeof Element||Element.prototype.matches||((e=Element.prototype).matches=e.matchesSelector||e.mozMatchesSelector||e.msMatchesSelector||e.oMatchesSelector||e.webkitMatchesSelector),t.exports=function(t,e){for(;t&&9!==t.nodeType;){if("function"==typeof t.matches&&t.matches(e))return t;t=t.parentNode}}},438:function(t,e,n){var u=n(828);function i(t,e,n,o,r){var i=function(e,n,t,o){return function(t){t.delegateTarget=u(t.target,n),t.delegateTarget&&o.call(e,t)}}.apply(this,arguments);return t.addEventListener(n,i,r),{destroy:function(){t.removeEventListener(n,i,r)}}}t.exports=function(t,e,n,o,r){return"function"==typeof t.addEventListener?i.apply(null,arguments):"function"==typeof n?i.bind(null,document).apply(null,arguments):("string"==typeof t&&(t=document.querySelectorAll(t)),Array.prototype.map.call(t,function(t){return i(t,e,n,o,r)}))}},879:function(t,n){n.node=function(t){return void 0!==t&&t instanceof HTMLElement&&1===t.nodeType},n.nodeList=function(t){var e=Object.prototype.toString.call(t);return void 0!==t&&("[object NodeList]"===e||"[object HTMLCollection]"===e)&&"length"in t&&(0===t.length||n.node(t[0]))},n.string=function(t){return"string"==typeof t||t instanceof String},n.fn=function(t){return"[object Function]"===Object.prototype.toString.call(t)}},370:function(t,e,n){var f=n(879),l=n(438);t.exports=function(t,e,n){if(!t&&!e&&!n)throw new Error("Missing required arguments");if(!f.string(e))throw new TypeError("Second argument must be a String");if(!f.fn(n))throw new TypeError("Third argument must be a Function");if(f.node(t))return c=e,a=n,(u=t).addEventListener(c,a),{destroy:function(){u.removeEventListener(c,a)}};if(f.nodeList(t))return o=t,r=e,i=n,Array.prototype.forEach.call(o,function(t){t.addEventListener(r,i)}),{destroy:function(){Array.prototype.forEach.call(o,function(t){t.removeEventListener(r,i)})}};if(f.string(t))return t=t,e=e,n=n,l(document.body,t,e,n);throw new TypeError("First argument must be a String, HTMLElement, HTMLCollection, or NodeList");var o,r,i,u,c,a}},817:function(t){t.exports=function(t){var e,n="SELECT"===t.nodeName?(t.focus(),t.value):"INPUT"===t.nodeName||"TEXTAREA"===t.nodeName?((e=t.hasAttribute("readonly"))||t.setAttribute("readonly",""),t.select(),t.setSelectionRange(0,t.value.length),e||t.removeAttribute("readonly"),t.value):(t.hasAttribute("contenteditable")&&t.focus(),n=window.getSelection(),(e=document.createRange()).selectNodeContents(t),n.removeAllRanges(),n.addRange(e),n.toString());return n}},279:function(t){function e(){}e.prototype={on:function(t,e,n){var o=this.e||(this.e={});return(o[t]||(o[t]=[])).push({fn:e,ctx:n}),this},once:function(t,e,n){var o=this;function r(){o.off(t,r),e.apply(n,arguments)}return r._=e,this.on(t,r,n)},emit:function(t){for(var e=[].slice.call(arguments,1),n=((this.e||(this.e={}))[t]||[]).slice(),o=0,r=n.length;o<r;o++)n[o].fn.apply(n[o].ctx,e);return this},off:function(t,e){var n=this.e||(this.e={}),o=n[t],r=[];if(o&&e)for(var i=0,u=o.length;i<u;i++)o[i].fn!==e&&o[i].fn._!==e&&r.push(o[i]);return r.length?n[t]=r:delete n[t],this}},t.exports=e,t.exports.TinyEmitter=e}},r={},o.n=function(t){var e=t&&t.__esModule?function(){return t.default}:function(){return t};return o.d(e,{a:e}),e},o.d=function(t,e){for(var n in e)o.o(e,n)&&!o.o(t,n)&&Object.defineProperty(t,n,{enumerable:!0,get:e[n]})},o.o=function(t,e){return Object.prototype.hasOwnProperty.call(t,e)},o(686).default;function o(t){if(r[t])return r[t].exports;var e=r[t]={exports:{}};return n[t](e,e.exports,o),e.exports}var n,r});</script>
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.7.2/css/all.css" crossorigin="anonymous">
+<style>pre.highlight .btn-copy{-webkit-transition:opacity 0.3s ease-in-out;-o-transition:opacity 0.3s ease-in-out;transition:opacity 0.3s ease-in-out;opacity:0;padding:2px 6px;position:absolute;right:4px;top:.225rem;background-color:#fff0;border:none}.listingblock:hover .btn-copy,pre.highlight .btn-copy:focus{opacity:.5}pre.highlight{position:relative}.listingblock code[data-lang]::before{display:block;content:attr(data-lang) '|';right:1.5rem;-webkit-transition:opacity 0.3s ease-in-out;-o-transition:opacity 0.3s ease-in-out;transition:opacity 0.3s ease-in-out;opacity:0}.listingblock:hover code[data-lang]::before{opacity:.5}.tooltip-text{display:block;position:absolute;top:1.5rem;right:4px;background:#444;color:#fff;padding:6px 10px;border-radius:4px;white-space:nowrap;z-index:1;opacity:0;font-size:11px} .tooltip-text span { color: #fff; } .listingblock:hover .tooltip-text.show{opacity:1}</style>
+<script>const codes=document.querySelectorAll('pre.highlight > code');let index=0;codes.forEach((code)=>{code.setAttribute("id","code"+index);const block=document.createElement('div');block.className="tooltip";const btn=document.createElement('button');btn.className="btn-copy fa-regular fa-copy";btn.setAttribute("data-clipboard-action","copy");btn.setAttribute("data-clipboard-target","#code"+index);btn.setAttribute("title","Copy to clipboard");btn.setAttribute("float-right","true");code.before(btn);const tooltip=document.createElement('div');tooltip.className="tooltip-text";tooltip.textContent="Copied!";code.before(tooltip);index++});const clipboard=new ClipboardJS('.btn-copy');clipboard.on('success',function(e){e.clearSelection();e.trigger.className=e.trigger.className.replace("fa-copy","fa-check").replace("fa-regular ","fa ");e.trigger.setAttribute("title","Copied!");e.trigger.nextSibling.classList.toggle("show");e.trigger.blur();setTimeout(function(){e.trigger.className=e.trigger.className.replace("fa-check","fa-copy").replace("fa ","fa-regular ");e.trigger.setAttribute("title","Copy to clipboard");e.trigger.nextSibling.classList.toggle("show")},1500)})</script>
 </body>
 </html>

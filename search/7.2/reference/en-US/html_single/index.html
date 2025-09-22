@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.23">
-<title>Hibernate Search 7.2.3.Final: Reference Documentation</title>
+<title>Hibernate Search 7.2.4.Final: Reference Documentation</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -555,9 +555,9 @@ table.CodeRay td.code{padding:0 0 0 .75em}
 </head>
 <body class="book toc2 toc-left">
 <div id="header">
-<h1>Hibernate Search 7.2.3.Final: Reference Documentation</h1>
+<h1>Hibernate Search 7.2.4.Final: Reference Documentation</h1>
 <div class="details">
-<span id="revdate">2025-03-18</span>
+<span id="revdate">2025-05-30</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -1874,7 +1874,7 @@ from free text queries.</p>
 </tr>
 <tr>
 <th class="tableblock halign-left valign-top"><p class="tableblock">Hibernate ORM (for the <a href="#mapper-orm">Hibernate ORM mapper</a></p></th>
-<td class="tableblock halign-center valign-top"><p class="tableblock">6.6.11.Final</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">6.6.16.Final</p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
@@ -1940,7 +1940,7 @@ as part of your dependency management to keep all its artifact versions aligned:
         <span class="tag">&lt;dependency&gt;</span>
             <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
             <span class="tag">&lt;artifactId&gt;</span>hibernate-search-bom<span class="tag">&lt;/artifactId&gt;</span>
-            <span class="tag">&lt;version&gt;</span>7.2.3.Final<span class="tag">&lt;/version&gt;</span>
+            <span class="tag">&lt;version&gt;</span>7.2.4.Final<span class="tag">&lt;/version&gt;</span>
             <span class="tag">&lt;type&gt;</span>pom<span class="tag">&lt;/type&gt;</span>
             <span class="tag">&lt;scope&gt;</span>import<span class="tag">&lt;/scope&gt;</span>
         <span class="tag">&lt;/dependency&gt;</span>
@@ -2074,7 +2074,7 @@ then simply adding version properties to your POM&#8217;s <code>&lt;properties&g
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="XML"><span class="tag">&lt;properties&gt;</span>
-    <span class="tag">&lt;hibernate.version&gt;</span>6.6.11.Final<span class="tag">&lt;/hibernate.version&gt;</span>
+    <span class="tag">&lt;hibernate.version&gt;</span>6.6.16.Final<span class="tag">&lt;/hibernate.version&gt;</span>
     <span class="tag">&lt;elasticsearch-client.version&gt;</span>8.15.4<span class="tag">&lt;/elasticsearch-client.version&gt;</span>
     <span class="comment">&lt;!-- ... plus any other properties of yours ... --&gt;</span>
 <span class="tag">&lt;/properties&gt;</span></code></pre>
@@ -2180,7 +2180,7 @@ mvn dependency:tree &quot;-Dincludes=org.hibernate.*,org.elasticsearch.*&quot;</
 you still have problems (e.g. <code>NoClassDefFoundError</code>) with some of Hibernate Search&#8217;s dependencies,
 look for the version of that dependency in
 <a href="https://search.maven.org/artifact/org.springframework.boot/spring-boot-dependencies/3.3.0/pom">Spring Boot&#8217;s POM</a>
-and <a href="https://search.maven.org/artifact/org.hibernate.search/hibernate-search-parent/7.2.3.Final/pom">Hibernate Search&#8217;s POM</a>:
+and <a href="https://search.maven.org/artifact/org.hibernate.search/hibernate-search-parent/7.2.4.Final/pom">Hibernate Search&#8217;s POM</a>:
 there will probably be a mismatch,
 and generally overriding Spring Boot&#8217;s version to match Hibernate Search&#8217;s version will work fine.</p>
 </div>
@@ -3158,12 +3158,12 @@ and all indexes need to live on the same server.</p>
 <pre class="CodeRay highlight"><code data-lang="XML"><span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-mapper-orm<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>7.2.3.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>7.2.4.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span>
 <span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-backend-lucene<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>7.2.3.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>7.2.4.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -3177,12 +3177,12 @@ and all indexes need to live on the same server.</p>
 <pre class="CodeRay highlight"><code data-lang="XML"><span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-mapper-pojo-standalone<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>7.2.3.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>7.2.4.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span>
 <span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-backend-lucene<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>7.2.3.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>7.2.4.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -3236,7 +3236,7 @@ or <a href="#search-dsl-query-elasticsearch-json">leveraging advanced features w
 </li>
 <li>
 <p>Horizontal scalability of the indexes: you can size the Elasticsearch cluster according to your needs.
-See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/scalability.html">"Scalability and resilience" in the Elasticsearch documentation</a>.</p>
+See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.18/scalability.html">"Scalability and resilience" in the Elasticsearch documentation</a>.</p>
 </li>
 <li>
 <p>Horizontal scalability of the application: you can have as many instances of the application as you need
@@ -3267,7 +3267,7 @@ this may increase the application&#8217;s latency and/or decrease its throughput
 <li>
 <p><a href="#backend-elasticsearch-io-refresh">Delayed visibility</a> (~1 second) of index updates (near-real-time).
 While changes can be made visible as soon as possible after the database changes,
-Elasticsearch is <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/getting-started-concepts.html#_near_realtime_nrt">near-real-time</a> by nature,
+Elasticsearch is <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.18/getting-started-concepts.html#_near_realtime_nrt">near-real-time</a> by nature,
 and won&#8217;t perform very well if you need changes to be visible immediately after the database changes.</p>
 </li>
 </ul>
@@ -3288,12 +3288,12 @@ and won&#8217;t perform very well if you need changes to be visible immediately 
 <pre class="CodeRay highlight"><code data-lang="XML"><span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-mapper-orm<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>7.2.3.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>7.2.4.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span>
 <span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-backend-elasticsearch<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>7.2.3.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>7.2.4.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -3307,12 +3307,12 @@ and won&#8217;t perform very well if you need changes to be visible immediately 
 <pre class="CodeRay highlight"><code data-lang="XML"><span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-mapper-pojo-standalone<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>7.2.3.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>7.2.4.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span>
 <span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-backend-elasticsearch<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>7.2.3.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>7.2.4.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -3408,7 +3408,7 @@ they don&#8217;t perform reindexing themselves.</p>
 </li>
 <li>
 <p>Horizontal scalability of the indexes: you can size the Elasticsearch cluster according to your needs.
-See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/scalability.html">"Scalability and resilience" in the Elasticsearch documentation</a>.</p>
+See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.18/scalability.html">"Scalability and resilience" in the Elasticsearch documentation</a>.</p>
 </li>
 <li>
 <p>Horizontal scalability of the application: you can have as many instances of the application as you need.</p>
@@ -3425,7 +3425,7 @@ See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/scalab
 </li>
 <li>
 <p>Delayed visibility (~1 second or more, depending on load and hardware) of index updates.
-First because Elasticsearch is <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/getting-started-concepts.html#_near_realtime_nrt">near-real-time</a> by nature,
+First because Elasticsearch is <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.18/getting-started-concepts.html#_near_realtime_nrt">near-real-time</a> by nature,
 but also because <a href="#coordination-outbox-polling-indexing-visibility">the event queue introduces additional delays</a>.</p>
 </li>
 <li>
@@ -3455,17 +3455,17 @@ To implement this architecture, use the following Maven dependencies:</p>
 <pre class="CodeRay highlight"><code data-lang="XML"><span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-mapper-orm<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>7.2.3.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>7.2.4.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span>
 <span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-mapper-orm-outbox-polling<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>7.2.3.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>7.2.4.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span>
 <span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-backend-elasticsearch<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>7.2.3.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>7.2.4.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -8015,7 +8015,7 @@ the model used to convert the data into vector representation.
 It is expected to be a positive integer value. Maximum accepted value is backend-specific.
 For the <a href="#backend-lucene">Lucene backend</a> the dimension must be in <code>[1, 4096]</code> range.
 As for the <a href="#backend-elasticsearch">Elasticsearch backend</a> the range depends on the distribution.
-See the <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/dense-vector.html#dense-vector-params">Elasticsearch</a>/<a href="https://opensearch.org/docs/2.16/search-plugins/knn/approximate-knn/#get-started-with-approximate-k-nn">OpenSearch</a>
+See the <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.18/dense-vector.html#dense-vector-params">Elasticsearch</a>/<a href="https://opensearch.org/docs/2.16/search-plugins/knn/approximate-knn/#get-started-with-approximate-k-nn">OpenSearch</a>
 specific documentation to learn about the vector types of these distributions.</p>
 </div>
 <div class="paragraph">
@@ -22683,7 +22683,7 @@ As for other implementations, they can also be used, but will require
 <pre class="CodeRay highlight"><code data-lang="XML"><span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-mapper-orm-jakarta-batch-jberet<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>7.2.3.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>7.2.4.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -22695,7 +22695,7 @@ As for other implementations, they can also be used, but will require
 <pre class="CodeRay highlight"><code data-lang="XML"><span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-mapper-orm-jakarta-batch-core<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>7.2.3.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>7.2.4.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -25892,7 +25892,7 @@ but using the Elasticsearch extension so that Elasticsearch-specific options are
 <td><i class="conum" data-value="3"></i><b>3</b></td>
 <td>Add content to the request body,
 so that Elasticsearch will return more data in the response.
-Here we&#8217;re asking Elasticsearch to apply a <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/search-suggesters.html">suggester</a>.</td>
+Here we&#8217;re asking Elasticsearch to apply a <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.18/search-suggesters.html">suggester</a>.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
@@ -27314,7 +27314,7 @@ Functionally, this is somewhat similar to a <a href="#search-dsl-predicate-boole
 <p>For the Lucene backend, run this code when starting up your application: <code>org.apache.lucene.search.BooleanQuery.maxClauseCount = &lt;your limit&gt;;</code></p>
 </li>
 <li>
-<p>For the Elasticsearch backend, see <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/search-settings.html">the global setting <code>indices.query.bool.max_clause_count</code> in the Elasticsearch documentation</a>.</p>
+<p>For the Elasticsearch backend, see <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.18/search-settings.html">the global setting <code>indices.query.bool.max_clause_count</code> in the Elasticsearch documentation</a>.</p>
 </li>
 </ul>
 </div>
@@ -29082,7 +29082,7 @@ and will not be sent in the request to the OpenSearch cluster.
 matched by a <a href="#search-dsl-predicate-knn"><code>knn</code> predicate</a>.
 When using the <a href="#backend-elasticsearch-compatibility-elasticsearch">Elastic</a> distribution of the <a href="#backend-elasticsearch">Elasticsearch backend</a>
 <code>k</code> will be treated as both <code>k</code> and <code>num_candidates</code>.
-See the Elasticsearch <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/knn-search.html#tune-approximate-knn-for-speed-accuracy">documentation</a> for more details.
+See the Elasticsearch <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.18/knn-search.html#tune-approximate-knn-for-speed-accuracy">documentation</a> for more details.
 While when an <a href="#backend-elasticsearch-compatibility-opensearch">OpenSearch</a> distribution is used,
 <code>k</code> will be mapped to <code>k</code> attribute of <code>knn</code> query. Note that in this case you may get more than <code>k</code> results,
 when the index is configured to have more than one shard.
@@ -29120,7 +29120,7 @@ It allows building more advanced query strings and has more configuration option
 <div class="paragraph">
 <p>We will not go much into details of a query syntax in this guide
 To familiarize yourself with it, please refer to your backend
-(<a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/query-dsl-query-string-query.html#query-string-syntax">Elasticsearch</a>/<a href="https://opensearch.org/docs/2.16/query-dsl/full-text/query-string/">OpenSearch</a>/<a href="https://lucene.apache.org/core/9_11_1/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#package.description/">Lucene</a>)
+(<a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.18/query-dsl-query-string-query.html#query-string-syntax">Elasticsearch</a>/<a href="https://opensearch.org/docs/2.16/query-dsl/full-text/query-string/">OpenSearch</a>/<a href="https://lucene.apache.org/core/9_11_1/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#package.description/">Lucene</a>)
 guides.</p>
 </div>
 <div class="exampleblock">
@@ -29338,7 +29338,7 @@ To achieve a constant score for results, see <a href="#search-dsl-predicate-quer
 <div class="paragraph">
 <p>We will not go into details about different rewrite methods in this guide.
 To learn more about them, please refer to your backend&#8217;s guide
-(<a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/query-dsl-multi-term-rewrite.html">Elasticsearch</a>/<a href="https://opensearch.org/docs/2.16/query-dsl/full-text/query-string/">OpenSearch</a>/<a href="https://lucene.apache.org/core/9_11_1/core/org/apache/lucene/search/MultiTermQuery.html">Lucene</a>).</p>
+(<a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.18/query-dsl-multi-term-rewrite.html">Elasticsearch</a>/<a href="https://opensearch.org/docs/2.16/query-dsl/full-text/query-string/">OpenSearch</a>/<a href="https://lucene.apache.org/core/9_11_1/core/org/apache/lucene/search/MultiTermQuery.html">Lucene</a>).</p>
 </div>
 <div class="exampleblock">
 <div class="title">Example 263. Matching a query string: rewrite method</div>
@@ -36913,7 +36913,7 @@ See <a href="https://hibernate.atlassian.net/browse/HSEARCH-3666">HSEARCH-3666</
 <td class="content">
 <div class="paragraph">
 <p>When ordering entries by ascending count in a <code>terms</code> aggregation,
-<a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/search-aggregations-bucket-terms-aggregation.html#search-aggregations-bucket-terms-aggregation-order">hit counts are approximate</a>.</p>
+<a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.18/search-aggregations-bucket-terms-aggregation.html#search-aggregations-bucket-terms-aggregation-order">hit counts are approximate</a>.</p>
 </div>
 </td>
 </tr>
@@ -38696,7 +38696,7 @@ RestClient client = elasticsearchBackend.client( RestClient.class ); <i class="c
 <div class="paragraph">
 <p>The client itself is not part of the Hibernate Search API,
 but of the
-<a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/index-modules.html#_static_index_settings">official Elasticsearch REST client API</a>.</p>
+<a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.18/index-modules.html#_static_index_settings">official Elasticsearch REST client API</a>.</p>
 </div>
 <div class="paragraph">
 <p>Hibernate Search may one day switch to another client with a different Java type,
@@ -40878,7 +40878,7 @@ The following sections detail those differences.</p>
 <div class="paragraph">
 <p>Hibernate Search&#8217;s Elasticsearch backend is compatible with
 <a href="https://www.elastic.co/elasticsearch">Elasticsearch</a> clusters running version 7.10+ or 8.x
-and regularly tested against versions 7.10, 7.17 or 8.15.</p>
+and regularly tested against versions 7.10, 7.17 or 8.18.</p>
 </div>
 <div class="paragraph">
 <p>Using Elasticsearch currently doesn&#8217;t require specific configuration
@@ -41241,7 +41241,7 @@ you can enable it with an additional dependency and a bit of configuration.</p>
 <pre class="CodeRay highlight"><code data-lang="XML"><span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-backend-elasticsearch-aws<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>7.2.3.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>7.2.4.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -41618,7 +41618,7 @@ see <a href="#concepts-sharding-routing">Sharding and routing</a>.</p>
 <div class="paragraph">
 <p>Elasticsearch disables sharding by default.
 To enable it,
-<a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/index-modules.html#_static_index_settings">set the property <code>index.number_of_shards</code> in your cluster</a>.</p>
+<a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.18/index-modules.html#_static_index_settings">set the property <code>index.number_of_shards</code> in your cluster</a>.</p>
 </div>
 </div>
 <div class="sect2">
@@ -41663,7 +41663,7 @@ The default for this property is <code>10000</code>.</p>
 <div class="sect2">
 <h3 id="backend-elasticsearch-indexlayout"><a class="anchor" href="#backend-elasticsearch-indexlayout"></a>18.9. Index layout</h3>
 <div class="paragraph">
-<p>Hibernate Search works with <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/indices-aliases.html">aliased</a> indexes.
+<p>Hibernate Search works with <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.18/indices-aliases.html">aliased</a> indexes.
 This means an index with a given name in Hibernate Search will not directly be mapped
 to an index with the same name in Elasticsearch.</p>
 </div>
@@ -41934,7 +41934,7 @@ ElasticsearchIndexDescriptor descriptor = esIndexManager.descriptor();<i class="
 <div class="sect2">
 <h3 id="backend-elasticsearch-schema"><a class="anchor" href="#backend-elasticsearch-schema"></a>18.10. Schema ("mapping")</h3>
 <div class="paragraph">
-<p>What Elasticsearch calls the <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/mapping.html">"mapping"</a>
+<p>What Elasticsearch calls the <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.18/mapping.html">"mapping"</a>
 is the schema assigned to each index,
 specifying the data type and capabilities of each "property" (called an "index field" in Hibernate Search).</p>
 </div>
@@ -42021,7 +42021,7 @@ See <a href="#backend-elasticsearch-field-types-extension">Index field type DSL 
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">Field type</th>
-<th class="tableblock halign-left valign-top"><a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/mapping-types.html">Data type</a> in Elasticsearch</th>
+<th class="tableblock halign-left valign-top"><a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.18/mapping-types.html">Data type</a> in Elasticsearch</th>
 <th class="tableblock halign-left valign-top">Limitations</th>
 </tr>
 </thead>
@@ -42352,7 +42352,7 @@ and extracted from the response.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>Works correctly when targeting <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/indices-add-alias.html">index aliases</a>.</p>
+<p>Works correctly when targeting <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.18/indices-add-alias.html">index aliases</a>.</p>
 </li>
 </ul>
 </div>
@@ -42406,7 +42406,7 @@ a custom <a href="#backend-elasticsearch-indexlayout">index layout</a> must be c
 <div class="sect3">
 <h4 id="backend-elasticsearch-mapping-dynamic"><a class="anchor" href="#backend-elasticsearch-mapping-dynamic"></a>18.10.3. Dynamic mapping</h4>
 <div class="paragraph">
-<p>By default, Hibernate Search sets the <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/dynamic.html"><code>dynamic</code></a> property in Elasticsearch index mappings to <code>strict</code>.
+<p>By default, Hibernate Search sets the <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.18/dynamic.html"><code>dynamic</code></a> property in Elasticsearch index mappings to <code>strict</code>.
 This means that attempting to index documents with fields that are not present in the mapping will lead to an indexing failure.</p>
 </div>
 <div class="paragraph">
@@ -42511,7 +42511,7 @@ The ID field is used to retrieve the original document IDs.</p>
 <p>Hibernate Search can <a href="#schema-management">create and validate indexes</a>,
 but by default created indexes will only include the bare minimum required to index and search:
 the mapping, and the analysis settings.
-Should you need to customize some <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/mapping-params.html">mapping parameters</a>,
+Should you need to customize some <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.18/mapping-params.html">mapping parameters</a>,
 it is possible to provide a custom mapping to Hibernate Search:
 it will include the custom mapping when creating an index.</p>
 </div>
@@ -42669,7 +42669,7 @@ has a <code>String name</code> property annotated with <code>@FullTextField</cod
 <div class="sect4">
 <h5 id="backend-elasticsearch-mapping-custom-disabling-source"><a class="anchor" href="#backend-elasticsearch-mapping-custom-disabling-source"></a><a id="_disable_source"></a> Disabling <code>_source</code></h5>
 <div class="paragraph">
-<p>Using this feature it is possible to <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/mapping-source-field.html">disable the <code>_source</code> field</a>.
+<p>Using this feature it is possible to <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.18/mapping-source-field.html">disable the <code>_source</code> field</a>.
 For instance, you could pass a <code>custom/index-mapping.json</code> file like the following:</p>
 </div>
 <div class="exampleblock">
@@ -42811,7 +42811,7 @@ If necessary, they can be overridden by defining your own analyzer with the same
 <div class="paragraph">
 <p>The Elasticsearch backend comes with several built-in analyzers.
 The exact list depends on the version of Elasticsearch and can be found
-<a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/analysis-analyzers.html">here</a>.</p>
+<a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.18/analysis-analyzers.html">here</a>.</p>
 </div>
 <div class="paragraph">
 <p>Regardless of the Elasticsearch version,
@@ -42997,13 +42997,13 @@ refer to the documentation:</p>
 <ul>
 <li>
 <p>If you want to use a built-in analyzer and not create your own:
-<a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/analysis-analyzers.html">analyzers</a>;</p>
+<a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.18/analysis-analyzers.html">analyzers</a>;</p>
 </li>
 <li>
 <p>If you want to define your own analyzer:
-<a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/analysis-charfilters.html">character filters</a>,
-<a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/analysis-tokenizers.html">tokenizers</a>,
-<a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/analysis-tokenfilters.html">token filters</a>.</p>
+<a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.18/analysis-charfilters.html">character filters</a>,
+<a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.18/analysis-tokenizers.html">tokenizers</a>,
+<a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.18/analysis-tokenfilters.html">token filters</a>.</p>
 </li>
 </ul>
 </div>
@@ -43090,7 +43090,7 @@ hibernate.search.backend.analysis.configurer = class:org.hibernate.search.docume
 <h3 id="backend-elasticsearch-configuration-index-settings"><a class="anchor" href="#backend-elasticsearch-configuration-index-settings"></a>18.12. <a id="_custom_index_settings"></a> Custom index settings</h3>
 <div class="paragraph">
 <p>Hibernate Search can <a href="#schema-management">create and validate indexes</a>, but by default created indexes will only include the bare minimum required to index and search: the mapping, and the analysis settings.
-Should you need to set some <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/index-modules.html#index-modules-settings">custom index settings</a>, it is possible to provide these settings to Hibernate Search: it will include them when creating an index and take them into account when validating an index.</p>
+Should you need to set some <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.18/index-modules.html#index-modules-settings">custom index settings</a>, it is possible to provide these settings to Hibernate Search: it will include them when creating an index and take them into account when validating an index.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -43224,7 +43224,7 @@ when they are about the same documents.</p>
 </div>
 <div class="paragraph">
 <p>For these reasons, Hibernate Search pushes these requests to ordered queues
-and relies on the <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/docs-bulk.html">Bulk API</a> to send them in batches.
+and relies on the <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.18/docs-bulk.html">Bulk API</a> to send them in batches.
 Each index maintains 10 queues holding at most 1000 elements each,
 and each queue will send bulk requests of at most 100 indexing requests.
 Queues operate independently (in parallel), but each queue sends one bulk request after the other,
@@ -43331,7 +43331,7 @@ when the application is under very high load.</p>
 <td class="content">
 <div class="paragraph">
 <p>Elasticsearch nodes can only handle so many parallel requests,
-and in particular they <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/circuit-breaker.html">limit the amount of memory</a>
+and in particular they <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.18/circuit-breaker.html">limit the amount of memory</a>
 available to store all pending requests at any given time.</p>
 </div>
 <div class="paragraph">
@@ -43365,7 +43365,7 @@ see <a href="#concepts-commit-refresh">Commit and refresh</a>.</p>
 <div class="sect3">
 <h4 id="backend-elasticsearch-io-commit"><a class="anchor" href="#backend-elasticsearch-io-commit"></a>18.15.1. Commit</h4>
 <div class="paragraph">
-<p>When writing to indexes, Elasticsearch relies on a <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/index-modules-translog.html">transaction log</a>
+<p>When writing to indexes, Elasticsearch relies on a <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.18/index-modules-translog.html">transaction log</a>
 to make sure that changes, even uncommitted, are always safe as soon as the REST API call returns.</p>
 </div>
 <div class="paragraph">
@@ -43379,12 +43379,12 @@ and commit requirements are largely irrelevant.</p>
 <p>When reading from indexes, Elasticsearch relies on a periodically refreshed index reader,
 meaning that search queries will return slightly out-of-date results,
 unless a refresh was forced:
-this is called <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/getting-started-concepts.html#_near_realtime_nrt">near-real-time</a> behavior.</p>
+this is called <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.18/getting-started-concepts.html#_near_realtime_nrt">near-real-time</a> behavior.</p>
 </div>
 <div class="paragraph">
 <p>By default, the index reader is refreshed every second,
 but this can be customized on the Elasticsearch side through index settings:
-see the <code>refresh_interval</code> setting on <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15/index-modules.html">this page</a>.</p>
+see the <code>refresh_interval</code> setting on <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.18/index-modules.html">this page</a>.</p>
 </div>
 </div>
 </div>
@@ -43799,7 +43799,7 @@ you will need extra configuration.</p>
 <pre class="CodeRay highlight"><code data-lang="XML"><span class="tag">&lt;dependency&gt;</span>
    <span class="tag">&lt;groupId&gt;</span>org.hibernate.search<span class="tag">&lt;/groupId&gt;</span>
    <span class="tag">&lt;artifactId&gt;</span>hibernate-search-mapper-orm-outbox-polling<span class="tag">&lt;/artifactId&gt;</span>
-   <span class="tag">&lt;version&gt;</span>7.2.3.Final<span class="tag">&lt;/version&gt;</span>
+   <span class="tag">&lt;version&gt;</span>7.2.4.Final<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -45374,7 +45374,7 @@ most of which include tutorials and/or simple applications.</p>
 <div class="sect2">
 <h3 id="further-reading-elasticsearch"><a class="anchor" href="#further-reading-elasticsearch"></a>23.2. Elasticsearch</h3>
 <div class="paragraph">
-<p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.15">Elasticsearch&#8217;s reference documentation</a> is an excellent starting point
+<p><a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.18">Elasticsearch&#8217;s reference documentation</a> is an excellent starting point
 to learn more about Elasticsearch.</p>
 </div>
 </div>
@@ -48207,7 +48207,7 @@ available in particular in our <a href="https://github.com/hibernate/hibernate-s
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-03-18 17:58:54 UTC
+Last updated 2025-05-30 17:03:11 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">

@@ -161,9 +161,9 @@ extends <a href="SharedSessionContract.html" title="interface in org.hibernate">
  behavior is appropriate for programs which use optimistic locking.
  <ul>
  <li>A different lock level may be obtained by explicitly specifying the mode using
-     <a href="#get(java.lang.Class,java.lang.Object,org.hibernate.LockMode)"><code>get(Class, Object, LockMode)</code></a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#find(java.lang.Class,java.lang.Object,jakarta.persistence.LockModeType)" title="class or interface in jakarta.persistence" class="external-link"><code>EntityManager.find(Class, Object, LockModeType)</code></a>,
-     <a href="#refresh(java.lang.Object,org.hibernate.LockMode)"><code>refresh(Object, LockMode)</code></a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#refresh(java.lang.Object,jakarta.persistence.LockModeType)" title="class or interface in jakarta.persistence" class="external-link"><code>EntityManager.refresh(Object, LockModeType)</code></a>, or
-     <a href="query/SelectionQuery.html#setLockMode(jakarta.persistence.LockModeType)"><code>SelectionQuery.setLockMode(LockModeType)</code></a>.
+     <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#find(java.lang.Class,java.lang.Object,jakarta.persistence.LockModeType)" title="class or interface in jakarta.persistence" class="external-link"><code>EntityManager.find(Class,Object,LockModeType)</code></a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#find(java.lang.Class,java.lang.Object,jakarta.persistence.FindOption...)" title="class or interface in jakarta.persistence" class="external-link"><code>EntityManager.find(Class,Object,FindOption...)</code></a>,
+     <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#refresh(java.lang.Object,jakarta.persistence.LockModeType)" title="class or interface in jakarta.persistence" class="external-link"><code>EntityManager.refresh(Object,LockModeType)</code></a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#refresh(java.lang.Object,jakarta.persistence.RefreshOption...)" title="class or interface in jakarta.persistence" class="external-link"><code>EntityManager.refresh(Object,RefreshOption...)</code></a>,
+     or <a href="query/SelectionQuery.html#setLockMode(jakarta.persistence.LockModeType)"><code>SelectionQuery.setLockMode(LockModeType)</code></a>.
  <li>The lock level of a managed instance already held by the session may be upgraded
      to a more restrictive lock level by calling <a href="#lock(java.lang.Object,org.hibernate.LockMode)"><code>lock(Object, LockMode)</code></a> or
      <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#lock(java.lang.Object,jakarta.persistence.LockModeType)" title="class or interface in jakarta.persistence" class="external-link"><code>EntityManager.lock(Object, LockModeType)</code></a>.
@@ -257,7 +257,7 @@ extends <a href="SharedSessionContract.html" title="interface in org.hibernate">
 <section class="method-summary" id="method-summary">
 <h2>Method Summary</h2>
 <div id="method-summary-table">
-<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab3" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab3', 3)" class="table-tab">Abstract Methods</button><button id="method-summary-table-tab6" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab6', 3)" class="table-tab">Deprecated Methods</button></div>
+<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab3" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab3', 3)" class="table-tab">Abstract Methods</button><button id="method-summary-table-tab5" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab5', 3)" class="table-tab">Default Methods</button><button id="method-summary-table-tab6" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab6', 3)" class="table-tab">Deprecated Methods</button></div>
 <div id="method-summary-table.tabpanel" role="tabpanel" aria-labelledby="method-summary-table-tab0">
 <div class="summary-table three-column-summary">
 <div class="table-header col-first">Modifier and Type</div>
@@ -340,7 +340,7 @@ extends <a href="SharedSessionContract.html" title="interface in org.hibernate">
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#clear()" class="member-name-link">clear</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Completely clear the session.</div>
+<div class="block">Completely clear the persistence context.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>boolean</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#contains(java.lang.String,java.lang.Object)" class="member-name-link">contains</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;entityName,
@@ -439,22 +439,6 @@ extends <a href="SharedSessionContract.html" title="interface in org.hibernate">
 <div class="block">Return the persistent instance of the given entity class with the given identifier,
  or null if there is no such persistent instance.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;T&gt;&nbsp;T</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#find(java.lang.Class,java.lang.Object,org.hibernate.LockMode)" class="member-name-link">find</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;entityType,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;id,
- <a href="LockMode.html" title="enum class in org.hibernate">LockMode</a>&nbsp;lockMode)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Return the persistent instance of the given entity class with the given identifier,
- or null if there is no such persistent instance.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;T&gt;&nbsp;T</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#find(java.lang.Class,java.lang.Object,org.hibernate.LockOptions)" class="member-name-link">find</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;entityType,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;id,
- <a href="LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Return the persistent instance of the given entity class with the given identifier,
- or null if there is no such persistent instance.</div>
-</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;E&gt;&nbsp;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;E&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#findMultiple(jakarta.persistence.EntityGraph,java.util.List,jakarta.persistence.FindOption...)" class="member-name-link">findMultiple</a><wbr>(<a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityGraph.html" title="class or interface in jakarta.persistence" class="external-link">EntityGraph</a>&lt;E&gt;&nbsp;entityGraph,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;?&gt;&nbsp;ids,
@@ -481,7 +465,7 @@ extends <a href="SharedSessionContract.html" title="interface in org.hibernate">
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="#get(java.lang.Class,java.lang.Object)" class="member-name-link">get</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;entityType,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;id)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6">
-<div class="block"><span class="deprecated-label">Deprecated.</span>
+<div class="block"><span class="deprecated-label">Deprecated, for removal: This API element is subject to removal in a future version.</span>
 <div class="deprecation-comment">Because the semantics of this method may change in a future release.</div>
 </div>
 </div>
@@ -490,8 +474,8 @@ extends <a href="SharedSessionContract.html" title="interface in org.hibernate">
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;id,
  <a href="LockMode.html" title="enum class in org.hibernate">LockMode</a>&nbsp;lockMode)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6">
-<div class="block"><span class="deprecated-label">Deprecated.</span>
-<div class="deprecation-comment">The semantics of this method may change in a future release.</div>
+<div class="block"><span class="deprecated-label">Deprecated, for removal: This API element is subject to removal in a future version.</span>
+<div class="deprecation-comment">Use <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#find(java.lang.Class,java.lang.Object,jakarta.persistence.FindOption...)" title="class or interface in jakarta.persistence" class="external-link"><code>EntityManager.find(Class, Object, FindOption...)</code></a> instead.</div>
 </div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code>&lt;T&gt;&nbsp;T</code></div>
@@ -499,15 +483,15 @@ extends <a href="SharedSessionContract.html" title="interface in org.hibernate">
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;id,
  <a href="LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6">
-<div class="block"><span class="deprecated-label">Deprecated.</span>
-<div class="deprecation-comment">The semantics of this method may change in a future release.</div>
+<div class="block"><span class="deprecated-label">Deprecated, for removal: This API element is subject to removal in a future version.</span>
+<div class="deprecation-comment">This method will be removed.</div>
 </div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="#get(java.lang.String,java.lang.Object)" class="member-name-link">get</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;entityName,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;id)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6">
-<div class="block"><span class="deprecated-label">Deprecated.</span>
+<div class="block"><span class="deprecated-label">Deprecated, for removal: This API element is subject to removal in a future version.</span>
 <div class="deprecation-comment">The semantics of this method may change in a future release.</div>
 </div>
 </div>
@@ -516,7 +500,7 @@ extends <a href="SharedSessionContract.html" title="interface in org.hibernate">
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;id,
  <a href="LockMode.html" title="enum class in org.hibernate">LockMode</a>&nbsp;lockMode)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6">
-<div class="block"><span class="deprecated-label">Deprecated.</span>
+<div class="block"><span class="deprecated-label">Deprecated, for removal: This API element is subject to removal in a future version.</span>
 <div class="deprecation-comment">The semantics of this method may change in a future release.</div>
 </div>
 </div>
@@ -525,8 +509,8 @@ extends <a href="SharedSessionContract.html" title="interface in org.hibernate">
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;id,
  <a href="LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6">
-<div class="block"><span class="deprecated-label">Deprecated.</span>
-<div class="deprecation-comment">The semantics of this method may change in a future release.</div>
+<div class="block"><span class="deprecated-label">Deprecated, for removal: This API element is subject to removal in a future version.</span>
+<div class="deprecation-comment">This method will be removed.</div>
 </div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="CacheMode.html" title="enum class in org.hibernate">CacheMode</a></code></div>
@@ -547,8 +531,8 @@ extends <a href="SharedSessionContract.html" title="interface in org.hibernate">
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="LockMode.html" title="enum class in org.hibernate">LockMode</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getCurrentLockMode(java.lang.Object)" class="member-name-link">getCurrentLockMode</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;object)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Determine the current <a href="LockMode.html" title="enum class in org.hibernate"><code>LockMode</code></a> of the given managed instance associated
- with this session.</div>
+<div class="block">Determine the current <a href="LockMode.html" title="enum class in org.hibernate">lock mode</a> held on the given
+ managed instance associated with this session.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="graph/RootGraph.html" title="interface in org.hibernate.graph">RootGraph</a>&lt;?&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getEntityGraph(java.lang.String)" class="member-name-link">getEntityGraph</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;graphName)</code></div>
@@ -695,64 +679,67 @@ extends <a href="SharedSessionContract.html" title="interface in org.hibernate">
  with this session.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#lock(java.lang.Object,org.hibernate.LockOptions)" class="member-name-link">lock</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;object,
- <a href="LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#lock(java.lang.Object,org.hibernate.LockMode,jakarta.persistence.LockOption...)" class="member-name-link">lock</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;object,
+ <a href="LockMode.html" title="enum class in org.hibernate">LockMode</a>&nbsp;lockMode,
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/LockOption.html" title="class or interface in jakarta.persistence" class="external-link">LockOption</a>...&nbsp;lockOptions)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Obtain a lock on the given managed instance associated with this session,
- using the given <a href="LockOptions.html" title="class in org.hibernate">lock options</a>.</div>
+<div class="block">Obtain the specified lock level on the given managed instance associated
+ with this session, applying any other specified options.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="#lock(java.lang.Object,org.hibernate.LockOptions)" class="member-name-link">lock</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;object,
+ <a href="LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6">
+<div class="block"><span class="deprecated-label">Deprecated, for removal: This API element is subject to removal in a future version.</span>
+<div class="deprecation-comment">This method will be removed.</div>
+</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;T&gt;&nbsp;T</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#merge(java.lang.String,T)" class="member-name-link">merge</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;entityName,
+ T&nbsp;object)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Copy the state of the given object onto the persistent object with the same
+ identifier.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;T&gt;&nbsp;T</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#merge(java.lang.String,T)" class="member-name-link">merge</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;entityName,
- T&nbsp;object)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#merge(T)" class="member-name-link">merge</a><wbr>(T&nbsp;object)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Copy the state of the given object onto the persistent object with the same
  identifier.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;T&gt;&nbsp;T</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#merge(T)" class="member-name-link">merge</a><wbr>(T&nbsp;object)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#merge(T,jakarta.persistence.EntityGraph)" class="member-name-link">merge</a><wbr>(T&nbsp;object,
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityGraph.html" title="class or interface in jakarta.persistence" class="external-link">EntityGraph</a>&lt;?&gt;&nbsp;loadGraph)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Copy the state of the given object onto the persistent object with the same
  identifier.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;T&gt;&nbsp;T</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#merge(T,jakarta.persistence.EntityGraph)" class="member-name-link">merge</a><wbr>(T&nbsp;object,
- <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityGraph.html" title="class or interface in jakarta.persistence" class="external-link">EntityGraph</a>&lt;?&gt;&nbsp;loadGraph)</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#persist(java.lang.Object)" class="member-name-link">persist</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;object)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Copy the state of the given object onto the persistent object with the same
- identifier.</div>
+<div class="block">Make a transient instance persistent and mark it for later insertion in the
+ database.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#persist(java.lang.Object)" class="member-name-link">persist</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;object)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#persist(java.lang.String,java.lang.Object)" class="member-name-link">persist</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;entityName,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;object)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Make a transient instance persistent and mark it for later insertion in the
  database.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#persist(java.lang.String,java.lang.Object)" class="member-name-link">persist</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;entityName,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;object)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#refresh(java.lang.Object)" class="member-name-link">refresh</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;object)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Make a transient instance persistent and mark it for later insertion in the
- database.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#refresh(java.lang.Object)" class="member-name-link">refresh</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;object)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Reread the state of the given managed instance associated with this session
  from the underlying database.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#refresh(java.lang.Object,org.hibernate.LockMode)" class="member-name-link">refresh</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;object,
- <a href="LockMode.html" title="enum class in org.hibernate">LockMode</a>&nbsp;lockMode)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Reread the state of the given managed instance from the underlying database,
- obtaining the given <a href="LockMode.html" title="enum class in org.hibernate"><code>LockMode</code></a>.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#refresh(java.lang.Object,org.hibernate.LockOptions)" class="member-name-link">refresh</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;object,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6"><code><a href="#refresh(java.lang.Object,org.hibernate.LockOptions)" class="member-name-link">refresh</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;object,
  <a href="LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Reread the state of the given managed instance from the underlying database,
- obtaining the given <a href="LockMode.html" title="enum class in org.hibernate"><code>LockMode</code></a>.</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3 method-summary-table-tab6">
+<div class="block"><span class="deprecated-label">Deprecated, for removal: This API element is subject to removal in a future version.</span>
+<div class="deprecation-comment">This method will be removed.</div>
+</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#remove(java.lang.Object)" class="member-name-link">remove</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;object)</code></div>
@@ -838,12 +825,18 @@ extends <a href="SharedSessionContract.html" title="interface in org.hibernate">
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Enable or disable subselect fetching in this session.</div>
 </div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default &lt;T&gt;&nbsp;T</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#unwrap(java.lang.Class)" class="member-name-link">unwrap</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;type)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="block">Return an object of the specified type to allow access to
+ a provider-specific API.</div>
+</div>
 </div>
 </div>
 </div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-jakarta.persistence.EntityManager">Methods inherited from interface&nbsp;jakarta.persistence.<a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html" title="class or interface in jakarta.persistence" class="external-link">EntityManager</a></h3>
-<code><a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#callWithConnection(jakarta.persistence.ConnectionFunction)" title="class or interface in jakarta.persistence" class="external-link">callWithConnection</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#close()" title="class or interface in jakarta.persistence" class="external-link">close</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#contains(java.lang.Object)" title="class or interface in jakarta.persistence" class="external-link">contains</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#createNamedStoredProcedureQuery(java.lang.String)" title="class or interface in jakarta.persistence" class="external-link">createNamedStoredProcedureQuery</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#createNativeQuery(java.lang.String)" title="class or interface in jakarta.persistence" class="external-link">createNativeQuery</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#createNativeQuery(java.lang.String,java.lang.Class)" title="class or interface in jakarta.persistence" class="external-link">createNativeQuery</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#createNativeQuery(java.lang.String,java.lang.String)" title="class or interface in jakarta.persistence" class="external-link">createNativeQuery</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#createQuery(jakarta.persistence.criteria.CriteriaSelect)" title="class or interface in jakarta.persistence" class="external-link">createQuery</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#createStoredProcedureQuery(java.lang.String)" title="class or interface in jakarta.persistence" class="external-link">createStoredProcedureQuery</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#createStoredProcedureQuery(java.lang.String,java.lang.Class...)" title="class or interface in jakarta.persistence" class="external-link">createStoredProcedureQuery</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#createStoredProcedureQuery(java.lang.String,java.lang.String...)" title="class or interface in jakarta.persistence" class="external-link">createStoredProcedureQuery</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#find(jakarta.persistence.EntityGraph,java.lang.Object,jakarta.persistence.FindOption...)" title="class or interface in jakarta.persistence" class="external-link">find</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#find(java.lang.Class,java.lang.Object,jakarta.persistence.FindOption...)" title="class or interface in jakarta.persistence" class="external-link">find</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#find(java.lang.Class,java.lang.Object,jakarta.persistence.LockModeType)" title="class or interface in jakarta.persistence" class="external-link">find</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#find(java.lang.Class,java.lang.Object,jakarta.persistence.LockModeType,java.util.Map)" title="class or interface in jakarta.persistence" class="external-link">find</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#find(java.lang.Class,java.lang.Object,java.util.Map)" title="class or interface in jakarta.persistence" class="external-link">find</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#getCriteriaBuilder()" title="class or interface in jakarta.persistence" class="external-link">getCriteriaBuilder</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#getDelegate()" title="class or interface in jakarta.persistence" class="external-link">getDelegate</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#getEntityManagerFactory()" title="class or interface in jakarta.persistence" class="external-link">getEntityManagerFactory</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#getLockMode(java.lang.Object)" title="class or interface in jakarta.persistence" class="external-link">getLockMode</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#getMetamodel()" title="class or interface in jakarta.persistence" class="external-link">getMetamodel</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#getProperties()" title="class or interface in jakarta.persistence" class="external-link">getProperties</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#getTransaction()" title="class or interface in jakarta.persistence" class="external-link">getTransaction</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#isJoinedToTransaction()" title="class or interface in jakarta.persistence" class="external-link">isJoinedToTransaction</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#isOpen()" title="class or interface in jakarta.persistence" class="external-link">isOpen</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#joinTransaction()" title="class or interface in jakarta.persistence" class="external-link">joinTransaction</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#lock(java.lang.Object,jakarta.persistence.LockModeType)" title="class or interface in jakarta.persistence" class="external-link">lock</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#lock(java.lang.Object,jakarta.persistence.LockModeType,jakarta.persistence.LockOption...)" title="class or interface in jakarta.persistence" class="external-link">lock</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#lock(java.lang.Object,jakarta.persistence.LockModeType,java.util.Map)" title="class or interface in jakarta.persistence" class="external-link">lock</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#refresh(java.lang.Object,jakarta.persistence.LockModeType)" title="class or interface in jakarta.persistence" class="external-link">refresh</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#refresh(java.lang.Object,jakarta.persistence.LockModeType,java.util.Map)" title="class or interface in jakarta.persistence" class="external-link">refresh</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#refresh(java.lang.Object,jakarta.persistence.RefreshOption...)" title="class or interface in jakarta.persistence" class="external-link">refresh</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#refresh(java.lang.Object,java.util.Map)" title="class or interface in jakarta.persistence" class="external-link">refresh</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#runWithConnection(jakarta.persistence.ConnectionConsumer)" title="class or interface in jakarta.persistence" class="external-link">runWithConnection</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#unwrap(java.lang.Class)" title="class or interface in jakarta.persistence" class="external-link">unwrap</a></code></div>
+<code><a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#callWithConnection(jakarta.persistence.ConnectionFunction)" title="class or interface in jakarta.persistence" class="external-link">callWithConnection</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#close()" title="class or interface in jakarta.persistence" class="external-link">close</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#contains(java.lang.Object)" title="class or interface in jakarta.persistence" class="external-link">contains</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#createNamedStoredProcedureQuery(java.lang.String)" title="class or interface in jakarta.persistence" class="external-link">createNamedStoredProcedureQuery</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#createNativeQuery(java.lang.String)" title="class or interface in jakarta.persistence" class="external-link">createNativeQuery</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#createNativeQuery(java.lang.String,java.lang.Class)" title="class or interface in jakarta.persistence" class="external-link">createNativeQuery</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#createNativeQuery(java.lang.String,java.lang.String)" title="class or interface in jakarta.persistence" class="external-link">createNativeQuery</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#createQuery(jakarta.persistence.criteria.CriteriaSelect)" title="class or interface in jakarta.persistence" class="external-link">createQuery</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#createStoredProcedureQuery(java.lang.String)" title="class or interface in jakarta.persistence" class="external-link">createStoredProcedureQuery</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#createStoredProcedureQuery(java.lang.String,java.lang.Class...)" title="class or interface in jakarta.persistence" class="external-link">createStoredProcedureQuery</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#createStoredProcedureQuery(java.lang.String,java.lang.String...)" title="class or interface in jakarta.persistence" class="external-link">createStoredProcedureQuery</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#find(jakarta.persistence.EntityGraph,java.lang.Object,jakarta.persistence.FindOption...)" title="class or interface in jakarta.persistence" class="external-link">find</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#find(java.lang.Class,java.lang.Object,jakarta.persistence.FindOption...)" title="class or interface in jakarta.persistence" class="external-link">find</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#find(java.lang.Class,java.lang.Object,jakarta.persistence.LockModeType)" title="class or interface in jakarta.persistence" class="external-link">find</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#find(java.lang.Class,java.lang.Object,jakarta.persistence.LockModeType,java.util.Map)" title="class or interface in jakarta.persistence" class="external-link">find</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#find(java.lang.Class,java.lang.Object,java.util.Map)" title="class or interface in jakarta.persistence" class="external-link">find</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#getCriteriaBuilder()" title="class or interface in jakarta.persistence" class="external-link">getCriteriaBuilder</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#getDelegate()" title="class or interface in jakarta.persistence" class="external-link">getDelegate</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#getEntityManagerFactory()" title="class or interface in jakarta.persistence" class="external-link">getEntityManagerFactory</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#getLockMode(java.lang.Object)" title="class or interface in jakarta.persistence" class="external-link">getLockMode</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#getMetamodel()" title="class or interface in jakarta.persistence" class="external-link">getMetamodel</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#getProperties()" title="class or interface in jakarta.persistence" class="external-link">getProperties</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#getTransaction()" title="class or interface in jakarta.persistence" class="external-link">getTransaction</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#isJoinedToTransaction()" title="class or interface in jakarta.persistence" class="external-link">isJoinedToTransaction</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#isOpen()" title="class or interface in jakarta.persistence" class="external-link">isOpen</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#joinTransaction()" title="class or interface in jakarta.persistence" class="external-link">joinTransaction</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#lock(java.lang.Object,jakarta.persistence.LockModeType)" title="class or interface in jakarta.persistence" class="external-link">lock</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#lock(java.lang.Object,jakarta.persistence.LockModeType,jakarta.persistence.LockOption...)" title="class or interface in jakarta.persistence" class="external-link">lock</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#lock(java.lang.Object,jakarta.persistence.LockModeType,java.util.Map)" title="class or interface in jakarta.persistence" class="external-link">lock</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#refresh(java.lang.Object,jakarta.persistence.LockModeType)" title="class or interface in jakarta.persistence" class="external-link">refresh</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#refresh(java.lang.Object,jakarta.persistence.LockModeType,java.util.Map)" title="class or interface in jakarta.persistence" class="external-link">refresh</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#refresh(java.lang.Object,jakarta.persistence.RefreshOption...)" title="class or interface in jakarta.persistence" class="external-link">refresh</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#refresh(java.lang.Object,java.util.Map)" title="class or interface in jakarta.persistence" class="external-link">refresh</a>, <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#runWithConnection(jakarta.persistence.ConnectionConsumer)" title="class or interface in jakarta.persistence" class="external-link">runWithConnection</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.hibernate.query.QueryProducer">Methods inherited from interface&nbsp;org.hibernate.query.<a href="query/QueryProducer.html" title="interface in org.hibernate.query">QueryProducer</a></h3>
 <code><a href="query/QueryProducer.html#createMutationQuery(jakarta.persistence.criteria.CriteriaDelete)">createMutationQuery</a>, <a href="query/QueryProducer.html#createMutationQuery(jakarta.persistence.criteria.CriteriaUpdate)">createMutationQuery</a>, <a href="query/QueryProducer.html#createMutationQuery(java.lang.String)">createMutationQuery</a>, <a href="query/QueryProducer.html#createMutationQuery(org.hibernate.query.criteria.JpaCriteriaInsert)">createMutationQuery</a>, <a href="query/QueryProducer.html#createNamedMutationQuery(java.lang.String)">createNamedMutationQuery</a>, <a href="query/QueryProducer.html#createNamedSelectionQuery(java.lang.String)">createNamedSelectionQuery</a>, <a href="query/QueryProducer.html#createNamedSelectionQuery(java.lang.String,java.lang.Class)">createNamedSelectionQuery</a>, <a href="query/QueryProducer.html#createNativeMutationQuery(java.lang.String)">createNativeMutationQuery</a>, <a href="query/QueryProducer.html#createNativeQuery(java.lang.String)">createNativeQuery</a>, <a href="query/QueryProducer.html#createNativeQuery(java.lang.String,java.lang.Class)">createNativeQuery</a>, <a href="query/QueryProducer.html#createNativeQuery(java.lang.String,java.lang.Class,java.lang.String)">createNativeQuery</a>, <a href="query/QueryProducer.html#createNativeQuery(java.lang.String,java.lang.String)">createNativeQuery</a>, <a href="query/QueryProducer.html#createNativeQuery(java.lang.String,java.lang.String,java.lang.Class)">createNativeQuery</a>, <a href="query/QueryProducer.html#createSelectionQuery(jakarta.persistence.criteria.CriteriaQuery)">createSelectionQuery</a>, <a href="query/QueryProducer.html#createSelectionQuery(java.lang.String)">createSelectionQuery</a>, <a href="query/QueryProducer.html#createSelectionQuery(java.lang.String,jakarta.persistence.EntityGraph)">createSelectionQuery</a>, <a href="query/QueryProducer.html#createSelectionQuery(java.lang.String,java.lang.Class)">createSelectionQuery</a>, <a href="query/QueryProducer.html#getNamedNativeQuery(java.lang.String)">getNamedNativeQuery</a>, <a href="query/QueryProducer.html#getNamedNativeQuery(java.lang.String,java.lang.String)">getNamedNativeQuery</a>, <a href="query/QueryProducer.html#getNamedQuery(java.lang.String)">getNamedQuery</a></code></div>
@@ -1334,7 +1327,7 @@ extends <a href="SharedSessionContract.html" title="interface in org.hibernate">
  <ul>
  <li>call <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#find(java.lang.Class,java.lang.Object,jakarta.persistence.FindOption...)" title="class or interface in jakarta.persistence" class="external-link"><code>EntityManager.find(Class, Object, FindOption...)</code></a>, passing
      <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/CacheRetrieveMode.html#BYPASS" title="class or interface in jakarta.persistence" class="external-link"><code>CacheRetrieveMode.BYPASS</code></a> as an option,
- <li>call <a href="#find(java.lang.Class,java.lang.Object,org.hibernate.LockMode)"><code>find(Class, Object, LockMode)</code></a> with the explicit lock mode
+ <li>call <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#find(java.lang.Class,java.lang.Object,jakarta.persistence.FindOption...)" title="class or interface in jakarta.persistence" class="external-link"><code>EntityManager.find(Class, Object, FindOption...)</code></a> with the explicit lock mode
      <a href="LockMode.html#READ"><code>LockMode.READ</code></a>, or
  <li><a href="#setCacheRetrieveMode(jakarta.persistence.CacheRetrieveMode)">set the cache mode</a> to
      <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/CacheRetrieveMode.html#BYPASS" title="class or interface in jakarta.persistence" class="external-link"><code>CacheRetrieveMode.BYPASS</code></a> before calling this method.
@@ -1349,58 +1342,6 @@ extends <a href="SharedSessionContract.html" title="interface in org.hibernate">
 <dd>a fully-fetched persistent instance or null</dd>
 <dt>API Note:</dt>
 <dd>This operation is very similar to <a href="#get(java.lang.Class,java.lang.Object)"><code>get(Class, Object)</code></a>.</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="find(java.lang.Class,java.lang.Object,org.hibernate.LockMode)">
-<h3>find</h3>
-<div class="member-signature"><span class="type-parameters">&lt;T&gt;</span>&nbsp;<span class="return-type">T</span>&nbsp;<span class="element-name">find</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;entityType,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;id,
- <a href="LockMode.html" title="enum class in org.hibernate">LockMode</a>&nbsp;lockMode)</span></div>
-<div class="block">Return the persistent instance of the given entity class with the given identifier,
- or null if there is no such persistent instance. If the instance is already associated
- with the session, return that instance. This method never returns an uninitialized
- instance. Obtain the specified lock mode if the instance exists.
- <p>
- Convenient form of <a href="#find(java.lang.Class,java.lang.Object,org.hibernate.LockOptions)"><code>find(Class, Object, LockOptions)</code></a>.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>entityType</code> - the entity type</dd>
-<dd><code>id</code> - an identifier</dd>
-<dd><code>lockMode</code> - the lock mode</dd>
-<dt>Returns:</dt>
-<dd>a fully-fetched persistent instance or null</dd>
-<dt>Since:</dt>
-<dd>7.0</dd>
-<dt>See Also:</dt>
-<dd>
-<ul class="see-list-long">
-<li><a href="#find(java.lang.Class,java.lang.Object,org.hibernate.LockOptions)"><code>find(Class, Object, LockOptions)</code></a></li>
-</ul>
-</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="find(java.lang.Class,java.lang.Object,org.hibernate.LockOptions)">
-<h3>find</h3>
-<div class="member-signature"><span class="type-parameters">&lt;T&gt;</span>&nbsp;<span class="return-type">T</span>&nbsp;<span class="element-name">find</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;entityType,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;id,
- <a href="LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</span></div>
-<div class="block">Return the persistent instance of the given entity class with the given identifier,
- or null if there is no such persistent instance. If the instance is already associated
- with the session, return that instance. This method never returns an uninitialized
- instance. Obtain the specified lock mode if the instance exists.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>entityType</code> - the entity type</dd>
-<dd><code>id</code> - an identifier</dd>
-<dd><code>lockOptions</code> - the lock mode</dd>
-<dt>Returns:</dt>
-<dd>a fully-fetched persistent instance or null</dd>
-<dt>Since:</dt>
-<dd>7.0</dd>
 </dl>
 </section>
 </li>
@@ -1696,25 +1637,55 @@ extends <a href="SharedSessionContract.html" title="interface in org.hibernate">
 <dt>Parameters:</dt>
 <dd><code>object</code> - a persistent instance associated with this session</dd>
 <dd><code>lockMode</code> - the lock level</dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list-long">
+<li><a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#lock(java.lang.Object,jakarta.persistence.LockModeType)" title="class or interface in jakarta.persistence" class="external-link"><code>EntityManager.lock(Object, LockModeType)</code></a></li>
+</ul>
+</dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="lock(java.lang.Object,org.hibernate.LockOptions)">
+<section class="detail" id="lock(java.lang.Object,org.hibernate.LockMode,jakarta.persistence.LockOption...)">
 <h3>lock</h3>
 <div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name">lock</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;object,
- <a href="LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</span></div>
-<div class="block">Obtain a lock on the given managed instance associated with this session,
- using the given <a href="LockOptions.html" title="class in org.hibernate">lock options</a>.
+ <a href="LockMode.html" title="enum class in org.hibernate">LockMode</a>&nbsp;lockMode,
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/LockOption.html" title="class or interface in jakarta.persistence" class="external-link">LockOption</a>...&nbsp;lockOptions)</span></div>
+<div class="block">Obtain the specified lock level on the given managed instance associated
+ with this session, applying any other specified options. This operation may
+ be used to:
+ <ul>
+ <li>perform a version check on an entity read from the second-level cache
+     by requesting <a href="LockMode.html#READ"><code>LockMode.READ</code></a>,
+ <li>schedule a version check at transaction commit by requesting
+     <a href="LockMode.html#OPTIMISTIC"><code>LockMode.OPTIMISTIC</code></a>,
+ <li>schedule a version increment at transaction commit by requesting
+     <a href="LockMode.html#OPTIMISTIC_FORCE_INCREMENT"><code>LockMode.OPTIMISTIC_FORCE_INCREMENT</code></a>
+ <li>upgrade to a pessimistic lock with <a href="LockMode.html#PESSIMISTIC_READ"><code>LockMode.PESSIMISTIC_READ</code></a>
+     or <a href="LockMode.html#PESSIMISTIC_WRITE"><code>LockMode.PESSIMISTIC_WRITE</code></a>, or
+ <li>immediately increment the version of the given instance by requesting
+     <a href="LockMode.html#PESSIMISTIC_FORCE_INCREMENT"><code>LockMode.PESSIMISTIC_FORCE_INCREMENT</code></a>.
+ </ul>
+ <p>
+ If the requested lock mode is already held on the given entity, this
+ operation has no effect.
  <p>
  This operation cascades to associated instances if the association is
- mapped with <a href="annotations/CascadeType.html#LOCK"><code>CascadeType.LOCK</code></a>.</div>
+ mapped with <a href="annotations/CascadeType.html#LOCK"><code>CascadeType.LOCK</code></a>.
+ <p>
+ The modes <a href="LockMode.html#WRITE"><code>LockMode.WRITE</code></a> and <a href="LockMode.html#UPGRADE_SKIPLOCKED"><code>LockMode.UPGRADE_SKIPLOCKED</code></a>
+ are not legal arguments to <code>lock()</code>.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>object</code> - a persistent instance associated with this session</dd>
-<dd><code>lockOptions</code> - the lock options</dd>
-<dt>Since:</dt>
-<dd>6.2</dd>
+<dd><code>lockMode</code> - the lock level</dd>
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list-long">
+<li><a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#lock(java.lang.Object,jakarta.persistence.LockModeType,jakarta.persistence.LockOption...)" title="class or interface in jakarta.persistence" class="external-link"><code>EntityManager.lock(Object, LockModeType, LockOption...)</code></a></li>
+</ul>
+</dd>
 </dl>
 </section>
 </li>
@@ -1737,48 +1708,13 @@ extends <a href="SharedSessionContract.html" title="interface in org.hibernate">
  with <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/CascadeType.html#REFRESH" title="class or interface in jakarta.persistence" class="external-link"><code>CascadeType.REFRESH</code></a>.
  <p>
  This operation requests <a href="LockMode.html#READ"><code>LockMode.READ</code></a>. To obtain a stronger lock,
- call <a href="#refresh(java.lang.Object,org.hibernate.LockMode)"><code>refresh(Object, LockMode)</code></a>.</div>
+ call <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#refresh(java.lang.Object,jakarta.persistence.RefreshOption...)" title="class or interface in jakarta.persistence" class="external-link"><code>EntityManager.refresh(Object, RefreshOption...)</code></a>, passing the appropriate
+ <a href="LockMode.html" title="enum class in org.hibernate"><code>LockMode</code></a> as an option.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#refresh(java.lang.Object)" title="class or interface in jakarta.persistence" class="external-link">refresh</a></code>&nbsp;in interface&nbsp;<code><a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html" title="class or interface in jakarta.persistence" class="external-link">EntityManager</a></code></dd>
 <dt>Parameters:</dt>
 <dd><code>object</code> - a persistent instance associated with this session</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="refresh(java.lang.Object,org.hibernate.LockMode)">
-<h3>refresh</h3>
-<div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name">refresh</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;object,
- <a href="LockMode.html" title="enum class in org.hibernate">LockMode</a>&nbsp;lockMode)</span></div>
-<div class="block">Reread the state of the given managed instance from the underlying database,
- obtaining the given <a href="LockMode.html" title="enum class in org.hibernate"><code>LockMode</code></a>.
- <p>
- Convenient form of <a href="#refresh(java.lang.Object,org.hibernate.LockOptions)"><code>refresh(Object, LockOptions)</code></a></div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>object</code> - a persistent instance associated with this session</dd>
-<dd><code>lockMode</code> - the lock mode to use</dd>
-<dt>See Also:</dt>
-<dd>
-<ul class="see-list-long">
-<li><a href="#refresh(java.lang.Object,org.hibernate.LockOptions)"><code>refresh(Object, LockOptions)</code></a></li>
-</ul>
-</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="refresh(java.lang.Object,org.hibernate.LockOptions)">
-<h3>refresh</h3>
-<div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name">refresh</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;object,
- <a href="LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</span></div>
-<div class="block">Reread the state of the given managed instance from the underlying database,
- obtaining the given <a href="LockMode.html" title="enum class in org.hibernate"><code>LockMode</code></a>.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>object</code> - a persistent instance associated with this session</dd>
-<dd><code>lockOptions</code> - contains the lock mode to use</dd>
 </dl>
 </section>
 </li>
@@ -1805,13 +1741,23 @@ extends <a href="SharedSessionContract.html" title="interface in org.hibernate">
 <section class="detail" id="getCurrentLockMode(java.lang.Object)">
 <h3>getCurrentLockMode</h3>
 <div class="member-signature"><span class="return-type"><a href="LockMode.html" title="enum class in org.hibernate">LockMode</a></span>&nbsp;<span class="element-name">getCurrentLockMode</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;object)</span></div>
-<div class="block">Determine the current <a href="LockMode.html" title="enum class in org.hibernate"><code>LockMode</code></a> of the given managed instance associated
- with this session.</div>
+<div class="block">Determine the current <a href="LockMode.html" title="enum class in org.hibernate">lock mode</a> held on the given
+ managed instance associated with this session.
+ <p>
+ Unlike the JPA-standard <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#getLockMode(java.lang.Object)" title="class or interface in jakarta.persistence" class="external-link"><code>EntityManager.getLockMode(java.lang.Object)</code></a>, this operation may be
+ called when no transaction is active, in which case it should return
+ <a href="LockMode.html#NONE"><code>LockMode.NONE</code></a>, indicating that no pessimistic lock is held on
+ the given entity.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>object</code> - a persistent instance associated with this session</dd>
 <dt>Returns:</dt>
-<dd>the current lock mode</dd>
+<dd>the lock mode currently held on the given entity</dd>
+<dt>Throws:</dt>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/IllegalStateException.html" title="class or interface in java.lang" class="external-link">IllegalStateException</a></code> - if the given instance is not associated
+                               with this persistence context</dd>
+<dd><code><a href="ObjectDeletedException.html" title="class in org.hibernate">ObjectDeletedException</a></code> - if the given instance was already
+                                <a href="#remove(java.lang.Object)">removed</a></dd>
 </dl>
 </section>
 </li>
@@ -1819,9 +1765,12 @@ extends <a href="SharedSessionContract.html" title="interface in org.hibernate">
 <section class="detail" id="clear()">
 <h3>clear</h3>
 <div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name">clear</span>()</div>
-<div class="block">Completely clear the session. Evict all loaded instances and cancel all pending
- saves, updates and deletions. Do not close open iterators or instances of
- <a href="ScrollableResults.html" title="interface in org.hibernate"><code>ScrollableResults</code></a>.</div>
+<div class="block">Completely clear the persistence context. Evict all loaded instances,
+ causing every managed entity currently associated with this session to
+ transition to the detached state, and cancel all pending insertions,
+ updates, and deletions.
+ <p>
+ Does not close open iterators or instances of <a href="ScrollableResults.html" title="interface in org.hibernate"><code>ScrollableResults</code></a>.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#clear()" title="class or interface in jakarta.persistence" class="external-link">clear</a></code>&nbsp;in interface&nbsp;<code><a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html" title="class or interface in jakarta.persistence" class="external-link">EntityManager</a></code></dd>
@@ -1831,10 +1780,11 @@ extends <a href="SharedSessionContract.html" title="interface in org.hibernate">
 <li>
 <section class="detail" id="get(java.lang.Class,java.lang.Object)">
 <h3>get</h3>
-<div class="member-signature"><span class="annotations"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html" title="class or interface in java.lang" class="external-link">@Deprecated</a>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html#since()" title="class or interface in java.lang" class="external-link">since</a>="7")
+<div class="member-signature"><span class="annotations"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html" title="class or interface in java.lang" class="external-link">@Deprecated</a>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html#since()" title="class or interface in java.lang" class="external-link">since</a>="7.0",
+            <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html#forRemoval()" title="class or interface in java.lang" class="external-link">forRemoval</a>=true)
 </span><span class="type-parameters">&lt;T&gt;</span>&nbsp;<span class="return-type">T</span>&nbsp;<span class="element-name">get</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;entityType,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;id)</span></div>
-<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span>
+<div class="deprecation-block"><span class="deprecated-label">Deprecated, for removal: This API element is subject to removal in a future version.</span>
 <div class="deprecation-comment">Because the semantics of this method may change in a future release.
              Use <a href="#find(java.lang.Class,java.lang.Object)"><code>find(Class, Object)</code></a> instead.</div>
 </div>
@@ -1873,48 +1823,13 @@ extends <a href="SharedSessionContract.html" title="interface in org.hibernate">
 <li>
 <section class="detail" id="get(java.lang.Class,java.lang.Object,org.hibernate.LockMode)">
 <h3>get</h3>
-<div class="member-signature"><span class="annotations"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html" title="class or interface in java.lang" class="external-link">@Deprecated</a>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html#since()" title="class or interface in java.lang" class="external-link">since</a>="7")
+<div class="member-signature"><span class="annotations"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html" title="class or interface in java.lang" class="external-link">@Deprecated</a>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html#since()" title="class or interface in java.lang" class="external-link">since</a>="7.0",
+            <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html#forRemoval()" title="class or interface in java.lang" class="external-link">forRemoval</a>=true)
 </span><span class="type-parameters">&lt;T&gt;</span>&nbsp;<span class="return-type">T</span>&nbsp;<span class="element-name">get</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;entityType,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;id,
  <a href="LockMode.html" title="enum class in org.hibernate">LockMode</a>&nbsp;lockMode)</span></div>
-<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span>
-<div class="deprecation-comment">The semantics of this method may change in a future release.
-             Use <a href="#find(java.lang.Class,java.lang.Object,org.hibernate.LockMode)"><code>find(Class, Object, LockMode)</code></a> instead.</div>
-</div>
-<div class="block">Return the persistent instance of the given entity class with the given identifier,
- or null if there is no such persistent instance. If the instance is already associated
- with the session, return that instance. This method never returns an uninitialized
- instance. Obtain the specified lock mode if the instance exists.
- <p>
- Convenient form of <a href="#get(java.lang.Class,java.lang.Object,org.hibernate.LockOptions)"><code>get(Class, Object, LockOptions)</code></a>.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>entityType</code> - the entity type</dd>
-<dd><code>id</code> - an identifier</dd>
-<dd><code>lockMode</code> - the lock mode</dd>
-<dt>Returns:</dt>
-<dd>a persistent instance or null</dd>
-<dt>See Also:</dt>
-<dd>
-<ul class="see-list-long">
-<li><a href="#get(java.lang.Class,java.lang.Object,org.hibernate.LockOptions)"><code>get(Class, Object, LockOptions)</code></a></li>
-</ul>
-</dd>
-<dt>API Note:</dt>
-<dd>This operation is very similar to <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#find(java.lang.Class,java.lang.Object,jakarta.persistence.LockModeType)" title="class or interface in jakarta.persistence" class="external-link"><code>EntityManager.find(Class, Object, LockModeType)</code></a>.</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="get(java.lang.Class,java.lang.Object,org.hibernate.LockOptions)">
-<h3>get</h3>
-<div class="member-signature"><span class="annotations"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html" title="class or interface in java.lang" class="external-link">@Deprecated</a>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html#since()" title="class or interface in java.lang" class="external-link">since</a>="7")
-</span><span class="type-parameters">&lt;T&gt;</span>&nbsp;<span class="return-type">T</span>&nbsp;<span class="element-name">get</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;entityType,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;id,
- <a href="LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</span></div>
-<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span>
-<div class="deprecation-comment">The semantics of this method may change in a future release.
-             Use <a href="#find(java.lang.Class,java.lang.Object,org.hibernate.LockOptions)"><code>find(Class, Object, LockOptions)</code></a> instead.</div>
+<div class="deprecation-block"><span class="deprecated-label">Deprecated, for removal: This API element is subject to removal in a future version.</span>
+<div class="deprecation-comment">Use <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#find(java.lang.Class,java.lang.Object,jakarta.persistence.FindOption...)" title="class or interface in jakarta.persistence" class="external-link"><code>EntityManager.find(Class, Object, FindOption...)</code></a> instead.</div>
 </div>
 <div class="block">Return the persistent instance of the given entity class with the given identifier,
  or null if there is no such persistent instance. If the instance is already associated
@@ -1924,19 +1839,22 @@ extends <a href="SharedSessionContract.html" title="interface in org.hibernate">
 <dt>Parameters:</dt>
 <dd><code>entityType</code> - the entity type</dd>
 <dd><code>id</code> - an identifier</dd>
-<dd><code>lockOptions</code> - the lock mode</dd>
+<dd><code>lockMode</code> - the lock mode</dd>
 <dt>Returns:</dt>
 <dd>a persistent instance or null</dd>
+<dt>API Note:</dt>
+<dd>This operation is very similar to <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#find(java.lang.Class,java.lang.Object,jakarta.persistence.LockModeType)" title="class or interface in jakarta.persistence" class="external-link"><code>EntityManager.find(Class, Object, LockModeType)</code></a>.</dd>
 </dl>
 </section>
 </li>
 <li>
 <section class="detail" id="get(java.lang.String,java.lang.Object)">
 <h3>get</h3>
-<div class="member-signature"><span class="annotations"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html" title="class or interface in java.lang" class="external-link">@Deprecated</a>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html#since()" title="class or interface in java.lang" class="external-link">since</a>="7")
+<div class="member-signature"><span class="annotations"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html" title="class or interface in java.lang" class="external-link">@Deprecated</a>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html#since()" title="class or interface in java.lang" class="external-link">since</a>="7",
+            <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html#forRemoval()" title="class or interface in java.lang" class="external-link">forRemoval</a>=true)
 </span><span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span>&nbsp;<span class="element-name">get</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;entityName,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;id)</span></div>
-<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span>
+<div class="deprecation-block"><span class="deprecated-label">Deprecated, for removal: This API element is subject to removal in a future version.</span>
 <div class="deprecation-comment">The semantics of this method may change in a future release.
              Use <a href="SessionFactory.html#createGraphForDynamicEntity(java.lang.String)"><code>SessionFactory.createGraphForDynamicEntity(String)</code></a>
              together with <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#find(jakarta.persistence.EntityGraph,java.lang.Object,jakarta.persistence.FindOption...)" title="class or interface in jakarta.persistence" class="external-link"><code>EntityManager.find(EntityGraph, Object, FindOption...)</code></a>
@@ -1965,19 +1883,18 @@ extends <a href="SharedSessionContract.html" title="interface in org.hibernate">
 <li>
 <section class="detail" id="get(java.lang.String,java.lang.Object,org.hibernate.LockMode)">
 <h3>get</h3>
-<div class="member-signature"><span class="annotations"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html" title="class or interface in java.lang" class="external-link">@Deprecated</a>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html#since()" title="class or interface in java.lang" class="external-link">since</a>="7")
+<div class="member-signature"><span class="annotations"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html" title="class or interface in java.lang" class="external-link">@Deprecated</a>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html#since()" title="class or interface in java.lang" class="external-link">since</a>="7.0",
+            <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html#forRemoval()" title="class or interface in java.lang" class="external-link">forRemoval</a>=true)
 </span><span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span>&nbsp;<span class="element-name">get</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;entityName,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;id,
  <a href="LockMode.html" title="enum class in org.hibernate">LockMode</a>&nbsp;lockMode)</span></div>
-<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span>
+<div class="deprecation-block"><span class="deprecated-label">Deprecated, for removal: This API element is subject to removal in a future version.</span>
 <div class="deprecation-comment">The semantics of this method may change in a future release.</div>
 </div>
 <div class="block">Return the persistent instance of the given entity class with the given identifier,
  or null if there is no such persistent instance. If the instance is already associated
  with the session, return that instance. This method never returns an uninitialized
- instance. Obtain the specified lock mode if the instance exists.
- <p>
- Convenient form of <a href="#get(java.lang.String,java.lang.Object,org.hibernate.LockOptions)"><code>get(String, Object, LockOptions)</code></a></div>
+ instance. Obtain the specified lock mode if the instance exists.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>entityName</code> - the entity name</dd>
@@ -1995,14 +1912,44 @@ extends <a href="SharedSessionContract.html" title="interface in org.hibernate">
 </section>
 </li>
 <li>
+<section class="detail" id="get(java.lang.Class,java.lang.Object,org.hibernate.LockOptions)">
+<h3>get</h3>
+<div class="member-signature"><span class="annotations"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html" title="class or interface in java.lang" class="external-link">@Deprecated</a>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html#since()" title="class or interface in java.lang" class="external-link">since</a>="7.0",
+            <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html#forRemoval()" title="class or interface in java.lang" class="external-link">forRemoval</a>=true)
+</span><span class="type-parameters">&lt;T&gt;</span>&nbsp;<span class="return-type">T</span>&nbsp;<span class="element-name">get</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;entityType,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;id,
+ <a href="LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</span></div>
+<div class="deprecation-block"><span class="deprecated-label">Deprecated, for removal: This API element is subject to removal in a future version.</span>
+<div class="deprecation-comment">This method will be removed.
+             Use <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#find(java.lang.Class,java.lang.Object,jakarta.persistence.FindOption...)" title="class or interface in jakarta.persistence" class="external-link"><code>EntityManager.find(Class, Object, FindOption...)</code></a> instead.</div>
+</div>
+<div class="block">Return the persistent instance of the given entity class with the given identifier,
+ or null if there is no such persistent instance. If the instance is already associated
+ with the session, return that instance. This method never returns an uninitialized
+ instance. Obtain the specified lock mode if the instance exists.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>entityType</code> - the entity type</dd>
+<dd><code>id</code> - an identifier</dd>
+<dd><code>lockOptions</code> - the lock mode</dd>
+<dt>Returns:</dt>
+<dd>a persistent instance or null</dd>
+</dl>
+</section>
+</li>
+<li>
 <section class="detail" id="get(java.lang.String,java.lang.Object,org.hibernate.LockOptions)">
 <h3>get</h3>
-<div class="member-signature"><span class="annotations"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html" title="class or interface in java.lang" class="external-link">@Deprecated</a>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html#since()" title="class or interface in java.lang" class="external-link">since</a>="7")
+<div class="member-signature"><span class="annotations"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html" title="class or interface in java.lang" class="external-link">@Deprecated</a>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html#since()" title="class or interface in java.lang" class="external-link">since</a>="7.0",
+            <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html#forRemoval()" title="class or interface in java.lang" class="external-link">forRemoval</a>=true)
 </span><span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span>&nbsp;<span class="element-name">get</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;entityName,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;id,
  <a href="LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</span></div>
-<div class="deprecation-block"><span class="deprecated-label">Deprecated.</span>
-<div class="deprecation-comment">The semantics of this method may change in a future release.</div>
+<div class="deprecation-block"><span class="deprecated-label">Deprecated, for removal: This API element is subject to removal in a future version.</span>
+<div class="deprecation-comment">This method will be removed.
+             Use <a href="SessionFactory.html#createGraphForDynamicEntity(java.lang.String)"><code>SessionFactory.createGraphForDynamicEntity(String)</code></a>
+             together with <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#find(jakarta.persistence.EntityGraph,java.lang.Object,jakarta.persistence.FindOption...)" title="class or interface in jakarta.persistence" class="external-link"><code>EntityManager.find(EntityGraph, Object, FindOption...)</code></a>
+             to load <a href="metamodel/RepresentationMode.html#MAP"><code>dynamic entities</code></a>.</div>
 </div>
 <div class="block">Return the persistent instance of the given entity class with the given identifier,
  or null if there is no such persistent instance. If the instance is already associated
@@ -2015,6 +1962,51 @@ extends <a href="SharedSessionContract.html" title="interface in org.hibernate">
 <dd><code>lockOptions</code> - contains the lock mode</dd>
 <dt>Returns:</dt>
 <dd>a persistent instance or null</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="lock(java.lang.Object,org.hibernate.LockOptions)">
+<h3>lock</h3>
+<div class="member-signature"><span class="annotations"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html" title="class or interface in java.lang" class="external-link">@Deprecated</a>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html#since()" title="class or interface in java.lang" class="external-link">since</a>="7.0",
+            <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html#forRemoval()" title="class or interface in java.lang" class="external-link">forRemoval</a>=true)
+</span><span class="return-type">void</span>&nbsp;<span class="element-name">lock</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;object,
+ <a href="LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</span></div>
+<div class="deprecation-block"><span class="deprecated-label">Deprecated, for removal: This API element is subject to removal in a future version.</span>
+<div class="deprecation-comment">This method will be removed.
+             Use <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#lock(java.lang.Object,jakarta.persistence.LockModeType,jakarta.persistence.LockOption...)" title="class or interface in jakarta.persistence" class="external-link">EntityManager.lock(Object, LockModeType, LockOption...)</a> instead</div>
+</div>
+<div class="block">Obtain a lock on the given managed instance associated with this session,
+ using the given <a href="LockOptions.html" title="class in org.hibernate">lock options</a>.
+ <p>
+ This operation cascades to associated instances if the association is
+ mapped with <a href="annotations/CascadeType.html#LOCK"><code>CascadeType.LOCK</code></a>.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>object</code> - a persistent instance associated with this session</dd>
+<dd><code>lockOptions</code> - the lock options</dd>
+<dt>Since:</dt>
+<dd>6.2</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="refresh(java.lang.Object,org.hibernate.LockOptions)">
+<h3>refresh</h3>
+<div class="member-signature"><span class="annotations"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html" title="class or interface in java.lang" class="external-link">@Deprecated</a>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html#since()" title="class or interface in java.lang" class="external-link">since</a>="7.0",
+            <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html#forRemoval()" title="class or interface in java.lang" class="external-link">forRemoval</a>=true)
+</span><span class="return-type">void</span>&nbsp;<span class="element-name">refresh</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;object,
+ <a href="LockOptions.html" title="class in org.hibernate">LockOptions</a>&nbsp;lockOptions)</span></div>
+<div class="deprecation-block"><span class="deprecated-label">Deprecated, for removal: This API element is subject to removal in a future version.</span>
+<div class="deprecation-comment">This method will be removed.
+             Use <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#refresh(java.lang.Object,jakarta.persistence.RefreshOption...)" title="class or interface in jakarta.persistence" class="external-link">EntityManager.refresh(Object, RefreshOption...)</a> instead</div>
+</div>
+<div class="block">Reread the state of the given managed instance from the underlying database,
+ obtaining the given <a href="LockMode.html" title="enum class in org.hibernate"><code>LockMode</code></a>.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>object</code> - a persistent instance associated with this session</dd>
+<dd><code>lockOptions</code> - contains the lock mode to use</dd>
 </dl>
 </section>
 </li>
@@ -2876,6 +2868,28 @@ extends <a href="SharedSessionContract.html" title="interface in org.hibernate">
 <dd><code><a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#createQuery(jakarta.persistence.criteria.CriteriaUpdate)" title="class or interface in jakarta.persistence" class="external-link">createQuery</a></code>&nbsp;in interface&nbsp;<code><a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html" title="class or interface in jakarta.persistence" class="external-link">EntityManager</a></code></dd>
 <dt>Specified by:</dt>
 <dd><code><a href="query/QueryProducer.html#createQuery(jakarta.persistence.criteria.CriteriaUpdate)">createQuery</a></code>&nbsp;in interface&nbsp;<code><a href="query/QueryProducer.html" title="interface in org.hibernate.query">QueryProducer</a></code></dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="unwrap(java.lang.Class)">
+<h3>unwrap</h3>
+<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="type-parameters">&lt;T&gt;</span>&nbsp;<span class="return-type">T</span>&nbsp;<span class="element-name">unwrap</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;T&gt;&nbsp;type)</span></div>
+<div class="block"><span class="descfrm-type-label">Description copied from interface:&nbsp;<code><a href="SharedSessionContract.html#unwrap(java.lang.Class)">SharedSessionContract</a></code></span></div>
+<div class="block">Return an object of the specified type to allow access to
+ a provider-specific API.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#unwrap(java.lang.Class)" title="class or interface in jakarta.persistence" class="external-link">unwrap</a></code>&nbsp;in interface&nbsp;<code><a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html" title="class or interface in jakarta.persistence" class="external-link">EntityManager</a></code></dd>
+<dt>Specified by:</dt>
+<dd><code><a href="SharedSessionContract.html#unwrap(java.lang.Class)">unwrap</a></code>&nbsp;in interface&nbsp;<code><a href="SharedSessionContract.html" title="interface in org.hibernate">SharedSessionContract</a></code></dd>
+<dt>Parameters:</dt>
+<dd><code>type</code> - the class of the object to be returned.
+ This is usually either the underlying class
+ implementing <code>SharedSessionContract</code> or an
+ interface it implements.</dd>
+<dt>Returns:</dt>
+<dd>an instance of the specified class</dd>
 </dl>
 </section>
 </li>

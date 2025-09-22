@@ -252,7 +252,11 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first odd-row-color"><code><a href="../Identifier.html" title="class in org.hibernate.boot.model.naming">Identifier</a></code></div>
 <div class="col-second odd-row-color"><span class="type-name-label">ImplicitNamingStrategyJpaCompliantImpl.</span><code><a href="../ImplicitNamingStrategyJpaCompliantImpl.html#determineBasicColumnName(org.hibernate.boot.model.naming.ImplicitBasicColumnNameSource)" class="member-name-link">determineBasicColumnName</a><wbr>(<a href="../ImplicitBasicColumnNameSource.html" title="interface in org.hibernate.boot.model.naming">ImplicitBasicColumnNameSource</a>&nbsp;source)</code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-last odd-row-color">
+<div class="block">JPA states we should use the following as default:
+ The property or field name
+ That is, the unqualified attribute path.</div>
+</div>
 <div class="col-first even-row-color"><code><a href="../Identifier.html" title="class in org.hibernate.boot.model.naming">Identifier</a></code></div>
 <div class="col-second even-row-color"><span class="type-name-label">ImplicitNamingStrategyLegacyHbmImpl.</span><code><a href="../ImplicitNamingStrategyLegacyHbmImpl.html#determineBasicColumnName(org.hibernate.boot.model.naming.ImplicitBasicColumnNameSource)" class="member-name-link">determineBasicColumnName</a><wbr>(<a href="../ImplicitBasicColumnNameSource.html" title="interface in org.hibernate.boot.model.naming">ImplicitBasicColumnNameSource</a>&nbsp;source)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
@@ -264,7 +268,12 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first even-row-color"><code><a href="../Identifier.html" title="class in org.hibernate.boot.model.naming">Identifier</a></code></div>
 <div class="col-second even-row-color"><span class="type-name-label">ImplicitNamingStrategyJpaCompliantImpl.</span><code><a href="../ImplicitNamingStrategyJpaCompliantImpl.html#determineCollectionTableName(org.hibernate.boot.model.naming.ImplicitCollectionTableNameSource)" class="member-name-link">determineCollectionTableName</a><wbr>(<a href="../ImplicitCollectionTableNameSource.html" title="interface in org.hibernate.boot.model.naming">ImplicitCollectionTableNameSource</a>&nbsp;source)</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-last even-row-color">
+<div class="block">JPA states we should use the following as default:
+ The concatenation of the name of the containing entity and the
+ name of the collection attribute, separated by an underscore.
+ That is, if owning entity has a JPA entity name:</div>
+</div>
 <div class="col-first odd-row-color"><code><a href="../Identifier.html" title="class in org.hibernate.boot.model.naming">Identifier</a></code></div>
 <div class="col-second odd-row-color"><span class="type-name-label">ImplicitNamingStrategyLegacyJpaImpl.</span><code><a href="../ImplicitNamingStrategyLegacyJpaImpl.html#determineCollectionTableName(org.hibernate.boot.model.naming.ImplicitCollectionTableNameSource)" class="member-name-link">determineCollectionTableName</a><wbr>(<a href="../ImplicitCollectionTableNameSource.html" title="interface in org.hibernate.boot.model.naming">ImplicitCollectionTableNameSource</a>&nbsp;source)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
@@ -319,7 +328,19 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first even-row-color"><code><a href="../Identifier.html" title="class in org.hibernate.boot.model.naming">Identifier</a></code></div>
 <div class="col-second even-row-color"><span class="type-name-label">ImplicitNamingStrategyJpaCompliantImpl.</span><code><a href="../ImplicitNamingStrategyJpaCompliantImpl.html#determineJoinColumnName(org.hibernate.boot.model.naming.ImplicitJoinColumnNameSource)" class="member-name-link">determineJoinColumnName</a><wbr>(<a href="../ImplicitJoinColumnNameSource.html" title="interface in org.hibernate.boot.model.naming">ImplicitJoinColumnNameSource</a>&nbsp;source)</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-last even-row-color">
+<div class="block">JPA states we should use the following as default:
+ 
+ If there is a "referencing relationship property":
+     The concatenation of the following: the name of the referencing
+     relationship property or field of the referencing entity or embeddable class;
+     <code>_</code>; the name of the referenced primary key column.
+ If there is no such "referencing relationship property",
+     or if the association is an element collection:
+     The concatenation of the following: the name of the entity;
+     <code>_</code>; the name of the referenced primary key column
+ </div>
+</div>
 <div class="col-first odd-row-color"><code><a href="../Identifier.html" title="class in org.hibernate.boot.model.naming">Identifier</a></code></div>
 <div class="col-second odd-row-color"><span class="type-name-label">ImplicitNamingStrategyLegacyHbmImpl.</span><code><a href="../ImplicitNamingStrategyLegacyHbmImpl.html#determineJoinColumnName(org.hibernate.boot.model.naming.ImplicitJoinColumnNameSource)" class="member-name-link">determineJoinColumnName</a><wbr>(<a href="../ImplicitJoinColumnNameSource.html" title="interface in org.hibernate.boot.model.naming">ImplicitJoinColumnNameSource</a>&nbsp;source)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
@@ -334,7 +355,12 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first even-row-color"><code><a href="../Identifier.html" title="class in org.hibernate.boot.model.naming">Identifier</a></code></div>
 <div class="col-second even-row-color"><span class="type-name-label">ImplicitNamingStrategyJpaCompliantImpl.</span><code><a href="../ImplicitNamingStrategyJpaCompliantImpl.html#determineJoinTableName(org.hibernate.boot.model.naming.ImplicitJoinTableNameSource)" class="member-name-link">determineJoinTableName</a><wbr>(<a href="../ImplicitJoinTableNameSource.html" title="interface in org.hibernate.boot.model.naming">ImplicitJoinTableNameSource</a>&nbsp;source)</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-last even-row-color">
+<div class="block">JPA states we should use the following as default:
+ The concatenated names of the two associated primary entity
+ tables (owning side first), separated by an underscore.
+ That is:</div>
+</div>
 <div class="col-first odd-row-color"><code><a href="../Identifier.html" title="class in org.hibernate.boot.model.naming">Identifier</a></code></div>
 <div class="col-second odd-row-color"><span class="type-name-label">ImplicitNamingStrategyLegacyHbmImpl.</span><code><a href="../ImplicitNamingStrategyLegacyHbmImpl.html#determineJoinTableName(org.hibernate.boot.model.naming.ImplicitJoinTableNameSource)" class="member-name-link">determineJoinTableName</a><wbr>(<a href="../ImplicitJoinTableNameSource.html" title="interface in org.hibernate.boot.model.naming">ImplicitJoinTableNameSource</a>&nbsp;source)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
@@ -373,7 +399,10 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first odd-row-color"><code><a href="../Identifier.html" title="class in org.hibernate.boot.model.naming">Identifier</a></code></div>
 <div class="col-second odd-row-color"><span class="type-name-label">ImplicitNamingStrategyJpaCompliantImpl.</span><code><a href="../ImplicitNamingStrategyJpaCompliantImpl.html#determinePrimaryKeyJoinColumnName(org.hibernate.boot.model.naming.ImplicitPrimaryKeyJoinColumnNameSource)" class="member-name-link">determinePrimaryKeyJoinColumnName</a><wbr>(<a href="../ImplicitPrimaryKeyJoinColumnNameSource.html" title="interface in org.hibernate.boot.model.naming">ImplicitPrimaryKeyJoinColumnNameSource</a>&nbsp;source)</code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-last odd-row-color">
+<div class="block">JPA states we should use the following as default:
+ the same name as the primary key column [of the referenced table]</div>
+</div>
 <div class="col-first even-row-color"><code><a href="../Identifier.html" title="class in org.hibernate.boot.model.naming">Identifier</a></code></div>
 <div class="col-second even-row-color"><span class="type-name-label">ImplicitNamingStrategy.</span><code><a href="../ImplicitNamingStrategy.html#determinePrimaryTableName(org.hibernate.boot.model.naming.ImplicitEntityNameSource)" class="member-name-link">determinePrimaryTableName</a><wbr>(<a href="../ImplicitEntityNameSource.html" title="interface in org.hibernate.boot.model.naming">ImplicitEntityNameSource</a>&nbsp;source)</code></div>
 <div class="col-last even-row-color">

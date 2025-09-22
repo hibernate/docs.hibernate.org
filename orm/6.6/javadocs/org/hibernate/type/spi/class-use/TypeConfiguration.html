@@ -14,7 +14,7 @@
 <!--[if IE]>
 <script type="text/javascript" src="../../../../../jquery/jszip-utils/dist/jszip-utils-ie.min.js"></script>
 <![endif]-->
-<script type="text/javascript" src="../../../../../jquery/jquery-3.6.1.min.js"></script>
+<script type="text/javascript" src="../../../../../jquery/jquery-3.7.1.min.js"></script>
 <script type="text/javascript" src="../../../../../jquery/jquery-ui.min.js"></script>
 </head>
 <body>
@@ -348,54 +348,58 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="altColor">
+<th class="colFirst" scope="row"><a href="#org.hibernate.testing.orm.junit">org.hibernate.testing.orm.junit</a></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr class="rowColor">
 <th class="colFirst" scope="row"><a href="#org.hibernate.type">org.hibernate.type</a></th>
 <td class="colLast">
 <div class="block">A Hibernate <a href="../../Type.html" title="interface in org.hibernate.type"><code>Type</code></a> is a strategy for mapping a Java
  property type to a JDBC type or types.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <th class="colFirst" scope="row"><a href="#org.hibernate.type.descriptor.java">org.hibernate.type.descriptor.java</a></th>
 <td class="colLast">
 <div class="block">Integrates a range of types defined by the JDK with the type system
  of Hibernate.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <th class="colFirst" scope="row"><a href="#org.hibernate.type.descriptor.java.spi">org.hibernate.type.descriptor.java.spi</a></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <th class="colFirst" scope="row"><a href="#org.hibernate.type.descriptor.jdbc">org.hibernate.type.descriptor.jdbc</a></th>
 <td class="colLast">
 <div class="block">Defines handling of almost the full range of standard JDBC-defined <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.sql/java/sql/Types.html?is-external=true" title="class or interface in java.sql" class="externalLink">SQL data types</a>.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <th class="colFirst" scope="row"><a href="#org.hibernate.type.descriptor.jdbc.internal">org.hibernate.type.descriptor.jdbc.internal</a></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <th class="colFirst" scope="row"><a href="#org.hibernate.type.descriptor.jdbc.spi">org.hibernate.type.descriptor.jdbc.spi</a></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <th class="colFirst" scope="row"><a href="#org.hibernate.type.descriptor.sql.spi">org.hibernate.type.descriptor.sql.spi</a></th>
 <td class="colLast">
 <div class="block">Defines a registry for <a href="../../descriptor/sql/DdlType.html" title="interface in org.hibernate.type.descriptor.sql"><code>DdlType</code></a>s.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <th class="colFirst" scope="row"><a href="#org.hibernate.type.internal">org.hibernate.type.internal</a></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <th class="colFirst" scope="row"><a href="#org.hibernate.type.spi">org.hibernate.type.spi</a></th>
 <td class="colLast">
 <div class="block">Defines a registry for Hibernate <a href="../../Type.html" title="interface in org.hibernate.type"><code>Type</code></a>s.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <th class="colFirst" scope="row"><a href="#org.hibernate.usertype">org.hibernate.usertype</a></th>
 <td class="colLast">
 <div class="block">An API for user-defined custom types which extend the set of built-in
@@ -805,14 +809,30 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <th class="colSecond" scope="row"><span class="typeNameLabel">Dialect.</span><code><span class="memberNameLink"><a href="../../../dialect/Dialect.html#getSelectClauseNullString(int,org.hibernate.type.spi.TypeConfiguration)">getSelectClauseNullString</a></span>&#8203;(int&nbsp;sqlType,
                          <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
 <td class="colLast">
-<div class="block">Given a <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.sql/java/sql/Types.html?is-external=true" title="class or interface in java.sql" class="externalLink">JDBC type code</a>, return the expression
- for a literal null value of that type, to use in a <code>select</code>
- clause.</div>
+<div class="block"><span class="deprecatedLabel">Deprecated, for removal: This API element is subject to removal in a future version.</span>
+<div class="deprecationComment">Use <a href="../../../dialect/Dialect.html#getSelectClauseNullString(org.hibernate.metamodel.mapping.SqlTypedMapping,org.hibernate.type.spi.TypeConfiguration)"><code>Dialect.getSelectClauseNullString(SqlTypedMapping, TypeConfiguration)</code></a> instead</div>
+</div>
 </td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a></code></td>
+<th class="colSecond" scope="row"><span class="typeNameLabel">Dialect.</span><code><span class="memberNameLink"><a href="../../../dialect/Dialect.html#getSelectClauseNullString(org.hibernate.metamodel.mapping.SqlTypedMapping,org.hibernate.type.spi.TypeConfiguration)">getSelectClauseNullString</a></span>&#8203;(<a href="../../../metamodel/mapping/SqlTypedMapping.html" title="interface in org.hibernate.metamodel.mapping">SqlTypedMapping</a>&nbsp;sqlTypeMapping,
+                         <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
+<td class="colLast">
+<div class="block">Given a type mapping, return the expression
+ for a literal null value of that type, to use in a <code>select</code>
+ clause.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a></code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">DialectDelegateWrapper.</span><code><span class="memberNameLink"><a href="../../../dialect/DialectDelegateWrapper.html#getSelectClauseNullString(int,org.hibernate.type.spi.TypeConfiguration)">getSelectClauseNullString</a></span>&#8203;(int&nbsp;sqlType,
+                         <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a></code></td>
+<th class="colSecond" scope="row"><span class="typeNameLabel">DialectDelegateWrapper.</span><code><span class="memberNameLink"><a href="../../../dialect/DialectDelegateWrapper.html#getSelectClauseNullString(org.hibernate.metamodel.mapping.SqlTypedMapping,org.hibernate.type.spi.TypeConfiguration)">getSelectClauseNullString</a></span>&#8203;(<a href="../../../metamodel/mapping/SqlTypedMapping.html" title="interface in org.hibernate.metamodel.mapping">SqlTypedMapping</a>&nbsp;sqlTypeMapping,
                          <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -829,12 +849,18 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="altColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a></code></td>
+<th class="colSecond" scope="row"><span class="typeNameLabel">PostgreSQLDialect.</span><code><span class="memberNameLink"><a href="../../../dialect/PostgreSQLDialect.html#getSelectClauseNullString(org.hibernate.metamodel.mapping.SqlTypedMapping,org.hibernate.type.spi.TypeConfiguration)">getSelectClauseNullString</a></span>&#8203;(<a href="../../../metamodel/mapping/SqlTypedMapping.html" title="interface in org.hibernate.metamodel.mapping">SqlTypedMapping</a>&nbsp;sqlType,
+                         <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr class="rowColor">
 <td class="colFirst"><code>protected <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Integer.html?is-external=true" title="class or interface in java.lang" class="externalLink">Integer</a></code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">CockroachDialect.</span><code><span class="memberNameLink"><a href="../../../dialect/CockroachDialect.html#resolveSqlTypeCode(java.lang.String,org.hibernate.type.spi.TypeConfiguration)">resolveSqlTypeCode</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;columnTypeName,
                   <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>protected <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Integer.html?is-external=true" title="class or interface in java.lang" class="externalLink">Integer</a></code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">Dialect.</span><code><span class="memberNameLink"><a href="../../../dialect/Dialect.html#resolveSqlTypeCode(java.lang.String,java.lang.String,org.hibernate.type.spi.TypeConfiguration)">resolveSqlTypeCode</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;typeName,
                   <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;baseTypeName,
@@ -845,7 +871,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
  (i.e.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>protected <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Integer.html?is-external=true" title="class or interface in java.lang" class="externalLink">Integer</a></code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">Dialect.</span><code><span class="memberNameLink"><a href="../../../dialect/Dialect.html#resolveSqlTypeCode(java.lang.String,org.hibernate.type.spi.TypeConfiguration)">resolveSqlTypeCode</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;columnTypeName,
                   <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
@@ -855,46 +881,46 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
  if it can't be resolved.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Integer.html?is-external=true" title="class or interface in java.lang" class="externalLink">Integer</a></code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">DialectDelegateWrapper.</span><code><span class="memberNameLink"><a href="../../../dialect/DialectDelegateWrapper.html#resolveSqlTypeCode(java.lang.String,java.lang.String,org.hibernate.type.spi.TypeConfiguration)">resolveSqlTypeCode</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;typeName,
                   <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;baseTypeName,
                   <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Integer.html?is-external=true" title="class or interface in java.lang" class="externalLink">Integer</a></code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">DialectDelegateWrapper.</span><code><span class="memberNameLink"><a href="../../../dialect/DialectDelegateWrapper.html#resolveSqlTypeCode(java.lang.String,org.hibernate.type.spi.TypeConfiguration)">resolveSqlTypeCode</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;columnTypeName,
                   <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>protected <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Integer.html?is-external=true" title="class or interface in java.lang" class="externalLink">Integer</a></code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">H2Dialect.</span><code><span class="memberNameLink"><a href="../../../dialect/H2Dialect.html#resolveSqlTypeCode(java.lang.String,java.lang.String,org.hibernate.type.spi.TypeConfiguration)">resolveSqlTypeCode</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;typeName,
                   <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;baseTypeName,
                   <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>protected <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Integer.html?is-external=true" title="class or interface in java.lang" class="externalLink">Integer</a></code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">H2Dialect.</span><code><span class="memberNameLink"><a href="../../../dialect/H2Dialect.html#resolveSqlTypeCode(java.lang.String,org.hibernate.type.spi.TypeConfiguration)">resolveSqlTypeCode</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;columnTypeName,
                   <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>protected <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Integer.html?is-external=true" title="class or interface in java.lang" class="externalLink">Integer</a></code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">HSQLDialect.</span><code><span class="memberNameLink"><a href="../../../dialect/HSQLDialect.html#resolveSqlTypeCode(java.lang.String,java.lang.String,org.hibernate.type.spi.TypeConfiguration)">resolveSqlTypeCode</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;typeName,
                   <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;baseTypeName,
                   <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>protected <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Integer.html?is-external=true" title="class or interface in java.lang" class="externalLink">Integer</a></code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">PostgreSQLDialect.</span><code><span class="memberNameLink"><a href="../../../dialect/PostgreSQLDialect.html#resolveSqlTypeCode(java.lang.String,org.hibernate.type.spi.TypeConfiguration)">resolveSqlTypeCode</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;columnTypeName,
                   <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code><a href="../../descriptor/jdbc/JdbcType.html" title="interface in org.hibernate.type.descriptor.jdbc">JdbcType</a></code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">OracleArrayJdbcTypeConstructor.</span><code><span class="memberNameLink"><a href="../../../dialect/OracleArrayJdbcTypeConstructor.html#resolveType(org.hibernate.type.spi.TypeConfiguration,org.hibernate.dialect.Dialect,org.hibernate.type.BasicType,org.hibernate.tool.schema.extract.spi.ColumnTypeInformation)">resolveType</a></span>&#8203;(<a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration,
            <a href="../../../dialect/Dialect.html" title="class in org.hibernate.dialect">Dialect</a>&nbsp;dialect,
@@ -902,7 +928,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
            <a href="../../../tool/schema/extract/spi/ColumnTypeInformation.html" title="interface in org.hibernate.tool.schema.extract.spi">ColumnTypeInformation</a>&nbsp;columnTypeInformation)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code><a href="../../descriptor/jdbc/JdbcType.html" title="interface in org.hibernate.type.descriptor.jdbc">JdbcType</a></code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">OracleArrayJdbcTypeConstructor.</span><code><span class="memberNameLink"><a href="../../../dialect/OracleArrayJdbcTypeConstructor.html#resolveType(org.hibernate.type.spi.TypeConfiguration,org.hibernate.dialect.Dialect,org.hibernate.type.descriptor.jdbc.JdbcType,org.hibernate.tool.schema.extract.spi.ColumnTypeInformation)">resolveType</a></span>&#8203;(<a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration,
            <a href="../../../dialect/Dialect.html" title="class in org.hibernate.dialect">Dialect</a>&nbsp;dialect,
@@ -910,7 +936,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
            <a href="../../../tool/schema/extract/spi/ColumnTypeInformation.html" title="interface in org.hibernate.tool.schema.extract.spi">ColumnTypeInformation</a>&nbsp;columnTypeInformation)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code><a href="../../descriptor/jdbc/JdbcType.html" title="interface in org.hibernate.type.descriptor.jdbc">JdbcType</a></code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">OracleNestedTableJdbcTypeConstructor.</span><code><span class="memberNameLink"><a href="../../../dialect/OracleNestedTableJdbcTypeConstructor.html#resolveType(org.hibernate.type.spi.TypeConfiguration,org.hibernate.dialect.Dialect,org.hibernate.type.BasicType,org.hibernate.tool.schema.extract.spi.ColumnTypeInformation)">resolveType</a></span>&#8203;(<a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration,
            <a href="../../../dialect/Dialect.html" title="class in org.hibernate.dialect">Dialect</a>&nbsp;dialect,
@@ -918,7 +944,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
            <a href="../../../tool/schema/extract/spi/ColumnTypeInformation.html" title="interface in org.hibernate.tool.schema.extract.spi">ColumnTypeInformation</a>&nbsp;columnTypeInformation)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code><a href="../../descriptor/jdbc/JdbcType.html" title="interface in org.hibernate.type.descriptor.jdbc">JdbcType</a></code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">OracleNestedTableJdbcTypeConstructor.</span><code><span class="memberNameLink"><a href="../../../dialect/OracleNestedTableJdbcTypeConstructor.html#resolveType(org.hibernate.type.spi.TypeConfiguration,org.hibernate.dialect.Dialect,org.hibernate.type.descriptor.jdbc.JdbcType,org.hibernate.tool.schema.extract.spi.ColumnTypeInformation)">resolveType</a></span>&#8203;(<a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration,
            <a href="../../../dialect/Dialect.html" title="class in org.hibernate.dialect">Dialect</a>&nbsp;dialect,
@@ -926,7 +952,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
            <a href="../../../tool/schema/extract/spi/ColumnTypeInformation.html" title="interface in org.hibernate.tool.schema.extract.spi">ColumnTypeInformation</a>&nbsp;columnTypeInformation)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code><a href="../../descriptor/jdbc/JdbcType.html" title="interface in org.hibernate.type.descriptor.jdbc">JdbcType</a></code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">PostgreSQLArrayJdbcTypeConstructor.</span><code><span class="memberNameLink"><a href="../../../dialect/PostgreSQLArrayJdbcTypeConstructor.html#resolveType(org.hibernate.type.spi.TypeConfiguration,org.hibernate.dialect.Dialect,org.hibernate.type.BasicType,org.hibernate.tool.schema.extract.spi.ColumnTypeInformation)">resolveType</a></span>&#8203;(<a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration,
            <a href="../../../dialect/Dialect.html" title="class in org.hibernate.dialect">Dialect</a>&nbsp;dialect,
@@ -934,7 +960,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
            <a href="../../../tool/schema/extract/spi/ColumnTypeInformation.html" title="interface in org.hibernate.tool.schema.extract.spi">ColumnTypeInformation</a>&nbsp;columnTypeInformation)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code><a href="../../descriptor/jdbc/JdbcType.html" title="interface in org.hibernate.type.descriptor.jdbc">JdbcType</a></code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">PostgreSQLArrayJdbcTypeConstructor.</span><code><span class="memberNameLink"><a href="../../../dialect/PostgreSQLArrayJdbcTypeConstructor.html#resolveType(org.hibernate.type.spi.TypeConfiguration,org.hibernate.dialect.Dialect,org.hibernate.type.descriptor.jdbc.JdbcType,org.hibernate.tool.schema.extract.spi.ColumnTypeInformation)">resolveType</a></span>&#8203;(<a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration,
            <a href="../../../dialect/Dialect.html" title="class in org.hibernate.dialect">Dialect</a>&nbsp;dialect,
@@ -1141,29 +1167,34 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="altColor">
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../dialect/function/DB2SubstringFunction.html#%3Cinit%3E(boolean,org.hibernate.type.spi.TypeConfiguration)">DB2SubstringFunction</a></span>&#8203;(boolean&nbsp;needsCodeUnit,
+                    <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr class="rowColor">
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../dialect/function/DB2SubstringFunction.html#%3Cinit%3E(org.hibernate.type.spi.TypeConfiguration)">DB2SubstringFunction</a></span>&#8203;(<a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../dialect/function/DerbyLpadEmulation.html#%3Cinit%3E(org.hibernate.type.spi.TypeConfiguration)">DerbyLpadEmulation</a></span>&#8203;(<a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../dialect/function/DerbyRpadEmulation.html#%3Cinit%3E(org.hibernate.type.spi.TypeConfiguration)">DerbyRpadEmulation</a></span>&#8203;(<a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../dialect/function/EveryAnyEmulation.html#%3Cinit%3E(org.hibernate.type.spi.TypeConfiguration,boolean,boolean)">EveryAnyEmulation</a></span>&#8203;(<a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration,
                  boolean&nbsp;every,
                  boolean&nbsp;supportsPredicateAsExpression)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../dialect/function/ExtractFunction.html#%3Cinit%3E(org.hibernate.dialect.Dialect,org.hibernate.type.spi.TypeConfiguration)">ExtractFunction</a></span>&#8203;(<a href="../../../dialect/Dialect.html" title="class in org.hibernate.dialect">Dialect</a>&nbsp;dialect,
                <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../dialect/function/FormatFunction.html#%3Cinit%3E(java.lang.String,boolean,boolean,boolean,org.hibernate.type.spi.TypeConfiguration)">FormatFunction</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;nativeFunctionName,
               boolean&nbsp;reversedArguments,
               boolean&nbsp;concatPattern,
@@ -1171,90 +1202,95 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
               <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../dialect/function/FormatFunction.html#%3Cinit%3E(java.lang.String,boolean,boolean,org.hibernate.type.spi.TypeConfiguration)">FormatFunction</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;nativeFunctionName,
               boolean&nbsp;reversedArguments,
               boolean&nbsp;concatPattern,
               <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../dialect/function/FormatFunction.html#%3Cinit%3E(java.lang.String,org.hibernate.type.spi.TypeConfiguration)">FormatFunction</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;nativeFunctionName,
               <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../dialect/function/HypotheticalSetFunction.html#%3Cinit%3E(java.lang.String,org.hibernate.type.BasicTypeReference,org.hibernate.type.spi.TypeConfiguration)">HypotheticalSetFunction</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;name,
                        <a href="../../BasicTypeReference.html" title="class in org.hibernate.type">BasicTypeReference</a>&lt;?&gt;&nbsp;returnType,
                        <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../dialect/function/HypotheticalSetWindowEmulation.html#%3Cinit%3E(java.lang.String,org.hibernate.type.BasicTypeReference,org.hibernate.type.spi.TypeConfiguration)">HypotheticalSetWindowEmulation</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;name,
                               <a href="../../BasicTypeReference.html" title="class in org.hibernate.type">BasicTypeReference</a>&lt;?&gt;&nbsp;returnType,
                               <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../dialect/function/InsertSubstringOverlayEmulation.html#%3Cinit%3E(org.hibernate.type.spi.TypeConfiguration,boolean)">InsertSubstringOverlayEmulation</a></span>&#8203;(<a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration,
                                boolean&nbsp;strictSubstring)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../dialect/function/IntegralTimestampaddFunction.html#%3Cinit%3E(org.hibernate.dialect.Dialect,org.hibernate.type.spi.TypeConfiguration)">IntegralTimestampaddFunction</a></span>&#8203;(<a href="../../../dialect/Dialect.html" title="class in org.hibernate.dialect">Dialect</a>&nbsp;dialect,
                             <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../dialect/function/InverseDistributionFunction.html#%3Cinit%3E(java.lang.String,org.hibernate.query.sqm.produce.function.FunctionParameterType,org.hibernate.type.spi.TypeConfiguration)">InverseDistributionFunction</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;name,
                            <a href="../../../query/sqm/produce/function/FunctionParameterType.html" title="enum in org.hibernate.query.sqm.produce.function">FunctionParameterType</a>&nbsp;parameterType,
                            <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../dialect/function/InverseDistributionWindowEmulation.html#%3Cinit%3E(java.lang.String,org.hibernate.query.sqm.produce.function.FunctionParameterType,org.hibernate.type.spi.TypeConfiguration)">InverseDistributionWindowEmulation</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;name,
                                   <a href="../../../query/sqm/produce/function/FunctionParameterType.html" title="enum in org.hibernate.query.sqm.produce.function">FunctionParameterType</a>&nbsp;parameterType,
                                   <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../dialect/function/LengthFunction.html#%3Cinit%3E(java.lang.String,java.lang.String,java.lang.String,org.hibernate.type.spi.TypeConfiguration)">LengthFunction</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;functionName,
               <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;stringPattern,
               <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;clobPattern,
               <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../dialect/function/ListaggFunction.html#%3Cinit%3E(java.lang.String,org.hibernate.type.spi.TypeConfiguration)">ListaggFunction</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;emptyWithinReplacement,
                <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../dialect/function/ListaggGroupConcatEmulation.html#%3Cinit%3E(org.hibernate.type.spi.TypeConfiguration)">ListaggGroupConcatEmulation</a></span>&#8203;(<a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../dialect/function/ListaggStringAggEmulation.html#%3Cinit%3E(java.lang.String,java.lang.String,boolean,org.hibernate.type.spi.TypeConfiguration)">ListaggStringAggEmulation</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;functionName,
                          <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;stringType,
                          boolean&nbsp;withinGroupClause,
                          <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../dialect/function/LocatePositionEmulation.html#%3Cinit%3E(org.hibernate.type.spi.TypeConfiguration)">LocatePositionEmulation</a></span>&#8203;(<a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../dialect/function/LpadRpadPadEmulation.html#%3Cinit%3E(org.hibernate.type.spi.TypeConfiguration)">LpadRpadPadEmulation</a></span>&#8203;(<a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../dialect/function/MinMaxCaseEveryAnyEmulation.html#%3Cinit%3E(org.hibernate.type.spi.TypeConfiguration,boolean)">MinMaxCaseEveryAnyEmulation</a></span>&#8203;(<a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration,
                            boolean&nbsp;every)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../dialect/function/ModeStatsModeEmulation.html#%3Cinit%3E(org.hibernate.type.spi.TypeConfiguration)">ModeStatsModeEmulation</a></span>&#8203;(<a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../dialect/function/OracleExtractFunction.html#%3Cinit%3E(org.hibernate.dialect.Dialect,org.hibernate.type.spi.TypeConfiguration)">OracleExtractFunction</a></span>&#8203;(<a href="../../../dialect/Dialect.html" title="class in org.hibernate.dialect">Dialect</a>&nbsp;dialect,
+                     <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="altColor">
@@ -1953,6 +1989,37 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <tbody>
 <tr class="altColor">
 <td class="colFirst"><code>static <a href="../../../metamodel/mapping/SelectableMapping.html" title="interface in org.hibernate.metamodel.mapping">SelectableMapping</a></code></td>
+<th class="colSecond" scope="row"><span class="typeNameLabel">SelectableMappingImpl.</span><code><span class="memberNameLink"><a href="../../../metamodel/mapping/internal/SelectableMappingImpl.html#from(java.lang.String,org.hibernate.mapping.Selectable,org.hibernate.metamodel.mapping.SelectablePath,org.hibernate.metamodel.mapping.JdbcMapping,org.hibernate.type.spi.TypeConfiguration,boolean,boolean,boolean,boolean,org.hibernate.dialect.Dialect,org.hibernate.query.sqm.function.SqmFunctionRegistry,org.hibernate.metamodel.spi.RuntimeModelCreationContext)">from</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;containingTableExpression,
+    <a href="../../../mapping/Selectable.html" title="interface in org.hibernate.mapping">Selectable</a>&nbsp;selectable,
+    @Nullable <a href="../../../metamodel/mapping/SelectablePath.html" title="class in org.hibernate.metamodel.mapping">SelectablePath</a>&nbsp;parentPath,
+    <a href="../../../metamodel/mapping/JdbcMapping.html" title="interface in org.hibernate.metamodel.mapping">JdbcMapping</a>&nbsp;jdbcMapping,
+    <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration,
+    boolean&nbsp;insertable,
+    boolean&nbsp;updateable,
+    boolean&nbsp;partitioned,
+    boolean&nbsp;forceNotNullable,
+    <a href="../../../dialect/Dialect.html" title="class in org.hibernate.dialect">Dialect</a>&nbsp;dialect,
+    <a href="../../../query/sqm/function/SqmFunctionRegistry.html" title="class in org.hibernate.query.sqm.function">SqmFunctionRegistry</a>&nbsp;sqmFunctionRegistry,
+    <a href="../../../metamodel/spi/RuntimeModelCreationContext.html" title="interface in org.hibernate.metamodel.spi">RuntimeModelCreationContext</a>&nbsp;creationContext)</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static <a href="../../../metamodel/mapping/SelectableMapping.html" title="interface in org.hibernate.metamodel.mapping">SelectableMapping</a></code></td>
+<th class="colSecond" scope="row"><span class="typeNameLabel">SelectableMappingImpl.</span><code><span class="memberNameLink"><a href="../../../metamodel/mapping/internal/SelectableMappingImpl.html#from(java.lang.String,org.hibernate.mapping.Selectable,org.hibernate.metamodel.mapping.SelectablePath,org.hibernate.metamodel.mapping.JdbcMapping,org.hibernate.type.spi.TypeConfiguration,boolean,boolean,boolean,org.hibernate.dialect.Dialect,org.hibernate.query.sqm.function.SqmFunctionRegistry,org.hibernate.metamodel.spi.RuntimeModelCreationContext)">from</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;containingTableExpression,
+    <a href="../../../mapping/Selectable.html" title="interface in org.hibernate.mapping">Selectable</a>&nbsp;selectable,
+    @Nullable <a href="../../../metamodel/mapping/SelectablePath.html" title="class in org.hibernate.metamodel.mapping">SelectablePath</a>&nbsp;parentPath,
+    <a href="../../../metamodel/mapping/JdbcMapping.html" title="interface in org.hibernate.metamodel.mapping">JdbcMapping</a>&nbsp;jdbcMapping,
+    <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration,
+    boolean&nbsp;insertable,
+    boolean&nbsp;updateable,
+    boolean&nbsp;partitioned,
+    <a href="../../../dialect/Dialect.html" title="class in org.hibernate.dialect">Dialect</a>&nbsp;dialect,
+    <a href="../../../query/sqm/function/SqmFunctionRegistry.html" title="class in org.hibernate.query.sqm.function">SqmFunctionRegistry</a>&nbsp;sqmFunctionRegistry,
+    <a href="../../../metamodel/spi/RuntimeModelCreationContext.html" title="interface in org.hibernate.metamodel.spi">RuntimeModelCreationContext</a>&nbsp;creationContext)</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static <a href="../../../metamodel/mapping/SelectableMapping.html" title="interface in org.hibernate.metamodel.mapping">SelectableMapping</a></code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">SelectableMappingImpl.</span><code><span class="memberNameLink"><a href="../../../metamodel/mapping/internal/SelectableMappingImpl.html#from(java.lang.String,org.hibernate.mapping.Selectable,org.hibernate.metamodel.mapping.JdbcMapping,org.hibernate.type.spi.TypeConfiguration,boolean,boolean,boolean,boolean,org.hibernate.dialect.Dialect,org.hibernate.query.sqm.function.SqmFunctionRegistry,org.hibernate.metamodel.spi.RuntimeModelCreationContext)">from</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;containingTableExpression,
     <a href="../../../mapping/Selectable.html" title="interface in org.hibernate.mapping">Selectable</a>&nbsp;selectable,
     <a href="../../../metamodel/mapping/JdbcMapping.html" title="interface in org.hibernate.metamodel.mapping">JdbcMapping</a>&nbsp;jdbcMapping,
@@ -1981,37 +2048,21 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code>static <a href="../../../metamodel/mapping/SelectableMapping.html" title="interface in org.hibernate.metamodel.mapping">SelectableMapping</a></code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">SelectableMappingImpl.</span><code><span class="memberNameLink"><a href="../../../metamodel/mapping/internal/SelectableMappingImpl.html#from(java.lang.String,org.hibernate.mapping.Selectable,org.hibernate.metamodel.mapping.SelectablePath,org.hibernate.metamodel.mapping.JdbcMapping,org.hibernate.type.spi.TypeConfiguration,boolean,boolean,boolean,boolean,org.hibernate.dialect.Dialect,org.hibernate.query.sqm.function.SqmFunctionRegistry,org.hibernate.metamodel.spi.RuntimeModelCreationContext)">from</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;containingTableExpression,
-    <a href="../../../mapping/Selectable.html" title="interface in org.hibernate.mapping">Selectable</a>&nbsp;selectable,
-    <a href="../../../metamodel/mapping/SelectablePath.html" title="class in org.hibernate.metamodel.mapping">SelectablePath</a>&nbsp;parentPath,
-    <a href="../../../metamodel/mapping/JdbcMapping.html" title="interface in org.hibernate.metamodel.mapping">JdbcMapping</a>&nbsp;jdbcMapping,
+<td class="colFirst"><code>static <a href="../../../metamodel/mapping/SelectableMappings.html" title="interface in org.hibernate.metamodel.mapping">SelectableMappings</a></code></td>
+<th class="colSecond" scope="row"><span class="typeNameLabel">SelectableMappingsImpl.</span><code><span class="memberNameLink"><a href="../../../metamodel/mapping/internal/SelectableMappingsImpl.html#from(java.lang.String,org.hibernate.mapping.Value,int%5B%5D,org.hibernate.metamodel.mapping.SelectablePath,org.hibernate.engine.spi.Mapping,org.hibernate.type.spi.TypeConfiguration,boolean%5B%5D,boolean%5B%5D,org.hibernate.dialect.Dialect,org.hibernate.query.sqm.function.SqmFunctionRegistry,org.hibernate.metamodel.spi.RuntimeModelCreationContext)">from</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;containingTableExpression,
+    <a href="../../../mapping/Value.html" title="interface in org.hibernate.mapping">Value</a>&nbsp;value,
+    int[]&nbsp;propertyOrder,
+    @Nullable <a href="../../../metamodel/mapping/SelectablePath.html" title="class in org.hibernate.metamodel.mapping">SelectablePath</a>&nbsp;parentSelectablePath,
+    <a href="../../../engine/spi/Mapping.html" title="interface in org.hibernate.engine.spi">Mapping</a>&nbsp;mapping,
     <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration,
-    boolean&nbsp;insertable,
-    boolean&nbsp;updateable,
-    boolean&nbsp;partitioned,
-    boolean&nbsp;forceNotNullable,
+    boolean[]&nbsp;insertable,
+    boolean[]&nbsp;updateable,
     <a href="../../../dialect/Dialect.html" title="class in org.hibernate.dialect">Dialect</a>&nbsp;dialect,
     <a href="../../../query/sqm/function/SqmFunctionRegistry.html" title="class in org.hibernate.query.sqm.function">SqmFunctionRegistry</a>&nbsp;sqmFunctionRegistry,
     <a href="../../../metamodel/spi/RuntimeModelCreationContext.html" title="interface in org.hibernate.metamodel.spi">RuntimeModelCreationContext</a>&nbsp;creationContext)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><code>static <a href="../../../metamodel/mapping/SelectableMapping.html" title="interface in org.hibernate.metamodel.mapping">SelectableMapping</a></code></td>
-<th class="colSecond" scope="row"><span class="typeNameLabel">SelectableMappingImpl.</span><code><span class="memberNameLink"><a href="../../../metamodel/mapping/internal/SelectableMappingImpl.html#from(java.lang.String,org.hibernate.mapping.Selectable,org.hibernate.metamodel.mapping.SelectablePath,org.hibernate.metamodel.mapping.JdbcMapping,org.hibernate.type.spi.TypeConfiguration,boolean,boolean,boolean,org.hibernate.dialect.Dialect,org.hibernate.query.sqm.function.SqmFunctionRegistry,org.hibernate.metamodel.spi.RuntimeModelCreationContext)">from</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;containingTableExpression,
-    <a href="../../../mapping/Selectable.html" title="interface in org.hibernate.mapping">Selectable</a>&nbsp;selectable,
-    <a href="../../../metamodel/mapping/SelectablePath.html" title="class in org.hibernate.metamodel.mapping">SelectablePath</a>&nbsp;parentPath,
-    <a href="../../../metamodel/mapping/JdbcMapping.html" title="interface in org.hibernate.metamodel.mapping">JdbcMapping</a>&nbsp;jdbcMapping,
-    <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration,
-    boolean&nbsp;insertable,
-    boolean&nbsp;updateable,
-    boolean&nbsp;partitioned,
-    <a href="../../../dialect/Dialect.html" title="class in org.hibernate.dialect">Dialect</a>&nbsp;dialect,
-    <a href="../../../query/sqm/function/SqmFunctionRegistry.html" title="class in org.hibernate.query.sqm.function">SqmFunctionRegistry</a>&nbsp;sqmFunctionRegistry,
-    <a href="../../../metamodel/spi/RuntimeModelCreationContext.html" title="interface in org.hibernate.metamodel.spi">RuntimeModelCreationContext</a>&nbsp;creationContext)</code></th>
-<td class="colLast">&nbsp;</td>
-</tr>
-<tr class="altColor">
 <td class="colFirst"><code>static <a href="../../../metamodel/mapping/SelectableMappings.html" title="interface in org.hibernate.metamodel.mapping">SelectableMappings</a></code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">SelectableMappingsImpl.</span><code><span class="memberNameLink"><a href="../../../metamodel/mapping/internal/SelectableMappingsImpl.html#from(java.lang.String,org.hibernate.mapping.Value,int%5B%5D,org.hibernate.engine.spi.Mapping,org.hibernate.type.spi.TypeConfiguration,boolean%5B%5D,boolean%5B%5D,org.hibernate.dialect.Dialect,org.hibernate.query.sqm.function.SqmFunctionRegistry,org.hibernate.metamodel.spi.RuntimeModelCreationContext)">from</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;containingTableExpression,
     <a href="../../../mapping/Value.html" title="interface in org.hibernate.mapping">Value</a>&nbsp;value,
@@ -3008,6 +3059,62 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <tr class="altColor">
 <td class="colFirst"><code><a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a></code></td>
 <th class="colSecond" scope="row"><span class="typeNameLabel">BootstrapContextImpl.</span><code><span class="memberNameLink"><a href="../../../testing/boot/BootstrapContextImpl.html#getTypeConfiguration()">getTypeConfiguration</a></span>()</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</section>
+</li>
+<li class="blockList">
+<section><a id="org.hibernate.testing.orm.junit">
+<!--   -->
+</a>
+<h3>Uses of <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a> in <a href="../../../testing/orm/junit/package-summary.html">org.hibernate.testing.orm.junit</a></h3>
+<table class="useSummary">
+<caption><span>Methods in <a href="../../../testing/orm/junit/package-summary.html">org.hibernate.testing.orm.junit</a> that return <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colSecond" scope="col">Method</th>
+<th class="colLast" scope="col">Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code><a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a></code></td>
+<th class="colSecond" scope="row"><span class="typeNameLabel">DialectFeatureChecks.FakeFunctionContributions.</span><code><span class="memberNameLink"><a href="../../../testing/orm/junit/DialectFeatureChecks.FakeFunctionContributions.html#getTypeConfiguration()">getTypeConfiguration</a></span>()</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a></code></td>
+<th class="colSecond" scope="row"><span class="typeNameLabel">DialectFeatureChecks.FakeMetadataBuildingContext.</span><code><span class="memberNameLink"><a href="../../../testing/orm/junit/DialectFeatureChecks.FakeMetadataBuildingContext.html#getTypeConfiguration()">getTypeConfiguration</a></span>()</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code><a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a></code></td>
+<th class="colSecond" scope="row"><span class="typeNameLabel">DialectFeatureChecks.FakeTypeContributions.</span><code><span class="memberNameLink"><a href="../../../testing/orm/junit/DialectFeatureChecks.FakeTypeContributions.html#getTypeConfiguration()">getTypeConfiguration</a></span>()</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<table class="useSummary">
+<caption><span>Constructors in <a href="../../../testing/orm/junit/package-summary.html">org.hibernate.testing.orm.junit</a> with parameters of type <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Constructor</th>
+<th class="colLast" scope="col">Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../testing/orm/junit/DialectFeatureChecks.FakeFunctionContributions.html#%3Cinit%3E(org.hibernate.dialect.Dialect,org.hibernate.type.spi.TypeConfiguration,org.hibernate.query.sqm.function.SqmFunctionRegistry)">FakeFunctionContributions</a></span>&#8203;(<a href="../../../dialect/Dialect.html" title="class in org.hibernate.dialect">Dialect</a>&nbsp;dialect,
+                         <a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration,
+                         <a href="../../../query/sqm/function/SqmFunctionRegistry.html" title="class in org.hibernate.query.sqm.function">SqmFunctionRegistry</a>&nbsp;functionRegistry)</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../testing/orm/junit/DialectFeatureChecks.FakeMetadataBuildingContext.html#%3Cinit%3E(org.hibernate.type.spi.TypeConfiguration,org.hibernate.query.sqm.function.SqmFunctionRegistry)">FakeMetadataBuildingContext</a></span>&#8203;(<a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration,
+                           <a href="../../../query/sqm/function/SqmFunctionRegistry.html" title="class in org.hibernate.query.sqm.function">SqmFunctionRegistry</a>&nbsp;functionRegistry)</code></th>
+<td class="colLast">&nbsp;</td>
+</tr>
+<tr class="altColor">
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="../../../testing/orm/junit/DialectFeatureChecks.FakeTypeContributions.html#%3Cinit%3E(org.hibernate.type.spi.TypeConfiguration)">FakeTypeContributions</a></span>&#8203;(<a href="../TypeConfiguration.html" title="class in org.hibernate.type.spi">TypeConfiguration</a>&nbsp;typeConfiguration)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 </tbody>

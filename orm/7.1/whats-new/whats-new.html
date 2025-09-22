@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.18">
+<title>What&#8217;s New in 7.1</title>
+<link rel="stylesheet" href="./css/hibernate.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body class="article">
+<div id="header">
+<h1>What&#8217;s New in 7.1</h1>
+<div class="details">
+<span id="revnumber">version 7.1.1.Final</span>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#resource-discovery">Resource Discovery in SE Environments</a></li>
+<li><a href="#locking">Locking</a></li>
+<li><a href="#interceptor-merge">Interceptor and merge</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Describes the new features and capabilities added to Hibernate ORM in 7.1.</p>
+</div>
+<div class="paragraph">
+<p>If migrating from earlier versions, be sure to also check out the <a href="https://docs.jboss.org/hibernate/orm/7.1/migration-guide/migration-guide.html">Migration Guide</a> for discussion of impactful changes.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="resource-discovery">Resource Discovery in SE Environments</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Jakarta Persistence specification defines the ability for a provider to discover "managed resources" in EE environments, alleviating the application from manually listing all classes and XML files.
+However, it defines no such support in SE environments.</p>
+</div>
+<div class="paragraph">
+<p>Starting with 7.1, Hibernate now supports this discovery in SE environments, by allowing applications to specify the root URL and zero-or-more "jar" URLs to search.
+These URLs correspond to</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>jakarta.persistence.spi.PersistenceUnitInfo#getPersistenceUnitRootUrl</code></p>
+</li>
+<li>
+<p><code>jakarta.persistence.spi.PersistenceUnitInfo#getJarFileUrls</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>These URLs are searched for managed resources according to the process defined in <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#a12305">the specification</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="locking">Locking</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>org.hibernate.Locking</code> has been introduced to support various aspects of pessimistic locking:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>Locking.Scope</code> is an extension of <code>jakarta.persistence.PessimisticLockScope</code> including some Hibernate-specific options.</p>
+</li>
+<li>
+<p><code>Locking.FollowOn</code> allows controlling Hibernate&#8217;s follow-on locking behavior.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Additionally, we&#8217;ve added <code>org.hibernate.Timeouts</code> to help deal with some standard <code>jakarta.persistence.Timeout</code> values.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="interceptor-merge">Interceptor and merge</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Support for intercepting <code>Session#merge</code> events has been added to Hibernate&#8217;s <code>Interceptor</code>.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 7.1.1.Final<br>
+Last updated 2025-09-14 00:06:52 UTC
+</div>
+</div>
+</body>
+</html>

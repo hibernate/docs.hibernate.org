@@ -261,6 +261,16 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color class-summary class-summary-tab2">
 <div class="block">A registry of <a href="BasicType.html" title="interface in org.hibernate.type"><code>BasicType</code></a> instances</div>
 </div>
+<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="BindableType.html" title="interface in org.hibernate.type">BindableType</a>&lt;J&gt;</div>
+<div class="col-last odd-row-color class-summary class-summary-tab1">
+<div class="block">Represents a type of argument which can be bound to a positional or named
+ <a href="../query/CommonQueryContract.html" title="interface in org.hibernate.query">query</a> parameter.</div>
+</div>
+<div class="col-first even-row-color class-summary class-summary-tab1"><a href="BindingContext.html" title="interface in org.hibernate.type">BindingContext</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab1">
+<div class="block">A context within which a <a href="BindableType.html" title="interface in org.hibernate.type"><code>BindableType</code></a> can be resolved
+ to an instance of <a href="../query/sqm/SqmExpressible.html" title="interface in org.hibernate.query.sqm"><code>SqmExpressible</code></a>.</div>
+</div>
 <div class="col-first odd-row-color class-summary class-summary-tab2"><a href="BottomType.html" title="class in org.hibernate.type">BottomType</a></div>
 <div class="col-last odd-row-color class-summary class-summary-tab2">
 <div class="block">A type that is assignable to every non-primitive type,
@@ -352,68 +362,73 @@ loadScripts(document, 'script');</script>
 <div class="col-last odd-row-color class-summary class-summary-tab2">
 <div class="block">A specialization of the set type, with (resultset-based) ordering.</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab1"><a href="ProcedureParameterExtractionAware.html" title="interface in org.hibernate.type">ProcedureParameterExtractionAware</a>&lt;T&gt;</div>
+<div class="col-first even-row-color class-summary class-summary-tab1"><a href="OutputableType.html" title="interface in org.hibernate.type">OutputableType</a>&lt;J&gt;</div>
 <div class="col-last even-row-color class-summary class-summary-tab1">
-<div class="block">Optional <a href="Type.html" title="interface in org.hibernate.type"><code>Type</code></a> contract for implementations that are aware of how to extract values from
- store procedure OUT/INOUT parameters.</div>
+<div class="block">Specialization of <a href="../metamodel/model/domain/DomainType.html" title="interface in org.hibernate.metamodel.model.domain"><code>DomainType</code></a> for types that
+ can be used as a parameter output for a <a href="../procedure/ProcedureCall.html" title="interface in org.hibernate.procedure"><code>ProcedureCall</code></a>.</div>
 </div>
-<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="ProcedureParameterNamedBinder.html" title="interface in org.hibernate.type">ProcedureParameterNamedBinder</a>&lt;J&gt;</div>
+<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="ProcedureParameterExtractionAware.html" title="interface in org.hibernate.type">ProcedureParameterExtractionAware</a>&lt;T&gt;</div>
 <div class="col-last odd-row-color class-summary class-summary-tab1">
+<div class="block">Optional <a href="Type.html" title="interface in org.hibernate.type"><code>Type</code></a> contract for implementations that are aware of
+ how to extract values from stored procedure OUT/INOUT parameters.</div>
+</div>
+<div class="col-first even-row-color class-summary class-summary-tab1"><a href="ProcedureParameterNamedBinder.html" title="interface in org.hibernate.type">ProcedureParameterNamedBinder</a>&lt;J&gt;</div>
+<div class="col-last even-row-color class-summary class-summary-tab1">
 <div class="block">Optional <a href="Type.html" title="interface in org.hibernate.type"><code>Type</code></a> contract for implementations enabled
  to set store procedure OUT/INOUT parameters values by name.</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab2"><a href="QueryParameterJavaObjectType.html" title="class in org.hibernate.type">QueryParameterJavaObjectType</a></div>
-<div class="col-last even-row-color class-summary class-summary-tab2">&nbsp;</div>
-<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="SerializableType.html" title="class in org.hibernate.type">SerializableType</a>&lt;T extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>&gt;</div>
-<div class="col-last odd-row-color class-summary class-summary-tab2">
+<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="QueryParameterJavaObjectType.html" title="class in org.hibernate.type">QueryParameterJavaObjectType</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab2">&nbsp;</div>
+<div class="col-first even-row-color class-summary class-summary-tab2"><a href="SerializableType.html" title="class in org.hibernate.type">SerializableType</a>&lt;T extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>&gt;</div>
+<div class="col-last even-row-color class-summary class-summary-tab2">
 <div class="block">A type that maps between a <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.sql/java/sql/Types.html#VARBINARY" title="class or interface in java.sql" class="external-link"><code>VARBINARY</code></a> and <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link"><code>Serializable</code></a> classes.</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab5"><a href="SerializationException.html" title="class in org.hibernate.type">SerializationException</a></div>
-<div class="col-last even-row-color class-summary class-summary-tab5">
+<div class="col-first odd-row-color class-summary class-summary-tab5"><a href="SerializationException.html" title="class in org.hibernate.type">SerializationException</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab5">
 <div class="block">Thrown when a property cannot be serialized/deserialized</div>
 </div>
-<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="SetType.html" title="class in org.hibernate.type">SetType</a></div>
-<div class="col-last odd-row-color class-summary class-summary-tab2">&nbsp;</div>
-<div class="col-first even-row-color class-summary class-summary-tab2"><a href="SortedMapType.html" title="class in org.hibernate.type">SortedMapType</a></div>
+<div class="col-first even-row-color class-summary class-summary-tab2"><a href="SetType.html" title="class in org.hibernate.type">SetType</a></div>
 <div class="col-last even-row-color class-summary class-summary-tab2">&nbsp;</div>
-<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="SortedSetType.html" title="class in org.hibernate.type">SortedSetType</a></div>
+<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="SortedMapType.html" title="class in org.hibernate.type">SortedMapType</a></div>
 <div class="col-last odd-row-color class-summary class-summary-tab2">&nbsp;</div>
-<div class="col-first even-row-color class-summary class-summary-tab2"><a href="SpecialOneToOneType.html" title="class in org.hibernate.type">SpecialOneToOneType</a></div>
-<div class="col-last even-row-color class-summary class-summary-tab2">
+<div class="col-first even-row-color class-summary class-summary-tab2"><a href="SortedSetType.html" title="class in org.hibernate.type">SortedSetType</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab2">&nbsp;</div>
+<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="SpecialOneToOneType.html" title="class in org.hibernate.type">SpecialOneToOneType</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab2">
 <div class="block">A one-to-one association that maps to specific formula(s)
  instead of the primary key column of the owning entity.</div>
 </div>
-<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="SqlTypes.html" title="class in org.hibernate.type">SqlTypes</a></div>
-<div class="col-last odd-row-color class-summary class-summary-tab2">
+<div class="col-first even-row-color class-summary class-summary-tab2"><a href="SqlTypes.html" title="class in org.hibernate.type">SqlTypes</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab2">
 <div class="block">Defines a list of constant type codes used to identify generic SQL types.</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab2"><a href="StandardBasicTypes.html" title="class in org.hibernate.type">StandardBasicTypes</a></div>
-<div class="col-last even-row-color class-summary class-summary-tab2">
-<div class="block">References to common <a href="BasicTypeReference.html" title="class in org.hibernate.type"><code>BasicTypeReference</code></a> instances</div>
-</div>
-<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="StandardBasicTypeTemplate.html" title="class in org.hibernate.type">StandardBasicTypeTemplate</a>&lt;J&gt;</div>
+<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="StandardBasicTypes.html" title="class in org.hibernate.type">StandardBasicTypes</a></div>
 <div class="col-last odd-row-color class-summary class-summary-tab2">
+<div class="block">References to common instances of <a href="BasicTypeReference.html" title="class in org.hibernate.type"><code>BasicTypeReference</code></a>.</div>
+</div>
+<div class="col-first even-row-color class-summary class-summary-tab2"><a href="StandardBasicTypeTemplate.html" title="class in org.hibernate.type">StandardBasicTypeTemplate</a>&lt;J&gt;</div>
+<div class="col-last even-row-color class-summary class-summary-tab2">
 <div class="block">A BasicType adapter targeting partial portability to 6.0's type
  system changes.</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab1"><a href="StandardBooleanConverter.html" title="interface in org.hibernate.type">StandardBooleanConverter</a>&lt;R&gt;</div>
-<div class="col-last even-row-color class-summary class-summary-tab1">
+<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="StandardBooleanConverter.html" title="interface in org.hibernate.type">StandardBooleanConverter</a>&lt;R&gt;</div>
+<div class="col-last odd-row-color class-summary class-summary-tab1">
 <div class="block">Marker for Hibernate defined converters of Boolean-typed domain values</div>
 </div>
-<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="StandardConverter.html" title="interface in org.hibernate.type">StandardConverter</a>&lt;O,<wbr>R&gt;</div>
-<div class="col-last odd-row-color class-summary class-summary-tab1">
+<div class="col-first even-row-color class-summary class-summary-tab1"><a href="StandardConverter.html" title="interface in org.hibernate.type">StandardConverter</a>&lt;O,<wbr>R&gt;</div>
+<div class="col-last even-row-color class-summary class-summary-tab1">
 <div class="block">Marker for Hibernate supplied <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/AttributeConverter.html" title="class or interface in jakarta.persistence" class="external-link">converter</a> classes.</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab3"><a href="TimeZoneStorageStrategy.html" title="enum class in org.hibernate.type">TimeZoneStorageStrategy</a></div>
-<div class="col-last even-row-color class-summary class-summary-tab3">
+<div class="col-first odd-row-color class-summary class-summary-tab3"><a href="TimeZoneStorageStrategy.html" title="enum class in org.hibernate.type">TimeZoneStorageStrategy</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab3">
 <div class="block">Enumerates the possible storage strategies for offset or zoned datetimes.</div>
 </div>
-<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="TrueFalseConverter.html" title="class in org.hibernate.type">TrueFalseConverter</a></div>
-<div class="col-last odd-row-color class-summary class-summary-tab2">
+<div class="col-first even-row-color class-summary class-summary-tab2"><a href="TrueFalseConverter.html" title="class in org.hibernate.type">TrueFalseConverter</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab2">
 <div class="block">Handles conversion to/from <code>Boolean</code> as <code>'T'</code> or <code>'F'</code></div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab1"><a href="Type.html" title="interface in org.hibernate.type">Type</a></div>
-<div class="col-last even-row-color class-summary class-summary-tab1">
+<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="Type.html" title="interface in org.hibernate.type">Type</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab1">
 <div class="block">Defines a mapping between a Java type and one or more JDBC <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.sql/java/sql/Types.html" title="class or interface in java.sql" class="external-link">types</a>,
  as well as describing the in-memory semantics of the given Java type, including:
  
@@ -421,21 +436,21 @@ loadScripts(document, 'script');</script>
      how to clone values, and
      how to assemble/disassemble values for storage in the second-level cache.</div>
 </div>
-<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="TypeHelper.html" title="class in org.hibernate.type">TypeHelper</a></div>
-<div class="col-last odd-row-color class-summary class-summary-tab2">
+<div class="col-first even-row-color class-summary class-summary-tab2"><a href="TypeHelper.html" title="class in org.hibernate.type">TypeHelper</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab2">
 <div class="block">Certain operations for working with arrays of property values.</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab2"><a href="UserComponentType.html" title="class in org.hibernate.type">UserComponentType</a>&lt;T&gt;</div>
-<div class="col-last even-row-color class-summary class-summary-tab2">
+<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="UserComponentType.html" title="class in org.hibernate.type">UserComponentType</a>&lt;T&gt;</div>
+<div class="col-last odd-row-color class-summary class-summary-tab2">
 <div class="block">Handles <a href="../usertype/CompositeUserType.html" title="interface in org.hibernate.usertype"><code>CompositeUserType</code></a>s.</div>
 </div>
-<div class="col-first odd-row-color class-summary class-summary-tab3"><a href="WrapperArrayHandling.html" title="enum class in org.hibernate.type">WrapperArrayHandling</a></div>
-<div class="col-last odd-row-color class-summary class-summary-tab3">
+<div class="col-first even-row-color class-summary class-summary-tab3"><a href="WrapperArrayHandling.html" title="enum class in org.hibernate.type">WrapperArrayHandling</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab3">
 <div class="block">Possible options for how to handle <code>Byte[]</code> and <code>Character[]</code> basic mappings
  encountered in the application domain model.</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab2"><a href="YesNoConverter.html" title="class in org.hibernate.type">YesNoConverter</a></div>
-<div class="col-last even-row-color class-summary class-summary-tab2">
+<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="YesNoConverter.html" title="class in org.hibernate.type">YesNoConverter</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab2">
 <div class="block">Handles conversion to/from <code>Boolean</code> as <code>'Y'</code> or <code>'N'</code></div>
 </div>
 </div>

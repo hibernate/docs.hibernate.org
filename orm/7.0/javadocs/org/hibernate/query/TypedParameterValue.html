@@ -79,7 +79,7 @@ loadScripts(document, 'script');</script>
 </div>
 <section class="class-description" id="class-description">
 <hr>
-<div class="type-signature"><span class="modifiers">public record </span><span class="element-name type-name-label">TypedParameterValue&lt;J&gt;</span>(<a href="BindableType.html" title="interface in org.hibernate.query">BindableType</a>&lt;<a href="TypedParameterValue.html" title="type parameter in TypedParameterValue">J</a>&gt;&nbsp;type, <a href="TypedParameterValue.html" title="type parameter in TypedParameterValue">J</a>&nbsp;value)
+<div class="type-signature"><span class="modifiers">public record </span><span class="element-name type-name-label">TypedParameterValue&lt;J&gt;</span>(<a href="../type/BindableType.html" title="interface in org.hibernate.type">BindableType</a>&lt;<a href="TypedParameterValue.html" title="type parameter in TypedParameterValue">J</a>&gt;&nbsp;type, <a href="TypedParameterValue.html" title="type parameter in TypedParameterValue">J</a>&nbsp;value)
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Record.html" title="class or interface in java.lang" class="external-link">Record</a></span></div>
 <div class="block">Represents a typed argument to a query parameter.
  <p>
@@ -95,6 +95,10 @@ loadScripts(document, 'script');</script>
  <pre>
  query.setParameter("stringNamedParam",
          TypedParameterValue.ofNull(StandardBasicTypes.STRING))
+ </pre>
+ <pre>
+ query.setParameter("address",
+         TypedParameterValue.of(Address_.class_, address))
  </pre>
  <p>
  Here, a "null string" argument was bound to the named parameter
@@ -124,7 +128,7 @@ loadScripts(document, 'script');</script>
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(org.hibernate.query.BindableType,J)" class="member-name-link">TypedParameterValue</a><wbr>(<a href="BindableType.html" title="interface in org.hibernate.query">BindableType</a>&lt;<a href="TypedParameterValue.html" title="type parameter in TypedParameterValue">J</a>&gt;&nbsp;type,
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(org.hibernate.type.BindableType,J)" class="member-name-link">TypedParameterValue</a><wbr>(<a href="../type/BindableType.html" title="interface in org.hibernate.type">BindableType</a>&lt;<a href="TypedParameterValue.html" title="type parameter in TypedParameterValue">J</a>&gt;&nbsp;type,
  <a href="TypedParameterValue.html" title="type parameter in TypedParameterValue">J</a>&nbsp;value)</code></div>
 <div class="col-last even-row-color">
 <div class="block">Creates an instance of a <code>TypedParameterValue</code> record class.</div>
@@ -148,7 +152,7 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Indicates whether some other object is "equal to" this one.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4 method-summary-table-tab6"><code><a href="BindableType.html" title="interface in org.hibernate.query">BindableType</a>&lt;<a href="TypedParameterValue.html" title="type parameter in TypedParameterValue">J</a>&gt;</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4 method-summary-table-tab6"><code><a href="../type/BindableType.html" title="interface in org.hibernate.type">BindableType</a>&lt;<a href="TypedParameterValue.html" title="type parameter in TypedParameterValue">J</a>&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4 method-summary-table-tab6"><code><a href="#getType()" class="member-name-link">getType</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4 method-summary-table-tab6">
 <div class="block"><span class="deprecated-label">Deprecated.</span>
@@ -175,13 +179,13 @@ loadScripts(document, 'script');</script>
 <div class="block">Returns a hash code value for this object.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static &lt;J&gt;&nbsp;<a href="TypedParameterValue.html" title="class in org.hibernate.query">TypedParameterValue</a>&lt;J&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#of(org.hibernate.query.BindableType,J)" class="member-name-link">of</a><wbr>(<a href="BindableType.html" title="interface in org.hibernate.query">BindableType</a>&lt;J&gt;&nbsp;type,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#of(jakarta.persistence.metamodel.Type,J)" class="member-name-link">of</a><wbr>(<a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Type</a>&lt;J&gt;&nbsp;type,
  J&nbsp;value)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Obtain an instance with the given type and given value.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static &lt;J&gt;&nbsp;<a href="TypedParameterValue.html" title="class in org.hibernate.query">TypedParameterValue</a>&lt;J&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#ofNull(org.hibernate.query.BindableType)" class="member-name-link">ofNull</a><wbr>(<a href="BindableType.html" title="interface in org.hibernate.query">BindableType</a>&lt;J&gt;&nbsp;type)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#ofNull(jakarta.persistence.metamodel.Type)" class="member-name-link">ofNull</a><wbr>(<a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Type</a>&lt;J&gt;&nbsp;type)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Obtain an instance with the given type and a null value.</div>
 </div>
@@ -190,7 +194,7 @@ loadScripts(document, 'script');</script>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns a string representation of this record class.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="BindableType.html" title="interface in org.hibernate.query">BindableType</a>&lt;<a href="TypedParameterValue.html" title="type parameter in TypedParameterValue">J</a>&gt;</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../type/BindableType.html" title="interface in org.hibernate.type">BindableType</a>&lt;<a href="TypedParameterValue.html" title="type parameter in TypedParameterValue">J</a>&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#type()" class="member-name-link">type</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the value of the <code>type</code> record component.</div>
@@ -218,9 +222,9 @@ loadScripts(document, 'script');</script>
 <h2>Constructor Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="&lt;init&gt;(org.hibernate.query.BindableType,J)">
-<h3 id="&lt;init&gt;(org.hibernate.query.BindableType,java.lang.Object)">TypedParameterValue</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">TypedParameterValue</span><wbr><span class="parameters">(<a href="BindableType.html" title="interface in org.hibernate.query">BindableType</a>&lt;<a href="TypedParameterValue.html" title="type parameter in TypedParameterValue">J</a>&gt;&nbsp;type,
+<section class="detail" id="&lt;init&gt;(org.hibernate.type.BindableType,J)">
+<h3 id="&lt;init&gt;(org.hibernate.type.BindableType,java.lang.Object)">TypedParameterValue</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">TypedParameterValue</span><wbr><span class="parameters">(<a href="../type/BindableType.html" title="interface in org.hibernate.type">BindableType</a>&lt;<a href="TypedParameterValue.html" title="type parameter in TypedParameterValue">J</a>&gt;&nbsp;type,
  <a href="TypedParameterValue.html" title="type parameter in TypedParameterValue">J</a>&nbsp;value)</span></div>
 <div class="block">Creates an instance of a <code>TypedParameterValue</code> record class.</div>
 <dl class="notes">
@@ -239,9 +243,9 @@ loadScripts(document, 'script');</script>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="of(org.hibernate.query.BindableType,J)">
-<h3 id="of(org.hibernate.query.BindableType,java.lang.Object)">of</h3>
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="type-parameters">&lt;J&gt;</span>&nbsp;<span class="return-type"><a href="TypedParameterValue.html" title="class in org.hibernate.query">TypedParameterValue</a>&lt;J&gt;</span>&nbsp;<span class="element-name">of</span><wbr><span class="parameters">(<a href="BindableType.html" title="interface in org.hibernate.query">BindableType</a>&lt;J&gt;&nbsp;type,
+<section class="detail" id="of(jakarta.persistence.metamodel.Type,J)">
+<h3 id="of(jakarta.persistence.metamodel.Type,java.lang.Object)">of</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="type-parameters">&lt;J&gt;</span>&nbsp;<span class="return-type"><a href="TypedParameterValue.html" title="class in org.hibernate.query">TypedParameterValue</a>&lt;J&gt;</span>&nbsp;<span class="element-name">of</span><wbr><span class="parameters">(<a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Type</a>&lt;J&gt;&nbsp;type,
  J&nbsp;value)</span></div>
 <div class="block">Obtain an instance with the given type and given value.</div>
 <dl class="notes">
@@ -251,9 +255,9 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="ofNull(org.hibernate.query.BindableType)">
+<section class="detail" id="ofNull(jakarta.persistence.metamodel.Type)">
 <h3>ofNull</h3>
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="type-parameters">&lt;J&gt;</span>&nbsp;<span class="return-type"><a href="TypedParameterValue.html" title="class in org.hibernate.query">TypedParameterValue</a>&lt;J&gt;</span>&nbsp;<span class="element-name">ofNull</span><wbr><span class="parameters">(<a href="BindableType.html" title="interface in org.hibernate.query">BindableType</a>&lt;J&gt;&nbsp;type)</span></div>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="type-parameters">&lt;J&gt;</span>&nbsp;<span class="return-type"><a href="TypedParameterValue.html" title="class in org.hibernate.query">TypedParameterValue</a>&lt;J&gt;</span>&nbsp;<span class="element-name">ofNull</span><wbr><span class="parameters">(<a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/metamodel/Type.html" title="class or interface in jakarta.persistence.metamodel" class="external-link">Type</a>&lt;J&gt;&nbsp;type)</span></div>
 <div class="block">Obtain an instance with the given type and a null value.</div>
 <dl class="notes">
 <dt>Since:</dt>
@@ -280,7 +284,7 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="getType()">
 <h3>getType</h3>
 <div class="member-signature"><span class="annotations"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html" title="class or interface in java.lang" class="external-link">@Deprecated</a>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Deprecated.html#since()" title="class or interface in java.lang" class="external-link">since</a>="7")
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="BindableType.html" title="interface in org.hibernate.query">BindableType</a>&lt;<a href="TypedParameterValue.html" title="type parameter in TypedParameterValue">J</a>&gt;</span>&nbsp;<span class="element-name">getType</span>()</div>
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../type/BindableType.html" title="interface in org.hibernate.type">BindableType</a>&lt;<a href="TypedParameterValue.html" title="type parameter in TypedParameterValue">J</a>&gt;</span>&nbsp;<span class="element-name">getType</span>()</div>
 <div class="deprecation-block"><span class="deprecated-label">Deprecated.</span>
 <div class="deprecation-comment">use <code>type</code></div>
 </div>
@@ -350,7 +354,7 @@ loadScripts(document, 'script');</script>
 <li>
 <section class="detail" id="type()">
 <h3>type</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="BindableType.html" title="interface in org.hibernate.query">BindableType</a>&lt;<a href="TypedParameterValue.html" title="type parameter in TypedParameterValue">J</a>&gt;</span>&nbsp;<span class="element-name">type</span>()</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../type/BindableType.html" title="interface in org.hibernate.type">BindableType</a>&lt;<a href="TypedParameterValue.html" title="type parameter in TypedParameterValue">J</a>&gt;</span>&nbsp;<span class="element-name">type</span>()</div>
 <div class="block">Returns the value of the <code>type</code> record component.</div>
 <dl class="notes">
 <dt>Returns:</dt>

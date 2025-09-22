@@ -97,7 +97,7 @@ loadScripts(document, 'script');</script>
      }
      </pre>
  <li>Finally, output parameters can be accessed using the overloaded
-     <a href="ProcedureOutputs.html#getOutputParameterValue(org.hibernate.query.procedure.ProcedureParameter)"><code>ProcedureOutputs.getOutputParameterValue(org.hibernate.query.procedure.ProcedureParameter&lt;T&gt;)</code></a> methods.
+     <a href="ProcedureOutputs.html#getOutputParameterValue(org.hibernate.procedure.ProcedureParameter)"><code>ProcedureOutputs.getOutputParameterValue(org.hibernate.procedure.ProcedureParameter&lt;T&gt;)</code></a> methods.
      For portability amongst databases, it is advised to access the output parameters after all
      returns have been processed.
  </ol></div>
@@ -149,8 +149,8 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color class-summary class-summary-tab1"><a href="FunctionReturn.html" title="interface in org.hibernate.procedure">FunctionReturn</a>&lt;T&gt;</div>
 <div class="col-last even-row-color class-summary class-summary-tab1">
-<div class="block">Describes the function return for ProcedureCalls that represent calls to
- a function (<code>"{? = call ...}</code> syntax) rather that a proc (<code>{call ...}</code> syntax)</div>
+<div class="block">Describes the function return value of a <a href="ProcedureCall.html" title="interface in org.hibernate.procedure"><code>ProcedureCall</code></a>
+ executed via a JDBC escape of form (<code>"{? = call ...}</code>.</div>
 </div>
 <div class="col-first odd-row-color class-summary class-summary-tab5"><a href="NamedParametersNotSupportedException.html" title="class in org.hibernate.procedure">NamedParametersNotSupportedException</a></div>
 <div class="col-last odd-row-color class-summary class-summary-tab5">
@@ -171,13 +171,16 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first even-row-color class-summary class-summary-tab1"><a href="ProcedureCall.html" title="interface in org.hibernate.procedure">ProcedureCall</a></div>
 <div class="col-last even-row-color class-summary class-summary-tab1">
-<div class="block">Defines support for executing database stored procedures and functions.</div>
+<div class="block">Defines support for executing database stored procedures and functions using the
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.sql/java/sql/CallableStatement.html" title="class or interface in java.sql" class="external-link">JDBC stored procedure SQL escape syntax</a>.</div>
 </div>
 <div class="col-first odd-row-color class-summary class-summary-tab1"><a href="ProcedureOutputs.html" title="interface in org.hibernate.procedure">ProcedureOutputs</a></div>
 <div class="col-last odd-row-color class-summary class-summary-tab1">
 <div class="block">Specialization of the <a href="../result/Outputs.html" title="interface in org.hibernate.result"><code>Outputs</code></a> contract providing access to the stored procedure's registered
  output parameters.</div>
 </div>
+<div class="col-first even-row-color class-summary class-summary-tab1"><a href="ProcedureParameter.html" title="interface in org.hibernate.procedure">ProcedureParameter</a>&lt;T&gt;</div>
+<div class="col-last even-row-color class-summary class-summary-tab1">&nbsp;</div>
 </div>
 </div>
 </div>

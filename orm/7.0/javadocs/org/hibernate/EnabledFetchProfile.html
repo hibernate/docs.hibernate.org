@@ -80,7 +80,7 @@ loadScripts(document, 'script');</script>
 <section class="class-description" id="class-description">
 <dl class="notes">
 <dt>Record Components:</dt>
-<dd><code><span id="param-profileName">profileName</span></code> - the <a href="annotations/FetchProfile.html#name()"><code>FetchProfile.name()</code></a></dd>
+<dd><code><span id="param-profileName">profileName</span></code> - the <a href="annotations/FetchProfile.html#name()">profile name</a></dd>
 </dl>
 <dl class="notes">
 <dt>All Implemented Interfaces:</dt>
@@ -91,7 +91,40 @@ loadScripts(document, 'script');</script>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Record.html" title="class or interface in java.lang" class="external-link">Record</a>
 implements <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/FindOption.html" title="class or interface in jakarta.persistence" class="external-link">FindOption</a></span></div>
 <div class="block">A <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/FindOption.html" title="class or interface in jakarta.persistence" class="external-link"><code>FindOption</code></a> which requests a named
- <a href="annotations/FetchProfile.html" title="annotation interface in org.hibernate.annotations">fetch profile</a>.</div>
+ <a href="annotations/FetchProfile.html" title="annotation interface in org.hibernate.annotations">fetch profile</a>.
+ <p>
+ An instance of this class may be obtained in a type safe way
+ from the static metamodel for the class annotated
+ <a href="annotations/FetchProfile.html" title="annotation interface in org.hibernate.annotations"><code>@FetchProfile</code></a>
+ and passed as an option to
+ <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/EntityManager.html#find(java.lang.Class,java.lang.Object,jakarta.persistence.FindOption...)" title="class or interface in jakarta.persistence" class="external-link"><code>find()</code></a>.
+ <p>
+ For example, this class defines a fetch profile:
+ <pre>
+ &#064;Entity
+ &#064;FetchProfile(name = "WithAuthors")
+ class Book {
+     ...
+
+     &#064;ManyToMany
+     &#064;FetchProfileOverride(profile = Book_.PROFILE_WITH_AUTHORS)
+     Set&lt;Author&gt; authors;
+ }
+ </pre>
+ The fetch profile may be requested like this:
+ <pre>
+ Book bookWithAuthors =
+         session.find(Book.class, isbn, Book_._WithAuthors)
+ </pre>
+ <p>
+ When the static metamodel is not used, an <code>EnabledFetchProfile</code>
+ may be instantiated directly, passing the name of the fetch profile
+ as a string.
+ <pre>
+ Book bookWithAuthors =
+         session.find(Book.class, isbn,
+                      new EnabledFetchProfile("WithAuthors"))
+ </pre></div>
 <dl class="notes">
 <dt>Since:</dt>
 <dd>7.0</dd>

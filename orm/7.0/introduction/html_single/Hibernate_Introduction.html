@@ -14,7 +14,7 @@
 <div id="header">
 <h1>A Short Guide to Hibernate 7</h1>
 <div class="details">
-<span id="revnumber">version 7.0.0.CR1</span>
+<span id="revnumber">version 7.0.10.Final</span>
 </div>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
@@ -108,34 +108,39 @@
 <li><a href="#load-access">5.8. Controlling lookup by id</a></li>
 <li><a href="#flush">5.9. Flushing the session</a></li>
 <li><a href="#callbacks">5.10. Lifecycle callbacks and entity listeners</a></li>
-<li><a href="#jdbc">5.11. Interacting directly with JDBC</a></li>
-<li><a href="#advice">5.12. What to do when things go wrong</a></li>
+<li><a href="#transient-vs-detached">5.11. Transient vs detached</a></li>
+<li><a href="#jdbc">5.12. Interacting directly with JDBC</a></li>
+<li><a href="#advice">5.13. What to do when things go wrong</a></li>
 </ul>
 </li>
 <li><a href="#queries">6. Executing queries</a>
 <ul class="sectlevel2">
 <li><a href="#hql-queries">6.1. HQL queries</a></li>
-<li><a href="#criteria-queries">6.2. Criteria queries</a></li>
-<li><a href="#criteria-definition">6.3. A more comfortable way to write criteria queries</a></li>
-<li><a href="#native-queries">6.4. Native SQL queries</a></li>
-<li><a href="#restrictions-and-ordering">6.5. Restrictions and ordering</a></li>
-<li><a href="#augmentation">6.6. Augmentation</a></li>
-<li><a href="#pagination">6.7. Limits and pagination</a></li>
-<li><a href="#key-based-pagination">6.8. Key-based pagination</a></li>
-<li><a href="#projection-lists">6.9. Representing projection lists</a></li>
-<li><a href="#named-queries">6.10. Named queries</a></li>
+<li><a href="#query-parameters">6.2. Query parameters</a></li>
+<li><a href="#auto-flush">6.3. Auto-flush</a></li>
+<li><a href="#criteria-queries">6.4. Criteria queries</a></li>
+<li><a href="#criteria-definition">6.5. A more comfortable way to write criteria queries</a></li>
+<li><a href="#native-queries">6.6. Native SQL queries</a></li>
+<li><a href="#restrictions-and-ordering">6.7. Restrictions and ordering</a></li>
+<li><a href="#augmentation">6.8. Augmentation</a></li>
+<li><a href="#pagination">6.9. Limits and pagination</a></li>
+<li><a href="#key-based-pagination">6.10. Key-based pagination</a></li>
+<li><a href="#projection-lists">6.11. Representing projection lists</a></li>
+<li><a href="#named-queries">6.12. Named queries</a></li>
 </ul>
 </li>
 <li><a href="#generator">7. Compile-time tooling</a>
 <ul class="sectlevel2">
-<li><a href="#generated-named-queries">7.1. Named queries and Hibernate Processor</a></li>
-<li><a href="#generated-query-methods">7.2. Generated query methods</a></li>
-<li><a href="#static-or-instance">7.3. Generating query methods as instance methods</a></li>
-<li><a href="#generated-finder-methods">7.4. Generated finder methods</a></li>
-<li><a href="#paging-and-ordering">7.5. Paging, ordering, and restrictions</a></li>
-<li><a href="#key-based-paging">7.6. Key-based pagination</a></li>
-<li><a href="#return-types">7.7. Query and finder method return types</a></li>
-<li><a href="#query-validator">7.8. An alternative approach</a></li>
+<li><a href="#static-metamodel">7.1. The static metamodel</a></li>
+<li><a href="#finders-queries-repositories">7.2. Finder methods, query methods, and repositories</a></li>
+<li><a href="#generated-named-queries">7.3. Named queries and Hibernate Processor</a></li>
+<li><a href="#generated-query-methods">7.4. Generated query methods</a></li>
+<li><a href="#static-or-instance">7.5. Generating query methods as instance methods</a></li>
+<li><a href="#generated-finder-methods">7.6. Generated finder methods</a></li>
+<li><a href="#paging-and-ordering">7.7. Paging, ordering, and restrictions</a></li>
+<li><a href="#key-based-paging">7.8. Key-based pagination</a></li>
+<li><a href="#return-types">7.9. Query and finder method return types</a></li>
+<li><a href="#query-validator">7.10. An alternative approach</a></li>
 </ul>
 </li>
 <li><a href="#tuning-and-performance">8. Tuning and performance</a>
@@ -560,17 +565,17 @@ When in the slightest doubt, map a foreign key relationship using <code>@ManyToO
 
 <span class="n">dependencies</span> <span class="o">{</span>
     <span class="c1">// the GOAT ORM</span>
-    <span class="n">implementation</span> <span class="s1">'org.hibernate.orm:hibernate-core:7.0.0.CR1'</span>
+    <span class="n">implementation</span> <span class="s1">'org.hibernate.orm:hibernate-core:7.0.10.Final'</span>
 
     <span class="c1">// Hibernate Processor</span>
-    <span class="n">annotationProcessor</span> <span class="s1">'org.hibernate.orm:hibernate-processor:7.0.0.CR1'</span>
+    <span class="n">annotationProcessor</span> <span class="s1">'org.hibernate.orm:hibernate-processor:7.0.10.Final'</span>
 
     <span class="c1">// Hibernate Validator</span>
     <span class="n">implementation</span> <span class="s1">'org.hibernate.validator:hibernate-validator:8.0.1.Final'</span>
     <span class="n">implementation</span> <span class="s1">'org.glassfish:jakarta.el:4.0.2'</span>
 
     <span class="c1">// Agroal connection pool</span>
-    <span class="n">runtimeOnly</span> <span class="s1">'org.hibernate.orm:hibernate-agroal:7.0.0.CR1'</span>
+    <span class="n">runtimeOnly</span> <span class="s1">'org.hibernate.orm:hibernate-agroal:7.0.10.Final'</span>
     <span class="n">runtimeOnly</span> <span class="s1">'io.agroal:agroal-pool:2.5'</span>
 
     <span class="c1">// logging via Log4j</span>
@@ -1486,7 +1491,7 @@ by specifying configuration properties.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Where <code>{version}</code> is the version of Hibernate you&#8217;re using, <code>7.0.0.CR1</code>, for example.</p>
+<p>Where <code>{version}</code> is the version of Hibernate you&#8217;re using, <code>7.0.10.Final</code>, for example.</p>
 </div>
 <div class="paragraph">
 <p>You&#8217;ll also need to add a dependency for the JDBC
@@ -3146,6 +3151,11 @@ The JPA specification defines a quite limited set of basic types:</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>BigInteger</code>, <code>BigDecimal</code></p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UUIDs</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>java.util</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>UUID</code></p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Date/time types</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>java.time</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>LocalDate</code>, <code>LocalTime</code>, <code>LocalDateTime</code>, <code>OffsetDateTime</code>, <code>Instant</code>, <code>Year</code></p></td>
@@ -3166,9 +3176,9 @@ The JPA specification defines a quite limited set of basic types:</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>byte[]</code>, <code>char[]</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">UUIDs</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>java.util</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>UUID</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Binary and character wrapper arrays 💀</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>java.lang</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Byte[]</code>, <code>Character[]</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Enumerated types</p></td>
@@ -3191,6 +3201,22 @@ The JPA specification defines a quite limited set of basic types:</p>
 <td class="content">
 <div class="paragraph">
 <p>We&#8217;re begging you to use types from the <code>java.time</code> package instead of anything which inherits <code>java.util.Date</code>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The use of <code>Byte[]</code> and <code>Character[]</code> as basic types was deprecated by Jakarta Persistence 3.2.
+Hibernate does not allow <code>null</code> elements in such arrays.
+Use <code>byte[]</code> or <code>char[]</code> instead.</p>
 </div>
 </td>
 </tr>
@@ -6060,7 +6086,8 @@ It&#8217;s quite acceptable for the foreign key to refer to any other unique key
 <div class="paragraph">
 <p>If you don&#8217;t supply an explicit name using <code>@ForeignKey</code>, Hibernate will generate a quite ugly name.
 The reason for this is that the maximum length of foreign key names on some databases is extremely constrained, and we need to avoid collisions.
-To be fair, this is perfectly fine if you&#8217;re only using the generated DDL for testing.</p>
+To be fair, this is perfectly fine if you&#8217;re only using the generated DDL for testing.
+You can customize the generated constraint names by writing your own <a href="#naming-strategies"><code>ImplicitNamingStrategy</code></a>.</p>
 </div>
 </td>
 </tr>
@@ -8137,9 +8164,80 @@ The <code>@EntityListeners</code> annotation specifies the listeners for a given
 <div class="paragraph">
 <p>A single entity listener class may even be a generic listener that receives lifecycle callbacks for multiple different entity classes.</p>
 </div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+The venerable <a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/Interceptor.html"><code>Interceptor</code></a> interface is a more powerful alternative to entity listeners.
+<code>Interceptor</code> and its friend <a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/CustomEntityDirtinessStrategy.html"><code>CustomEntityDirtinessStrategy</code></a> allow advanced users to augment the built-in handling of managed entities with custom behavior.
+These interfaces are very useful if you&#8217;re building your own persistence framework with Hibernate as the foundation.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>We&#8217;re about to see one way <code>Interceptor</code> can be used.</p>
+</div>
 </div>
 <div class="sect2">
-<h3 id="jdbc">5.11. Interacting directly with JDBC</h3>
+<h3 id="transient-vs-detached">5.11. Transient vs detached</h3>
+<div class="paragraph">
+<p>Sometimes, Hibernate needs to be able to distinguish whether an entity instance is:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>a brand-new transient object the client just instantiated using <code>new</code>, or</p>
+</li>
+<li>
+<p>a detached object, which previously belonged to a persistence context.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This is a bit of a problem, since there&#8217;s no good and efficient way for Hibernate to just tag an entity with a Post-it saying "I&#8217;ve seen you before".</p>
+</div>
+<div class="paragraph">
+<p>Therefore, Hibernate uses heuristics.
+The two most useful heuristics are:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>If the entity has a <a href="#generated-identifiers">generated identifier</a>, the value of the id field is inspected: if the value currently assigned to the id field is the default value for the type of the field, then the object is transient; otherwise, the object is detached.</p>
+</li>
+<li>
+<p>If the entity has a <a href="#version-attributes">version</a>, the value of the version field is inspected: if the value currently assigned to the version field is the default value, or a negative number, then the object is transient; otherwise, the object is detached.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>If the entity has neither a generated id, nor a version, Hibernate usually falls back to just doing something reasonable.
+In extreme cases a <code>SELECT</code> query will be issued to determine whether a matching row exists in the database.</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+These heuristics aren&#8217;t perfect.
+It&#8217;s quite easy to confuse Hibernate by assigning a value to the id field or version field, making a new transient instance look like it&#8217;s detached.
+We therefore strongly discourage assigning values to fields annotated <code>@GeneratedValue</code> or <code>@Version</code> before passing an entity to Hibernate.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If the heuristics ever happen cause a real problem, you may implement your own Post-it tagging via <a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/Interceptor.html#isTransient(java.lang.Object)"><code>Interceptor.isTransient()</code></a>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="jdbc">5.12. Interacting directly with JDBC</h3>
 <div class="paragraph">
 <p>From time to time we run into the need to write some code that calls JDBC directly.
 The <code>EntityManager</code> now offers a convenient way to do this:</p>
@@ -8192,7 +8290,7 @@ The <code>EntityManager</code> now offers a convenient way to do this:</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="advice">5.12. What to do when things go wrong</h3>
+<h3 id="advice">5.13. What to do when things go wrong</h3>
 <div class="paragraph">
 <p>Object/relational mapping has been called the "Vietnam of computer science".
 The person who made this analogy is American, and so one supposes that he meant to imply some kind of unwinnable war.
@@ -8337,13 +8435,13 @@ The method we call depends on what kind of query it is:</p>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Selection</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>createSelectionQuery(String,Class)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/query/QueryProducer.html#createSelectionQuery(java.lang.String,java.lang.Class)"><code>createSelectionQuery(String,Class)</code></a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>createQuery(String,Class)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>getResultList()</code>, <code>getSingleResult()</code>, or <code>getSingleResultOrNull()</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Mutation</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>createMutationQuery(String)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/query/QueryProducer.html#createMutationQuery(java.lang.String)"><code>createMutationQuery(String)</code></a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>createQuery(String)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>executeUpdate()</code></p></td>
 </tr>
@@ -8372,12 +8470,55 @@ The method we call depends on what kind of query it is:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>The only difference between <code>createSelectionQuery()</code> and <code>createQuery()</code> is that <code>createSelectionQuery()</code> throws an exception if passed an <code>insert</code>, <code>delete</code>, or <code>update</code>.</p>
+<p>The main difference between <code>createSelectionQuery()</code> and <code>createQuery()</code> is that <code>createSelectionQuery()</code> throws an exception if passed a query string that begins with <code>insert</code>, <code>delete</code>, or <code>update</code>.</p>
 </div>
 <div class="paragraph">
-<p>In the query above, <code>:titleSearchPattern</code> is called a <em>named parameter</em>.
-We may also identify parameters by a number.
-These are called <em>ordinal parameters</em>.</p>
+<p>We&#8217;ve been using <a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/query/SelectionQuery.html#getResultList()"><code>getResultList()</code></a> because we&#8217;ve been expecting our queries to return multiple results.
+If we&#8217;re expecting a query to return a single result, we can use <a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/query/SelectionQuery.html#getSingleResult()"><code>getSingleResult()</code></a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nc">Book</span> <span class="n">book</span> <span class="o">=</span>
+        <span class="n">session</span><span class="o">.</span><span class="na">createSelectionQuery</span><span class="o">(</span><span class="s">"from Book where isbn = ?1"</span><span class="o">,</span> <span class="nc">Book</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">setParameter</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="n">isbn</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">getSingleResult</span><span class="o">();</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Or, if we&#8217;re expecting it to return at most one result, we can use <a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/query/SelectionQuery.html#getSingleResultOrNull()"><code>getSingleResultOrNull()</code></a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nc">Book</span> <span class="n">bookOrNull</span> <span class="o">=</span>
+        <span class="n">session</span><span class="o">.</span><span class="na">createSelectionQuery</span><span class="o">(</span><span class="s">"from Book where isbn = ?1"</span><span class="o">,</span> <span class="nc">Book</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">setParameter</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="n">isbn</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">getSingleResultOrNull</span><span class="o">();</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The difference, of course, is that <code>getSingleResult()</code> throws an exception if there&#8217;s no matching row in the database, whereas <code>getSingleResultOrNull()</code> just returns <code>null</code>.</p>
+</div>
+<div class="paragraph">
+<p>To execute a <code>MutationQuery</code>, we use <a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/query/MutationQuery.html#executeUpdate()"><code>executeUpdate()</code></a>, which returns the number of entities affected by the <code>insert</code>, <code>update</code>, or <code>delete</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="query-parameters">6.2. Query parameters</h3>
+<div class="paragraph">
+<p>Queries are often parameterized.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>In the query above, <code>:titleSearchPattern</code> is called a <em>named parameter</em>.</p>
+</li>
+<li>
+<p>Alternatively, we may label a parameter by a number. Such a parameter is called an <em>ordinal parameter</em>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>We may easily rewrite our query to use an ordinal parameter:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -8406,43 +8547,74 @@ This would open up the possibility for an attacker to execute arbitrary code on 
 </table>
 </div>
 <div class="paragraph">
-<p>If we&#8217;re expecting a query to return a single result, we can use <code>getSingleResult()</code>.</p>
+<p>The <a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/query/CommonQueryContract.html#setParameter(java.lang.String,java.lang.Object)"><code>setParameter()</code></a> methods specify arguments to query parameters.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The two-argument forms of <code>setParameter()</code> are perfect for most purposes, but <em>very occasionally</em> it&#8217;s necessary to resolve an ambiguity in the interpretation of the argument value by explicitly specifying the <a href="#compositional-basic-types">type</a> of the argument.
+The best way to identify the type is via a reference to a JPA metamodel <code>Type</code>.
+There are two ways to do this:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>by passing the <code>Type</code> as a third argument to <a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/query/CommonQueryContract.html#setParameter(java.lang.String,java.lang.Object,jakarta.persistence.metamodel.Type)"><code>setParameter()</code></a>, or</p>
+</li>
+<li>
+<p>by packaging the argument and its <code>Type</code> in a <a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/query/TypedParameterValue.html"><code>TypedParameterValue</code></a>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>For example, we may pass a <a href="#static-metamodel">static metamodel</a> reference to <code>setParameter()</code>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="java"><span class="nc">Book</span> <span class="n">book</span> <span class="o">=</span>
+<pre class="rouge highlight"><code data-lang="java"><span class="n">session</span><span class="o">.</span><span class="na">createSelectionQuery</span><span class="o">(</span><span class="s">"from Person where address = :address"</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">setParameter</span><span class="o">(</span><span class="s">"address"</span> <span class="n">address</span><span class="o">,</span> <span class="n">Person_</span><span class="o">.</span><span class="na">address</span><span class="o">.</span><span class="na">getType</span><span class="o">())</span>
+        <span class="o">.</span><span class="na">getResultList</span><span class="o">();</span></code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="auto-flush">6.3. Auto-flush</h3>
+<div class="paragraph">
+<p>By default, Hibernate dirty checks entities in the persistence context before executing a query, in order to determine if there are changes which have not yet been flushed to the database, but which might affect the results of the query.
+If there are unflushed changes, then Hibernate goes ahead and executes an automatic <a href="#flush">flush</a> before executing the query.
+That way, the query won&#8217;t return stale results which fail to reflect changes made to data within the current unit of work.
+But if there are many entities association with the persistence context, then this can be an expensive operation.</p>
+</div>
+<div class="paragraph">
+<p>To disable this behavior, set the <a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/query/QueryFlushMode.html">query flush mode</a> to <code>NO_FLUSH</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nc">Book</span> <span class="n">bookOrNull</span> <span class="o">=</span>
         <span class="n">session</span><span class="o">.</span><span class="na">createSelectionQuery</span><span class="o">(</span><span class="s">"from Book where isbn = ?1"</span><span class="o">,</span> <span class="nc">Book</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
             <span class="o">.</span><span class="na">setParameter</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="n">isbn</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">setQueryFlushMode</span><span class="o">(</span><span class="nc">QueryFlushMode</span><span class="o">.</span><span class="na">NO_FLUSH</span><span class="o">)</span>
             <span class="o">.</span><span class="na">getSingleResult</span><span class="o">();</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Or, if we&#8217;re expecting it to return at most one result, we can use <code>getSingleResultOrNull()</code>.</p>
+<p>Or, especially if you&#8217;re using JPA-standard APIs, use <code>FlushModeType.COMMIT</code>:</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="java"><span class="nc">Book</span> <span class="n">bookOrNull</span> <span class="o">=</span>
         <span class="n">session</span><span class="o">.</span><span class="na">createSelectionQuery</span><span class="o">(</span><span class="s">"from Book where isbn = ?1"</span><span class="o">,</span> <span class="nc">Book</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
             <span class="o">.</span><span class="na">setParameter</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="n">isbn</span><span class="o">)</span>
-            <span class="o">.</span><span class="na">getSingleResultOrNull</span><span class="o">();</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The difference, of course, is that <code>getSingleResult()</code> throws an exception if there&#8217;s no matching row in the database, whereas <code>getSingleResultOrNull()</code> just returns <code>null</code>.</p>
-</div>
-<div class="paragraph">
-<p>By default, Hibernate dirty checks entities in the persistence context before executing a query, in order to determine if the session should be flushed.
-If there are many entities association with the persistence context, then this can be an expensive operation.</p>
-</div>
-<div class="paragraph">
-<p>To disable this behavior, set the flush mode to <code>COMMIT</code> or <code>MANUAL</code>:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="java"><span class="nc">Book</span> <span class="n">bookOrNull</span> <span class="o">=</span>
-        <span class="n">session</span><span class="o">.</span><span class="na">createSelectionQuery</span><span class="o">(</span><span class="s">"from Book where isbn = ?1"</span><span class="o">,</span> <span class="nc">Book</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
-            <span class="o">.</span><span class="na">setParameter</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="n">isbn</span><span class="o">)</span>
-            <span class="o">.</span><span class="na">setHibernateFlushMode</span><span class="o">(</span><span class="no">MANUAL</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">setFlushMode</span><span class="o">(</span><span class="nc">FlushModeType</span><span class="o">.</span><span class="na">COMMIT</span><span class="o">)</span>
             <span class="o">.</span><span class="na">getSingleResult</span><span class="o">();</span></code></pre>
 </div>
 </div>
@@ -8454,7 +8626,7 @@ If there are many entities association with the persistence context, then this c
 </td>
 <td class="content">
 <div class="paragraph">
-<p>Setting the flush mode to <code>COMMIT</code> or <code>MANUAL</code> might cause the query to return stale results.</p>
+<p>Setting the flush mode to <code>NO_FLUSH</code>, <code>COMMIT</code>, or <code>MANUAL</code> might cause the query to return stale results.</p>
 </div>
 </td>
 </tr>
@@ -8466,7 +8638,7 @@ For this, JPA offers an API which allows programmatic construction of a query.</
 </div>
 </div>
 <div class="sect2">
-<h3 id="criteria-queries">6.2. Criteria queries</h3>
+<h3 id="criteria-queries">6.4. Criteria queries</h3>
 <div class="paragraph">
 <p>Imagine we&#8217;re implementing some sort of search screen, where the user of our system is offered several different ways to constrain the query result set.
 For example, we might let them search for books by title and/or the author name.
@@ -8534,7 +8706,7 @@ Either:</p>
 <div class="paragraph">
 <p>We&#8217;re ready to create a criteria query.</p>
 </div>
-<div class="listingblock">
+<div id="criteria-query-example" class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="java"><span class="nc">CriteriaQuery</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="n">query</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="na">createQuery</span><span class="o">(</span><span class="nc">Book</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
 <span class="nc">Root</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">&gt;</span> <span class="n">book</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="na">from</span><span class="o">(</span><span class="nc">Book</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
@@ -8590,14 +8762,14 @@ That&#8217;s safe because, by default, Hibernate automatically and transparently
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Selection</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>createSelectionQuery(CriteriaQuery)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/query/QueryProducer.html#createSelectionQuery(jakarta.persistence.criteria.CriteriaQuery)"><code>createSelectionQuery(CriteriaQuery)</code></a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>createQuery(CriteriaQuery)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>getResultList()</code>, <code>getSingleResult()</code>, or <code>getSingleResultOrNull()</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Mutation</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>createMutationQuery(CriteriaUpdate)</code> or <code>createMutationQuery(CriteriaDelete)</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>createQuery(CriteriaUpdate)</code> or <code>createQuery(CriteriaDelte)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/query/QueryProducer.html#createMutationQuery(jakarta.persistence.criteria.CriteriaUpdate)"><code>createMutationQuery(CriteriaUpdate)</code></a> or <a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/query/QueryProducer.html#createMutationQuery(jakarta.persistence.criteria.CriteriaDelete)"><code>createMutationQuery(CriteriaDelete)</code></a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>createQuery(CriteriaUpdate)</code> or <code>createQuery(CriteriaDelete)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>executeUpdate()</code></p></td>
 </tr>
 </tbody>
@@ -8657,14 +8829,14 @@ We do.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="criteria-definition">6.3. A more comfortable way to write criteria queries</h3>
+<h3 id="criteria-definition">6.5. A more comfortable way to write criteria queries</h3>
 <div class="paragraph">
 <p>Actually, what makes the JPA criteria API less ergonomic than it should be is the need to call all operations of the <code>CriteriaBuilder</code> as instance methods, instead of having them as <code>static</code> functions.
 The reason it works this way is that each JPA provider has its own implementation of <code>CriteriaBuilder</code>.</p>
 </div>
 <div class="paragraph">
-<p>Hibernate 6.3 introduces the helper class <a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/query/criteria/CriteriaDefinition.html"><code>CriteriaDefinition</code></a> to reduce the verbosity of criteria queries.
-Our example looks like this:</p>
+<p>The helper class <a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/query/criteria/CriteriaDefinition.html"><code>CriteriaDefinition</code></a> can reduce the verbosity of criteria queries by eliminating the need to explicitly qualify calls to the methods of <code>CriteriaBuilder</code>.
+Our <a href="#criteria-query-example">previous example</a> would look like this:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -8687,7 +8859,7 @@ Our example looks like this:</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="native-queries">6.4. Native SQL queries</h3>
+<h3 id="native-queries">6.6. Native SQL queries</h3>
 <div class="paragraph">
 <p>HQL is a powerful language which helps reduce the verbosity of SQL, and significantly increases portability of queries between databases.
 But ultimately, the true value of ORM is not in avoiding SQL, but in alleviating the pain involved in dealing with SQL result sets once we get them back to our Java program.
@@ -8712,19 +8884,19 @@ As we said <a href="#introduction">right up front</a>, Hibernate&#8217;s generat
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Selection</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>createNativeQuery(String,Class)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/query/QueryProducer.html#createNativeQuery(java.lang.String,java.lang.Class)"><code>createNativeQuery(String,Class)</code></a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>createNativeQuery(String,Class)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>getResultList()</code>, <code>getSingleResult()</code>, or <code>getSingleResultOrNull()</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Mutation</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>createNativeMutationQuery(String)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/query/QueryProducer.html#createNativeMutationQuery(java.lang.String)"><code>createNativeMutationQuery(String)</code></a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>createNativeQuery(String)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>executeUpdate()</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Stored procedure</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>createStoredProcedureCall(String)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/SharedSessionContract.html#createStoredProcedureCall(java.lang.String)"><code>createStoredProcedureCall(String)</code></a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>createStoredProcedureQuery(String)</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>execute()</code></p></td>
 </tr>
@@ -8805,7 +8977,7 @@ That&#8217;s because the session is unaware of which modifications held in memor
 </div>
 </div>
 <div class="sect2">
-<h3 id="restrictions-and-ordering">6.5. Restrictions and ordering</h3>
+<h3 id="restrictions-and-ordering">6.7. Restrictions and ordering</h3>
 <div class="paragraph">
 <p>We&#8217;ve already seen how the JPA <a href="#criteria-queries">Criteria Query API</a> can be used to construct a query completely programmatically.
 The Criteria API is powerful, but for the most common scenarios it&#8217;s at least arguably overkill.
@@ -8971,7 +9143,7 @@ For such cases, the full Criteria API is appropriate.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="augmentation">6.6. Augmentation</h3>
+<h3 id="augmentation">6.8. Augmentation</h3>
 <div class="paragraph">
 <p>When <code>Restriction</code>, <code>Path</code>, and <code>Order</code> aren&#8217;t expressive enough, we can <em>augment</em> the query by manipulating its representation as a criteria:</p>
 </div>
@@ -9015,7 +9187,7 @@ For complicated queries involving multiple entities, or with aggregation and pro
 </div>
 </div>
 <div class="sect2">
-<h3 id="pagination">6.7. Limits and pagination</h3>
+<h3 id="pagination">6.9. Limits and pagination</h3>
 <div class="paragraph">
 <p>If a query might return more results than we can handle at one time, we may specify:</p>
 </div>
@@ -9164,7 +9336,7 @@ Since Hibernate 6.5, there&#8217;s an alternative approach, which offers some ad
 </div>
 </div>
 <div class="sect2">
-<h3 id="key-based-pagination">6.8. Key-based pagination</h3>
+<h3 id="key-based-pagination">6.10. Key-based pagination</h3>
 <div class="paragraph">
 <p><em>Key-based pagination</em> aims to reduce the likelihood of missed or duplicate results when data is modified between page requests.
 It&#8217;s most easily illustrated with an example:</p>
@@ -9202,7 +9374,7 @@ In this example, <code>Book.isbn</code> is the key.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="projection-lists">6.9. Representing projection lists</h3>
+<h3 id="projection-lists">6.11. Representing projection lists</h3>
 <div class="paragraph">
 <p>A <em>projection list</em> is the list of things that a query returns, that is, the list of expressions in the <code>select</code> clause.
 Since Java has no tuple types, representing query projection lists in Java has always been a problem for JPA and Hibernate.
@@ -9244,7 +9416,19 @@ Java&#8217;s <code>record</code> types now offer an interesting alternative:</p>
 <p>Notice that we&#8217;re able to declare the <code>record</code> right before the line which executes the query.</p>
 </div>
 <div class="paragraph">
-<p>Now, this is only <em>superficially</em> more typesafe, since the query itself is not checked statically, and so we can&#8217;t say it&#8217;s objectively better.
+<p>This works just as well with queries written in SQL:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="n">record</span> <span class="nf">BookInfo</span><span class="o">(</span><span class="nc">String</span> <span class="n">isbn</span><span class="o">,</span> <span class="nc">String</span> <span class="n">title</span><span class="o">,</span> <span class="kt">int</span> <span class="n">pages</span><span class="o">)</span> <span class="o">{}</span>
+
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">BookInfo</span><span class="o">&gt;</span> <span class="n">resultList</span> <span class="o">=</span>
+        <span class="n">session</span><span class="o">.</span><span class="na">createNativeQuery</span><span class="o">(</span><span class="s">"select title, isbn, pages from Book"</span><span class="o">,</span> <span class="nc">BookInfo</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">getResultList</span><span class="o">();</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now, this approach is only <em>superficially</em> more typesafe, since the query itself is not checked statically, and so we can&#8217;t say it&#8217;s objectively better.
 But perhaps you find it more aesthetically pleasing.
 And if we&#8217;re going to be passing query results around the system, the use of a <code>record</code> type is <em>much</em> better.</p>
 </div>
@@ -9275,7 +9459,7 @@ Consider the following code:</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="named-queries">6.10. Named queries</h3>
+<h3 id="named-queries">6.12. Named queries</h3>
 <div class="paragraph">
 <p>The <code>@NamedQuery</code> annotation lets us define a HQL query that is compiled and checked as part of the bootstrap process.
 This means we find out about errors in our queries earlier, instead of waiting until the query is actually executed.
@@ -9410,6 +9594,26 @@ If we use the Query Validator, there&#8217;s not much advantage to the use of na
 <p>The <em>static metamodel generator</em> is a standard part of JPA.
 We&#8217;ve actually already seen its handiwork in the code examples <a href="#main-hibernate">earlier</a>: it&#8217;s the author of the class <code>Book_</code>, which contains the static metamodel of the <a href="#book">entity class</a> <code>Book</code>.</p>
 </div>
+<div class="paragraph">
+<p>Hibernate comes with an annotation processor which does much more than just this.
+It&#8217;s capable of automatically generating:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#static-metamodel">JPA metamodel</a> classes, as we&#8217;ve already seen,</p>
+</li>
+<li>
+<p><a href="https://docs.jboss.org/hibernate/orm/7.0/repositories/html_single/Hibernate_Data_Repositories.html#data-static-metamodel">Jakarta Data metamodel</a> classes,</p>
+</li>
+<li>
+<p>static <a href="#generated-query-methods">query methods</a> and <a href="#generated-finder-methods">finder methods</a>, and</p>
+</li>
+<li>
+<p>implementations of <a href="#static-or-instance">repository interfaces</a>, including <a href="https://docs.jboss.org/hibernate/orm/7.0/repositories/html_single/Hibernate_Data_Repositories.html#repository-interfaces">Jakarta Data repositories</a>.</p>
+</li>
+</ul>
+</div>
 <div id="metamodel-generator" class="sidebarblock">
 <div class="content">
 <div class="title">Hibernate Processor</div>
@@ -9457,6 +9661,28 @@ For more details on how to integrate the Hibernate Processor, check out the <a h
 </td>
 </tr>
 </table>
+</div>
+<div class="sect2">
+<h3 id="static-metamodel">7.1. The static metamodel</h3>
+<div class="paragraph">
+<p>We&#8217;ve already seen several ways to use the JPA static metamodel.
+Metamodel references are useful for expressing, in a completely type-safe way:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#criteria-queries">Criteria queries</a>,</p>
+</li>
+<li>
+<p>eager fetching via an <a href="#entity-graph">entity graph</a>,</p>
+</li>
+<li>
+<p>dynamic <a href="#restrictions-and-ordering">restriction and sorting</a>, and</p>
+</li>
+<li>
+<p>references to named <a href="#named-queries">queries</a> and named entity graphs.</p>
+</li>
+</ul>
 </div>
 <div class="paragraph">
 <p>Here&#8217;s an example of the sort of code that&#8217;s generated for an entity class, as mandated by the JPA specification:</p>
@@ -9617,26 +9843,11 @@ For example, you could use it to create your own criteria query API.</p>
 <p>We&#8217;ve already been using metamodel references like <code>Book_.authors</code> and <code>Book.AUTHORS</code> in the previous chapters.
 So now let&#8217;s see what else Hibernate Processor can do for us.</p>
 </div>
-<div class="sidebarblock">
-<div class="content">
-<div class="title">Hibernate Processor and Jakarta Data</div>
+</div>
+<div class="sect2">
+<h3 id="finders-queries-repositories">7.2. Finder methods, query methods, and repositories</h3>
 <div class="paragraph">
-<p>The functionality we&#8217;re about to describe was developed before Jakarta Data took on its current shape, and directly triggered the apocalypse which lead to the final form of the specification.
-Therefore, there&#8217;s massive overlap between the functionality described in this chapter, and the functionality available via the Jakarta Data annotations.
-On the other hand, Jakarta Data can&#8217;t do <em>everything</em> described below, and in particular it doesn&#8217;t yet come with built-in support for stateful persistence contexts or reactive sessions.</p>
-</div>
-<div class="paragraph">
-<p>We&#8217;ve therefore opted <em>not</em> to rewrite this chapter in a Jakarta Data-centric way, and instead refer you to <a href="https://docs.jboss.org/hibernate/orm/7.0/repositories/html_single/Hibernate_Data_Repositories.html">Introducing Hibernate Data Repositories</a> for information about the standard Jakarta Data APIs.</p>
-</div>
-<div class="paragraph">
-<p>As Jakarta Data matures, even more of this functionality might be made obsolete, at least in the form described here.
-We&#8217;re working hard to make this happen.</p>
-</div>
-</div>
-</div>
-<div class="paragraph">
-<p>Automatic generation of <em>finder methods</em> and <em>query methods</em> is a relatively new feature of Hibernate Processor, and an extension to the functionality defined by the JPA specification.
-In this chapter, we&#8217;re going to explore these features.</p>
+<p>Automatic generation of <em>finder methods</em> and <em>query methods</em> is a relatively new feature of Hibernate Processor&#8212;&#8203;originally introduced as an experiment&#8212;&#8203;which ultimately grew into a whole new way to use Hibernate.</p>
 </div>
 <div class="paragraph">
 <p>We&#8217;re going to meet three different kinds of generated method:</p>
@@ -9668,7 +9879,27 @@ In this chapter, we&#8217;re going to explore these features.</p>
 </ul>
 </div>
 <div class="paragraph">
-<p>To whet our appetites, let&#8217;s see how this works for a <code>@NamedQuery</code>.</p>
+<p>Back in <a href="#organizing-persistence">Organizing persistence logic</a>, we walked you through a few different ways to organize your code with the help of Hibernate Processor.
+That journey terminated at the idea of a repository, but we emphasized that you aren&#8217;t required to stay all the way to the end of the line.
+Repositories are a sweet spot for many users, but they might not be your sweet spot, and that&#8217;s OK.
+Hibernate Processor is perfectly happy to generate <code>static</code> implementations of <code>@HQL</code>, <code>@SQL</code>, and <code>@Find</code> methods, eliminating the need to inject or instantiate a repository object.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Hibernate Processor and Jakarta Data</div>
+<div class="paragraph">
+<p>The functionality we&#8217;re about to describe was developed before Jakarta Data took on its current shape, and directly triggered the apocalypse which lead to the final form of the specification.
+Therefore, there&#8217;s massive overlap between the functionality described in this chapter, and the functionality available via the Jakarta Data annotations.
+On the other hand, Jakarta Data can&#8217;t do <em>everything</em> described below, and in particular it doesn&#8217;t yet come with built-in support for stateful persistence contexts or reactive sessions.</p>
+</div>
+<div class="paragraph">
+<p>We&#8217;ve therefore opted <em>not</em> to rewrite this chapter in a Jakarta Data-centric way, and instead refer you to <a href="https://docs.jboss.org/hibernate/orm/7.0/repositories/html_single/Hibernate_Data_Repositories.html">Introducing Hibernate Data Repositories</a> for information about the standard Jakarta Data APIs.</p>
+</div>
+<div class="paragraph">
+<p>As Jakarta Data matures, even more of this functionality might be made obsolete, at least in the form described here.
+We&#8217;re working hard to make that happen.</p>
+</div>
+</div>
 </div>
 <div class="admonitionblock caution">
 <table>
@@ -9686,8 +9917,12 @@ Hibernate Processor is not currently able to generate finder methods and query m
 </tr>
 </table>
 </div>
+<div class="paragraph">
+<p>To whet our appetites, let&#8217;s see how it works for a <code>@NamedQuery</code>.</p>
+</div>
+</div>
 <div class="sect2">
-<h3 id="generated-named-queries">7.1. Named queries and Hibernate Processor</h3>
+<h3 id="generated-named-queries">7.3. Named queries and Hibernate Processor</h3>
 <div class="paragraph">
 <p>The very simplest way to generate a query method is to put a <code>@NamedQuery</code> annotation anywhere we like, with a <code>name</code> beginning with the magical character <code>#</code>.</p>
 </div>
@@ -9734,7 +9969,7 @@ Hibernate Processor is not currently able to generate finder methods and query m
 </div>
 </div>
 <div class="sect2">
-<h3 id="generated-query-methods">7.2. Generated query methods</h3>
+<h3 id="generated-query-methods">7.4. Generated query methods</h3>
 <div class="paragraph">
 <p>The principal problem with generating the query method straight from the <code>@NamedQuery</code> annotation is that it doesn&#8217;t let us explicitly specify the return type or parameter list.
 In the case we just saw, Hibernate Processor does a reasonable job of inferring the query return type and parameter types, but we&#8217;re often going to need a bit more control.</p>
@@ -9850,7 +10085,7 @@ In this case there&#8217;s a lot less the Processor can do to check that the que
 </div>
 </div>
 <div class="sect2">
-<h3 id="static-or-instance">7.3. Generating query methods as instance methods</h3>
+<h3 id="static-or-instance">7.5. Generating query methods as instance methods</h3>
 <div class="paragraph">
 <p>One thing not to like about what we&#8217;ve just seen is that we can&#8217;t transparently replace a generated <code>static</code> function of the <code>Queries_</code> class with an improved handwritten implementation without impacting clients.
 Now, if our query is only called in one place, which is quite common, this isn&#8217;t going to be a big issue, and so we&#8217;re inclined to think the <code>static</code> function is fine.</p>
@@ -10006,7 +10241,7 @@ This approach is so flexible that we don&#8217;t even really know what to call t
 </div>
 </div>
 <div class="sect2">
-<h3 id="generated-finder-methods">7.4. Generated finder methods</h3>
+<h3 id="generated-finder-methods">7.6. Generated finder methods</h3>
 <div class="paragraph">
 <p>At this point, one usually begins to question whether it&#8217;s even necessary to write a query at all.
 Would it be possible to just infer the query from the method signature?</p>
@@ -10185,7 +10420,7 @@ For example, <code>Range.pattern()</code> constructs a <code>Range</code> repres
 </div>
 </div>
 <div class="sect2">
-<h3 id="paging-and-ordering">7.5. Paging, ordering, and restrictions</h3>
+<h3 id="paging-and-ordering">7.7. Paging, ordering, and restrictions</h3>
 <div class="paragraph">
 <p>Optionally, a query method&#8212;&#8203;or a finder method which returns multiple results&#8212;&#8203;may have additional "magic" parameters which do not map to query parameters:</p>
 </div>
@@ -10299,7 +10534,7 @@ We&#8217;ll see <a href="#return-query-from-method-example">below</a> that it&#8
 </div>
 </div>
 <div class="sect2">
-<h3 id="key-based-paging">7.6. Key-based pagination</h3>
+<h3 id="key-based-paging">7.8. Key-based pagination</h3>
 <div class="paragraph">
 <p>A generated query or finder method can make use of <a href="#key-based-pagination">key-based pagination</a>.</p>
 </div>
@@ -10346,7 +10581,7 @@ We&#8217;ll see <a href="#return-query-from-method-example">below</a> that it&#8
 </div>
 </div>
 <div class="sect2">
-<h3 id="return-types">7.7. Query and finder method return types</h3>
+<h3 id="return-types">7.9. Query and finder method return types</h3>
 <div class="paragraph">
 <p>A query method doesn&#8217;t need to return <code>List</code>.
 It might return a single <code>Book</code>.</p>
@@ -10458,7 +10693,7 @@ A finder method must return an entity type like <code>Book</code>, or a list of 
 </div>
 </div>
 <div class="sect2">
-<h3 id="query-validator">7.8. An alternative approach</h3>
+<h3 id="query-validator">7.10. An alternative approach</h3>
 <div class="paragraph">
 <p>What if you just don&#8217;t like the ideas we&#8217;ve presented in this chapter, preferring to call the <code>Session</code> or <code>EntityManager</code> directly, but you still want compile-time validation for HQL?
 Or what if you <em>do</em> like the ideas, but you&#8217;re working on a huge existing codebase full of code you don&#8217;t want to change?</p>
@@ -13054,11 +13289,11 @@ Within a given session, our data is automatically filtered so that only rows tag
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate.tenant_identifier_resolver</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/cfg/MultiTenancySettings.html#MULTI_TENANT_IDENTIFIER_RESOLVER"><code>hibernate.tenant_identifier_resolver</code></a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the <code>CurrentTenantIdentifierResolver</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate.multi_tenant_connection_provider</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/cfg/MultiTenancySettings.html#MULTI_TENANT_CONNECTION_PROVIDER"><code>hibernate.multi_tenant_connection_provider</code></a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the <code>MultiTenantConnectionProvider</code></p></td>
 </tr>
 </tbody>
@@ -13324,7 +13559,7 @@ So let&#8217;s drop down a layer, and see how that works.</p>
 <td class="content">
 <div class="paragraph">
 <p>These APIs were new in Hibernate 6, and supersede the classic <code>IdentifierGenerator</code> interface and <code>@GenericGenerator</code> annotation from older versions of Hibernate.
-However, the older APIs are still available and custom <code>IdentifierGenerator</code>s written for older versions of Hibernate continue to work in Hibernate 6.</p>
+However, the older APIs are still available and custom <code>IdentifierGenerator</code>s written for older versions of Hibernate continue to work in Hibernate 7.</p>
 </div>
 </td>
 </tr>
@@ -13349,32 +13584,32 @@ However, the older APIs are still available and custom <code>IdentifierGenerator
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@Generated</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/annotations/Generated.html"><code>@Generated</code></a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>GeneratedGeneration</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Generically handles database-generated values</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@GeneratedColumn</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/annotations/GeneratedColumn.html"><code>@GeneratedColumn</code></a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>GeneratedAlwaysGeneration</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Handles values generated using <code>generated always</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@CurrentTimestamp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/annotations/CurrentTimestamp.html"><code>@CurrentTimestamp</code></a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>CurrentTimestampGeneration</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Generic support for database or in-memory generation of creation or update timestamps</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@CreationTimestamp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/annotations/CreationTimestamp.html"><code>@CreationTimestamp</code></a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>CurrentTimestampGeneration</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">A timestamp generated when an entity is first made persistent</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@UpdateTimestamp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/annotations/UpdateTimestamp.html"><code>@UpdateTimestamp</code></a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>CurrentTimestampGeneration</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">A timestamp generated when an entity is made persistent, and regenerated every time the entity is modified</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@UuidGenerator</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/annotations/UuidGenerator.html"><code>@UuidGenerator</code></a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>UuidGenerator</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">A more flexible generator for RFC 4122 UUIDs</p></td>
 </tr>
@@ -13545,11 +13780,11 @@ We bet you could easily come up with a much better <code>ImplicitNamingStrategy<
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate.implicit_naming_strategy</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/cfg/MappingSettings.html#IMPLICIT_NAMING_STRATEGY"><code>hibernate.implicit_naming_strategy</code></a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the <code>ImplicitNamingStrategy</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hibernate.physical_naming_strategy</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/cfg/MappingSettings.html#PHYSICAL_NAMING_STRATEGY"><code>hibernate.physical_naming_strategy</code></a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the <code>PhysicalNamingStrategy</code></p></td>
 </tr>
 </tbody>
@@ -14166,7 +14401,7 @@ Check constraints and foreign key constraints can help ensure that a row never c
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="groovy"><span class="n">plugins</span> <span class="o">{</span>
-    <span class="n">id</span> <span class="s2">"org.hibernate.orm"</span> <span class="n">version</span> <span class="s2">"7.0.0.CR1"</span>
+    <span class="n">id</span> <span class="s2">"org.hibernate.orm"</span> <span class="n">version</span> <span class="s2">"7.0.10.Final"</span>
 <span class="o">}</span>
 
 <span class="n">hibernate</span> <span class="o">{</span> <span class="n">enhancement</span> <span class="o">}</span></code></pre>
@@ -14407,12 +14642,20 @@ But the format of this annotation is <em>even worse</em> than <code>@FetchProfil
 </tbody>
 </table>
 <div class="paragraph">
-<p>A fetch profile must be explicitly enabled for a given session by calling <a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/Session.html#enableFetchProfile(java.lang.String)"><code>enableFetchProfile()</code></a>:</p>
+<p>A fetch profile must be explicitly enabled for a given session by passing the name of the profile to <a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/Session.html#enableFetchProfile(java.lang.String)"><code>enableFetchProfile()</code></a>:</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="java"><span class="n">session</span><span class="o">.</span><span class="na">enableFetchProfile</span><span class="o">(</span><span class="n">Book_</span><span class="o">.</span><span class="na">PROFILE_EAGER_BOOK</span><span class="o">);</span>
 <span class="nc">Book</span> <span class="n">eagerBook</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">find</span><span class="o">(</span><span class="nc">Book</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">bookId</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Alternatively, an instance of <a href="https://docs.jboss.org/hibernate/orm/7.0/javadocs/org/hibernate/EnabledFetchProfile.html"><code>EnabledFetchProfile</code></a> may be obtained in a type safe way from the static metamodel, and used as a <code>FindOption</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nc">Book</span> <span class="n">eagerBook</span> <span class="o">=</span> <span class="n">entityManager</span><span class="o">.</span><span class="na">find</span><span class="o">(</span><span class="nc">Book</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">bookId</span><span class="o">,</span> <span class="n">Book_</span><span class="o">.</span><span class="na">_EagerBook</span><span class="o">);</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -14475,8 +14718,8 @@ And in principle it even helps partially mitigate the <a href="#lazy-problem">pr
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 7.0.0.CR1<br>
-Last updated 2025-04-24 19:31:08 UTC
+Version 7.0.10.Final<br>
+Last updated 2025-08-10 00:01:18 UTC
 </div>
 </div>
 </body>

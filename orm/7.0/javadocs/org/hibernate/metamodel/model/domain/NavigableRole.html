@@ -81,7 +81,8 @@ loadScripts(document, 'script');</script>
 <dd><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></code>, <code><a href="../../../spi/DotIdentifierSequence.html" title="interface in org.hibernate.spi">DotIdentifierSequence</a></code></dd>
 </dl>
 <hr>
-<div class="type-signature"><span class="modifiers">public final class </span><span class="element-name type-name-label">NavigableRole</span>
+<div class="type-signature"><span class="annotations"><a href="../../../Incubating.html" title="annotation interface in org.hibernate">@Incubating</a>
+</span><span class="modifiers">public final class </span><span class="element-name type-name-label">NavigableRole</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>
 implements <a href="../../../spi/DotIdentifierSequence.html" title="interface in org.hibernate.spi">DotIdentifierSequence</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a></span></div>
 <div class="block">A compound path which represents a <a href="../../mapping/ModelPart.html" title="interface in org.hibernate.metamodel.mapping"><code>ModelPart</code></a>
@@ -89,7 +90,7 @@ implements <a href="../../../spi/DotIdentifierSequence.html" title="interface in
  <p/>
  The <a href="../../../spi/DotIdentifierSequence.html#isRoot()">root</a> will name either an
  <a href="../../MappingMetamodel.html#getEntityDescriptor(java.lang.String)">entity</a> or
- <a href="../../MappingMetamodel.html#getCollectionDescriptor(java.lang.String)">collection</a></div>
+ <a href="../../MappingMetamodel.html#getCollectionDescriptor(java.lang.String)">collection</a>.</div>
 <dl class="notes">
 <dt>See Also:</dt>
 <dd>
@@ -98,7 +99,8 @@ implements <a href="../../../spi/DotIdentifierSequence.html" title="interface in
 </ul>
 </dd>
 <dt>API Note:</dt>
-<dd>Poorly named. Should probably have been `org.hibernate.metamodel.model.mapping.MappingRole`;
+<dd>This is an incubating SPI type, and will move to <a href="../../../spi/package-summary.html"><code>org.hibernate.spi</code></a>.
+ It might be renamed to <code>org.hibernate.metamodel.model.mapping.MappingRole</code>;
  the term "navigable" here is meant to indicate that we could navigate to the specific
  <a href="../../mapping/ModelPart.html" title="interface in org.hibernate.metamodel.mapping"><code>ModelPart</code></a> given the role.</dd>
 </dl>
@@ -162,10 +164,13 @@ implements <a href="../../../spi/DotIdentifierSequence.html" title="interface in
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="NavigableRole.html" title="class in org.hibernate.metamodel.model.domain">NavigableRole</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#appendContainer(java.lang.String)" class="member-name-link">appendContainer</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Uses `#` as the separator rather than `.`.</div>
+<div class="block">Uses <code>#</code> as the separator rather than a period,
+ the intention being that the incoming name is a
+ <a href="../../mapping/ModelPartContainer.html" title="interface in org.hibernate.metamodel.mapping"><code>ModelPartContainer</code></a>
+ of some sort.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#equals(java.lang.Object)" class="member-name-link">equals</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;o)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#equals(java.lang.Object)" class="member-name-link">equals</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;object)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getFullPath()" class="member-name-link">getFullPath</a>()</code></div>
@@ -288,10 +293,10 @@ implements <a href="../../../spi/DotIdentifierSequence.html" title="interface in
 <section class="detail" id="appendContainer(java.lang.String)">
 <h3>appendContainer</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="NavigableRole.html" title="class in org.hibernate.metamodel.model.domain">NavigableRole</a></span>&nbsp;<span class="element-name">appendContainer</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</span></div>
-<div class="block">Uses `#` as the separator rather than `.`.  The intention being that the incoming name is a
- <a href="../../mapping/ModelPartContainer.html" title="interface in org.hibernate.metamodel.mapping"><code>ModelPartContainer</code></a> of some sort
-
- todo (6.0) : better name?</div>
+<div class="block">Uses <code>#</code> as the separator rather than a period,
+ the intention being that the incoming name is a
+ <a href="../../mapping/ModelPartContainer.html" title="interface in org.hibernate.metamodel.mapping"><code>ModelPartContainer</code></a>
+ of some sort.</div>
 </section>
 </li>
 <li>
@@ -358,7 +363,7 @@ implements <a href="../../../spi/DotIdentifierSequence.html" title="interface in
 <li>
 <section class="detail" id="equals(java.lang.Object)">
 <h3>equals</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">equals</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;o)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">equals</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;object)</span></div>
 <dl class="notes">
 <dt>Overrides:</dt>
 <dd><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="class or interface in java.lang" class="external-link">equals</a></code>&nbsp;in class&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></code></dd>

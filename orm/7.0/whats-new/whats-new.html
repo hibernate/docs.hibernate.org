@@ -14,7 +14,7 @@
 <div id="header">
 <h1>What&#8217;s New in 7.0</h1>
 <div class="details">
-<span id="revnumber">version 7.0.0.CR1</span>
+<span id="revnumber">version 7.0.10.Final</span>
 </div>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
@@ -26,9 +26,11 @@
 <li><a href="#soft-delete-timestamp">@SoftDelete with TIMESTAMP</a></li>
 <li><a href="#embedded-column-naming">@EmbeddedColumnNaming</a></li>
 <li><a href="#NamedEntityGraph">@NamedEntityGraph</a></li>
-<li><a href="#session-find-multiple">findMultiple()</a></li>
-<li><a href="#QuerySpecification">QuerySpecification</a></li>
+<li><a href="#session-find-multiple">findMultiple() and getMultiple()</a></li>
+<li><a href="#operation-options">FindOption, LockOption, RefreshOption</a></li>
+<li><a href="#QuerySpecification">QuerySpecification, Restriction, and Range</a></li>
 <li><a href="#session-managed-entities">Direct access to first-level cache</a></li>
+<li><a href="#metamode-param-binding">Use of metamodel in query parameter binding</a></li>
 <li><a href="#enum-checks">Converted Enums and Check Constraints</a></li>
 <li><a href="#json-xml-functions">JSON and XML functions</a></li>
 <li><a href="#set-returning-functions">Set-returning Functions</a></li>
@@ -37,6 +39,7 @@
 <li><a href="#stateless-session-cache">StatelessSession and Second Level Cache</a></li>
 <li><a href="#stateless-session-jdbc-batching">StatelessSession and JDBC Batching</a></li>
 <li><a href="#transaction-api">Improvements to Transaction</a></li>
+<li><a href="#collection-id-java-class">@CollectionIdJavaClass</a></li>
 <li><a href="#schema-manager-populate">Data population</a></li>
 <li><a href="#xml-mapping">XML mappings</a></li>
 </ul>
@@ -206,16 +209,128 @@ specifying a named entity-graph using Hibernate&#8217;s ability to parse a strin
 </div>
 </div>
 <div class="sect1">
-<h2 id="session-find-multiple">findMultiple()</h2>
+<h2 id="session-find-multiple">findMultiple() and getMultiple()</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The new operation <code>Session.findMultiple()</code> provides a convenient way to fetch a batch of entities by id.
+<p>The new operations <code>Session.findMultiple()</code> and <code>StatelessSession.getMultiple()</code> provide a convenient way to fetch a batch of entities by id.
 Combined with the <code>BatchSize</code> option, allows breaking up the JDBC calls into "batches".</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="QuerySpecification">QuerySpecification</h2>
+<h2 id="operation-options">FindOption, LockOption, RefreshOption</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>As a more typesafe replacement for hints, Jakarta Persistence now allows for "option objects" which indicate these hints.  Not only is it more typesafe, but also more concise - a double win!</p>
+</div>
+<div class="paragraph">
+<p>These "option objects" come in 3 flavors depending on what operation is being performed -</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">FindOption</dt>
+<dd>
+<p>Used to indicate options for find operations :</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>Session.find</code></p>
+</li>
+<li>
+<p><code>Session.findMultiple</code></p>
+</li>
+<li>
+<p>etc</p>
+</li>
+</ul>
+</div>
+</dd>
+<dt class="hdlist1">LockOption</dt>
+<dd>
+<p>Used to indicate options for <code>Session.lock</code></p>
+</dd>
+<dt class="hdlist1">RefreshOption</dt>
+<dd>
+<p>Used to indicate options for <code>Session.refresh</code></p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>Each of these are interfaces.  Jakarta Persistence does provide some built-in options:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">CacheRetrieveMode</dt>
+<dd>
+<p>Is now a <code>FindOption</code>.</p>
+</dd>
+<dt class="hdlist1">CacheStoreMode</dt>
+<dd>
+<p>Is now a <code>FindOption</code> and a <code>RefreshOption</code>.</p>
+</dd>
+<dt class="hdlist1">LockModeType</dt>
+<dd>
+<p>Is now a <code>FindOption</code> and a <code>RefreshOption</code>.</p>
+</dd>
+<dt class="hdlist1">Timeout (new)</dt>
+<dd>
+<p>Is a <code>FindOption</code>, a <code>RefreshOption</code> and a <code>LockOption</code>.  See also <code>org.hibernate.Timeouts</code> for some magic values.</p>
+</dd>
+<dt class="hdlist1">PessimisticLockScope</dt>
+<dd>
+<p>Is now a <code>FindOption</code>, a <code>RefreshOption</code> and a <code>LockOption</code></p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>Hibernate provides a few additional options:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">ReadOnlyMode (new)</dt>
+<dd>
+<p>Is a <code>FindOption</code> which indicates whether the entities and collections being loaded should be considered read-only.</p>
+</dd>
+<dt class="hdlist1">EnabledFetchProfile (new)</dt>
+<dd>
+<p>Is a <code>FindOption</code> indicating a fetch-profile to be enabled for the find operation.</p>
+</dd>
+<dt class="hdlist1">LockMode</dt>
+<dd>
+<p>Is now a <code>FindOption</code> and a <code>RefreshOption</code> (expanded version of JPA&#8217;s <code>LockModeType</code>).</p>
+</dd>
+<dt class="hdlist1">CacheMode</dt>
+<dd>
+<p>Is now a <code>FindOption</code>.</p>
+</dd>
+<dt class="hdlist1">BatchSize (new)</dt>
+<dd>
+<p>Is now a <code>FindOption</code>.</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>All operations which accept options (which previously accepted hints) accept a varargs grouping of them.  E.g.</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nc">Book</span> <span class="n">loaded</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">find</span><span class="o">(</span>
+    <span class="nc">Book</span><span class="o">.</span><span class="na">class</span><span class="o">,</span>
+    <span class="mi">1</span><span class="o">,</span>
+    <span class="nc">LockMode</span><span class="o">.</span><span class="na">PESSIMISTIC_WRITE</span><span class="o">,</span>
+    <span class="nc">Timeouts</span><span class="o">.</span><span class="na">NO_WAIT</span><span class="o">,</span>
+    <span class="k">new</span> <span class="nf">EnabledFetchProfile</span><span class="o">(</span><span class="s">"with-authors"</span><span class="o">)</span>
+<span class="o">);</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="QuerySpecification">QuerySpecification, Restriction, and Range</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>A new API has been added for incremental definition of a query, with support for selections -</p>
@@ -297,6 +412,21 @@ Combined with the <code>BatchSize</code> option, allows breaking up the JDBC cal
 </td>
 </tr>
 </table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="metamode-param-binding">Use of metamodel in query parameter binding</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When an argument to a query parameter is of ambiguous type, the static metamodel may now be used to disambiguate.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="n">session</span><span class="o">.</span><span class="na">createSelectionQuery</span><span class="o">(</span><span class="s">"from Thing where uniqueKey = ?1"</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">setParameter</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="n">key</span><span class="o">,</span> <span class="n">Thing_</span><span class="o">.</span><span class="na">uniqueKey</span><span class="o">.</span><span class="na">getType</span><span class="o">())</span>
+        <span class="o">.</span><span class="na">getSingleResult</span><span class="o">();</span></code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -475,6 +605,26 @@ New operations were added to the <code>Transaction</code> interface, allowing co
 </div>
 </div>
 <div class="sect1">
+<h2 id="collection-id-java-class">@CollectionIdJavaClass</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>@CollectionIdJavaClass</code> is an alternative to <code>@CollectionIdJavaType</code> for simpler cases of id-bag mappings.  E.g.</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Bag</span>
+<span class="nd">@CollectionId</span><span class="o">(</span><span class="n">generator</span><span class="o">=</span><span class="s">"increment"</span><span class="o">)</span>
+<span class="nd">@CollectionIdJavaClass</span><span class="o">(</span><span class="nc">Integer</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+<span class="nc">Collection</span><span class="o">&lt;</span><span class="nc">Person</span><span class="o">&gt;</span> <span class="n">authors</span><span class="o">;</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="schema-manager-populate">Data population</h2>
 <div class="sectionbody">
 <div class="paragraph">
@@ -498,8 +648,8 @@ Support for <code>hbm.xml</code> mappings will be removed in 8.0.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 7.0.0.CR1<br>
-Last updated 2025-04-24 19:38:40 UTC
+Version 7.0.10.Final<br>
+Last updated 2025-08-10 00:17:43 UTC
 </div>
 </div>
 </body>

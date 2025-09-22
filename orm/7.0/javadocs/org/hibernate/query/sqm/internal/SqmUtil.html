@@ -175,7 +175,10 @@ A&gt;&nbsp;<a href="../tree/from/SqmAttributeJoin.html" title="interface in org.
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isResultTypeAlwaysAllowed(java.lang.Class)" class="member-name-link">isResultTypeAlwaysAllowed</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;expectedResultClass)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Any query result can be represented as a <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Tuple.html" title="class or interface in jakarta.persistence" class="external-link"><code>Tuple</code></a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link"><code>List</code></a>, or <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link"><code>Map</code></a>,
+ simply by repackaging the result tuple.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isSelect(org.hibernate.query.sqm.tree.SqmStatement)" class="member-name-link">isSelect</a><wbr>(<a href="../tree/SqmStatement.html" title="interface in org.hibernate.query.sqm.tree">SqmStatement</a>&lt;?&gt;&nbsp;sqm)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
@@ -220,8 +223,8 @@ A&gt;&nbsp;<a href="../tree/from/SqmAttributeJoin.html" title="interface in org.
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;hqlString)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>protected static void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#verifyResultType(java.lang.Class,org.hibernate.query.sqm.SqmExpressible)" class="member-name-link">verifyResultType</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;resultClass,
- @Nullable <a href="../SqmExpressible.html" title="interface in org.hibernate.query.sqm">SqmExpressible</a>&lt;?&gt;&nbsp;selectionExpressible)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#verifyResultType(java.lang.Class,org.hibernate.query.sqm.tree.select.SqmSelectableNode)" class="member-name-link">verifyResultType</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;resultClass,
+ <a href="../tree/select/SqmSelectableNode.html" title="interface in org.hibernate.query.sqm.tree.select">SqmSelectableNode</a>&lt;?&gt;&nbsp;selectableNode)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
@@ -451,13 +454,25 @@ A&gt;</span>&nbsp;<span class="return-type"><a href="../tree/from/SqmAttributeJo
 <section class="detail" id="isResultTypeAlwaysAllowed(java.lang.Class)">
 <h3>isResultTypeAlwaysAllowed</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isResultTypeAlwaysAllowed</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;expectedResultClass)</span></div>
+<div class="block">Any query result can be represented as a <a href="https://jakarta.ee/specifications/platform/11/apidocs/jakarta/persistence/Tuple.html" title="class or interface in jakarta.persistence" class="external-link"><code>Tuple</code></a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link"><code>List</code></a>, or <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link"><code>Map</code></a>,
+ simply by repackaging the result tuple. Also, any query result is assignable to
+ <code>Object</code>, or can be returned as an instance of <code>Object[]</code>.</div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list-long">
+<li><a href="ConcreteSqmSelectQueryPlan.html#determineRowTransformer(org.hibernate.query.sqm.tree.select.SqmSelectStatement,java.lang.Class,org.hibernate.sql.results.internal.TupleMetadata,org.hibernate.query.spi.QueryOptions)"><code>ConcreteSqmSelectQueryPlan.determineRowTransformer(org.hibernate.query.sqm.tree.select.SqmSelectStatement&lt;?&gt;, java.lang.Class&lt;T&gt;, org.hibernate.sql.results.internal.TupleMetadata, org.hibernate.query.spi.QueryOptions)</code></a></li>
+<li><a href="../../sql/internal/NativeQueryImpl.html#determineTupleTransformerForResultType(java.lang.Class)"><code>NativeQueryImpl.determineTupleTransformerForResultType(java.lang.Class&lt;?&gt;)</code></a></li>
+</ul>
+</dd>
+</dl>
 </section>
 </li>
 <li>
-<section class="detail" id="verifyResultType(java.lang.Class,org.hibernate.query.sqm.SqmExpressible)">
+<section class="detail" id="verifyResultType(java.lang.Class,org.hibernate.query.sqm.tree.select.SqmSelectableNode)">
 <h3>verifyResultType</h3>
 <div class="member-signature"><span class="modifiers">protected static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">verifyResultType</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="class or interface in java.lang" class="external-link">Class</a>&lt;?&gt;&nbsp;resultClass,
- @Nullable <a href="../SqmExpressible.html" title="interface in org.hibernate.query.sqm">SqmExpressible</a>&lt;?&gt;&nbsp;selectionExpressible)</span></div>
+ <a href="../tree/select/SqmSelectableNode.html" title="interface in org.hibernate.query.sqm.tree.select">SqmSelectableNode</a>&lt;?&gt;&nbsp;selectableNode)</span></div>
 </section>
 </li>
 </ul>
