@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"org.hibernate.infra.develocity"},{"l":"org.hibernate.infra.develocity.normalization"},{"l":"org.hibernate.infra.develocity.plugins"},{"l":"org.hibernate.infra.develocity.scan"},{"l":"org.hibernate.infra.develocity.util"}];updateSearchResults();
