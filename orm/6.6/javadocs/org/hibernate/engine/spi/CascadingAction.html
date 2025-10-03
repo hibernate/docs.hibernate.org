@@ -27,7 +27,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":6,"i1":6,"i2":6,"i3":50,"i4":6,"i5":50};
+var data = {"i0":6,"i1":6,"i2":18,"i3":6,"i4":50,"i5":6,"i6":50};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],4:["t3","Abstract Methods"],16:["t5","Default Methods"],32:["t6","Deprecated Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -124,6 +124,10 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <ul class="blockList">
 <li class="blockList">
 <dl>
+<dt><span class="paramLabel">Type Parameters:</span></dt>
+<dd><code>T</code> - The type of some context propagated with the cascading action</dd>
+</dl>
+<dl>
 <dt>All Known Implementing Classes:</dt>
 <dd><code><a href="CascadingActions.BaseCascadingAction.html" title="class in org.hibernate.engine.spi">CascadingActions.BaseCascadingAction</a></code></dd>
 </dl>
@@ -169,6 +173,14 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </td>
 </tr>
 <tr id="i2" class="altColor">
+<td class="colFirst"><code>default @Nullable <a href="../../type/ForeignKeyDirection.html" title="enum in org.hibernate.type">ForeignKeyDirection</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#directionAffectedByCascadeDelete()">directionAffectedByCascadeDelete</a></span>()</code></th>
+<td class="colLast">
+<div class="block">The cascade direction in which we care whether the foreign key is declared with
+ <a href="../../annotations/OnDeleteAction.html#CASCADE"><code>on delete cascade</code></a>.</div>
+</td>
+</tr>
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Iterator.html?is-external=true" title="class or interface in java.util" class="externalLink">Iterator</a>&lt;?&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getCascadableChildrenIterator(org.hibernate.event.spi.EventSource,org.hibernate.type.CollectionType,java.lang.Object)">getCascadableChildrenIterator</a></span>&#8203;(<a href="../../event/spi/EventSource.html" title="interface in org.hibernate.event.spi">EventSource</a>&nbsp;session,
                              <a href="../../type/CollectionType.html" title="class in org.hibernate.type">CollectionType</a>&nbsp;collectionType,
@@ -178,7 +190,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
  current cascading action should be visited.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>default void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#noCascade(org.hibernate.event.spi.EventSource,java.lang.Object,org.hibernate.persister.entity.EntityPersister,org.hibernate.type.Type,int)">noCascade</a></span>&#8203;(<a href="../../event/spi/EventSource.html" title="interface in org.hibernate.event.spi">EventSource</a>&nbsp;session,
          <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">Object</a>&nbsp;parent,
@@ -191,14 +203,14 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#performOnLazyProperty()">performOnLazyProperty</a></span>()</code></th>
 <td class="colLast">
 <div class="block">Should this action be performed (or noCascade consulted) in the case of lazy properties.</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>default boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#requiresNoCascadeChecking()">requiresNoCascadeChecking</a></span>()</code></th>
 <td class="colLast">
@@ -243,10 +255,9 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>session</code> - The session within which the cascade is occurring.</dd>
 <dd><code>child</code> - The child to which cascading should be performed.</dd>
-<dd><code>entityName</code> - The child's entity name</dd>
-<dd><code>anything</code> - Anything ;)  Typically some form of cascade-local cache
- which is specific to each CascadingAction type</dd>
-<dd><code>isCascadeDeleteEnabled</code> - Are cascading deletes enabled.</dd>
+<dd><code>anything</code> - Some context specific to the kind of <a href="CascadingAction.html" title="interface in org.hibernate.engine.spi"><code>CascadingAction</code></a></dd>
+<dd><code>isCascadeDeleteEnabled</code> - Whether the foreign key is declared with
+        <a href="../../annotations/OnDeleteAction.html#CASCADE"><code>on delete cascade</code></a>.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../HibernateException.html" title="class in org.hibernate">HibernateException</a></code></dd>
 </dl>
@@ -337,11 +348,29 @@ default&nbsp;void&nbsp;noCascade&#8203;(<a href="../../event/spi/EventSource.htm
 <a id="performOnLazyProperty()">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>performOnLazyProperty</h4>
 <pre class="methodSignature">boolean&nbsp;performOnLazyProperty()</pre>
 <div class="block">Should this action be performed (or noCascade consulted) in the case of lazy properties.</div>
+</li>
+</ul>
+<a id="directionAffectedByCascadeDelete()">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>directionAffectedByCascadeDelete</h4>
+<pre class="methodSignature"><a href="../../Incubating.html" title="annotation in org.hibernate">@Incubating</a>
+default&nbsp;@Nullable <a href="../../type/ForeignKeyDirection.html" title="enum in org.hibernate.type">ForeignKeyDirection</a>&nbsp;directionAffectedByCascadeDelete()</pre>
+<div class="block">The cascade direction in which we care whether the foreign key is declared with
+ <a href="../../annotations/OnDeleteAction.html#CASCADE"><code>on delete cascade</code></a>.</div>
+<dl>
+<dt><span class="simpleTagLabel">API Note:</span></dt>
+<dd>This allows us to reuse the long-existing boolean parameter of
+          <a href="#cascade(org.hibernate.event.spi.EventSource,java.lang.Object,java.lang.String,T,boolean)"><code>cascade(EventSource, Object, String, Object, boolean)</code></a>
+          for multiple purposes.</dd>
+</dl>
 </li>
 </ul>
 </li>

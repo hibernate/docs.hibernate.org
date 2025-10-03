@@ -121,9 +121,32 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 public @interface <span class="memberNameLabel">OnDelete</span></pre>
 <div class="block">Specifies an <code>on delete</code> action for a foreign key constraint.
  The most common usage is <code>@OnDelete(action = CASCADE)</code>.
+ <pre>
+ &#064;ManyToOne
+ &#064;OnDelete(action = CASCADE)
+ Parent parent;
+ </pre>
  Note that this results in an <code>on delete cascade</code> clause in
  the DDL definition of the foreign key. It's completely different
  to <a href="https://jakarta.ee/specifications/platform/9/apidocs/jakarta/persistence/CascadeType.html?is-external=true#REMOVE" title="class or interface in jakarta.persistence" class="externalLink"><code>CascadeType.REMOVE</code></a>.
+ <p>
+ In fact, <code>@OnDelete</code> may be combined with <code>cascade=REMOVE</code>.
+ <pre>
+ &#064;ManyToOne(cascade = REMOVE)
+ &#064;OnDelete(action = CASCADE)
+ Parent parent;
+ </pre>
+ <ul>
+ <li>If <code>@OnDelete(action = CASCADE)</code> is used in conjunction
+     with <code>cascade=REMOVE</code>, then associated entities are fetched
+     from the database, marked deleted in the persistence context,
+     and evicted from the second-level cache.
+ <li>If <code>@OnDelete(action = CASCADE)</code> is used on its own,
+     <em>without</em> <code>cascade=REMOVE</code>, then associated
+     entities are not fetched from the database, are not marked
+     deleted in the persistence context, and are not automatically
+     evicted from the second-level cache.
+ </ul>
  <p>
  Like database triggers, <code>on delete</code> actions can cause state
  held in memory to lose synchronization with the database.</div>

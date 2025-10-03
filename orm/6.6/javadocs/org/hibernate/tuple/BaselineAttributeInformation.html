@@ -27,7 +27,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":42,"i1":42,"i2":42,"i3":42,"i4":42,"i5":42,"i6":42,"i7":42};
+var data = {"i0":42,"i1":42,"i2":42,"i3":42,"i4":42,"i5":42,"i6":42,"i7":42,"i8":42};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"],32:["t6","Deprecated Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -184,13 +184,14 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr class="altColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(boolean,boolean,boolean,boolean,boolean,boolean,org.hibernate.engine.spi.CascadeStyle,org.hibernate.FetchMode)">BaselineAttributeInformation</a></span>&#8203;(boolean&nbsp;lazy,
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(boolean,boolean,boolean,boolean,boolean,boolean,org.hibernate.engine.spi.CascadeStyle,org.hibernate.annotations.OnDeleteAction,org.hibernate.FetchMode)">BaselineAttributeInformation</a></span>&#8203;(boolean&nbsp;lazy,
                             boolean&nbsp;insertable,
                             boolean&nbsp;updateable,
                             boolean&nbsp;nullable,
                             boolean&nbsp;dirtyCheckable,
                             boolean&nbsp;versionable,
                             <a href="../engine/spi/CascadeStyle.html" title="interface in org.hibernate.engine.spi">CascadeStyle</a>&nbsp;cascadeStyle,
+                            <a href="../annotations/OnDeleteAction.html" title="enum in org.hibernate.annotations">OnDeleteAction</a>&nbsp;onDeleteAction,
                             <a href="../FetchMode.html" title="enum in org.hibernate">FetchMode</a>&nbsp;fetchMode)</code></th>
 <td class="colLast">
 <div class="block"><span class="deprecatedLabel">Deprecated, for removal: This API element is subject to removal in a future version.</span></div>
@@ -229,41 +230,48 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 &nbsp;</td>
 </tr>
 <tr id="i2" class="altColor">
-<td class="colFirst"><code>boolean</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isDirtyCheckable()">isDirtyCheckable</a></span>()</code></th>
+<td class="colFirst"><code><a href="../annotations/OnDeleteAction.html" title="enum in org.hibernate.annotations">OnDeleteAction</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getOnDeleteAction()">getOnDeleteAction</a></span>()</code></th>
 <td class="colLast">
 <div class="block"><span class="deprecatedLabel">Deprecated, for removal: This API element is subject to removal in a future version.</span></div>
 &nbsp;</td>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isInsertable()">isInsertable</a></span>()</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isDirtyCheckable()">isDirtyCheckable</a></span>()</code></th>
 <td class="colLast">
 <div class="block"><span class="deprecatedLabel">Deprecated, for removal: This API element is subject to removal in a future version.</span></div>
 &nbsp;</td>
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isLazy()">isLazy</a></span>()</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isInsertable()">isInsertable</a></span>()</code></th>
 <td class="colLast">
 <div class="block"><span class="deprecatedLabel">Deprecated, for removal: This API element is subject to removal in a future version.</span></div>
 &nbsp;</td>
 </tr>
 <tr id="i5" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isNullable()">isNullable</a></span>()</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isLazy()">isLazy</a></span>()</code></th>
 <td class="colLast">
 <div class="block"><span class="deprecatedLabel">Deprecated, for removal: This API element is subject to removal in a future version.</span></div>
 &nbsp;</td>
 </tr>
 <tr id="i6" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isUpdateable()">isUpdateable</a></span>()</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isNullable()">isNullable</a></span>()</code></th>
 <td class="colLast">
 <div class="block"><span class="deprecatedLabel">Deprecated, for removal: This API element is subject to removal in a future version.</span></div>
 &nbsp;</td>
 </tr>
 <tr id="i7" class="rowColor">
+<td class="colFirst"><code>boolean</code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isUpdateable()">isUpdateable</a></span>()</code></th>
+<td class="colLast">
+<div class="block"><span class="deprecatedLabel">Deprecated, for removal: This API element is subject to removal in a future version.</span></div>
+&nbsp;</td>
+</tr>
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#isVersionable()">isVersionable</a></span>()</code></th>
 <td class="colLast">
@@ -294,7 +302,7 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a id="&lt;init&gt;(boolean,boolean,boolean,boolean,boolean,boolean,org.hibernate.engine.spi.CascadeStyle,org.hibernate.FetchMode)">
+<a id="&lt;init&gt;(boolean,boolean,boolean,boolean,boolean,boolean,org.hibernate.engine.spi.CascadeStyle,org.hibernate.annotations.OnDeleteAction,org.hibernate.FetchMode)">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -307,6 +315,7 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
                                     boolean&nbsp;dirtyCheckable,
                                     boolean&nbsp;versionable,
                                     <a href="../engine/spi/CascadeStyle.html" title="interface in org.hibernate.engine.spi">CascadeStyle</a>&nbsp;cascadeStyle,
+                                    <a href="../annotations/OnDeleteAction.html" title="enum in org.hibernate.annotations">OnDeleteAction</a>&nbsp;onDeleteAction,
                                     <a href="../FetchMode.html" title="enum in org.hibernate">FetchMode</a>&nbsp;fetchMode)</pre>
 <div class="deprecationBlock"><span class="deprecatedLabel">Deprecated, for removal: This API element is subject to removal in a future version.</span></div>
 </li>
@@ -394,10 +403,20 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 <a id="getFetchMode()">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>getFetchMode</h4>
 <pre class="methodSignature">public&nbsp;<a href="../FetchMode.html" title="enum in org.hibernate">FetchMode</a>&nbsp;getFetchMode()</pre>
+<div class="deprecationBlock"><span class="deprecatedLabel">Deprecated, for removal: This API element is subject to removal in a future version.</span></div>
+</li>
+</ul>
+<a id="getOnDeleteAction()">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>getOnDeleteAction</h4>
+<pre class="methodSignature">public&nbsp;<a href="../annotations/OnDeleteAction.html" title="enum in org.hibernate.annotations">OnDeleteAction</a>&nbsp;getOnDeleteAction()</pre>
 <div class="deprecationBlock"><span class="deprecatedLabel">Deprecated, for removal: This API element is subject to removal in a future version.</span></div>
 </li>
 </ul>
